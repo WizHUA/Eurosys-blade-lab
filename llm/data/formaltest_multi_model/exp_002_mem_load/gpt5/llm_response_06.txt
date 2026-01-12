@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Abrupt memory surge and overcommit while job 276 (ft_cgC) was running: memory_active_anon jumped ~3.0 GiB and committed_as rose from ~7.5 GiB to ~10.9 GiB (> physical 7.7–7.8 GiB), with free memory dropping to ~0.53 GiB and memory_available to ~2.55 GiB around 07:04:28.",
+    "root_causes": "The job entered a memory-intensive phase, allocating large anonymous memory regions. With ~46.6% of swap already in use, the rise in anon memory and committed_as indicates aggressive allocation under Linux overcommit, increasing OOM risk if growth continues.",
+    "solutions": [
+      "Right-size the job’s memory request for future runs (e.g., Slurm --mem/--mem-per-cpu) based on the observed peak (~10.9 GiB committed vs ~7.8 GiB RAM).",
+      "Enforce cgroup memory limits (memory.high/memory.max via Slurm cgroup plugin) to prevent node-wide pressure and OOM.",
+      "Audit the application’s allocation behavior at ~07:04:28 (use pmap/smaps/smem during the same phase) and reduce problem size or optimize data structures if feasible.",
+      "Review kernel overcommit policy (vm.overcommit_memory/vm.overcommit_ratio) to align with workload needs and reduce excessive overcommit exposure."
+    ]
+  },
+  {
+    "anomaly": "Persistent high baseline swap usage (~1.0 GiB, ~46.6% of 2.0 GiB swap used) with negligible swap-in/out activity across the window.",
+    "root_causes": "Long-lived inactive pages likely remain swapped out from prior workloads or daemons. This reduces headroom for new allocations and, combined with the job’s memory spike, elevates risk of latency or OOM under further pressure.",
+    "solutions": [
+      "During a maintenance window, clear stale swap (swapoff -a && swapon -a) or reboot the node to restore full headroom.",
+      "Lower vm.swappiness (e.g., to 10–20) to discourage swapping for future workloads while monitoring performance.",
+      "Use Slurm memory/cgroup enforcement to avoid chronic swap residency by constraining jobs to requested memory.",
+      "Identify and retire or restart processes holding swapped pages (smem -sw, ps aux --sort=-rss) before admitting new memory-intensive jobs."
+    ]
+  }
+]

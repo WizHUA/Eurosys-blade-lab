@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "High CPU usage spikes and sustained system load during job execution",
+    "root_causes": "The CPU usage jump from 45% to 83% and load average increase to 4.88 indicates the FT job (CG variant) was computationally intensive",
+    "solutions": [
+      "Analyze job scheduling parameters to ensure proper core allocation",
+      "Profile the application to identify optimization opportunities",
+      "Consider adjusting the job's CPU frequency governor settings for better thermal management"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O operations with high write activity",
+    "root_causes": "Disk writes peaked at ~170MB/s with queue depths up to 9, suggesting heavy temporary file operations or checkpointing",
+    "solutions": [
+      "Verify if the job is properly utilizing available RAM before spilling to disk",
+      "Check if the scratch directory is correctly configured for optimal I/O performance",
+      "Consider increasing memory allocation if job is doing excessive swapping"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations during computation phases",
+    "root_causes": "Memory usage reached 78% with active anonymous memory consumption pattern typical of iterative solvers",
+    "solutions": [
+      "Monitor memory usage patterns across different phases of the CG algorithm",
+      "Verify proper MPI process pinning to NUMA nodes to optimize memory access",
+      "Consider adjusting process affinity settings to reduce cross-socket memory traffic"
+    ]
+  },
+  {
+    "anomaly": "Unusually high context switching rate during peak computation",
+    "root_causes": "Context switches spiked to 1841/s suggesting possible thread contention or suboptimal process scheduling",
+    "solutions": [
+      "Verify thread pinning and OpenMP/DL_CG thread affinity settings",
+      "Check for false sharing or locking issues in the application",
+      "Consider adjusting the Linux scheduler tunables for HPC workloads"
+    ]
+  }
+]

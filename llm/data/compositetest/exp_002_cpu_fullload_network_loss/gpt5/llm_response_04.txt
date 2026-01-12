@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with sustained high write throughput and spikes in CPU iowait.",
+    "root_causes": "The running workload (ft_cgC) generated very heavy disk writes (up to ~215 MB/s) with disk I/O utilization peaking at ~87% and CPU iowait spiking to ~22%, indicating the node was storage-bound; additional swap traffic amplified I/O load.",
+    "solutions": [
+      "Identify the heaviest writers with iotop/pidstat -d during the job; confirm the ft_cgC processes are responsible.",
+      "Throttle or shape I/O for the job (ionice, cgroups io.max/blkio.throttle) or stage large outputs in batches (e.g., buffered writes, rsync with --bwlimit).",
+      "Use faster local scratch (NVMe/SSD) for intermediate data and defer flush to shared/slow storage until post-processing.",
+      "Tune application I/O (larger sequential writes, enable MPI-IO collective buffering if applicable) to reduce small/random I/O.",
+      "Monitor queue depth and latency with iostat -x 1; if persistent, consider relocating the workload to nodes/storage tiers with higher IOPS/throughput."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space nearly exhausted during the run, creating risk of ENOSPC and write failures.",
+    "root_causes": "Filesystem usage stayed very high (≈94–98%) with available space dropping as low as ~1.57 GB while large amounts of data were being written, then space recovered later, consistent with the job creating and then cleaning up sizable outputs.",
+    "solutions": [
+      "Redirect large temporary outputs to a designated scratch filesystem with automatic cleanup on job exit.",
+      "Enforce per-job quotas/limits and set proactive alerts when filesystem_usage_percent exceeds 90%.",
+      "Schedule periodic cleanup of transient files and ensure the job removes intermediate data promptly.",
+      "If high usage is routine for this workload, expand capacity or migrate to a higher-throughput, larger filesystem tier."
+    ]
+  },
+  {
+    "anomaly": "Excessive swap activity despite moderate RAM usage, contributing to additional disk load.",
+    "root_causes": "Swap usage remained ~54% with very high swap-in/out rates (e.g., ~145k/210k ops/s) early in the window, which, combined with heavy writes, increased storage contention and iowait even though overall memory usage hovered near 35–36%.",
+    "solutions": [
+      "Review vm.swappiness and consider lowering it to reduce swapping for this workload profile.",
+      "Ensure the job’s working set fits in RAM (increase memory request/limit or reduce in-memory footprint).",
+      "Pin frequently accessed data in memory or rework access patterns to avoid paging hot data.",
+      "Investigate long-lived swapped-out pages; if they are stale, consider dropping caches post-job (sync; echo 3 > /proc/sys/vm/drop_caches) as part of controlled maintenance, not during active jobs."
+    ]
+  }
+]

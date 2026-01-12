@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with excessive I/O wait time",
+    "root_causes": "The system shows consistently high CPU usage (76-83%) with significant I/O wait percentages (7-22%), indicating disk bottleneck during job execution",
+    "solutions": [
+      "Investigate disk performance using 'iostat -x' to identify specific bottlenecks",
+      "Check for disk contention between jobs using 'iotop' to view I/O per process",
+      "Consider increasing I/O bandwidth or optimizing job scheduling to reduce disk contention"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with heavy swap usage",
+    "root_causes": "Memory usage spikes to 36% with significant swap utilization (53% swap space used), suggesting memory-intensive workload",
+    "solutions": [
+      "Monitor memory consumption patterns with 'vmstat 1' to identify memory-intensive processes",
+      "Consider adjusting job memory allocation or request more memory resources",
+      "Check for memory leaks in the application using 'valgrind' or similar tools"
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load average",
+    "root_causes": "1-minute load averages reach 8.37 on an 8-core system, indicating significant process contention during job execution",
+    "solutions": [
+      "Review CPU-bound processes with 'top -1' to identify resource hogs",
+      "Consider optimizing job thread/process count to better match system capabilities",
+      "Check for process blocking using 'ps -eo state,pid,cmd | grep ^D'"
+    ]
+  }
+]

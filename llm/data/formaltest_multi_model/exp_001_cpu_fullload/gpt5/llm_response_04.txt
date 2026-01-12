@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "Burst of TCP retransmissions and timeouts indicating transient network instability",
+    "root_causes": "During 07:02:43–07:02:58, TCP retransmissions spiked (tcp_retransmissions_rate up to 17.45/s) with simultaneous kernel counters showing node_netstat_Tcp_RetransSegs ≈30/s, TCPSynRetrans ≈6/s, and TCPTimeouts ≈15/s, while NIC error/drop counters remained at 0. This pattern is consistent with path congestion or link-level issues outside the host (e.g., switch/port/cabling) or transient upstream saturation, rather than a local NIC fault.",
+    "solutions": [
+      "Inspect switch and uplink port counters for CRC/FCS errors, discards, or congestion (show interface counters) over the same window.",
+      "On the node, check ethtool -S <iface> and dmesg for NIC driver resets or link flaps; confirm negotiated speed/duplex and MTU consistency along the path.",
+      "Run targeted path tests (iperf3 in both directions, small- and large-MTU) during similar workload to reproduce and localize the issue.",
+      "If congestion is observed, rate-limit or stagger traffic from competing jobs, or apply QoS on the fabric path used by this job.",
+      "Validate TCP offload settings and socket buffer sizing (net.core.{r,w}mem_max, net.ipv4.tcp_{r,w}mem) if high-latency or reordering is suspected."
+    ]
+  },
+  {
+    "anomaly": "Sustained swap usage with bursts of swap I/O despite ample available RAM, plus a recorded OOM kill",
+    "root_causes": "Swap is ~46.6% used throughout (swap_usage_percent ≈46.61%) with large page swap activity early (page_swap_in_rate ≈1390/s and page_swap_out_rate ≈235–269/s at 07:01:43–07:01:58) and continued swap churn thereafter, while memory_available_bytes remains high (~5.4–5.5 GB) and memory_usage_percent ~33–34%. vm_oom_kills_total=1 indicates at least one OOM event occurred (not necessarily in this exact window). This suggests suboptimal reclaim/swappiness or workload access patterns faulting swapped pages back in, possibly combined with prior memory pressure or cgroup limits.",
+    "solutions": [
+      "Verify if an OOM occurred recently: review dmesg/journalctl -k for OOM backtraces and identify the offending process or cgroup.",
+      "Identify processes with high major faults and swap I/O (pidstat -r -p ALL 1, perf stat, or ps -eo pid,maj_flt,min_flt,cmd --sort=-maj_flt).",
+      "Temporarily reduce swappiness (sysctl vm.swappiness=10) and consider enabling zswap; reassess swap-in/out rates under workload.",
+      "Check Slurm/cgroup memory limits for job 276 and ensure they match the workload’s working set to avoid reclaim/oom side effects.",
+      "If swap remains heavily used despite free RAM, consider dropping inactive cache (echo 1 > /proc/sys/vm/drop_caches during maintenance) and review memory reclaim tunables (vm.watermark_scale_factor, vm.page-cluster) in a test window."
+    ]
+  }
+]

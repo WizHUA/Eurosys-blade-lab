@@ -1,0 +1,18 @@
+Fault Types: mem-load, disk-burn
+Experiment IDs: 37934298f42cce81, 298217f7ac83d2c7
+Injection Time Range: 2025-09-20 07:48:14 - 2025-09-20 07:49:21
+Fault Commands:
+blade status 37934298f42cce81
+blade status 298217f7ac83d2c7
+
+Detailed Fault Information:
+1. ID: 37934298f42cce81
+   Type: mem-load
+   Create: 2025-09-20 07:48:14
+   End: 2025-09-20 07:49:21
+
+2. ID: 298217f7ac83d2c7
+   Type: disk-burn
+   Create: 2025-09-20 07:48:14
+   End: 2025-09-20 07:49:21
+

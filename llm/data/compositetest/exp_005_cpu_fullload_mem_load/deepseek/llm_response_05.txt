@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with sustained load average above CPU core count",
+    "root_causes": "CPU-bound workload from the completed ft_cgC job combined with system processes, showing high user space CPU usage and elevated load averages",
+    "solutions": [
+      "Review ft_cgC job parameters to optimize CPU efficiency",
+      "Check for CPU throttling or frequency scaling issues that may be limiting performance",
+      "Analyze user-space processes contributing to high CPU usage (cpu_user_percent ~75%)"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with high cache usage",
+    "root_causes": "Job's memory footprint caused extensive page cache usage (62% cache_usage_percent) and memory allocation patterns",
+    "solutions": [
+      "Profile memory usage of ft_cgC job to identify optimization opportunities",
+      "Consider adjusting swappiness parameter if inappropriate swapping is occurring",
+      "Monitor for memory leaks in long-running processes"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O bottlenecks during job execution",
+    "root_causes": "High disk_io_time_seconds_total suggests storage system was a performance constraint for the computational workload",
+    "solutions": [
+      "Verify filesystem performance meets application requirements",
+      "Consider using local SSD storage if workload is I/O intensive",
+      "Check disk queue lengths and optimize I/O scheduling if needed"
+    ]
+  }
+]

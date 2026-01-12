@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization reaching 51% with significant system load during job execution period.",
+    "root_causes": "CPU resource load from the 'ft_cgC' job which ran for 27 minutes and 39 seconds, consuming substantial computational resources.",
+    "solutions": [
+      "Monitor CPU usage patterns during job execution to identify if this is expected behavior for the workload type.",
+      "Use 'htop' or 'top' to verify which specific processes are consuming CPU resources.",
+      "Consider CPU resource limits or job scheduling optimization if this impacts other workloads."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with usage climbing to 32% and increasing memory allocation activity.",
+    "root_causes": "Memory resource load from the running job, with committed memory reaching over 7GB and active anonymous memory increasing significantly.",
+    "solutions": [
+      "Monitor memory usage trends to ensure the job doesn't exceed available memory limits.",
+      "Check for memory leaks by monitoring the 'memory_committed_as_bytes' metric over time.",
+      "Verify that the job's memory requirements are within the node's capacity and consider memory limits if needed."
+    ]
+  },
+  {
+    "anomaly": "Moderate disk I/O activity with increasing write operations during job execution.",
+    "root_causes": "Disk I/O load from the computational job writing intermediate results or output data to storage.",
+    "solutions": [
+      "Monitor disk utilization to ensure I/O operations don't become a bottleneck.",
+      "Use 'iotop' to identify specific processes generating disk activity.",
+      "Consider optimizing I/O patterns or using faster storage if disk performance becomes limiting."
+    ]
+  }
+]

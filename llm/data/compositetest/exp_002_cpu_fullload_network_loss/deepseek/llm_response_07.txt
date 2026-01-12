@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High disk I/O wait time (22.49%) despite moderate CPU usage",
+    "root_causes": "I/O bottleneck likely caused by filesystem operations from the FT-CG benchmark job",
+    "solutions": [
+      "Check if the job is performing excessive small I/O operations and optimize with larger block sizes",
+      "Verify if the storage backend (Lustre/GPFS/etc) is experiencing performance issues",
+      "Monitor per-process I/O with 'iotop' to identify if specific processes are causing contention"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with low free memory (211MB) and high cache usage (5GB)",
+    "root_causes": "Memory allocation patterns from computational chemistry workload may be suboptimal",
+    "solutions": [
+      "Analyze memory usage patterns in the FT-CG benchmark with tools like Valgrind/massif",
+      "Consider adjusting Slurm memory request parameters for the job",
+      "Check for memory leaks in the application code"
+    ]
+  },
+  {
+    "anomaly": "Network receive errors (43 total) during job execution",
+    "root_causes": "Potential network interface issues during MPI communication phases",
+    "solutions": [
+      "Verify network interface statistics with 'ethtool' for physical layer errors",
+      "Check MPI implementation logs for communication errors",
+      "Test network bandwidth and latency between nodes with OSU benchmarks"
+    ]
+  }
+]

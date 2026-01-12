@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 33% to 73% during job execution, with available memory dropping from 5.5GB to 2.2GB, indicating excessive memory consumption by the running job 'ft_cgC'.",
+    "solutions": [
+      "Monitor the specific memory usage pattern of the 'ft_cgC' job to identify if it has memory leaks or inefficient memory allocation",
+      "Check if the job requires more memory allocation than currently available and consider increasing memory limits",
+      "Review job configuration and optimize memory usage patterns to prevent future memory exhaustion",
+      "Consider implementing memory limits for jobs to prevent system-wide memory starvation"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system utilization indicating kernel overhead.",
+    "root_causes": "CPU system percentage increased from 1.7% to over 4% during the memory pressure period, suggesting the kernel is spending excessive time managing memory operations, likely due to swapping and memory reclamation activities.",
+    "solutions": [
+      "Monitor swap activity using 'vmstat' to confirm if memory swapping is causing the increased system CPU usage",
+      "Check kernel logs for out-of-memory events or memory allocation failures",
+      "Consider adding more physical memory to reduce kernel memory management overhead",
+      "Optimize application memory access patterns to reduce kernel intervention"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity coinciding with memory pressure.",
+    "root_causes": "Disk write rate increased significantly during the memory pressure period, likely due to swap activity and memory page-out operations as the system attempts to free physical memory.",
+    "solutions": [
+      "Verify swap usage and configure appropriate swap space if memory pressure is expected",
+      "Monitor disk I/O patterns to distinguish between application I/O and swap-related I/O",
+      "Consider using faster storage for swap partitions if swapping cannot be avoided",
+      "Implement application-level memory management to reduce reliance on virtual memory"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High memory pressure with memory usage consistently above 70%",
+    "root_causes": "Significant memory consumption by active processes, particularly with 1.6GB of active anonymous memory usage",
+    "solutions": [
+      "Investigate memory usage patterns of completed job ft_cgC using 'sacct -j 276 --format=MaxRSS'",
+      "Check for memory leaks in the application code of ft_cgC",
+      "Consider increasing memory allocation for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "Network throughput spikes coinciding with job completion",
+    "root_causes": "Possible MPI job finalization activities during job completion phase",
+    "solutions": [
+      "Analyze network usage patterns during job completion with 'nethogs' or similar tools",
+      "Review MPI_Finalize implementation in the application",
+      "Consider staggering job completion times if multiple jobs end simultaneously"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure during job execution with 20-40% disk utilization",
+    "root_causes": "Checkpointing or temporary file operations during the compute job",
+    "solutions": [
+      "Review job's disk I/O patterns using 'iotop' during execution",
+      "Consider using RAM disk for temporary files if job allows",
+      "Evaluate filesystem performance and possible need for faster storage"
+    ]
+  }
+]

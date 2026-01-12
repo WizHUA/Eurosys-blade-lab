@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient but severe memory pressure with swap activity spike between 07:08:28 and 07:09:13",
+    "root_causes": "During the ft_cgC job window, memory_available_bytes dropped sharply from ~5.61 GB to ~3.72 GB (07:08:28) while memory_active_anon doubled (~1.58 GB to ~3.43 GB) and memory_committed_as_bytes jumped (~7.14 GB to ~9.05 GB). Page faults surged (page_faults_rate ~113/s at 07:08:13 to ~5711/s at 07:08:28) with increased swap in/out (page_swap_in_rate ~3.7/s and page_swap_out_rate peaking at ~167/s at 07:08:58 and ~160/s at 07:09:13). This indicates a burst of anonymous memory allocation from user processes causing swapping pressure, consistent with a workload memory surge rather than cache growth.",
+    "solutions": [
+      "Identify the processes responsible for the anonymous memory spike during that window (e.g., ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem; smem -r) and verify the ft_cgC job’s memory footprint.",
+      "Enforce per-job memory limits via Slurm (e.g., --mem/--mem-per-cpu) and cgroup memory controllers (memory.high/memory.max) to prevent node-wide pressure.",
+      "Tune VM settings to reduce swap aggressiveness if appropriate (e.g., set vm.swappiness=10–20) and verify overcommit policy (vm.overcommit_memory and vm.overcommit_ratio) given the committed_as surge.",
+      "If recurrent, right-size the job (algorithm/data partitioning) or provision more RAM on the node; ensure swap resides on fast storage if swapping cannot be avoided."
+    ]
+  },
+  {
+    "anomaly": "Burst of TCP connection churn and resets around 07:08:28",
+    "root_causes": "At 07:08:28, node_netstat reported spikes: Tcp_ActiveOpens ≈ 30/s, Tcp_PassiveOpens ≈ 6/s, Tcp_CurrEstab ≈ 15, and Tcp_OutRsts ≈ 24/s, while link error counters and bandwidth were low. This indicates many short-lived or failing TCP handshakes/connections (likely local or control-plane connections) being reset, not a bandwidth saturation event.",
+    "solutions": [
+      "Correlate with application/system logs to find services spawning or resetting connections at 07:08:28; inspect recent restarts or health checks.",
+      "Inspect current socket state and churn (ss -s; ss -tni) and connection tracking limits (nf_conntrack) for pressure.",
+      "Check local firewall/ACLs and SYN/backlog tuning (net.core.somaxconn, net.ipv4.tcp_max_syn_backlog) and ensure no policy is triggering resets.",
+      "If the job opens many short TCP sessions, move to persistent connections or tune retry/backoff to reduce reset spikes."
+    ]
+  },
+  {
+    "anomaly": "Prior out-of-memory (OOM) kill recorded on the node",
+    "root_causes": "vm_oom_kills_total=1 throughout the window indicates at least one OOM kill occurred since boot (no increment during this interval). This suggests historical memory overcommit on this node that could recur under similar load patterns.",
+    "solutions": [
+      "Audit kernel logs (journalctl -k | grep -i 'out of memory' and 'Killed process') to identify the process and timing of the OOM event.",
+      "Apply Slurm/cgroup memory limits and set oom_score_adj appropriately for critical services to prevent system-level impact.",
+      "Review overcommit settings and typical job memory requests to ensure aggregate commitments do not exceed safe headroom."
+    ]
+  }
+]

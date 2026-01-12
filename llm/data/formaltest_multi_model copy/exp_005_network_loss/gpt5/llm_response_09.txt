@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Active swapping bursts and high swap residency despite ample free memory.",
+    "root_causes": "During 07:10:28–07:10:58, page_swap_out_rate peaked around 166–170/s and page_swap_in_rate ~17/s while memory_available_bytes stayed ~5.6 GiB and memory_usage_percent ~32%. Swap usage remained ~46.6% (swap_free_bytes ~1.146 GiB of 2.147 GiB), indicating aggressive reclamation of inactive pages or persistently swapped pages even though RAM was available. This occurred while job 276 (ft_cgC) was running.",
+    "solutions": [
+      "Confirm swap churn in real time with: vmstat 1 (si/so) and sar -B 1; correlate with processes using smem -rs swap or grep -H VmSwap /proc/*/status.",
+      "Reduce unnecessary swapping if latency-sensitive: check and lower vm.swappiness (e.g., to 10–20) via sysctl; persist in /etc/sysctl.d.",
+      "Verify no cgroup memory limits are forcing reclaim (inspect memory.max and memory.swap.max for the job slice) and adjust Slurm memory requests/limits accordingly.",
+      "If swap must remain, place it on a faster device or enable zswap to mitigate latency."
+    ]
+  },
+  {
+    "anomaly": "Elevated IO and memory pressure (PSI) with low disk utilization, suggesting many small or synchronous IO operations.",
+    "root_causes": "io_pressure_waiting_rate ranged ~16–21 and io_pressure_stalled_rate ~1.4–2.1 while disk_io_usage_percent stayed low (≤0.076) and total IOPS ~2/s. Concurrently, page_faults_rate rose sharply (≈280/s to >5,000/s), indicating page churn and wait states disproportionate to actual disk throughput.",
+    "solutions": [
+      "Profile IO at 1 s granularity: iostat -x 1, pidstat -d 1, and per-process fio/strace sampling to identify small sync writes/reads or metadata-heavy paths.",
+      "Batch and buffer IO where possible (avoid frequent fsync/synchronous writes); increase application IO chunk sizes to reduce syscall rate.",
+      "Direct high-churn temporary files to faster storage (local SSD/tmpfs) and ensure mount options and IO scheduler are appropriate (e.g., mq-deadline/none for SSD).",
+      "Inspect /proc/pressure/io and /proc/pressure/memory during the job to verify and quantify pressure events; optimize hotspots accordingly."
+    ]
+  },
+  {
+    "anomaly": "Historical OOM kill recorded on the node (vm_oom_kills_total=1).",
+    "root_causes": "An OOM event has occurred prior to or during system uptime; while no new increments were seen in this window, the presence of 1 indicates at least one past memory exhaustion incident that may correlate with workload behavior.",
+    "solutions": [
+      "Audit kernel logs for the OOM incident to identify the offending process and timestamp: journalctl -k -g \"Out of memory\" or dmesg | grep -i oom.",
+      "Right-size Slurm memory requests/limits for similar jobs and set cgroup protections (memory.high, memory.max) to prevent node-wide OOM.",
+      "Implement proactive monitoring/alerts on memory_available_bytes, page_major_faults_rate, and swap activity to catch impending OOM conditions earlier."
+    ]
+  }
+]

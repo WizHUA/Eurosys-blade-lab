@@ -1,0 +1,52 @@
+[
+  {
+    "anomaly": "Kernel out-of-memory (OOM) event detected during the job window.",
+    "root_causes": "vm_oom_kills_total is 1 while the job was active, indicating at least one process was killed due to memory pressure despite non-exhausted RAM and ~46.6% swap occupancy.",
+    "solutions": [
+      "Inspect kernel logs for the victim and context (journalctl -k or dmesg | grep -i 'out of memory').",
+      "Right-size the job’s memory request/limit and ensure it uses node-local scratch instead of keeping large data resident.",
+      "Set safer allocation policy (e.g., vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio) to avoid optimistic overcommit.",
+      "If swapping contributed to pressure, reduce vm.swappiness (e.g., to 10–20) and consider enabling/tuning zswap.",
+      "Profile peak RSS of the workload to set guardrails (cgroup memory.high/memory.max or Slurm --mem/--mem-per-cpu)."
+    ]
+  },
+  {
+    "anomaly": "TCP listen queue saturation with drops and overflows.",
+    "root_causes": "Non-zero tcp_listen_drops_rate and tcp_listen_overflows_rate (e.g., drops ≈0.36/s and overflows ≈0.07–0.09/s between 07:14:43–07:15:13) indicate bursts of incoming connections exceeded the backlog.",
+    "solutions": [
+      "Identify affected listeners (ss -lntp) and the source of bursts; correlate with job launch phases or services on the node.",
+      "Increase backlog where needed (per-service backlog and sysctls net.core.somaxconn and net.ipv4.tcp_max_syn_backlog).",
+      "Ensure SYN cookies are enabled (net.ipv4.tcp_syncookies=1) and verify no unintended connection storms.",
+      "Stagger connection attempts from clients or use connection pooling."
+    ]
+  },
+  {
+    "anomaly": "Abrupt collapse of page cache during the run.",
+    "root_causes": "memory_cached_bytes dropped sharply from ~5.25 GB to ~0.53 GB at 07:14:13 alongside a halving of kreclaimable memory, consistent with an explicit cache drop or massive file invalidation.",
+    "solutions": [
+      "Confirm whether drop_caches was executed (audit cron/systemd timers and admin scripts) and avoid running it during active jobs.",
+      "If large file deletions are expected, throttle cleanup to reduce cache churn and I/O spikes.",
+      "Tune vfs_cache_pressure to avoid overly aggressive reclaim if applicable."
+    ]
+  },
+  {
+    "anomaly": "High and persistent swap occupancy with intermittent swap I/O despite ample free memory.",
+    "root_causes": "swap_free is ~1.15 GB of 2.0 GB (≈46.6% used) while memory_available remains >5 GB; swap-in/out rates were non-zero (e.g., tens to hundreds per second earlier), implying cold pages are being swapped and occasionally touched.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., to 10–20) to keep inactive pages in RAM when capacity allows.",
+      "Validate that no process is faulting swapped pages in tight loops (vmstat/iostat/ps to correlate).",
+      "Consider enabling/tuning zswap to mitigate swap latency if disk-backed swap is slow.",
+      "If swap is intentionally used, ensure swap device performance is adequate."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity near full with rapid oscillations.",
+    "root_causes": "filesystem_usage_percent peaked around 90.34% (≈8.1 GB free) and later dropped to ~73%, while disk write rates reached >170 MB/s earlier, consistent with large temporary files being created and removed quickly, risking ENOSPC and I/O variability.",
+    "solutions": [
+      "Direct large scratch output to a volume with more headroom or node-local NVMe (update job I/O paths).",
+      "Reserve operational headroom (alerts at 85% and hard caps/quota for scratch).",
+      "Implement periodic but throttled cleanup to avoid sudden capacity swings during active I/O phases.",
+      "Pre-run checks to ensure sufficient free space before starting similar workloads."
+    ]
+  }
+]

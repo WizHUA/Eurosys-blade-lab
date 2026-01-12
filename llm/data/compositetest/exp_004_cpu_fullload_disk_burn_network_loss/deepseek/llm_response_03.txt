@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Memory pressure increasing with high anonymous memory usage",
+    "root_causes": "Memory pressure spikes correlate with high anonymous memory usage (memory_active_anon_bytes) suggesting application is allocating large amounts of heap memory",
+    "solutions": [
+      "Profile the ft_cgC application's memory usage to identify potential memory leaks or inefficient allocations",
+      "Check if application has proper memory cleanup during job completion",
+      "Review memory request/limit settings for the job"
+    ]
+  },
+  {
+    "anomaly": "High disk write activity during job execution",
+    "root_causes": "Disk write operations (disk_written_bytes_total) were sustained at high levels during the entire job duration, indicating potential inefficient I/O patterns",
+    "solutions": [
+      "Optimize application I/O patterns to use buffered writes instead of frequent small writes",
+      "Consider using faster storage or dedicated scratch space if application requires heavy writes",
+      "Review job's disk I/O requirements and adjust resource requests accordingly"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Acute memory pressure: memory_usage_percent surged to ~92–93% with memory_available_bytes near ~0.6 GB, page cache collapsed (memory_cached_bytes fell from ~5.1 GB to ~0.4 GB), and anonymous memory spiked (~6.58 GB active_anon).",
+    "root_causes": "The running job 'ft_cgC' drove rapid growth of anonymous resident memory, forcing aggressive page-cache eviction; swap remained ~48% used and early swap-in/out activity indicates paging under pressure.",
+    "solutions": [
+      "Profile 'ft_cgC' memory usage during the spike to identify allocations or leaks (e.g., /usr/bin/time -v, smem, pmap, or /proc/<pid>/smaps).",
+      "Enforce Slurm memory limits and cgroup controls (--mem/--mem-per-cpu with memory cgroups) to prevent node-wide pressure.",
+      "If the working set legitimately requires more RAM, reschedule on a higher-memory node or reduce problem size/parallelism to fit available memory.",
+      "Reduce swap-induced latency by lowering vm.swappiness and ensure sufficient free RAM; avoid page-cache thrash by staging large I/O to local scratch."
+    ]
+  },
+  {
+    "anomaly": "Storage saturation and elevated I/O wait at job start: disk_io_usage_percent peaked ~59–70% with read throughput ~272 MB/s and write ~139 MB/s, while cpu_iowait_percent reached ~7.7%.",
+    "root_causes": "Intense job-driven disk read/write combined with paging led to a busy storage device and CPU time spent waiting on I/O.",
+    "solutions": [
+      "Use iotop or pidstat -d during runs to identify the processes/paths generating the heavy I/O.",
+      "Redirect scratch I/O to faster local storage or a high-IOPS filesystem; avoid slow/shared disks for intermediate data.",
+      "Throttle/isolate I/O using cgroup blkio or Slurm QoS limits; batch large I/O operations to reduce contention.",
+      "Mitigate memory pressure first to reduce swap I/O that amplifies disk load."
+    ]
+  },
+  {
+    "anomaly": "Sustained swap occupancy (~48%) with bursts of swap-in/out early (tens to hundreds of kB/s).",
+    "root_causes": "Working set intermittently exceeded available RAM, triggering paging and maintaining substantial swap usage.",
+    "solutions": [
+      "Reduce application memory footprint (smaller problem size or fewer concurrent processes) or allocate more memory per task/node.",
+      "Tune vm.swappiness downward and verify no other processes retain large swapped regions; clear legacy swap usage between jobs if necessary.",
+      "Continuously monitor swap activity (vmstat, sar -W) and alert on rising swap_in/out rates to preempt performance degradation."
+    ]
+  }
+]

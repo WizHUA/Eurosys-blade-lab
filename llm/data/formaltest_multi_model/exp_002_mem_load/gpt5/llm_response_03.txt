@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Transient but severe memory pressure with large anonymous memory growth and active swapping between 07:04:28 and 07:05:13",
+    "root_causes": "During this window, memory_free_bytes fell from ~3.4 GB to ~0.28–0.57 GB and memory_available_bytes to ~2.2–2.6 GB, while anon_memory_percent jumped from ~22% to ~62% and memory_committed_as_bytes surged from ~7.5 GB to ~10.9 GB (exceeding physical RAM). Page faults and swap activity spiked (page_faults_rate ~6.8–7.7K/s, page_swap_out_rate peaking ~169/s, swap_in ~9/s). CPU iowait stayed near zero, indicating the pressure was from allocations rather than storage. The running job (ft_cgC) likely triggered a short-lived allocation burst.",
+    "solutions": [
+      "Profile the job's memory usage (e.g., /usr/bin/time -v, heap profiling) to identify the allocation spike and reduce peak memory.",
+      "Enforce Slurm/cgroup memory limits (e.g., --mem/--mem-per-cpu and cgroup memory.max/memory.high) to prevent node-wide pressure.",
+      "Right-size the job's requested memory to match peak usage, or split the workload to lower per-task footprint.",
+      "Tune overcommit policy if appropriate (vm.overcommit_memory and vm.overcommit_ratio) to avoid committing well beyond RAM.",
+      "Add PSI/alerts on memory_available_bytes and swap rates to catch similar spikes early during runs."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap utilization (~46.6% of 2 GB) with ongoing swap churn even after memory recovers",
+    "root_causes": "swap_free_bytes remains ~1.146 GB across samples (swap_usage_percent ~46.6%) and swap activity continues (swap_in/out non-zero, e.g., ~6–21 ops/s) even when memory_usage_percent returns to ~33% and memory_available_bytes ~5.5 GB. This indicates long-lived pages remain swapped out after the spike, increasing latency risk for touched pages.",
+    "solutions": [
+      "If operationally safe, cycle swap to clear old pages (swapoff -a && swapon) during a maintenance window.",
+      "Lower vm.swappiness (e.g., 10–20) to reduce aggressive swapping on future spikes; consider enabling zswap.",
+      "Audit long-lived processes that rarely fault but hold swapped pages; restart or pin critical services if needed.",
+      "Prevent recurrence by capping job memory (Slurm/cgroups) so background services are not forced into swap."
+    ]
+  },
+  {
+    "anomaly": "Node reports at least one historical OOM kill (vm_oom_kills_total = 1)",
+    "root_causes": "The counter is non-zero throughout the window, indicating that at some point since boot an OOM event occurred, consistent with observed high committed memory and prior swap usage. Exact timing is not in the provided samples.",
+    "solutions": [
+      "Inspect kernel logs (dmesg/journalctl) for OOM timestamps and correlate with Slurm job logs to identify the offender.",
+      "Tighten memory isolation: enable cgroup memory limits with oom.group as needed to confine OOM to the job cgroup.",
+      "Adjust job memory requests/limits and consider stricter overcommit policy to avoid future OOMs.",
+      "Add monitoring alerts on memory_committed_as_bytes relative to physical RAM to preempt OOM conditions."
+    ]
+  }
+]

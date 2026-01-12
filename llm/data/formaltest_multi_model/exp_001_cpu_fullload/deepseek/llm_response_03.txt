@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "CPU usage surge during HPC job execution",
+    "root_causes": "Conjugate Gradient computation (ft_cgC job) driving CPU utilization above 80% while maintaining high system load",
+    "solutions": [
+      "Verify job resource allocation matches computational requirements",
+      "Check if CPU frequency scaling is disabled for maximum performance",
+      "Profile application with perf to identify potential optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure from active computational workload",
+    "root_causes": "ft_cgC job consuming 77% of available memory with high active_anon usage indicating computation working sets",
+    "solutions": [
+      "Monitor memory bandwidth utilization with perf stat -d",
+      "Check NUMA locality for memory allocations in MPI job",
+      "Consider adjusting OMP_NUM_THREADS if using hybrid MPI+OpenMP"
+    ]
+  },
+  {
+    "anomaly": "Increased TCP connection churn during computation",
+    "root_causes": "Communication pattern changes during different phases of the CG solver causing connection state changes",
+    "solutions": [
+      "Analyze MPI communication pattern with mpiP or similar profiler",
+      "Verify MPI implementation and network driver settings",
+      "Check for optimal MPI collective operation configurations"
+    ]
+  },
+  {
+    "anomaly": "Moderate context switch rate during high CPU utilization",
+    "root_causes": "OS scheduler activity competing with computational threads",
+    "solutions": [
+      "Check CPU affinity settings for the job",
+      "Monitor for NUMA balancing activity with perf stat -e numa_*",
+      "Consider using taskset or numactl to restrict scheduling"
+    ]
+  }
+]

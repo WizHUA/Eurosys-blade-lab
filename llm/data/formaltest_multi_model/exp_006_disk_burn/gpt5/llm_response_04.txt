@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Abrupt swap storm and memory reclaim thrash starting ~07:12:28, with massive swap-in/out rates and surging page faults.",
+    "root_causes": "The running job (ft_cgC) triggered heavy file I/O and page cache growth, causing the kernel to aggressively reclaim anonymous memory and swap it. Evidence: page_swap_in_rate jumped from ~0.15/s (07:11:43) to 145,075/s (07:12:28) then >300k–570k/s; page_swap_out_rate rose to 69k–193k/s; page_faults_rate increased 10× (to 23k–30k/s). memory_cached_bytes ballooned (to ~6.2 GB at 07:12:43), dirty/writeback bytes spiked, and memory_pressure_waiting/stalled rates rose. Swap was not exhausted (swap_free ~1.146 GB), indicating churn rather than total depletion.",
+    "solutions": [
+      "Constrain the job’s memory footprint: set Slurm memory limits (e.g., --mem or --mem-per-cpu) and verify cgroup enforcement; if appropriate for this workload, set memory.swap.max=0 for the job cgroup to prevent swapping.",
+      "Lower vm.swappiness (e.g., to 10) for this node or the job’s cgroup to reduce anonymous page swapping under cache pressure.",
+      "Tune writeback: reduce vm.dirty_ratio and vm.dirty_background_ratio to smooth large flushes; monitor dirty/writeback with vmstat/iostat.",
+      "Use faster local scratch or a parallel filesystem for large I/O phases; avoid reading/writing via slower volumes.",
+      "For the application, reduce working-set and I/O footprint (smaller batch sizes, chunked I/O), or use O_DIRECT/posix_fadvise to avoid unnecessary caching for streaming I/O.",
+      "Identify offenders with pidstat -r 1, smem -tk, and iotop -oPa; correlate major faults and RSS with the job processes."
+    ]
+  },
+  {
+    "anomaly": "Escalating disk I/O saturation and I/O pressure with high iowait and blocked tasks.",
+    "root_causes": "Sustained read/write throughput and IOPS increased sharply alongside I/O pressure and cpu_iowait. Evidence: disk_io_usage_percent climbed from ~0.06% (07:11:43) to 11.6% (07:12:28), 26.9% (07:12:43), 42.6% (07:12:58), 54.8% (07:13:13), 60.2% (07:13:28); read/write rates peaked at ~149 MB/s read and ~71 MB/s write (07:12:28) and kept rising; io_pressure_waiting_rate/stalled_rate increased to ~0.076/0.058 by 07:13:28; cpu_iowait_percent rose to ~4.9% and processes_blocked reached 2.",
+    "solutions": [
+      "Place the job’s heavy I/O on higher-throughput storage (local NVMe or parallel FS); avoid saturated volumes.",
+      "Throttle I/O of the job with ionice and IO cgroup (io.max/io.weight) to protect system responsiveness.",
+      "Increase read-ahead for large sequential reads (blockdev --setra) and enable application-level buffering; batch small writes.",
+      "Check disk health and queueing: iostat -x 1, blktrace/btstat; verify no competing background jobs on the same device.",
+      "If filesystem usage approaches high-water marks (peaked ~85.6%), ensure sufficient free space to avoid allocator contention."
+    ]
+  },
+  {
+    "anomaly": "Rising TCP retransmissions and SYN retransmissions despite low network throughput.",
+    "root_causes": "Intermittent packet loss or latency spikes likely induced kernel retransmits during the period of high system I/O pressure. Evidence: tcp_retransmissions_rate grew from ~0 to 10.9 (07:12:28), 17.45 (07:12:43), 25.45 (07:13:13), 33.09 (07:13:28); tcp_syn_retrans_rate peaked ~11.18 by 07:13:28, while link error counters remained 0.",
+    "solutions": [
+      "Inspect NIC and switch counters for drops/errors (ethtool -S, ip -s link) and check dmesg for driver resets.",
+      "Verify MTU consistency end-to-end and consider enabling ECN; ensure no QoS/policing is dropping bursts.",
+      "Correlate retrans spikes with storage pressure; mitigate the underlying I/O thrash (see above) to reduce host-induced latency.",
+      "If the job uses networked storage or MPI control traffic, pin it to a less loaded interface and validate driver/firmware versions."
+    ]
+  }
+]

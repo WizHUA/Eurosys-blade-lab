@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure leading to system instability and potential out-of-memory conditions.",
+    "root_causes": "Memory resource exhaustion with usage climbing from 32% to 99% and swap utilization reaching 90%, indicating the system has run out of available physical memory.",
+    "solutions": [
+      "Immediately identify memory-intensive processes using 'ps aux --sort=-%mem' and consider terminating non-essential processes.",
+      "Monitor for OOM killer activity in system logs (/var/log/kern.log) as vm_oom_kills_total has increased to 5.",
+      "Check if the completed job 'ft_ftC' left behind memory leaks or zombie processes consuming resources.",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent future occurrences."
+    ]
+  },
+  {
+    "anomaly": "Severe I/O bottleneck with extremely high disk utilization and wait times.",
+    "root_causes": "Disk I/O subsystem is severely overloaded with utilization reaching 66% and massive increases in I/O wait time from 0.01% to 27%, likely caused by heavy swapping due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing excessive disk I/O activity.",
+      "The primary cause is likely memory swapping - resolving memory pressure should significantly reduce I/O load.",
+      "Check disk health and consider I/O scheduling optimizations if hardware issues are suspected.",
+      "Monitor swap activity patterns to confirm the correlation between memory pressure and I/O bottleneck."
+    ]
+  },
+  {
+    "anomaly": "System load and process blocking indicate severe resource contention.",
+    "root_causes": "System load has doubled from 5.15 to 10.02 while blocked processes increased from 0 to 17, indicating processes are waiting for I/O operations to complete.",
+    "solutions": [
+      "The high number of blocked processes (17) suggests processes are waiting for disk I/O, confirming the I/O bottleneck.",
+      "Addressing the root memory pressure issue should reduce both system load and process blocking.",
+      "Consider implementing resource limits and monitoring to prevent jobs from consuming excessive system resources.",
+      "Review job scheduling policies to avoid running memory-intensive jobs simultaneously."
+    ]
+  }
+]

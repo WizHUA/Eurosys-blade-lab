@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with high page swap activity",
+    "root_causes": "Memory resources being heavily utilized by active job processes, triggering swapping to disk",
+    "solutions": [
+      "Investigate memory usage patterns of recently completed job ft_cgC and its batch process",
+      "Check for memory leaks in application code or libraries used by the job",
+      "Consider increasing RAM allocation for memory-intensive jobs or optimizing memory management"
+    ]
+  },
+  {
+    "anomaly": "Persistent high CPU usage despite job completion",
+    "root_causes": "System processing swap operations and managing memory after intensive computation job",
+    "solutions": [
+      "Monitor system for post-job cleanup processes that may be consuming CPU resources",
+      "Analyze system logs for any background maintenance tasks triggered by job completion",
+      "Check for zombie processes or orphaned child processes from the completed job"
+    ]
+  },
+  {
+    "anomaly": "Significant I/O pressure from swap operations",
+    "root_causes": "High memory pressure causing excessive paging to disk during job execution",
+    "solutions": [
+      "Verify swap configuration and consider adjusting swappiness if appropriate",
+      "Monitor disk performance metrics to ensure storage subsystem can handle swap load",
+      "Review workload distribution to prevent memory contention on compute nodes"
+    ]
+  }
+]

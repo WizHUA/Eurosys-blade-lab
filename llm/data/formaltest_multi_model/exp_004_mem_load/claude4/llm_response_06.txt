@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 32% to 55% at 07:08:28, indicating excessive memory consumption by running processes.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming excessive RAM.",
+      "Monitor memory allocation patterns using 'vmstat 1' to track memory pressure trends.",
+      "Consider increasing available memory or optimizing application memory usage patterns.",
+      "Check for memory leaks in long-running processes that may be accumulating over time."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity with significant write operations indicating storage bottleneck.",
+    "root_causes": "Disk write rates increased dramatically from minimal activity to over 170KB/sec, suggesting intensive file operations or memory swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes responsible for high disk write activity.",
+      "Monitor swap usage with 'free -h' as memory pressure may be causing swap activity.",
+      "Check filesystem health and available disk space using 'df -h' and 'iostat'.",
+      "Consider implementing I/O throttling for non-critical processes to reduce storage contention."
+    ]
+  }
+]

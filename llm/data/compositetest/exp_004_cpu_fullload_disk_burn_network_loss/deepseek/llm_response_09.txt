@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap exhaustion during job execution",
+    "root_causes": "Memory-intensive computation causing system to exhaust physical RAM and heavily utilize swap space",
+    "solutions": [
+      "Increase memory allocation for compute nodes running similar jobs",
+      "Optimize application memory usage or implement checkpointing for large datasets",
+      "Monitor memory usage patterns to identify memory leaks in application code"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity during job execution",
+    "root_causes": "Intensive disk operations from computational workload causing I/O bottlenecks",
+    "solutions": [
+      "Consider using faster storage (NVMe/SSD) for temporary working directories",
+      "Implement data staging strategies to reduce I/O contention",
+      "Review application I/O patterns for optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "Significant CPU pressure during job execution",
+    "root_causes": "Compute-intensive workload fully utilizing available CPU resources",
+    "solutions": [
+      "Verify CPU affinity settings for optimal NUMA performance",
+      "Consider increasing CPU resources for similar workloads",
+      "Profile application to identify potential parallelization improvements"
+    ]
+  }
+]

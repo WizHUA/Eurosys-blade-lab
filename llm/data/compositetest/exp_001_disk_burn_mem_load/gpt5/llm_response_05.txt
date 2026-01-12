@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swap thrashing during job execution",
+    "root_causes": "The running job (ft_cgC) drove anonymous memory usage and commitment beyond available RAM, causing heavy swapping: swap usage rose to ~56% (swap_free_bytes ~954 MB), memory_available_bytes fell as low as ~0.93 GB, and page swap activity spiked massively (page_swap_in_rate up to ~391,783/s and page_swap_out_rate up to ~172,434/s).",
+    "solutions": [
+      "Constrain and profile the job's memory usage: run with Slurm memory limits (e.g., --mem or --mem-per-cpu) and cgroup v2 memory controls (memory.max, memory.high) to prevent overcommit.",
+      "Request more memory per task or reduce parallelism (processes/threads) to keep the working set within physical RAM.",
+      "Profile per-process RSS over time (smem, pmap, /proc/<pid>/smaps) to detect leaks or unexpectedly large allocations; fix or cap offending allocations.",
+      "Lower swap pressure where appropriate (tune vm.swappiness) and prefer fail-fast (OOM kill) over prolonged thrashing for batch nodes, if policy allows.",
+      "Schedule this workload on higher-memory nodes or reduce problem size/tiling to fit node memory."
+    ]
+  },
+  {
+    "anomaly": "Storage I/O saturation with rising iowait",
+    "root_causes": "Swap thrash and job I/O drove disk throughput and device time very high: disk_read_rate_bytes_per_sec climbed to ~401 MB/s and disk_write_rate_bytes_per_sec to ~177 MB/s, disk_io_usage_percent rose to ~52%, and cpu_iowait_percent increased to ~5.9%, with processes entering blocked state.",
+    "solutions": [
+      "First resolve memory thrashing (see above) to eliminate swap-induced I/O.",
+      "Isolate and monitor per-process I/O (iotop, pidstat -d, iostat -x 1); throttle heavy jobs via cgroup v2 io.max/blkio or Slurm cgroup plugin.",
+      "Use fast local scratch (NVMe) for temporary files and ensure large, sequential I/O; avoid small random I/O where possible.",
+      "Pre-stage input and buffer output to reduce synchronous writes; review filesystem mounts (e.g., noatime) to cut metadata churn."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity approaching high-water mark (~86% used)",
+    "root_causes": "filesystem_usage_percent increased to ~86%, reducing headroom for burst writes and exacerbating I/O contention during the job's heavy write phase.",
+    "solutions": [
+      "Clean up job scratch and stale temporary files; enforce purge policies for per-node and shared scratch.",
+      "Set alerts/quotas to keep usage below 80–85% during peak runs; consider allocating dedicated scratch for heavy I/O jobs.",
+      "Plan capacity expansion or redistribute data if sustained utilization remains above 85%."
+    ]
+  }
+]

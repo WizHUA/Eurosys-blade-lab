@@ -1,0 +1,21 @@
+[
+  {
+    "anomaly": "Significant memory pressure with over 50% memory consumption and substantial page swapping activity.",
+    "root_causes": "Memory resource exhaustion likely from the recently completed job 'ft_cgC' which ran for 27 minutes and may have left residual memory allocations or caused memory fragmentation.",
+    "solutions": [
+      "Monitor for memory leaks from the completed job using 'ps aux --sort=-%mem' to identify any lingering processes.",
+      "Check swap usage with 'swapon -s' and consider clearing swap if excessive: 'swapoff -a && swapon -a'.",
+      "Review job logs for the completed 'ft_cgC' job to determine if it properly released all allocated memory.",
+      "Consider implementing memory limits for future jobs to prevent similar resource exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Moderate disk I/O activity with increasing write operations during the monitoring period.",
+    "root_causes": "Disk I/O load from cleanup operations following job completion or ongoing swap activity due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the disk write activity.",
+      "Monitor swap activity with 'vmstat 1' to confirm if disk writes are related to memory swapping.",
+      "Check system logs for any post-job cleanup scripts or maintenance tasks that might be writing to disk."
+    ]
+  }
+]

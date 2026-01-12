@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions and timeouts around 07:14:43.",
+    "root_causes": "At 2025-09-20 07:14:43, node_netstat showed Tcp_RetransSegs ≈ 30/s, TCPSynRetrans ≈ 6/s, and TCPTimeouts ≈ 15/s (near-zero at other times), indicating brief packet loss or congestion affecting the running job.",
+    "solutions": [
+      "Inspect switch and NIC counters around 07:14:43 (ethtool -S, switch port error logs) for CRC errors, drops, or congestion.",
+      "Check syslog/dmesg on the node for transient NIC resets or driver warnings.",
+      "Verify cabling and transceivers; if using virtualization or overlays, check the hypervisor/overlay fabric health at that time.",
+      "Enable/validate ECN and appropriate queueing on the path; consider QoS for MPI/control traffic."
+    ]
+  },
+  {
+    "anomaly": "Sudden page cache eviction event causing cache to drop from ~5.25 GiB to ~0.53 GiB at 07:14:13.",
+    "root_causes": "memory_cached_bytes fell sharply (5,253,488,640 → 534,990,848 bytes) and cache_usage_percent dropped (63.46% → 6.46%) while memory_free_bytes jumped (~0.25 GiB → ~4.90 GiB), consistent with a mass cache drop (e.g., explicit drop_caches or aggressive cache reclamation) during the job.",
+    "solutions": [
+      "Audit for any 'sync; echo 3 > /proc/sys/vm/drop_caches' or drop-caches actions in node automation or the job script.",
+      "Review vm.vfs_cache_pressure and vm.dirty_* settings; avoid overly aggressive cache pressure that defeats read caching.",
+      "If the application issues posix_fadvise(DONTNEED) or frequent fsyncs, revisit I/O patterns or reduce unnecessary cache invalidations."
+    ]
+  },
+  {
+    "anomaly": "Short burst of very heavy disk I/O (read/write) leading to high disk utilization, then tapering off.",
+    "root_causes": "Between 07:13:43–07:13:58, disk_io_usage_percent was 60–68% with write rates ≈139–172 MB/s and substantial read rates, likely from the running job’s checkpoint/output activity.",
+    "solutions": [
+      "Identify top I/O contributors during that window (iotop, pidstat -d) and correlate with job phases.",
+      "Reduce checkpoint/output frequency or aggregate writes; use parallel or higher-throughput storage where available.",
+      "Apply ionice/cgroup I/O throttling for non-critical writes to prevent saturation.",
+      "Tune filesystem and writeback (vm.dirty_ratio, vm.dirty_background_ratio) to smooth bursts."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage oscillated and peaked near 90.34% used, reducing available space to ~8.10 GiB.",
+    "root_causes": "filesystem_usage_percent shifted from ~73–85% to ~90.34% between 07:14:13–07:14:28 with large swings in available bytes, indicating rapid creation/deletion of large files by the workload.",
+    "solutions": [
+      "Monitor free space and set alerts for >85–90% usage to avoid ENOSPC failures during jobs.",
+      "Direct large temporary outputs to a designated scratch filesystem with sufficient headroom.",
+      "Implement automated post-job cleanup of temporary data and consider per-job quotas or limits."
+    ]
+  }
+]

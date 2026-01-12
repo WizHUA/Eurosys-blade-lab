@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 32% to 55% during job execution, with available memory dropping from 5.6GB to 3.7GB, indicating excessive memory consumption by the running workload.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to identify if this is expected behavior or a memory leak",
+      "Consider implementing memory limits using cgroups or Slurm job constraints to prevent memory exhaustion",
+      "Increase swap space or add more physical memory if this memory usage pattern is legitimate for the workload"
+    ]
+  },
+  {
+    "anomaly": "Excessive disk I/O activity causing storage bottleneck.",
+    "root_causes": "Disk write activity increased dramatically from 10KB/s to over 164MB/s during the memory pressure event, likely due to heavy swapping and application I/O demands.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes causing high disk I/O and determine if it's swapping or application behavior",
+      "Consider faster storage solutions (SSD) for swap partitions if swapping is unavoidable",
+      "Optimize application I/O patterns or implement I/O throttling to prevent storage saturation"
+    ]
+  },
+  {
+    "anomaly": "Network performance degradation with increased TCP connection management overhead.",
+    "root_causes": "TCP retransmission rate increased significantly during the resource pressure period, suggesting network congestion or performance issues affecting job communication.",
+    "solutions": [
+      "Monitor network bandwidth utilization and check for hardware issues in network infrastructure",
+      "Verify that network buffers and TCP settings are optimized for HPC workloads",
+      "Consider implementing network QoS policies to prioritize HPC job traffic during peak usage periods"
+    ]
+  }
+]

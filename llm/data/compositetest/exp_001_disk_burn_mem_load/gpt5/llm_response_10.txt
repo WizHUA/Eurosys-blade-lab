@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Severe memory pressure with a swap storm during the ft_cgC job runtime",
+    "root_causes": "While job 284 (ft_cgC) was running, memory_available_bytes dropped sharply (to ~0.93 GB at 23:17:10) and swap usage rose (swap_usage_percent ~55.6%). Page activity spiked massively (page_faults_rate >46k–50k/s; page_swap_in_rate/page_swap_out_rate up to ~391,783/s and ~172,434/s by 23:17:25). This indicates anonymous memory growth and reclaim activity causing heavy swapping and memory thrashing.",
+    "solutions": [
+      "Increase the job's requested memory (e.g., Slurm --mem) or reschedule it on a higher-memory node to avoid swapping.",
+      "Investigate the job's memory behavior (e.g., /usr/bin/time -v, pmap, heap profiling) to identify leaks or oversized working sets; reduce problem size or memory footprint if possible.",
+      "Enforce cgroup memory limits in Slurm to prevent node-wide swap storms from a single job.",
+      "As a mitigation, consider lowering vm.swappiness and setting operational alerts to pause or requeue jobs when swap_in/out rates exceed a threshold."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation and rising I/O wait correlated with swapping",
+    "root_causes": "Disk throughput and queueing increased sharply during the swap storm: disk_read_rate_bytes_per_sec grew from ~198 MB/s (23:15:40 baseline was far lower) to ~401 MB/s and disk_write_rate_bytes_per_sec to ~177 MB/s by 23:17:25; disk_total_iops ~1,068; disk_io_usage_percent ~52.2%; cpu_iowait_percent rose to ~5.88%. This is consistent with storage pressure from heavy swap-in/out plus the job’s own I/O.",
+    "solutions": [
+      "Profile I/O contributors with iotop/blktrace and correlate to the job processes.",
+      "Resolve the memory thrashing (above) first to cut swap I/O.",
+      "Direct large temporaries/checkpoints to fast local scratch and avoid shared filesystems where possible.",
+      "Apply I/O controls if available (ionice/cgroup blkio) to prevent a single job from saturating the disk subsystem."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the job window",
+    "root_causes": "Filesystem_avail_bytes dropped from ~22.34 GB to ~11.76 GB and filesystem_usage_percent rose from ~73.35% to ~85.97% within minutes (23:15:40–23:17:25), indicating large writes (also reflected by rising disk_write_rate_bytes_per_sec). This risks space exhaustion if the trend continues.",
+    "solutions": [
+      "Inspect job 284 output and temp directories (du/find) to identify large, recent files; compress or remove unneeded intermediates.",
+      "Redirect temporary and checkpoint files to node-local scratch with automatic cleanup at job end.",
+      "Set quotas/alerts and enforce per-job storage policies to prevent sudden space exhaustion on the filesystem."
+    ]
+  },
+  {
+    "anomaly": "Elevated kernel CPU time and interrupt/context-switch overhead",
+    "root_causes": "cpu_system_percent rose from ~2% to >31% with cpu_usage_percent ~91% at 23:17:10; interrupts_rate increased to ~10.9k/s and context_switches_rate >3.1k/s. This aligns with intense page reclaim and I/O activity during the swap storm.",
+    "solutions": [
+      "Prioritize resolving memory pressure and I/O saturation to reduce kernel overhead.",
+      "Profile kernel hotspots (perf top, vmstat, iostat) to confirm reclaim/kswapd and storage drivers as primary contributors.",
+      "If persistent, tune job memory usage and I/O patterns (batching, fewer concurrent writers) to reduce kernel-mode work."
+    ]
+  }
+]

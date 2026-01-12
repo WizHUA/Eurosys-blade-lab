@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Rapid filesystem fill with sustained, extreme disk I/O and rising I/O pressure",
+    "root_causes": "During the window while job 284 (ft_cgC) was active, disk read/write throughput surged (disk_read_rate_bytes_per_sec increased from ~1.68e5 to 5.08e8 B/s and disk_write_rate_bytes_per_sec from ~6.43e4 to 1.86e8 B/s at 23:23:10), disk_io_usage_percent climbed from ~0.46% to 54.91%, and filesystem_usage_percent rose from 73.36% to 87.05% (23:21:40 to 23:23:25). Dirty/writeback bytes also spiked (e.g., memory_dirty_bytes up to 88,326,144 and memory_writeback_bytes up to 29,356,032), indicating heavy writeback backlog. These together point to the job generating large, continuous file I/O causing storage contention and rapid space consumption.",
+    "solutions": [
+      "Identify top writers/readers: iotop -oPa, pidstat -d 1, and lsof to find rapidly growing files and the processes owning them.",
+      "Redirect or limit output to a high-throughput scratch filesystem; review job 284's output/log directories for runaway logging or checkpoints.",
+      "Clean up or archive large intermediate files; enforce per-job quotas or use Slurm cgroup I/O limits (io.max/blkio) to prevent saturation.",
+      "Tune writeback if needed (temporarily lower vm.dirty_ratio/vm.dirty_background_ratio) to reduce large dirty page bursts.",
+      "Verify available capacity and expand or rebalance storage if sustained workload requires it."
+    ]
+  },
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions",
+    "root_causes": "TCP retransmission rates spiked sharply (node_netstat_Tcp_RetransSegs ≈ 30/s and node_netstat_TcpExt_TCPSynRetrans ≈ 6/s at 23:22:25), consistent with short-lived packet loss or congestion during the active job. NIC error counters remain zero, suggesting congestion or path issues rather than interface errors.",
+    "solutions": [
+      "Check switch ports and links for congestion or errors: ethtool -S <iface>, ip -s link, and switch port counters around 23:22:25.",
+      "Verify consistent MTU across endpoints (e.g., 1500 vs jumbo frames) to avoid fragmentation and retransmissions.",
+      "Isolate traffic from heavy I/O phases (stagger checkpoints) or apply QoS/traffic shaping if multiple flows converge (incast).",
+      "Monitor retransmissions in real time with nstat -az and ss -s during the job’s communication-intensive phases."
+    ]
+  },
+  {
+    "anomaly": "Large growth in shared memory (shmem) and page cache with very low free memory",
+    "root_causes": "memory_shmem_bytes increased from ~9.9 MB to 2.99–4.98 GB (e.g., 2,986,024,960 at 23:22:25 and 4,975,431,680 at 23:23:25), memory_cached_bytes rose to ~4.8–5.0 GB, while memory_free_bytes dropped to ~200–300 MB. Although memory_available_bytes stayed >5 GB (cache-dominated), the combination with rising dirty/writeback indicates heavy use of shared memory and caching that could escalate to memory pressure if sustained.",
+    "solutions": [
+      "Inspect shared memory usage: df -h /dev/shm and ipcs -m to identify large segments and owning processes.",
+      "Review the job’s use of /dev/shm or shared-memory backends; cap allocations if not required or move intermediates to disk.",
+      "Keep an eye on dirty/writeback growth (cat /proc/meminfo) and consider temporarily adjusting vm.dirty_* to prevent excessive buildup.",
+      "If tmpfs capacity is inadequate or at risk, resize appropriately or relocate workloads to persistent storage."
+    ]
+  }
+]

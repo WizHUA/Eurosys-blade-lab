@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization spiked to 76% with system load reaching 5.68 on an 8-core system",
+    "root_causes": "CPU-intensive computation phase of the FT_CG benchmark during its execution period",
+    "solutions": [
+      "Review FT_CG job parameters to optimize CPU core utilization",
+      "Check for potential CPU throttling due to thermal issues",
+      "Monitor process-level CPU usage during similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increased significantly with active anonymous memory reaching 1.7GB",
+    "root_causes": "Memory allocation patterns of the FT_CG benchmark during its computation phase",
+    "solutions": [
+      "Analyze memory usage patterns of FT_CG benchmark",
+      "Consider adjusting Slurm memory allocation parameters for similar jobs",
+      "Check for memory leaks in the application code"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O operations surged with write rates exceeding 100MB/s",
+    "root_causes": "Checkpointing or intermediate data writing during FT_CG benchmark execution",
+    "solutions": [
+      "Review FT_CG I/O patterns and optimize checkpoint intervals",
+      "Consider using faster storage or RAM disk for temporary files",
+      "Verify filesystem performance characteristics"
+    ]
+  }
+]

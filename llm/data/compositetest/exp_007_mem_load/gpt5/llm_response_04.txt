@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion and swap saturation during job execution (memory_available_bytes dropped to 26–71 MB, swap_free_bytes fell to as low as 8 KB, swap_usage_percent ~99.96–100%).",
+    "root_causes": "The running job exceeded physical RAM, driving the system into heavy swapping and thrashing. Evidence includes memory_committed_as_bytes ~13.4–13.6 GB on an ~8.28 GB node, sustained page swap-in/out rates (e.g., swap-in up to ~140k pages/s and swap-out up to ~19k pages/s), and anon_memory_percent ~89–90% with cache_usage_percent ~0.35–1.2%, indicating page cache eviction.",
+    "solutions": [
+      "Enforce Slurm memory limits for this workload (e.g., set --mem/--mem-per-cpu and enable cgroup memory controllers with memory.max) to prevent the job from exceeding available RAM.",
+      "Right-size or reconfigure the job to reduce memory footprint (profile with /proc/<pid>/smaps, pmap, or heap profilers; reduce in-memory data; enable checkpointing or tiling).",
+      "Increase available memory resources (schedule on a node with more RAM or increase node RAM) or split the workload across more nodes.",
+      "Tune swapping behavior to avoid thrashing (lower vm.swappiness to 1–10 and ensure vm.min_free_kbytes is reasonable), and consider using zram or moving swap to faster local NVMe if swap must remain.",
+      "Add Slurm KillOnOOM/cgroup OOM policies so jobs are terminated when exceeding limits rather than causing node-wide swap storms."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation and CPU time stalled in I/O wait (cpu_iowait_percent peaked at ~54%, disk_io_usage_percent sustained ~62–87%, very high read/write rates and IOPS).",
+    "root_causes": "Memory-induced swap thrashing generated massive paging traffic to disk, saturating storage and causing many tasks to block (processes_blocked up to 13). This storage bottleneck dominated CPU time in iowait and degraded overall throughput.",
+    "solutions": [
+      "Alleviate the memory pressure first (see above) to eliminate swap traffic, which is the primary driver of the I/O saturation.",
+      "Validate storage health and latency in real time (iostat -x 1, pidstat -d 1, iotop) and investigate per-process I/O patterns.",
+      "If swap is required, place it on fast NVMe/local SSD and ensure sufficient queue depth; consider increasing read_ahead_kb for sequential workloads and verifying scheduler (mq-deadline/none) on NVMe.",
+      "Use node-local scratch for job I/O and reduce small random I/O (batch writes, larger sequential I/O, buffering) to lower IOPS pressure."
+    ]
+  },
+  {
+    "anomaly": "High system load dominated by blocked I/O rather than compute (load_1m rose to ~11.9 on an 8-core node while cpu_user_percent remained modest and iowait dominated).",
+    "root_causes": "Run queue pressure was driven by many threads waiting on disk due to swap/paging and reduced page cache (cache_usage_percent near 0.35–1.2%), not by useful CPU work.",
+    "solutions": [
+      "Confirm task states with top/htop (D state) and trace I/O waiters (pidstat -d, perf sched, blktrace) to verify load is I/O-bound.",
+      "Reduce concurrency of I/O-intensive phases (limit parallel readers/writers, add throttling) and restructure job to process data in smaller memory tiles.",
+      "After mitigating memory pressure, retest: load should fall toward core count with iowait returning to single digits."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage escalated from 33% to 55% during the monitoring period, with available memory dropping from 5.5GB to 3.7GB, indicating heavy memory consumption by running processes.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes and determine if they have memory leaks.",
+      "Monitor swap usage trends as the system approaches memory exhaustion to prevent thrashing.",
+      "Consider killing or restarting memory-heavy processes if they are not critical to system operation.",
+      "Review the completed job 'ft_cgC' logs to determine if it left behind any zombie processes or memory allocations."
+    ]
+  },
+  {
+    "anomaly": "Significant disk I/O performance degradation over time.",
+    "root_causes": "Disk write activity increased dramatically from 165KB/s to 193MB/s, with write IOPS climbing from 1.1 to 5.8, indicating intensive disk operations likely related to memory pressure and swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and their specific read/write patterns.",
+      "Monitor disk utilization and queue depths to determine if the storage subsystem is becoming a bottleneck.",
+      "Check if the high I/O is related to swap activity by monitoring '/proc/vmstat' for swap-in/swap-out operations.",
+      "Consider temporarily reducing I/O-intensive workloads to allow the system to recover."
+    ]
+  }
+]

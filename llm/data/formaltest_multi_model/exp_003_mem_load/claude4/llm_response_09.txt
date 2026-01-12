@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Significant memory pressure indicated by substantial drop in available memory and increased swap usage.",
+    "root_causes": "Memory resource load from the running ft_cgC job causing high memory consumption and forcing the system to use swap space.",
+    "solutions": [
+      "Monitor the ft_cgC job's memory usage patterns using 'ps aux --sort=-%mem' to identify if it has memory leaks or excessive allocation.",
+      "Check if the job's memory requirements exceed the node's capacity and consider job constraints or memory limits.",
+      "Use 'free -h' and 'vmstat 1' to monitor swap activity and confirm memory pressure patterns."
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity correlating with memory pressure events.",
+    "root_causes": "Disk I/O load caused by memory swapping activity as the system moves data between RAM and swap space.",
+    "solutions": [
+      "The increase in disk write activity from ~165KB/s to ~193KB/s suggests swap-related I/O during memory pressure periods.",
+      "Use 'iotop' to confirm swap-related disk activity and identify specific processes causing I/O load.",
+      "Consider adding more physical memory or optimizing the ft_cgC application's memory usage patterns."
+    ]
+  }
+]

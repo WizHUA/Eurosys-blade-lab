@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spiked to critical levels with active anonymous memory consumption reaching 4.7GB",
+    "root_causes": "The 'ft_cgC' application likely had a memory leak or inefficient memory management during its execution period",
+    "solutions": [
+      "Profile the application with valgrind to check for memory leaks",
+      "Review application logs for out-of-memory errors or improper deallocation",
+      "Consider increasing swap space or physical memory allocation for this workload"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O operations showed intermittent spikes with read operations reaching 24.7MB/s",
+    "root_causes": "Possible checkpointing or data staging activity from the HPC application",
+    "solutions": [
+      "Review application I/O patterns and consider optimizing checkpoint frequency",
+      "Check if temporary directory (/tmp) usage could be moved to faster storage",
+      "Verify if I/O operations are properly synchronized between MPI ranks"
+    ]
+  },
+  {
+    "anomaly": "Network activity showed unusual TCP segment retransmissions and SYN retries",
+    "root_causes": "Possible network congestion or packet loss during MPI communications",
+    "solutions": [
+      "Monitor network hardware for errors on the compute node's interface",
+      "Check MPI implementation configuration (transport layer, timeout settings)",
+      "Consider using a different MPI transport protocol (ucx instead of tcp)"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Critical system performance degradation with extremely high I/O wait and severe memory pressure causing system to approach unresponsive state.",
+    "root_causes": "System is experiencing massive I/O bottleneck with I/O wait reaching 53% combined with memory exhaustion (99.6% usage) forcing excessive swapping activity.",
+    "solutions": [
+      "Immediately identify and terminate or renice the most I/O intensive processes using 'iotop -a' and 'ionice'",
+      "Free up memory by killing non-essential processes or restarting memory-leaking applications",
+      "Check disk health and filesystem integrity using 'smartctl' and 'fsck' as the extreme I/O wait suggests possible storage hardware issues",
+      "Consider adding swap space temporarily or increasing memory if this workload pattern is expected"
+    ]
+  },
+  {
+    "anomaly": "System load average has reached critical levels indicating severe resource contention.",
+    "root_causes": "Load average of 11.88 on an 8-core system indicates significant process queuing and resource starvation, likely caused by the combination of memory pressure and I/O bottleneck.",
+    "solutions": [
+      "Use 'ps aux --sort=-%cpu' and 'top' to identify processes contributing to high load",
+      "Check for processes in uninterruptible sleep state (D state) using 'ps aux | grep \" D \"'",
+      "Consider temporarily reducing the number of concurrent processes or jobs",
+      "Monitor system recovery after addressing memory and I/O issues"
+    ]
+  },
+  {
+    "anomaly": "Filesystem space is critically low with over 84% utilization approaching capacity limits.",
+    "root_causes": "Available filesystem space has dropped to approximately 12GB out of 78GB total, which combined with high I/O activity could lead to filesystem full conditions.",
+    "solutions": [
+      "Immediately clean up temporary files and logs using 'find /tmp -type f -atime +7 -delete' and log rotation",
+      "Identify large files consuming space using 'du -h --max-depth=1 /' and 'find / -size +1G -type f'",
+      "Archive or compress old data files that are no longer actively needed",
+      "Consider extending filesystem or adding additional storage if this is expected usage"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Significant memory pressure and swapping activity detected during job execution",
+    "root_causes": "Memory usage spiked to 88.7% with heavy swapping (swap usage reached 55.6%) while running the ft_cgC job, indicating insufficient memory allocation",
+    "solutions": [
+      "Increase memory allocation for similar jobs in the Slurm configuration",
+      "Investigate and optimize memory usage in the ft_cgC application code",
+      "Consider using memory-optimized nodes for this workload"
+    ]
+  },
+  {
+    "anomaly": "High system load with CPU utilization reaching 90+% while many processes were blocked",
+    "root_causes": "System experienced significant I/O wait (peaking at 5.9%) and process blocking (2 processes at peak), likely due to memory pressure and swapping",
+    "solutions": [
+      "Monitor and optimize disk I/O patterns in the application",
+      "Adjust Slurm job parameters to better distribute resource usage",
+      "Consider implementing memory-aware scheduling for similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Sharp increase in network retransmissions and TCP errors toward job completion",
+    "root_causes": "Network issues emerged under heavy load with TCP retransmission rate peaking at 0.079 per second and TCP errors appearing",
+    "solutions": [
+      "Investigate network infrastructure for potential bottlenecks",
+      "Monitor network performance during job execution",
+      "Consider adjusting MPI configuration for better network utilization"
+    ]
+  }
+]

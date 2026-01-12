@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes to critical levels with swap usage exceeding 50%",
+    "root_causes": "Application 'ft_cgC' appears to have memory-intensive phases causing high memory demand and triggering heavy swap usage",
+    "solutions": [
+      "Check application memory requirements and compare with system allocation",
+      "Consider increasing physical memory allocation for similar jobs",
+      "Optimize application memory usage patterns to reduce swapping"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O operations spike dramatically during job execution",
+    "root_causes": "Application workload transitioned from computation to heavy disk I/O operations during certain phases",
+    "solutions": [
+      "Verify if temporary files or checkpoints can be moved to faster storage",
+      "Investigate application I/O patterns for optimization opportunities",
+      "Consider using tmpfs for temporary files if memory pressure allows"
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage increases significantly during job execution",
+    "root_causes": "System overhead from managing memory and I/O operations during high workload phases",
+    "solutions": [
+      "Analyze system call patterns during high system time periods",
+      "Consider reducing process count or increasing CPU allocation",
+      "Check for resource contention with other processes"
+    ]
+  }
+]

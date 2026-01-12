@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes coinciding with job completion",
+    "root_causes": "Memory fragmentation or inefficient cleanup after FT_CG job completion at 07:28:52",
+    "solutions": [
+      "Check job's memory deallocation patterns in application code",
+      "Monitor slab allocation statistics (slab_reclaimable_bytes) for fragmentation",
+      "Verify if the node needs manual slab reclaim or compaction after large jobs"
+    ]
+  },
+  {
+    "anomaly": "Sudden increase in anonymous memory usage",
+    "root_causes": "Memory allocation pattern shift during CG solver execution phases",
+    "solutions": [
+      "Analyze memory.meminfo reports before/during/after job execution",
+      "Check for potential memory leaks in the FT_CG application",
+      "Consider adjusting job memory limits or requesting full node allocation"
+    ]
+  },
+  {
+    "anomaly": "Unusual TCP connection patterns during computation",
+    "root_causes": "Network communication pattern of FT_CG application during solve phase",
+    "solutions": [
+      "Verify MPI implementation settings and network buffer sizes",
+      "Check for unnecessary network communication in solver implementation",
+      "Monitor individual process network connections with ss/netstat"
+    ]
+  }
+]

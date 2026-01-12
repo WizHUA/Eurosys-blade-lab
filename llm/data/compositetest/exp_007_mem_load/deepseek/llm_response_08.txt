@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with near-exhausted swap space",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing heavy swapping activity",
+    "solutions": [
+      "Investigate memory usage patterns of completed job 'ft_ftC' which ran during this period",
+      "Check for memory leaks in the application code that ran in the batch job",
+      "Consider increasing physical memory allocation or optimizing job memory requirements"
+    ]
+  },
+  {
+    "anomaly": "High CPU I/O wait percentage (consistently above 45%)",
+    "root_causes": "Disk I/O bottleneck likely caused by heavy swapping activity and storage subsystem contention",
+    "solutions": [
+      "Monitor disk I/O queues using 'iostat -x 1' to identify storage bottlenecks",
+      "Check if the storage backend (network/filesystem) was experiencing issues during the job execution",
+      "Consider moving temporary files to faster storage or optimizing I/O patterns"
+    ]
+  },
+  {
+    "anomaly": "Extremely high system load (load_1min > 11) with relatively few running processes",
+    "root_causes": "Processes stuck in uninterruptible sleep (D state) likely due to I/O or memory pressure",
+    "solutions": [
+      "Use 'ps aux' to identify processes in D state and their waiting resources",
+      "Check kernel logs ('dmesg') for storage or memory subsystem errors",
+      "Consider rebooting affected nodes if the issue persists after job completion"
+    ]
+  }
+]

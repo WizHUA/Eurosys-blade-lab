@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure leading to heavy swapping and performance degradation.",
+    "root_causes": "Memory usage exceeded available physical RAM, causing the system to heavily rely on swap space with swap-in rates reaching 495,868 pages/sec.",
+    "solutions": [
+      "Immediately identify memory-intensive processes using 'ps aux --sort=-%mem' and consider terminating or reducing memory allocation for non-critical processes.",
+      "Monitor swap activity with 'vmstat 1' to confirm the extent of swapping and its impact on system performance.",
+      "Consider adding more physical memory or implementing memory limits on jobs to prevent future memory exhaustion scenarios.",
+      "Review the completed job 'ft_cgC' configuration to ensure proper memory allocation limits are set for similar workloads."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O wait times indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O utilization peaked at over 50% with system CPU time escalating to 16% due to excessive swap operations and disk activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing the highest disk I/O load and correlate with memory swapping activity.",
+      "Consider implementing I/O scheduling optimizations or upgrading storage subsystem to handle high-throughput workloads.",
+      "Monitor disk queue depth and latency metrics to determine if storage hardware is reaching capacity limits.",
+      "Implement job scheduling policies that prevent memory-intensive and I/O-intensive jobs from running simultaneously."
+    ]
+  },
+  {
+    "anomaly": "High system CPU usage and context switching rates during memory pressure period.",
+    "root_causes": "System overhead increased significantly due to kernel processing swap operations and memory management, with context switches reaching over 2,100/sec.",
+    "solutions": [
+      "Monitor system CPU breakdown using 'top' or 'htop' to confirm kernel overhead from memory management operations.",
+      "Consider tuning kernel swap parameters such as vm.swappiness to reduce aggressive swapping behavior.",
+      "Implement memory monitoring alerts to detect memory pressure before it reaches critical levels.",
+      "Review system logs for any kernel messages related to memory allocation failures or out-of-memory conditions."
+    ]
+  }
+]

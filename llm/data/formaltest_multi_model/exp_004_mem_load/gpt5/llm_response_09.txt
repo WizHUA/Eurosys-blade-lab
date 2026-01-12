@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe transient memory pressure with active swapping and a page-fault storm around 07:08:28–07:08:58.",
+    "root_causes": "While job ft_cgC was running, anonymous memory usage surged (memory_active_anon_bytes ~1.58e9 -> ~3.43e9), memory_available_bytes dropped sharply (~5.61e9 -> ~3.72e9), and page_faults_rate spiked (~279/s -> ~5711/s). Swap usage was already high and steady (swap_usage_percent ~46.6%), with swap activity bursts (page_swap_out_rate up to ~167 at 07:08:58 and non-zero swap-in). Memory_pressure_waiting_rate/memory_pressure_stalled_rate remained ~6.818, confirming sustained pressure. This indicates the workload increased its memory footprint abruptly, causing swapping and thrashing.",
+    "solutions": [
+      "Increase the job's requested memory in Slurm (e.g., --mem or --mem-per-cpu) or schedule it on a node with more RAM.",
+      "Enable/enforce memory cgroups for Slurm steps to contain swap storms and fail fast instead of system-wide thrashing.",
+      "Profile the job's memory usage (e.g., smaps/pmap/heap profilers) to reduce footprint or fix leaks; consider lowering concurrency or dataset size.",
+      "Optionally reduce vm.swappiness (e.g., to 10–20) after confirming workloads have sufficient RAM, to prefer OOM over heavy swapping.",
+      "Add alerts when memory_available_bytes falls below a threshold (e.g., 4e9) or when page_swap_in/out rates rise, to preemptively mitigate."
+    ]
+  },
+  {
+    "anomaly": "Evidence of a prior OOM-kill on the node during the job’s run window.",
+    "root_causes": "vm_oom_kills_total is 1 across the entire window, indicating at least one OOM event since boot. Combined with high swap utilization (~46.6%) and subsequent memory pressure, this suggests earlier memory overcommit by a process (likely the running job).",
+    "solutions": [
+      "Review kernel logs for OOM details (e.g., journalctl -k | grep -i OOM) to identify the offending process and timing.",
+      "Set strict Slurm memory limits and cgroup memory+swap limits to prevent node-wide impact.",
+      "Tune application memory usage or increase requested memory; if recurrent, consider nodes with larger RAM."
+    ]
+  },
+  {
+    "anomaly": "Writeback and I/O pressure burst concurrent with the memory event.",
+    "root_causes": "memory_dirty_bytes spiked (~7.4e4 -> ~8.6e6 bytes) and disk_io_usage_percent increased (to ~6.36%) while swap-out bursts occurred. load_1min rose (~0.02 -> ~3.9) without a corresponding increase in cpu_iowait_percent (~0.0023%), indicating runnable tasks stalled by memory reclaim/writeback rather than pure I/O saturation.",
+    "solutions": [
+      "Address the primary memory pressure (see above) to eliminate reclaim-induced writeback.",
+      "Verify the job writes to fast local storage; if possible, stage heavy I/O to a faster scratch device.",
+      "Validate and, if appropriate, tune vm.dirty_background_ratio/dirty_ratio (or *_bytes) to smooth writeback and avoid large dirty-page bursts.",
+      "Use iostat/iotop during the workload to confirm which processes dominate writeback and adjust their I/O patterns (e.g., batching, async I/O)."
+    ]
+  }
+]

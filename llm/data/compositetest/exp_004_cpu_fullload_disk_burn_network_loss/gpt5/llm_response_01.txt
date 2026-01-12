@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Explosive shared memory (/dev/shm) growth with severe swap thrashing and rising kernel/iowait time",
+    "root_causes": "Between 23:22:25 and 23:23:25, memory_shmem_bytes jumped from ~10 MB to ~3.0–5.0 GB (e.g., 2.99 GB at 23:22:25 and 4.98 GB at 23:23:25) while page_swap_in_rate and page_swap_out_rate spiked from ~160/60 per second to 420,625/147,706 per second (and higher), cpu_system_percent rose to ~16.48% and cpu_iowait_percent to ~3.77%, and memory_free_bytes fell to ~0.2–0.27 GB. These signatures indicate the running job 284 (ft_cgC) rapidly allocated large shared memory or tmpfs, driving aggressive reclamation and swap activity.",
+    "solutions": [
+      "Inspect and reclaim shared memory used by the job: ls -lh /dev/shm and ipcs -m; identify the job’s PIDs and confirm large segments.",
+      "Modify the job to avoid large /dev/shm usage for bulk data; use disk-backed scratch or smaller buffer sizes.",
+      "Apply memory controls to the job (Slurm/cgroup memory.high and memory.max) to prevent node-wide swapping; consider lowering vm.swappiness temporarily if safe.",
+      "Request more RAM for this workload in future runs or schedule on a node with larger memory.",
+      "If the job is still running, consider checkpointing and resubmitting with adjusted memory settings to avoid thrashing."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation and page cache writeback surge",
+    "root_causes": "disk_io_usage_percent climbed from ~0.46% to 22.19% → 36.99% → 51.23% → 54.91%, with disk_read_rate_bytes_per_sec peaking around 507 MB/s and disk_write_rate_bytes_per_sec around 186 MB/s. Concurrent increases in cpu_iowait_percent (to ~3.77%) and processes_blocked (to 2) align with swap storms and heavy sequential I/O driven by the job’s memory behavior and file writes.",
+    "solutions": [
+      "Identify top I/O contributors with iotop or pidstat -d 1 and correlate with the job’s processes.",
+      "Throttle or isolate I/O for the job using cgroups (io.max or blkio throttling) to protect node responsiveness.",
+      "Reduce bursty writeback by tuning vm.dirty_bytes and vm.dirty_background_bytes (temporary mitigation during the run).",
+      "Stagger or reduce checkpoint/output frequency in the job; compress or batch outputs to lower sustained throughput.",
+      "If possible, direct heavy I/O to a higher-throughput scratch or dedicated storage tier."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption approaching high utilization",
+    "root_causes": "filesystem_usage_percent rose quickly from ~73.36% to ~87.05% during the window, with disk_write_rate_bytes_per_sec consistently high, indicating the job 284 (ft_cgC) is producing large outputs or temporary files and accelerating space consumption.",
+    "solutions": [
+      "Locate the growth: run du -x -h --max-depth=2 on the job’s output/scratch directories and remove unneeded intermediates.",
+      "Redirect large temporary/output files to a designated scratch space and implement size limits/quotas for the job.",
+      "Enable alerts and preemptive cleanup at 85–90% usage to avoid out-of-space failures during runs.",
+      "Review the job’s output policy (checkpoint size/frequency, logging verbosity) and reduce or rotate large files."
+    ]
+  }
+]

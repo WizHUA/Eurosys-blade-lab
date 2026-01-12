@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with usage jumping from 33% to 73% and available memory dropping from 5.4GB to 2.1GB.",
+    "root_causes": "Memory resource exhaustion likely caused by the ft_cgC job consuming excessive memory resources during execution.",
+    "solutions": [
+      "Monitor memory usage patterns of the ft_cgC job to identify memory leaks or inefficient memory allocation.",
+      "Use 'ps aux --sort=-%mem' and 'top' to identify the specific processes consuming the most memory.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints.",
+      "Review the ft_cgC application configuration for potential memory optimization settings."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in active anonymous memory from 1.6GB to 5.0GB indicating heavy process memory allocation.",
+    "root_causes": "Application memory allocation pattern showing rapid growth in process-specific memory usage.",
+    "solutions": [
+      "Analyze the ft_cgC job's memory allocation patterns using memory profiling tools.",
+      "Check if the application has configurable memory pool sizes that can be optimized.",
+      "Monitor for memory fragmentation issues that could be causing inefficient memory usage.",
+      "Consider restarting the job with stricter memory limits to prevent system-wide memory pressure."
+    ]
+  }
+]

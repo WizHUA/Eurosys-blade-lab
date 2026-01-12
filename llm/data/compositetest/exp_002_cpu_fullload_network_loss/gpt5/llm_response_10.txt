@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with elevated CPU iowait and blocked tasks during the job window.",
+    "root_causes": "While job 284 (ft_cgC) was running, disk_io_usage_percent rose to 87%, cpu_iowait peaked at ~22.5%, and processes_blocked reached 3, concurrent with very high disk write throughput (up to ~215 MB/s). This indicates the workload was write-heavy and saturated the storage device, stalling runnable threads on I/O.",
+    "solutions": [
+      "Redirect job scratch/output to a faster scratch volume (e.g., local NVMe or parallel FS) and avoid writing to a busy/root filesystem.",
+      "Apply per-job I/O QoS (cgroup v2 io.max/blkio throttling) to cap bursts and reduce system-wide stalls.",
+      "Profile the job’s I/O pattern with iostat -x 1 and iotop to confirm top writers; if sequential, increase write buffering or batching in the application.",
+      "If on ext4/xfs, ensure sufficient free space and consider mount options (e.g., noatime) to reduce metadata overhead.",
+      "Stagger or schedule other I/O-intensive jobs away from this node while ft_cgC runs."
+    ]
+  },
+  {
+    "anomaly": "Filesystem nearly full for most of the interval (94–98% usage) with an abrupt drop to ~73% free space at 23:19:40.",
+    "root_causes": "The node’s filesystem usage climbed from ~94.1% to ~98.1% while disk writes were high, then a large amount of space was freed suddenly (filesystem_avail_bytes jumped from ~1.6–5.0 GB to ~22.3 GB). This pattern is consistent with the job creating large temporary/output files and deleting them later, exacerbating I/O latency when space was scarce.",
+    "solutions": [
+      "Enforce per-job disk quotas or pre-run space checks; reject or reschedule jobs if projected space would exceed thresholds (e.g., >90% FS usage).",
+      "Write large temporaries to per-node or shared scratch designed for high throughput, not the root filesystem.",
+      "Add monitoring/alerts for filesystem_usage_percent crossing 90% and auto-clean old scratch files.",
+      "Coordinate job cleanup to occur after data is fully flushed to avoid long periods of near-ENOSPC conditions."
+    ]
+  },
+  {
+    "anomaly": "Transient heavy swap activity early in the window despite ample free memory reported.",
+    "root_causes": "At 23:17:55 page_swap_in_rate and page_swap_out_rate were very high (~145k/s and ~210k/s) with swap usage around 54%, contributing to disk contention; later rates subsided. This indicates brief swap pressure/reclaim that amplified the I/O bottleneck.",
+    "solutions": [
+      "Verify and tune vm.swappiness (e.g., lower it) and ensure memory cgroup limits match the job’s requested memory to prevent swapping.",
+      "Identify processes with significant swap usage (smem -s swap or cat /proc/*/status) and adjust the job’s memory footprint or parallelism.",
+      "If safe during maintenance, clear swap (swapoff -a; swapon -a) after investigating to remove stale swapped pages.",
+      "Prefer memory-local scratch and avoid unnecessary page cache pressure by streaming or chunking writes in the application."
+    ]
+  }
+]

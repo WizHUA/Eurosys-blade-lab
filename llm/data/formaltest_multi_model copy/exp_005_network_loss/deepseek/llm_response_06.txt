@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with elevated system load despite completed jobs",
+    "root_causes": "The system shows sustained CPU usage around 50% and high load averages (3.6-3.8) while monitoring occurred after job completion, suggesting unaccounted background processes or resource leakage",
+    "solutions": [
+      "Check for orphaned processes from completed job 276 using 'ps -eo pid,ppid,cmd | grep -v grep | grep 276'",
+      "Examine kernel logs for potential out-of-memory events (dmesg | grep -i oom)",
+      "Analyze memory pressure metrics showing periodic spikes in anonymous memory usage"
+    ]
+  },
+  {
+    "anomaly": "Irregular network activity spikes after job completion",
+    "root_causes": "Network transmit/receive rates fluctuated significantly (8-46MB/s) despite no active jobs, indicating possible post-processing synchronization or logging operations",
+    "solutions": [
+      "Monitor network connections with 'ss -tulwnp' to identify unexpected network activity",
+      "Check for NFS or distributed filesystem operations that might still be completing",
+      "Verify if any job cleanup or data staging operations were configured to run post-execution"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O patterns show unusual periodic bursts",
+    "root_causes": "Disk write operations continued in bursts (up to 170MB/s) after job completion, suggesting filesystem syncing or temporary file cleanup operations",
+    "solutions": [
+      "Use 'lsof +L1' to check for unlinked temporary files still consuming space",
+      "Analyze filesystem journaling activity with 'journalctl -b --since=07:00'",
+      "Consider tuning filesystem sync intervals if cleanup operations are causing spikes"
+    ]
+  }
+]

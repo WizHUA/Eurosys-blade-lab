@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "Severe memory thrashing and swap storm during the ft_cgC job window",
+    "root_causes": "The job's memory footprint exceeded available RAM, driving anonymous memory usage up and pushing the system into heavy swapping. Evidence includes memory_available_bytes dropping as low as ~0.93 GB, swap_usage_percent rising to ~56%, page_swap_in/out rates spiking from ~14k/30k to ~392k/172k ops/s, major page faults increasing sharply, and memory_committed_as_bytes exceeding physical memory.",
+    "solutions": [
+      "Enforce per-job memory limits in Slurm (e.g., --mem/--mem-per-cpu) and use cgroup memory controllers to prevent node-wide swapping.",
+      "Profile the job's memory usage (pmap/smem/heap profiling) and reduce working set (smaller problem size, streaming, tiling, or out-of-core algorithms).",
+      "Reduce or disable overcommit for this workload (vm.overcommit_memory/mmap settings) and lower vm.swappiness to limit swap pressure.",
+      "If the workload genuinely requires more RAM, schedule on higher-memory nodes or reduce concurrency per node.",
+      "Monitor in real time with vmstat 1 and sar -B to verify that swap-in/out and major faults return to near-zero during reruns."
+    ]
+  },
+  {
+    "anomaly": "Storage saturated by swap and job I/O, causing escalating disk activity",
+    "root_causes": "Swap I/O combined with job read/write activity drove disk utilization up. Disk_io_usage_percent rose from ~0.77% to ~52%, with disk read/write rates peaking near ~401 MB/s and ~177 MB/s respectively, closely tracking the swap-in/out surge.",
+    "solutions": [
+      "Resolve the underlying memory thrashing to eliminate swap traffic (primary fix).",
+      "Redirect temporary and spill files to fast local scratch (NVMe) and ensure TMPDIR points to node-local storage.",
+      "Apply I/O throttling or blkio cgroup limits for noncritical jobs; verify I/O scheduler and queue depths with iostat/iotop.",
+      "If feasible, place swap on faster media or reduce swap size after enforcing stronger memory limits to discourage swapping."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the job",
+    "root_causes": "Filesystem_usage_percent increased from ~73.35% to ~85.97% within minutes, indicating large output or spill files written by the job concurrent with the swap storm.",
+    "solutions": [
+      "Direct large intermediate/output files to designated scratch filesystems and clean them promptly after completion.",
+      "Set and enforce per-user/job quotas; alert when filesystem_usage_percent crosses thresholds.",
+      "Audit job output paths and temporary directories; compress or prune intermediates where possible."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization with elevated kernel time and load spikes",
+    "root_causes": "CPU usage peaked around ~91% with cpu_system_percent up to ~31% and load_1min rising above 7, reflecting kernel overhead from paging and heavy I/O and increased runnable threads.",
+    "solutions": [
+      "After eliminating swapping, remeasure CPU profile (perf/top) to confirm kernel time drops.",
+      "Reduce per-node concurrency/threads (e.g., OMP_NUM_THREADS, MPI ranks per node) to fit within memory and I/O capacity.",
+      "Pin threads and ensure NUMA-local allocations to improve cache/TLB locality and reduce kernel overhead."
+    ]
+  }
+]

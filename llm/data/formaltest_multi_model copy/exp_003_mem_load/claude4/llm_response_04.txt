@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage increasing from 33% to 54% during job execution.",
+    "root_causes": "The ft_cgC job is consuming excessive memory resources, causing anonymous memory to increase from 22% to 43% of total system memory.",
+    "solutions": [
+      "Monitor the ft_cgC job's memory allocation patterns using 'ps aux --sort=-%mem' and 'pmap' to identify memory leaks or inefficient allocation.",
+      "Check if the job has appropriate memory limits set in Slurm configuration to prevent memory exhaustion.",
+      "Review the job's algorithm and data structures for memory optimization opportunities.",
+      "Consider running the job on a node with more available memory or splitting the workload across multiple nodes."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time and I/O wait during memory pressure period.",
+    "root_causes": "System overhead increased due to memory management activities including page swapping and kernel memory allocation operations.",
+    "solutions": [
+      "Monitor swap usage with 'vmstat 1' to confirm if swapping is occurring and contributing to I/O wait.",
+      "Use 'iotop' to identify processes causing disk I/O that may be related to memory pressure.",
+      "Implement memory-aware scheduling policies to prevent memory-intensive jobs from overwhelming system resources.",
+      "Consider tuning kernel memory management parameters like swappiness to optimize performance under memory pressure."
+    ]
+  }
+]

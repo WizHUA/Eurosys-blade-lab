@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Sudden collapse of page cache with a large spike in free memory around 07:14:13",
+    "root_causes": "At 07:13:58 -> 07:14:13, memory_cached_bytes dropped from ~5.33 GB to ~0.53 GB while memory_free_bytes jumped from ~0.18 GB to ~5.27 GB and disk I/O sharply declined. This pattern is consistent with an explicit page cache purge (e.g., drop_caches) or an application phase that aggressively evicted page cache.",
+    "solutions": [
+      "Audit job scripts and system automation for use of 'echo 1|2|3 > /proc/sys/vm/drop_caches' and remove in production runs unless explicitly required.",
+      "If cache management is needed, prefer application-level hints (e.g., posix_fadvise(DONTNEED)) instead of global cache drops.",
+      "Tune vm.vfs_cache_pressure (e.g., reduce from default 100) only after validation, to avoid overly aggressive cache reclaim.",
+      "Add alerting for abrupt cache/free-memory step changes to catch unintended cache purges during jobs."
+    ]
+  },
+  {
+    "anomaly": "High swap usage (~46.6% of 2 GB) with significant swap I/O bursts despite ample RAM available",
+    "root_causes": "swap_free_bytes ~1.15 GB (≈53% free) implies ~1.0 GB swap in use while memory_available_bytes remained multi‑GB (≥5.4 GB). Early intervals show notable swap activity (page_swap_in_rate ≈257k/s, swap_out ≈136k/s at 07:13:43) with near‑zero major faults, indicating cold anonymous pages lingering in swap or aggressive swappiness rather than active memory pressure.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., 10–20) to discourage swapping when RAM is available.",
+      "During a maintenance window, run swapoff -a && swapon -a to repatriate cold pages and reset swap residency.",
+      "Review cgroup memory settings to ensure limits are not forcing reclaim to swap.",
+      "Track per‑process swap usage (e.g., /proc/<pid>/smaps_rollup) and fix applications holding large cold anonymous memory."
+    ]
+  },
+  {
+    "anomaly": "Short burst of heavy disk I/O utilization (up to ~68% util, ~264 MB/s reads and ~139 MB/s writes) with elevated I/O wait",
+    "root_causes": "disk_io_usage_percent peaked at ~67.7% with cpu_iowait_percent ~6.16% and io_pressure_waiting_rate non‑zero at 07:13:43, then tapered off. This indicates a write/read‑intensive phase of the workload driving storage close to saturation. Filesystem usage also peaked around 90.34%, which can exacerbate latency under heavy writes.",
+    "solutions": [
+      "If this interferes with co‑tenants, throttle job I/O via cgroup blkio/ionice or schedule it on nodes with faster local scratch/NVMe.",
+      "Maintain filesystem headroom (keep usage <85%) by cleaning temporary outputs or expanding capacity to reduce fragmentation and write amplification.",
+      "Validate I/O patterns (sequential vs random) and align with storage characteristics; batch large writes and avoid unnecessary fsyncs where safe.",
+      "Enable per‑job I/O telemetry (iostat/blktrace) to pinpoint phases causing saturation and tune them."
+    ]
+  }
+]

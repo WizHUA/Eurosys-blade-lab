@@ -1,0 +1,11 @@
+[
+  {
+    "anomaly": "Sustained high system load disproportionate to moderate CPU usage.",
+    "root_causes": "CPU resource load from a high number of processes or background tasks.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify the specific processes contributing to the high system load.",
+      "Check system logs (e.g., /var/log/syslog) for any post-job cleanup or maintenance tasks that might be consuming CPU resources.",
+      "Analyze the process states; a high number of processes in 'D' (disk wait) state could point to an I/O bottleneck causing the load."
+    ]
+  }
+]

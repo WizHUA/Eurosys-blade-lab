@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with substantial reduction in available memory during job execution.",
+    "root_causes": "The ft_cgC job consumed excessive memory resources, causing available memory to drop from 6.7GB to 5.6GB and memory usage to increase from 18% to 32%.",
+    "solutions": [
+      "Monitor memory usage patterns of the ft_cgC job to identify if it has memory leaks or inefficient memory allocation",
+      "Consider implementing memory limits using cgroups or Slurm memory constraints to prevent future memory exhaustion",
+      "Analyze the application's memory requirements and optimize memory usage if possible",
+      "Increase system memory if the workload consistently requires more resources than available"
+    ]
+  },
+  {
+    "anomaly": "Network activity fluctuations with periodic increases in transmission rates.",
+    "root_causes": "The job exhibits variable network communication patterns with transmission rates varying significantly from 3.8 to 16.9 bytes per second, suggesting intermittent data exchange or communication phases.",
+    "solutions": [
+      "Profile the application's network communication patterns to understand if the fluctuations are expected behavior",
+      "Monitor network latency and bandwidth utilization to ensure network infrastructure can handle peak communication loads",
+      "Consider network optimization techniques if the application requires consistent high-bandwidth communication",
+      "Implement network monitoring to detect potential bottlenecks during high communication phases"
+    ]
+  }
+]

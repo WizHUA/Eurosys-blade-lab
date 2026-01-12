@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient filesystem saturation: usage spiked from ~73.36% to ~95.36% with available space dropping from ~22.3 GB to ~3.9 GB, then recovered within minutes.",
+    "root_causes": "A short-lived burst of file creation or large temporary outputs during the running job (ft_cgC) caused the filesystem to nearly fill, then cleanup or job completion removed the data.",
+    "solutions": [
+      "Identify large and rapidly created files during the interval (23:20:25–23:21:10) using du -x --max-depth=2 on likely output directories and lsof +L1 for deleted-but-open files.",
+      "Redirect temporary and checkpoint data to node-local or dedicated scratch filesystems; ensure TMPDIR points to fast scratch in the job script.",
+      "Implement quotas or per-job output limits and set alerts at 85–90% filesystem usage to prevent full-volume outages.",
+      "Review the job’s output/log patterns and rotate or compress logs more aggressively during runs."
+    ]
+  },
+  {
+    "anomaly": "Active swapping with moderate RAM usage: swap usage ~48–54% and sustained swap in/out rates while memory_available_bytes remained ~5.5 GB.",
+    "root_causes": "Kernel reclaim or job memory behavior caused inactive pages to be swapped despite ample free memory, leading to unnecessary swap churn (e.g., high swappiness or per-cgroup memory limits).",
+    "solutions": [
+      "Verify swappiness and reclaim settings (cat /proc/sys/vm/swappiness); consider lowering swappiness on compute nodes if policy allows.",
+      "Check per-job/container memory limits versus working set (Slurm cgroup MemoryMax) to avoid artificial pressure prompting swap.",
+      "Monitor vmstat 1 and sar -B to confirm swap-in/out during runs; correlate with process RSS using smem or ps to identify offenders.",
+      "If feasible, allocate more memory to the job or refactor to reduce memory footprint and inactive anonymous pages."
+    ]
+  },
+  {
+    "anomaly": "Burst of heavy disk I/O with elevated I/O wait: cpu_iowait_percent peaked at ~7.97% and disk_io_usage_percent reached ~62% with writes ~31–33 MB/s.",
+    "root_causes": "Write-intensive phases of the running workload, potentially combined with swap activity, temporarily saturated the storage backend.",
+    "solutions": [
+      "Profile I/O during the heavy period (around 23:19:40) with iostat -x 1 and iotop to identify the busiest processes and files.",
+      "Stage intermediate data to local NVMe/SSD scratch and batch writes back to shared storage to reduce contention.",
+      "Ensure mount options and I/O scheduler are tuned for the workload; consider per-job I/O throttling or QoS on the shared filesystem."
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage consistently above 98%, available memory critically low, and swap nearly exhausted.",
+    "root_causes": "Memory resource exhaustion from high memory demand processes.",
+    "solutions": [
+      "Investigate processes with high memory usage using 'ps aux --sort=-%mem' or 'top'.",
+      "Check for memory leaks in recently completed job 'ft_ftC' which ran during this period.",
+      "Monitor swap usage with 'vmstat 1' to confirm active swapping and consider adding more physical RAM."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O utilization with disk I/O time consistently above 80%, indicating severe storage bottleneck.",
+    "root_causes": "Intense disk I/O activity likely from both application demands and memory swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O.",
+      "The high 'page_swap_in_rate' and 'page_swap_out_rate' confirm swapping is contributing to I/O load.",
+      "Addressing the memory pressure should reduce swap-related I/O."
+    ]
+  },
+  {
+    "anomaly": "Elevated CPU system time and high context switch rate, indicating kernel overhead.",
+    "root_causes": "Increased kernel processing likely due to memory management and I/O handling.",
+    "solutions": [
+      "High context switches ('context_switches_rate' > 10,000/s) suggest process scheduling overhead.",
+      "Monitor 'cpu_system_percent' which reaches over 21%, indicating significant kernel CPU time.",
+      "Reduce system overhead by addressing the primary memory and I/O bottlenecks."
+    ]
+  },
+  {
+    "anomaly": "Job '277.batch' completed with exit code 15, indicating a potential failure.",
+    "root_causes": "Job execution failure, possibly due to resource constraints or application error.",
+    "solutions": [
+      "Check the job's standard error and output logs for specific error messages.",
+      "Review Slurm accounting data for the job to see if it was killed due to resource limits.",
+      "Verify if the job's resource requests were adequate for the actual workload."
+    ]
+  }
+]

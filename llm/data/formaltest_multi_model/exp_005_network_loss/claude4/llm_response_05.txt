@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Sustained high CPU utilization (47-51%) with disproportionate system load averaging 3.8 across the monitoring period.",
+    "root_causes": "CPU resource load from computationally intensive processes or background tasks that exceed normal operational levels.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify the specific processes contributing to the high CPU utilization.",
+      "Check system logs for any background maintenance tasks or system processes consuming excessive CPU cycles.",
+      "Monitor the completed job 'ft_cgC' impact and verify if cleanup processes are still running after job completion."
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with usage climbing from 18% to 32% and increased memory allocation activity.",
+    "root_causes": "Memory resource load from active processes requiring substantial RAM allocation, potentially related to the recently completed computational job.",
+    "solutions": [
+      "Monitor memory allocation patterns using 'vmstat 1' to identify if memory usage continues to climb.",
+      "Use 'ps aux --sort=-%mem' to identify processes with high memory consumption.",
+      "Check for memory leaks in applications that may persist after job completion."
+    ]
+  },
+  {
+    "anomaly": "Moderate disk I/O activity with intermittent spikes in write operations reaching up to 174MB/s.",
+    "root_causes": "Disk I/O load from file operations, likely related to data output or cleanup activities from the completed computational job.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are responsible for the disk write activity.",
+      "Monitor filesystem usage to ensure adequate free space for ongoing operations.",
+      "Check if the I/O spikes correlate with specific application cleanup or data processing tasks."
+    ]
+  }
+]

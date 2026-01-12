@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure increasing over time with high anon memory usage",
+    "root_causes": "Memory-intensive job (ft_cgC) consuming significant anonymous memory (1.5-1.6GB) leading to reduced available memory",
+    "solutions": [
+      "Check job's memory limits and allocation to ensure proper configuration",
+      "Monitor memory usage patterns of similar jobs to optimize resource requests",
+      "Consider memory optimizations in the application code if this is a recurring pattern"
+    ]
+  },
+  {
+    "anomaly": "Network throughput spike during job execution with packet loss indicators",
+    "root_causes": "MPI communication intensive workload causing network congestion visible in increased retransmissions (peaking at 7.5 retrans/sec)",
+    "solutions": [
+      "Verify MPI implementation configuration and collective operation patterns",
+      "Check network fabric health and interface statistics for potential hardware issues",
+      "Consider adjusting MPI job parameters to reduce communication density"
+    ]
+  },
+  {
+    "anomaly": "Unusual TCP connection churn during network intensive phase",
+    "root_causes": "Abnormal TCP connection establishment patterns during high network activity period",
+    "solutions": [
+      "Inspect MPI initialization code for unnecessary connection setups",
+      "Check for network timeouts or keepalive settings that may be too aggressive",
+      "Profile MPI initialization phase for potential optimization opportunities"
+    ]
+  }
+]

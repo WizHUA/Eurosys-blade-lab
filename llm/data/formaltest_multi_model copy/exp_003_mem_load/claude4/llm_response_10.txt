@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant memory pressure and resource contention during job execution period.",
+    "root_causes": "Memory allocation patterns showing transition from 43% to 55% usage with corresponding increase in anonymous memory from 22% to 43%, indicating intensive memory consumption by the running job.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to understand its memory allocation behavior.",
+      "Consider implementing memory limits or cgroups to prevent excessive memory consumption.",
+      "Evaluate if the node has sufficient memory resources for this type of computational workload.",
+      "Review job scheduling policies to avoid memory-intensive jobs on nodes with limited available memory."
+    ]
+  },
+  {
+    "anomaly": "Moderate increase in disk I/O activity during job execution.",
+    "root_causes": "Disk write rate increased substantially from ~165KB/s to ~193KB/s, with corresponding increase in write IOPS from 1.1 to 3.2, indicating the job performs significant data output operations.",
+    "solutions": [
+      "Use 'iotop' to monitor specific processes responsible for increased I/O activity.",
+      "Evaluate if the job's I/O patterns are within expected parameters for this workload type.",
+      "Consider implementing I/O throttling if disk performance becomes a bottleneck for other workloads.",
+      "Monitor disk utilization trends to ensure storage subsystem can handle the workload demands."
+    ]
+  },
+  {
+    "anomaly": "Elevated system load relative to CPU utilization indicating resource wait states.",
+    "root_causes": "System load increased from 4.08 to 4.11 while CPU usage fluctuated between 48-52%, suggesting processes are waiting for resources beyond just CPU cycles.",
+    "solutions": [
+      "Analyze process states using 'ps aux' to identify processes in uninterruptible sleep (D state).",
+      "Monitor I/O wait times and memory pressure to determine primary bottleneck sources.",
+      "Review system logs for any hardware or kernel-level issues causing process delays.",
+      "Consider workload distribution adjustments if resource contention becomes systematic."
+    ]
+  }
+]

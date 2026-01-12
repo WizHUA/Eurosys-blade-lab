@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage shows sharp increase affecting system performance",
+    "root_causes": "Job 276 (ft_cgC) completed, but memory remains highly utilized with active_anon_bytes spiking to 4.7GB during execution, suggesting potential memory leak or inefficient garbage collection in application",
+    "solutions": [
+      "Profile application memory usage to identify leaks",
+      "Increase swap space or memory allocation",
+      "Check for memory fragmentation issues"
+    ]
+  },
+  {
+    "anomaly": "Context switches rate spiked to 2775/s during job execution",
+    "root_causes": "High process switching overhead from compute-intensive job coupled with memory pressure triggers frequent scheduler interventions",
+    "solutions": [
+      "Optimize job scheduling parameters (CPU affinity, memory binding)",
+      "Check for excessive threading/process spawning in application",
+      "Monitor processor cache performance"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O time spiked to 90% with heavy write operations",
+    "root_causes": "Job 276 generated significant disk activity (38GB written during execution period) while running computation",
+    "solutions": [
+      "Optimize application I/O patterns (larger buffers, asynchronous writes)",
+      "Consider using faster storage or RAM disk for temporary files",
+      "Review filesystem caching parameters"
+    ]
+  }
+]

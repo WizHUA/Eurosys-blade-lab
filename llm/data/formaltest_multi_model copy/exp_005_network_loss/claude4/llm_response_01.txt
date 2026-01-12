@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant memory pressure and cache utilization fluctuations during job execution.",
+    "root_causes": "Memory resource load from computationally intensive workload causing variable memory allocation patterns and cache pressure.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' to identify peak memory consumption periods.",
+      "Check if the job 'ft_cgC' has memory allocation patterns that could benefit from optimization or different memory management strategies.",
+      "Consider using memory profiling tools to analyze the application's memory access patterns and optimize data structures.",
+      "Evaluate if the current memory configuration is adequate for the workload's peak memory requirements."
+    ]
+  },
+  {
+    "anomaly": "Variable disk I/O activity with periodic increases in write operations and latency.",
+    "root_causes": "Disk I/O load from application data processing and periodic system operations like memory management and cache flushing.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes responsible for disk I/O spikes during job execution.",
+      "Monitor disk queue depth and utilization to ensure storage subsystem can handle the workload efficiently.",
+      "Consider optimizing application I/O patterns or implementing asynchronous I/O to reduce latency impact.",
+      "Evaluate if faster storage or additional I/O channels would benefit this type of computational workload."
+    ]
+  },
+  {
+    "anomaly": "Moderate TCP connection activity with occasional retransmissions during network operations.",
+    "root_causes": "Network communication patterns from the running job causing intermittent packet loss or connection establishment overhead.",
+    "solutions": [
+      "Monitor network interface statistics to identify if packet loss is occurring at the hardware level.",
+      "Check network configuration and ensure adequate bandwidth for the application's communication patterns.",
+      "Consider implementing connection pooling or optimizing network buffer sizes if the application performs frequent network operations.",
+      "Evaluate if network latency or bandwidth limitations are affecting job performance."
+    ]
+  }
+]

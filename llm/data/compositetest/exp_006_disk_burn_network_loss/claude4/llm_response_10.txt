@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to heavy swapping and system performance degradation.",
+    "root_causes": "Memory usage escalated from 32% to 99% during job execution, with swap usage increasing from 48% to 90%, causing the system to rely heavily on swap space.",
+    "solutions": [
+      "Monitor memory consumption of the 'ft_ftC' job to determine if it has a memory leak or insufficient memory allocation.",
+      "Use 'vmstat 1' to confirm active swapping and 'ps aux --sort=-%mem' to identify memory-intensive processes.",
+      "Consider increasing available RAM or implementing memory limits for jobs to prevent system-wide impact.",
+      "Review job requirements and optimize memory usage patterns to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "I/O wait percentage spiked from 0.01% to 27% due to intensive swapping activity and high disk utilization reaching 66%.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and confirm swapping as the primary cause.",
+      "Consider faster storage solutions or adding more RAM to reduce swap dependency.",
+      "Monitor disk queue depth and latency to assess if storage subsystem can handle the load.",
+      "Implement I/O scheduling policies to prioritize critical system processes during heavy swap periods."
+    ]
+  },
+  {
+    "anomaly": "System load average reached critically high levels during job execution.",
+    "root_causes": "Load average increased from 5.15 to 10.02 for a system with limited CPU cores, indicating severe resource contention from memory pressure and I/O bottlenecks.",
+    "solutions": [
+      "The high number of blocked processes (up to 17) confirms I/O bottleneck is causing process queuing.",
+      "Address the root memory pressure issue to reduce swap-induced I/O and lower system load.",
+      "Monitor process states using 'top' to identify processes in 'D' (uninterruptible sleep) state.",
+      "Consider job scheduling policies to prevent resource-intensive jobs from overwhelming the system simultaneously."
+    ]
+  }
+]

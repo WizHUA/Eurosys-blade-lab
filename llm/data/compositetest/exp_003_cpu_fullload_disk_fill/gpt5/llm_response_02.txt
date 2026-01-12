@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Transient filesystem near-full event: filesystem_usage_percent jumped from ~73.36% to ~95.36% between 23:20:25 and 23:21:10, then returned to ~73.36% by 23:21:25.",
+    "root_causes": "Short-lived creation or exposure of large files during the running job window (ft_cgC) or space held by deleted-but-open files; the sharp change in filesystem_avail/free bytes without a matching sustained disk_write_rate suggests data appeared between samples (e.g., created just before sampling, moved/renamed, or accounted for differently) and was then removed.",
+    "solutions": [
+      "Immediately audit recent large files in the job's working directories: du -xSh /path | sort -h (compare before/after if available).",
+      "Check for deleted-but-open files holding space: lsof +L1 and restart offending processes if necessary.",
+      "Enable alerts and protective actions when filesystem_usage_percent exceeds 90% to avoid job failures.",
+      "If jobs create large scratch files, redirect to a dedicated scratch filesystem and ensure automatic cleanup on job completion.",
+      "Review any scheduled housekeeping (snapshots, log rotations) that might temporarily consume space during this interval."
+    ]
+  },
+  {
+    "anomaly": "Aggressive swapping during job runtime: swap_usage_percent ~48–54% with bursts of swap I/O (page_swap_out_rate up to ~31.8k/s and page_swap_in_rate >300/s) and elevated cpu_iowait (up to ~7.97%).",
+    "root_causes": "Kernel is actively swapping anonymous memory despite substantial free/available RAM, indicating aggressive reclaim policy (e.g., high vm.swappiness) or memory pressure within a cgroup for the job causing swapping even when system memory is available; resulting swap traffic adds I/O pressure.",
+    "solutions": [
+      "Validate swappiness and reclaim behavior: sysctl vm.swappiness (consider reducing for HPC nodes, e.g., 10–20) and confirm no zram/zswap misconfiguration.",
+      "Check the job’s memory cgroup limits/usage to ensure memory.high/memory.max are not forcing swap under per-job constraints.",
+      "Correlate major faults and swap rates with the job: vmstat 1 and pidstat -r -p <pid> to verify ongoing swap activity.",
+      "If application tolerates it, pin critical processes to RAM (avoid overcommit) or provision more memory per task to reduce swap pressure.",
+      "Monitor swap_free_bytes and page_swap_{in,out}_rate; alert when sustained swap-out occurs alongside ample free memory."
+    ]
+  },
+  {
+    "anomaly": "Short-lived storage I/O pressure at 23:19:40: disk_io_usage_percent ~62.4% with high page_swap_out_rate and cpu_iowait ~8%, then tapering off in subsequent samples.",
+    "root_causes": "I/O contention driven by swap traffic and write activity during the job (ft_cgC), causing the block device to be busy and increasing CPU iowait.",
+    "solutions": [
+      "Identify top I/O contributors during spikes: iotop -oPa and iostat -x 1 to confirm queue depth and device utilization.",
+      "Mitigate swap-induced I/O by addressing the swapping root causes (see above) and consider lowering dirty writeback thresholds if large bursts occur.",
+      "If feasible, throttle heavy writers via cgroup I/O controls (e.g., io.max) or stagger I/O phases in the workflow.",
+      "Validate storage health and latency (smartctl -a, dmesg) to rule out device errors amplifying contention."
+    ]
+  }
+]

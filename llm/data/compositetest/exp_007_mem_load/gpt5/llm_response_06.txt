@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with swap saturation and continuous swapping",
+    "root_causes": "During the job window (ft_ftC), physical RAM was essentially fully consumed (memory_usage_percent ~99.1–99.7%, memory_available_bytes as low as 26–71 MB) while swap usage reached ~98.5–100% (swap_free_bytes down to 8 KB). Virtual memory was overcommitted (memory_committed_as_bytes ~13.6 GB vs ~8.3 GB RAM), driving very high swap-in/out rates (e.g., page_swap_in_rate up to ~107k/s and swap_out up to ~18836/s) and major faults, indicating the job's working set exceeded RAM.",
+    "solutions": [
+      "Enforce per-job memory limits via Slurm cgroups (e.g., ConstrainRAMSpace=yes; require --mem/--mem-per-cpu) to prevent overcommit and swapping storms.",
+      "Tune VM overcommit policy to be stricter (e.g., vm.overcommit_memory=2 and appropriate vm.overcommit_ratio) so committed memory cannot substantially exceed physical RAM.",
+      "Profile and reduce the job's memory footprint (smaller batch sizes/data tiles, more streaming/tiling, memory pooling, release unused buffers).",
+      "If the workload legitimately needs more memory, schedule on higher-RAM nodes or increase node RAM capacity.",
+      "As a stopgap, move swap to a faster device (e.g., NVMe) or add swap, understanding it only mitigates symptoms and does not replace sufficient RAM."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with very high CPU iowait and elevated system load",
+    "root_causes": "Sustained swapping induced heavy disk traffic: disk_io_usage_percent peaked ~71–87% with read/write rates up to ~108–142 MB/s, while cpu_iowait_percent stayed extremely high (~29–54%) and processes_blocked rose (up to 13). The system load (load_1min ~9–11.9) reflects threads stalled on I/O rather than pure CPU computation.",
+    "solutions": [
+      "Resolve the root memory pressure (see above) to stop swap-driven I/O; this will directly lower iowait and load.",
+      "Validate storage health and latency with iostat/iotop; ensure no failing device or throttling.",
+      "If swapping cannot be eliminated immediately, place swap on the fastest available device and ensure sufficient I/O queue depth.",
+      "Review VM dirty writeback settings (vm.dirty_ratio, vm.dirty_background_ratio) to avoid bursty writeback under pressure."
+    ]
+  },
+  {
+    "anomaly": "High process blocking (D-state) indicating frequent stalls on I/O",
+    "root_causes": "Processes_blocked increased (up to 13) while swap and disk I/O were saturated, showing tasks frequently waiting on paging and storage. This is consistent with memory thrash and congested I/O queues.",
+    "solutions": [
+      "After mitigating memory pressure, confirm blocked processes drop using vmstat/iostat; investigate any remaining hot files or devices.",
+      "Check per-process I/O patterns with iotop/pidstat -d to identify offenders and optimize access patterns (sequential reads, larger I/O, buffering).",
+      "If applicable, distribute scratch I/O to faster local storage or multiple devices to reduce queueing."
+    ]
+  }
+]

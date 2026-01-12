@@ -1,0 +1,99 @@
+{
+  "model_short_name": "deepseek",
+  "model_full_name": "deepseek/deepseek-chat-v3-0324",
+  "total_runs": 10,
+  "successful_runs": 10,
+  "success_rate": "100.0%",
+  "results": [
+    {
+      "run_id": 1,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_01.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:09:08.727022"
+    },
+    {
+      "run_id": 2,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_02.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:09:37.774614"
+    },
+    {
+      "run_id": 3,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_03.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:09:53.103935"
+    },
+    {
+      "run_id": 4,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_04.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:10:10.184409"
+    },
+    {
+      "run_id": 5,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_05.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:10:33.031666"
+    },
+    {
+      "run_id": 6,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_06.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:10:50.012496"
+    },
+    {
+      "run_id": 7,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_07.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:11:01.416158"
+    },
+    {
+      "run_id": 8,
+      "success": true,
+      "anomaly_count": 4,
+      "response_file": "llm_response_08.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:11:27.268931"
+    },
+    {
+      "run_id": 9,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_09.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:11:48.998769"
+    },
+    {
+      "run_id": 10,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_10.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T13:12:04.793501"
+    }
+  ]
+}

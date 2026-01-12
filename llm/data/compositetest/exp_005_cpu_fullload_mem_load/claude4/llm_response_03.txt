@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to aggressive swap usage and system instability.",
+    "root_causes": "Memory usage reached 92% with over 1GB of swap space consumed, indicating the system is running out of physical memory and heavily relying on swap storage.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to identify memory-intensive processes",
+      "Use 'ps aux --sort=-%mem' to identify the top memory-consuming processes",
+      "Consider adding more physical memory or optimizing application memory usage",
+      "Review the completed job 'ft_cgC' for memory leaks or inefficient memory allocation patterns"
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait times causing system performance degradation.",
+    "root_causes": "Disk I/O utilization reaching 70% with significant I/O wait percentages, likely caused by memory pressure forcing extensive swap activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing heavy disk I/O activity",
+      "Monitor swap activity with 'swapon -s' and consider reducing swap usage by addressing memory pressure",
+      "Check disk health and performance using 'iostat -x 1' to rule out hardware issues",
+      "Consider using faster storage (SSD) for swap partitions if memory upgrades are not feasible"
+    ]
+  },
+  {
+    "anomaly": "High CPU usage with disproportionate user space consumption.",
+    "root_causes": "CPU utilization consistently above 70% with user space processes consuming 50-75% of CPU time, indicating computationally intensive workload.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify CPU-intensive processes and their resource consumption patterns",
+      "Consider implementing CPU throttling or nice values for non-critical processes",
+      "Monitor the system load average and ensure it doesn't consistently exceed the number of CPU cores",
+      "Evaluate if the workload can be distributed across multiple nodes to reduce single-node strain"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with filesystem cache being aggressively reclaimed during job execution.",
+    "root_causes": "Memory resource exhaustion forcing the system to reclaim filesystem cache to make room for application memory demands.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to determine if it has memory leaks or inefficient allocation patterns.",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact.",
+      "Use 'vmstat 1' and 'free -h' to monitor real-time memory pressure and cache reclaim activity.",
+      "Review job memory requirements and optimize application memory usage if possible."
+    ]
+  },
+  {
+    "anomaly": "High I/O wait times coinciding with intensive disk activity and memory pressure.",
+    "root_causes": "Storage subsystem under heavy load due to combination of application I/O demands and memory swapping activity.",
+    "solutions": [
+      "The disk I/O utilization reaching 87% indicates severe storage bottleneck during peak job activity.",
+      "Use 'iotop' to identify specific processes causing high disk I/O load.",
+      "Consider implementing I/O throttling for jobs or upgrading storage subsystem performance.",
+      "Monitor for potential storage hardware issues given the sustained high utilization."
+    ]
+  },
+  {
+    "anomaly": "System load significantly higher than CPU core count with blocked processes.",
+    "root_causes": "Resource contention causing processes to wait for system resources, particularly I/O operations.",
+    "solutions": [
+      "The presence of blocked processes (up to 3) combined with load average of 8.37 on an 8-core system indicates resource saturation.",
+      "Investigate process states using 'ps aux' to identify processes in uninterruptible sleep (D state).",
+      "Consider job scheduling policies to prevent resource conflicts between concurrent workloads.",
+      "Monitor system during job execution to identify optimal resource allocation strategies."
+    ]
+  }
+]

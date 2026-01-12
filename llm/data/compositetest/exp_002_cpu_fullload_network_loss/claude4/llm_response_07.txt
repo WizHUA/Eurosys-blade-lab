@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Extreme memory pressure causing severe system performance degradation and potential instability.",
+    "root_causes": "Memory resource exhaustion with usage reaching critical levels above 95%, combined with active swapping indicating physical RAM depletion.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to confirm current swap activity levels.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' or 'top' to find the largest memory consumers.",
+      "Check if the completed job 'ft_cgC' left behind any zombie processes or memory leaks using 'ps aux | grep defunct'.",
+      "Consider increasing physical RAM if workloads consistently exceed current capacity.",
+      "Implement memory limits using cgroups to prevent future jobs from consuming excessive memory."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O utilization with significant write activity causing performance bottleneck.",
+    "root_causes": "Intensive disk write operations likely caused by memory swapping and application I/O from the computational job.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load.",
+      "Check disk health and performance with 'iostat -x 1' to monitor I/O wait times and utilization.",
+      "The high 'disk_io_usage_percent' values above 70% indicate storage subsystem stress that needs attention.",
+      "Consider using faster storage (SSD) for swap partitions if memory pressure cannot be resolved.",
+      "Optimize application I/O patterns or implement I/O scheduling policies to reduce disk contention."
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load disproportionate to CPU utilization indicating resource contention.",
+    "root_causes": "High load average (above 8.0) combined with blocked processes suggests I/O wait and resource contention beyond just CPU usage.",
+    "solutions": [
+      "Analyze process states using 'ps axo pid,ppid,state,comm' to identify processes in 'D' (uninterruptible sleep) state.",
+      "Use 'uptime' and 'w' commands to monitor load trends and active user sessions.",
+      "The presence of blocked processes in the metrics indicates I/O bottlenecks that need investigation.",
+      "Consider workload scheduling improvements to prevent resource conflicts during peak usage periods.",
+      "Implement process priority adjustments using 'nice' and 'ionice' for better resource allocation."
+    ]
+  }
+]

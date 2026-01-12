@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Excessive CPU utilization reaching up to 83% with sustained high user CPU time.",
+    "root_causes": "CPU resource load from computationally intensive job 'ft_cgC' consuming significant processing cycles.",
+    "solutions": [
+      "Monitor the 'ft_cgC' job which shows completed status - verify if this high CPU usage is expected behavior for this workload type.",
+      "Use 'top' or 'htop' to confirm which specific processes are consuming CPU resources during similar job executions.",
+      "Consider implementing CPU limits or job scheduling policies to prevent single jobs from monopolizing system resources."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity with write rates reaching up to 275KB/s.",
+    "root_causes": "Disk I/O load likely caused by the computational job writing results or intermediate data to storage.",
+    "solutions": [
+      "The disk write activity correlates with the 'ft_cgC' job execution timeline, suggesting this is job-related I/O.",
+      "Use 'iotop' to identify specific processes responsible for the disk write activity.",
+      "Consider optimizing I/O patterns in the application or using faster storage if this becomes a performance bottleneck."
+    ]
+  }
+]

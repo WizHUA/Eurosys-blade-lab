@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spiked to 73.67% with active allocations consuming most available memory",
+    "root_causes": "Application memory leak or insufficient memory allocation for the active job",
+    "solutions": [
+      "Check for memory leaks in the ft_cgC application code",
+      "Increase Slurm job memory allocation for this type of workload",
+      "Monitor memory pressure metrics (memory_pressure_waiting_rate) during job execution"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O wait times increased to 0.42% of total CPU time during peak memory usage",
+    "root_causes": "Memory pressure causing increased swap activity and disk paging",
+    "solutions": [
+      "Optimize application memory access patterns to reduce paging",
+      "Consider adding more physical memory to the node",
+      "Review filesystem cache usage (cache_usage_percent dropped to 23.69%)"
+    ]
+  },
+  {
+    "anomaly": "TCP retransmission rate increased to 0.381/sec during computation phase",
+    "root_causes": "Network congestion or MPI communication bottlenecks during heavy computation",
+    "solutions": [
+      "Check network infrastructure health and switch configurations",
+      "Optimize MPI communication patterns in the application",
+      "Consider using faster interconnects if available"
+    ]
+  }
+]

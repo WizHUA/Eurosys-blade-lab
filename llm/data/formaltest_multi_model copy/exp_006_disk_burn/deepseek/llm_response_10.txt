@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High disk I/O wait time causing CPU performance degradation",
+    "root_causes": "Disk I/O saturation indicated by disk_io_time_seconds_total increasing from 4220.335 to 4262.351 during the monitoring period, with disk_write_time_seconds_total reaching 74159.553",
+    "solutions": [
+      "Investigate disk activity using 'iotop' to identify processes causing high I/O",
+      "Consider moving the workload to faster storage if available",
+      "Optimize application I/O patterns to reduce disk contention"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure leading to increased page faults",
+    "root_causes": "Memory usage spiked to 77.59% with page_faults_rate reaching 30038.45 and memory_available_bytes dropping to 168488960 at peak usage",
+    "solutions": [
+      "Check memory usage patterns of completed job 276 (ft_cgC)",
+      "Analyze memory allocation in application code",
+      "Consider increasing memory allocation for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage increased significantly",
+    "root_causes": "CPU system percent rose from 0.89% to 17.78% during the monitoring period, suggesting increased kernel overhead",
+    "solutions": [
+      "Profile system calls using 'strace' or 'perf' to identify sources of kernel activity",
+      "Check for excessive context switches (peaked at 1918.75 per second)",
+      "Review file system and I/O related kernel parameters"
+    ]
+  }
+]

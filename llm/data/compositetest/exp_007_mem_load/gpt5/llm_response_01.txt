@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with sustained swap thrashing and OOM events during the job window",
+    "root_causes": "The node’s available memory dropped to ~26–66 MB while swap free fell to as low as 8 KB, with extreme swap activity (page_swap_in_rate up to ~107k/s and page_swap_out_rate up to ~54k/s). Committed memory (~13.4–13.6 GB) exceeded physical RAM (8 GB), and vm_oom_kills_total=5 indicates out-of-memory kills. This aligns with the job ft_ftC running in this interval, strongly suggesting the job’s memory demand exceeded the node’s capacity.",
+    "solutions": [
+      "Enforce and verify Slurm memory limits for this job (e.g., --mem/--mem-per-cpu) and ensure cgroup memory enforcement is enabled (ConstrainRAMSpace=Yes).",
+      "Re-run the workload with an appropriate memory request or on a higher-memory node/partition; reduce per-task memory by lowering ranks/threads if feasible.",
+      "Investigate the job’s memory profile (sacct -j 285 --format=JobID,MaxRSS,AveRSS,State; sstat --format=MaxRSS,AveRSS -j 285) and check for leaks/oversubscription.",
+      "Tune system to avoid catastrophic thrashing: consider lowering vm.swappiness and, if swap is required, place it on the fastest local device (e.g., NVMe) or use zram to mitigate write amplification.",
+      "Review kernel logs for OOM details (dmesg or /var/log/messages) to identify the processes that were killed."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation driven by paging, with disk I/O utilization ~72–87% and large read/write throughput",
+    "root_causes": "Memory pressure forced heavy paging, generating sustained disk traffic (e.g., disk_io_usage_percent peaking ~86.8%, read/write rates up to ~100 MB/s read and ~55 MB/s write), which in turn throttled application performance.",
+    "solutions": [
+      "Primary fix is to resolve memory overcommit (see memory solutions). Reducing swap activity will immediately lower disk load.",
+      "Validate which devices are saturated (iostat -x 1, pidstat -d 1, iotop) and ensure swap and hot data are on the fastest available local device.",
+      "If swap must be used, prefer fast local NVMe or enable compressed RAM swap (zram) to reduce physical I/O.",
+      "Limit concurrent I/O-heavy tasks on the node (Slurm job concurrency/placement) to avoid compounding device contention."
+    ]
+  },
+  {
+    "anomaly": "Excessive CPU time in iowait with rising system load and blocked processes",
+    "root_causes": "CPU iowait remained extremely high (peaking ~54%) while load_1min rose to ~11.9 and processes_blocked peaked at 13, indicating many tasks stalled on disk due to paging and I/O contention rather than useful compute.",
+    "solutions": [
+      "Alleviate the root memory pressure to reduce paging-induced I/O stalls.",
+      "Throttle job concurrency (reduce threads/ranks) or adjust task placement to lower contention until memory footprint is under control.",
+      "Monitor in real time to confirm recovery (vmstat 1, iostat -x 1, pidstat -dl 1) and consider draining the node and restarting affected services/jobs after the pressure abates."
+    ]
+  }
+]

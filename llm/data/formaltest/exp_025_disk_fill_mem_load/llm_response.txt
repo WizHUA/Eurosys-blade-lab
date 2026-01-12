@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage, indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load from heavy read/write operations.",
+    "solutions": [
+      "Investigate disk I/O patterns using 'iotop' to identify processes causing high I/O.",
+      "Check for filesystem issues or hardware problems with the storage device.",
+      "Monitor 'disk_io_time_seconds_total' and 'disk_io_weighted_time_seconds_total' for sustained high values."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with very low available memory and high swap usage.",
+    "root_causes": "Memory resource exhaustion from memory-intensive processes.",
+    "solutions": [
+      "Use 'vmstat 1' to monitor swapping activity ('si'/'so' columns).",
+      "Identify memory-hungry processes with 'ps aux --sort=-%mem'.",
+      "Consider terminating non-essential processes to free up memory."
+    ]
+  },
+  {
+    "anomaly": "High system load average with significant number of blocked processes.",
+    "root_causes": "Resource contention from I/O-bound processes waiting for disk operations.",
+    "solutions": [
+      "Check 'processes_blocked' count which reaches 11, indicating I/O wait issues.",
+      "Use 'top' command to see processes in 'D' state (uninterruptible sleep).",
+      "Address the underlying disk I/O bottleneck to reduce process blocking."
+    ]
+  },
+  {
+    "anomaly": "Filesystem nearing capacity with very low available space.",
+    "root_causes": "Storage space exhaustion from large file writes or temporary files.",
+    "solutions": [
+      "Check filesystem usage with 'df -h' and identify large files with 'du -sh /*'.",
+      "Clean up temporary files and old job outputs to free space.",
+      "Monitor 'filesystem_avail_bytes' which drops to critical levels."
+    ]
+  }
+]

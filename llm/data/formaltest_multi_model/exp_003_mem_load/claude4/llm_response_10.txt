@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage climbing from 33% to 55% and swap space exhaustion indicated by high page swap rates.",
+    "root_causes": "Memory resource exhaustion caused by the running job 'ft_cgC' consuming increasing amounts of physical memory, forcing the system to heavily utilize swap space.",
+    "solutions": [
+      "Monitor the specific memory consumption of job 276 (ft_cgC) using 'ps aux --sort=-%mem' or 'top' to identify if it has a memory leak",
+      "Check swap usage with 'swapon -s' and 'vmstat 1' to confirm heavy swapping activity",
+      "Consider killing the job if it continues to consume excessive memory beyond expected limits",
+      "Review the job's memory requirements and ensure adequate physical RAM is allocated for similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Increasing disk I/O activity with write rates climbing significantly during the monitoring period.",
+    "root_causes": "Disk I/O load likely caused by heavy swapping activity due to memory pressure and application data writes from the running computational job.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity",
+      "Monitor disk utilization with 'iostat -x 1' to confirm if the storage subsystem is becoming a bottleneck",
+      "The correlation between memory pressure and disk I/O suggests addressing the memory issue will likely reduce disk stress",
+      "Consider implementing I/O throttling if the application is performing excessive disk writes"
+    ]
+  }
+]

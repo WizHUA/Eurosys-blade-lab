@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Spike in TCP retransmissions with kernel softnet drops indicating network stack congestion.",
+    "root_causes": "Between 07:08:28 and 07:09:13, tcp_retransmissions_rate jumped from ~0 to 10.9–17.5/s and tcp_syn_retrans_rate became non-zero, while softnet_dropped_rate spiked to 6.0/s at 07:08:28. Interface error/drop counters stayed at 0, pointing to RX backlog/NAPI saturation or CPU/IRQ affinity issues rather than physical link errors during the running job (ft_cgC).",
+    "solutions": [
+      "Inspect NIC and driver queues: ethtool -g to view RX/TX ring sizes and increase if small; verify GRO/LRO and interrupt coalescing (ethtool -k/-C) to smooth bursts.",
+      "Balance packet processing: enable/tune RPS/XPS (sysfs) and ensure IRQs are spread across cores (irqbalance or manual smp_affinity).",
+      "Check host-level softnet stats (cat /proc/net/softnet_stat) and NIC stats (ethtool -S) for RX ring overflows; correlate with switch port counters for congestion.",
+      "For the job, reduce burstiness (e.g., adjust MPI transport/eager limits or collective algorithms) or throttle per-rank send rates if feasible."
+    ]
+  },
+  {
+    "anomaly": "Sudden surge in paging and swap activity despite moderate overall memory headroom.",
+    "root_causes": "At 07:08:28 memory_free_bytes dropped from ~3.7 GiB to ~1.8 GiB and memory_active_anon_bytes jumped to ~3.43 GiB, with page_faults_rate rising to ~5711/s and page_swap_out_rate spiking from ~0 to 14–167/s (remaining elevated through 07:09:13). swap_usage_percent stayed ~46.6%, indicating active swapping of pages even with several GiB available, likely due to working set changes or VM swappiness behavior during the job phase shift.",
+    "solutions": [
+      "Identify processes driving page faults/swapping: vmstat 1, pidstat -r 1, and per-process smaps/numa_maps to find hot working sets.",
+      "Reduce swapping pressure: lower vm.swappiness (e.g., 10–20), consider enabling/tuning zswap/zram if appropriate, and ensure cgroup memory limits align with workload needs.",
+      "If feasible, allocate more memory to this job or reschedule on a node with larger RAM; verify the job’s memory footprint and data staging strategy to avoid sudden working set explosions."
+    ]
+  },
+  {
+    "anomaly": "Committed virtual memory exceeds physical RAM, increasing OOM risk under page touch.",
+    "root_causes": "memory_committed_as_bytes climbed to ~9.0 GiB at 07:08:28 (above MemTotal ~8.28 GiB) and remained high, indicating overcommit relative to physical memory. If more of this committed space becomes resident, the system could hit OOM despite current availability.",
+    "solutions": [
+      "Tighten memory overcommit policy: set vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio, or enforce Slurm/cgroup memory limits for the job.",
+      "Audit the application’s allocation patterns (e.g., large reservations/mmap) and right-size allocations or use on-demand allocation strategies.",
+      "Monitor oom_kills (currently 0) and PSI memory to preemptively act if pressure rises; alert if committed_as approaches a configurable threshold."
+    ]
+  }
+]

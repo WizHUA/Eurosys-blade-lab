@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization spikes to 94% with sustained high load averages",
+    "root_causes": "Compute-intensive workload from FT benchmark job causing CPU saturation",
+    "solutions": [
+      "Monitor CPU affinity settings to ensure proper core utilization",
+      "Check for CPU frequency scaling issues that may impact performance",
+      "Verify MPI process pinning configuration for optimal NUMA performance"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increasing with active swapping activity",
+    "root_causes": "Memory-intensive computation phase of FT benchmark exceeding physical RAM capacity",
+    "solutions": [
+      "Monitor swap usage trends during benchmark execution",
+      "Check MPI rank memory allocation patterns",
+      "Verify Slurm memory request configuration matches job requirements"
+    ]
+  },
+  {
+    "anomaly": "Network retransmissions detected during benchmark execution",
+    "root_causes": "MPI communication patterns causing network congestion",
+    "solutions": [
+      "Verify network fabric health and link status",
+      "Check MPI collective operation tuning parameters",
+      "Monitor for packet drops at switch interfaces"
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Sudden spike in memory usage from 32% to 55% indicating memory pressure.",
+    "root_causes": "Memory resource load from increased anonymous memory allocation, likely from the completed job's cleanup or residual processes.",
+    "solutions": [
+      "Check for lingering processes from the completed job 'ft_cgC' using 'ps aux' and terminate any zombie processes.",
+      "Monitor memory allocation patterns with 'vmstat 1' to identify if there are memory leaks in system processes.",
+      "Review system logs around job completion time (07:28:52) to identify any cleanup issues or resource deallocation problems."
+    ]
+  },
+  {
+    "anomaly": "Disk write activity increased significantly from minimal to over 160MB/sec.",
+    "root_causes": "Disk I/O load from post-job cleanup activities, log rotation, or data synchronization operations.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity.",
+      "Check if system logs, job output files, or temporary data are being written or cleaned up after job completion.",
+      "Monitor disk space usage with 'df -h' to ensure adequate free space for ongoing operations."
+    ]
+  }
+]

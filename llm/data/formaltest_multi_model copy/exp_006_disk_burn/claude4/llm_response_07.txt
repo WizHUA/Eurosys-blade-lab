@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing aggressive paging and potential system instability",
+    "root_causes": "The node experienced critical memory exhaustion with available memory dropping from 5.6GB to 5.4GB while memory usage increased from 32% to 35%. Simultaneously, page fault rates spiked dramatically from 5,369 to 30,038 faults per second, and swap activity increased significantly with page swap-in rates reaching 573,695 pages per second.",
+    "solutions": [
+      "Immediately check running processes with 'ps aux --sort=-%mem' to identify memory-intensive applications",
+      "Monitor swap usage with 'vmstat 1' and 'swapon -s' to assess paging activity impact",
+      "Consider terminating or restarting memory-heavy processes if they appear to have memory leaks",
+      "Add more physical RAM to the node if this represents typical workload memory requirements"
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation causing significant performance degradation",
+    "root_causes": "Disk utilization spiked from minimal levels to over 60% with extremely high I/O rates. Disk write rates increased dramatically from 177KB/s to 461MB/s, and write IOPS jumped from 2.18 to 812.9. This appears directly correlated with the severe memory pressure causing intensive swap activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load",
+      "Check disk health with 'smartctl -a /dev/sdX' to rule out hardware issues",
+      "Monitor swap partition location and consider moving swap to faster storage if possible",
+      "Resolve the underlying memory pressure to reduce swap-induced I/O load"
+    ]
+  },
+  {
+    "anomaly": "Increasing CPU system utilization indicating kernel overhead from resource contention",
+    "root_causes": "CPU system time increased from 0.90% to 17.8% while user CPU decreased from 46.7% to 42.4%. This shift indicates the kernel is spending significantly more time managing memory paging, I/O operations, and resource contention rather than executing user applications.",
+    "solutions": [
+      "Monitor context switch rates which increased from 1,255 to 1,887 per second indicating scheduler overhead",
+      "Check for high interrupt rates that increased from 4,485 to 6,930 per second",
+      "Address the root memory and I/O issues to reduce kernel overhead",
+      "Consider CPU governor settings if available to ensure adequate performance during high system load"
+    ]
+  }
+]

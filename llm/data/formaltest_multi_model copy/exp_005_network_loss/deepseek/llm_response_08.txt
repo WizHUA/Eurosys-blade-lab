@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spiked to 78% with swap usage reaching critical levels",
+    "root_causes": "Application ft_cgC consumed significant memory resources during execution",
+    "solutions": [
+      "Analyze memory usage patterns of ft_cgC application",
+      "Optimize application memory allocation",
+      "Consider increasing swap space or adding physical memory"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity during application execution",
+    "root_causes": "Application ft_cgC generated significant disk writes",
+    "solutions": [
+      "Investigate disk-bound operations in ft_cgC",
+      "Consider using faster storage or RAM disks",
+      "Implement I/O throttling mechanisms"
+    ]
+  },
+  {
+    "anomaly": "CPU usage showed irregular spikes up to 51%",
+    "root_causes": "Variable computational intensity during ft_cgC execution",
+    "solutions": [
+      "Profile CPU usage throughout application workflow",
+      "Evaluate CPU affinity settings",
+      "Check for potential CPU contention with other processes"
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage (consistently above 40%) indicating severe disk I/O bottleneck.",
+    "root_causes": "Disk I/O load from intensive storage operations.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity.",
+      "Check for heavy swapping activity using 'vmstat 1' (si/so columns).",
+      "Monitor disk latency metrics to confirm storage subsystem performance issues."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with swap space nearly exhausted (swap_free_bytes dropping to near zero).",
+    "root_causes": "Memory resource load exceeding physical RAM capacity.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "Monitor swap usage with 'free -h' and 'vmstat 1' to confirm active swapping.",
+      "Check for memory leaks in applications that recently completed (job 277)."
+    ]
+  },
+  {
+    "anomaly": "High system load average (8+) with relatively low number of running processes, indicating I/O-bound workload.",
+    "root_causes": "Disk I/O load causing process blocking and high load average.",
+    "solutions": [
+      "Analyze 'processes_blocked' metric which shows elevated values (7-9 processes blocked).",
+      "Use 'iostat -x 1' to monitor disk utilization and await time.",
+      "Consider optimizing storage I/O patterns or moving to higher performance storage."
+    ]
+  },
+  {
+    "anomaly": "Elevated page fault rates and major faults indicating memory pressure and potential swapping.",
+    "root_causes": "Memory resource load causing frequent page faults.",
+    "solutions": [
+      "Monitor 'page_major_faults_rate' which shows significant activity.",
+      "Check if applications are properly tuned for available memory resources.",
+      "Consider adding more physical memory if this pattern persists across jobs."
+    ]
+  }
+]

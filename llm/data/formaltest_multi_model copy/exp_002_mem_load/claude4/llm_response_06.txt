@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage jumping from 33% to 73% and subsequent sustained high levels.",
+    "root_causes": "Memory resource exhaustion likely caused by the 'ft_cgC' job which exhibits memory-intensive behavior patterns typical of computational geometry or fluid dynamics applications.",
+    "solutions": [
+      "Monitor memory allocation patterns using 'ps aux --sort=-%mem' to identify the specific processes consuming excessive memory.",
+      "Check if the job is experiencing memory leaks by monitoring its memory consumption over time with 'top -p <pid>'.",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact.",
+      "Review job configuration to ensure memory requirements are properly specified and within system limits."
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU pressure with CPU usage between 48-73% and elevated system load.",
+    "root_causes": "CPU resource contention from computationally intensive workload running under the 'ft_cgC' job, typical of floating-point intensive scientific computing applications.",
+    "solutions": [
+      "Use 'htop' or 'top' to identify specific CPU-intensive processes and their resource consumption patterns.",
+      "Monitor CPU temperature and throttling to ensure the system is not experiencing thermal issues under sustained load.",
+      "Consider job scheduling policies to distribute CPU-intensive workloads across multiple time slots or nodes.",
+      "Verify that the application is properly utilizing available CPU cores and not creating unnecessary thread contention."
+    ]
+  },
+  {
+    "anomaly": "Elevated I/O wait times and disk pressure during memory stress periods.",
+    "root_causes": "I/O bottleneck caused by increased disk activity, likely due to memory pressure forcing the system to swap and increased file I/O from the computational job.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and determine if it's related to swapping or application data access.",
+      "Monitor swap usage with 'vmstat 1' to confirm if I/O pressure is related to memory swapping activity.",
+      "Consider optimizing application I/O patterns or using faster storage for temporary files if the job requires intensive disk access.",
+      "Implement I/O scheduling policies to prioritize critical system processes during high I/O load periods."
+    ]
+  }
+]

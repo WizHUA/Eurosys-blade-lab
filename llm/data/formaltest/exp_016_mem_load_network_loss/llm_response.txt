@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage is critically high at over 98%, with available memory dropping to extremely low levels (below 115 MB).",
+    "root_causes": "Memory resource load from one or more memory-intensive processes.",
+    "solutions": [
+      "Check for memory leaks in recently completed jobs, particularly job ID 277 (ft_ftC) which finished around the time of the anomaly.",
+      "Use 'ps aux --sort=-%mem' to identify any processes consuming excessive memory.",
+      "Review system logs for out-of-memory (OOM) killer activity; the 'vm_oom_kills_total' metric indicates OOM events have occurred."
+    ]
+  },
+  {
+    "anomaly": "Swap usage is extremely high (over 96%), with swap free space critically low and swap cached bytes significant.",
+    "root_causes": "Memory resource load forcing heavy swapping to disk.",
+    "solutions": [
+      "Monitor swap activity with 'vmstat 1' to confirm ongoing swapping (si/so columns).",
+      "The high swap usage is a direct consequence of the memory exhaustion; resolving the memory pressure will reduce swap dependency.",
+      "Consider adding more physical RAM if this pattern is consistent for the workload types running on this node."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O utilization is consistently high (over 80%), indicating a storage performance bottleneck.",
+    "root_causes": "Disk I/O load, likely exacerbated by heavy swapping activity due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk read/write rates.",
+      "The high 'disk_io_time_seconds_total' and 'disk_io_weighted_time_seconds_total' confirm a significant I/O wait burden.",
+      "Optimize application I/O patterns or consider using faster storage media if the I/O load is inherent to the workload and not just from swapping."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spiked to 73.67% with active anonymous memory consumption exceeding 5GB",
+    "root_causes": "Application memory allocation patterns during the FT_CG job execution, particularly from the batch process",
+    "solutions": [
+      "Profile memory usage patterns of FT_CG workloads using valgrind/massif",
+      "Adjust Slurm job memory limits to better match application requirements",
+      "Monitor memory reclaimable metrics (memory_kreclaimable_bytes) for optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "Network transmit errors and packet drops detected during job execution",
+    "root_causes": "Network interface congestion or hardware issues during MPI communications",
+    "solutions": [
+      "Verify network interface statistics for physical errors (CRC, framing errors)",
+      "Monitor network bandwidth utilization during MPI jobs",
+      "Consider adjusting MPI collective operation algorithms or message sizes"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with weighted time exceeding 100,000 seconds",
+    "root_causes": "Filesystem activity from job output and temporary files",
+    "solutions": [
+      "Optimize job I/O patterns using tmpfs for temporary files",
+      "Implement burst buffer solutions for high-frequency output",
+      "Consider using parallel filesystem tuning for small file operations"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage bottleneck during job execution.",
+    "root_causes": "Disk I/O load caused by intensive read/write operations from the ft_ftC job, leading to I/O wait percentages ranging from 29% to 53%.",
+    "solutions": [
+      "Use 'iotop' to identify the specific processes causing the high disk I/O activity.",
+      "Monitor disk utilization with 'iostat -x 1' to confirm if the storage subsystem is saturated.",
+      "Consider optimizing the ft_ftC job's I/O patterns or using faster storage solutions.",
+      "Check if the job can benefit from I/O scheduling optimizations or larger buffer sizes."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure approaching critical levels with usage at 99.6%.",
+    "root_causes": "Memory resource exhaustion due to high memory consumption by the running ft_ftC job, with available memory dropping to only 26-50MB.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' or 'top'.",
+      "Monitor for swap activity using 'vmstat 1' to check if the system is swapping heavily.",
+      "Consider increasing available memory or optimizing the ft_ftC job's memory usage patterns.",
+      "Review job memory requirements and adjust resource allocation if possible."
+    ]
+  },
+  {
+    "anomaly": "High system load and CPU pressure indicating resource contention.",
+    "root_causes": "CPU resource load from computational workload combined with I/O bottlenecks, creating queue saturation and process blocking.",
+    "solutions": [
+      "Monitor the number of blocked processes which peaked at 13, indicating I/O bottlenecks.",
+      "Use 'top' to verify if CPU usage is primarily from user processes or system overhead.",
+      "Consider load balancing across multiple nodes if the workload can be distributed.",
+      "Optimize the ft_ftC job to reduce both CPU and I/O intensity simultaneously."
+    ]
+  }
+]

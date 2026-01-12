@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extreme disk I/O activity with very high write rates and IOPS during job execution.",
+    "root_causes": "The 'ft_cgC' job is performing intensive disk write operations, with disk write rates reaching 154-214 MB/s and write IOPS peaking at 169. The disk utilization consistently remains between 52-67%, indicating sustained I/O pressure.",
+    "solutions": [
+      "Monitor the specific I/O patterns of the 'ft_cgC' job to determine if this is expected behavior for this workload type.",
+      "Consider using faster storage (NVMe SSD) or implementing I/O scheduling optimizations if this level of disk activity is causing performance bottlenecks.",
+      "Evaluate if the application can be optimized to reduce write frequency through buffering or batch operations.",
+      "Monitor for any correlation between high I/O and system responsiveness to determine if intervention is needed."
+    ]
+  },
+  {
+    "anomaly": "Significant filesystem space consumption during job execution.",
+    "root_causes": "Filesystem usage increased dramatically from 78% to 90% during the monitoring period, indicating the job is generating substantial disk space consumption concurrent with the high write activity.",
+    "solutions": [
+      "Monitor available disk space closely as the filesystem is approaching capacity limits.",
+      "Implement disk space monitoring alerts to prevent filesystem from reaching 100% capacity.",
+      "Review the 'ft_cgC' job's data output patterns to ensure efficient space utilization and proper cleanup of temporary files.",
+      "Consider expanding filesystem capacity or implementing data archival strategies if this usage pattern is expected to continue."
+    ]
+  }
+]

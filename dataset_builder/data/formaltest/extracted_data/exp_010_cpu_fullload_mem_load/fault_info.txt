@@ -1,0 +1,18 @@
+Fault Types: cpu-fullload, mem-load
+Experiment IDs: 4dfe3a2ded9c7dcf, b2492206bc052c87
+Injection Time Range: 2025-09-20 07:20:13 - 2025-09-20 07:21:14
+Fault Commands:
+blade status 4dfe3a2ded9c7dcf
+blade status b2492206bc052c87
+
+Detailed Fault Information:
+1. ID: 4dfe3a2ded9c7dcf
+   Type: cpu-fullload
+   Create: 2025-09-20 07:20:13
+   End: 2025-09-20 07:21:14
+
+2. ID: b2492206bc052c87
+   Type: mem-load
+   Create: 2025-09-20 07:20:13
+   End: 2025-09-20 07:21:14
+

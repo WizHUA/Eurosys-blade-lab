@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with significant I/O wait time",
+    "root_causes": "CPU resource load combined with disk I/O bottleneck",
+    "solutions": [
+      "Investigate processes causing high CPU usage with 'top' or 'htop'",
+      "Check disk I/O performance with 'iotop' to identify heavy I/O processes",
+      "Review filesystem metrics for potential storage bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high swap usage",
+    "root_causes": "Memory resource load exceeding physical RAM capacity",
+    "solutions": [
+      "Monitor memory usage patterns with 'free -h' and 'vmstat 1'",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Consider optimizing application memory usage or adding more physical RAM"
+    ]
+  },
+  {
+    "anomaly": "Network performance degradation",
+    "root_causes": "Network infrastructure congestion during MPI job execution",
+    "solutions": [
+      "Check network interface statistics for errors or packet drops",
+      "Monitor bandwidth utilization during MPI communications",
+      "Verify network hardware health and configuration"
+    ]
+  }
+]

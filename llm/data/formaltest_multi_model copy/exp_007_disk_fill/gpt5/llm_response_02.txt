@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Abrupt purge of page cache/inactive file memory around 07:14:13 causing a cold cache and sudden jump in free memory.",
+    "root_causes": "At 07:14:13 memory_cached_bytes dropped from ~5.3 GiB to ~0.53 GiB and memory_inactive_file_bytes from ~5.1 GiB to ~0.29 GiB while swap usage and anon memory remained stable; this pattern is consistent with an explicit drop_caches action or aggressive cache reclaim, which would invalidate cached data and disrupt I/O locality during the running job (ft_cgC).",
+    "solutions": [
+      "Audit for cache flushes: add an audit rule (e.g., auditctl -w /proc/sys/vm/drop_caches -p wa -k drop_caches) and review cron/Prolog/Epilog/job scripts for any 'echo 3 > /proc/sys/vm/drop_caches' usage.",
+      "If cache drops are intentional for testing, schedule them outside production windows; otherwise remove them to avoid performance cliffs.",
+      "Tune reclaim aggressiveness if reclaim caused the drop (e.g., lower vm.vfs_cache_pressure) and ensure jobs use node-local scratch to reduce cache thrash."
+    ]
+  },
+  {
+    "anomaly": "High filesystem utilization (~90%) with large swings in free space during the window.",
+    "root_causes": "filesystem_usage_percent rises to ~90.34% from 07:14:28 onward, and filesystem_free/avail bytes oscillate widely (e.g., ~22.3 GiB down to ~8.1 GiB), indicating substantial temporary file creation/deletion by workload activity.",
+    "solutions": [
+      "Clean up job artifacts and temporary files under /tmp, /var/tmp, and node-local scratch after runs (enforce via Slurm Prolog/Epilog).",
+      "Redirect intermediate outputs and checkpoints to appropriate scratch or parallel filesystems instead of the root filesystem.",
+      "Set alerts at 85% usage and plan capacity expansion or quotas to keep headroom."
+    ]
+  },
+  {
+    "anomaly": "Recent out-of-memory event recorded with significant ongoing swap usage (~46.6%).",
+    "root_causes": "vm_oom_kills_total=1 across the window and swap_free_bytes indicates ~1.0 GiB swap in use; this reflects a prior memory spike/overcommit resulting in an OOM kill, after which the node continues to rely on swap.",
+    "solutions": [
+      "Identify the OOM victim and timestamp using 'dmesg -T | grep -i \"Out of memory\"' and review /var/log/messages or journald.",
+      "Enforce memory limits via Slurm cgroups (e.g., ConstrainRAMSpace/ConstrainSwapSpace) and right-size job memory requests.",
+      "Consider adjusting vm.overcommit_memory and increasing node memory or swap if justified by workload."
+    ]
+  },
+  {
+    "anomaly": "Transient high disk I/O load earlier in the window with elevated I/O wait.",
+    "root_causes": "disk_io_usage_percent peaked around 67.7% with sustained write rates (e.g., ~172 MB/s) and cpu_iowait_percent up to ~6.16%, consistent with heavy checkpointing or data dumps by the running workload.",
+    "solutions": [
+      "Validate storage behavior with 'iostat -x 1' or 'blktrace' during runs to pinpoint devices under pressure.",
+      "Use node-local high-throughput scratch (e.g., NVMe) or parallel filesystems for checkpoints and large intermediates; throttle I/O via cgroups where appropriate.",
+      "Tune application checkpoint frequency/size to reduce bursts."
+    ]
+  }
+]

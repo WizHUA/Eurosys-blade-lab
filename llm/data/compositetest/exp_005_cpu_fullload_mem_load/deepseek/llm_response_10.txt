@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with system load significantly exceeding CPU core count",
+    "root_causes": "The job 'ft_cgC' was completed but left behind a high system load (6.8 at peak) and sustained high CPU usage (79-83%) even after completion. The metrics show a combination of high user CPU (74.6%) and system CPU (11.6%) usage",
+    "solutions": [
+      "Check for zombie or runaway processes from the completed job using 'ps -eo pid,ppid,cmd,%cpu,%mem,stat'",
+      "Analyze application exit behavior to ensure proper cleanup of MPI resources",
+      "Monitor memory pressure indicators which may be causing swapping and additional CPU overhead"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure and unusual memory usage pattern",
+    "root_causes": "Memory usage shows periods of extreme pressure (34.7% usage with low available memory) interspersed with sudden spikes in free memory, suggesting memory handling issues in the application",
+    "solutions": [
+      "Review memory allocation patterns in the application code",
+      "Check for memory leaks in the application using valgrind or similar tools",
+      "Verify if the application properly frees all allocated memory before exit"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O patterns show high write activity",
+    "root_causes": "Sustained high disk write throughput (139MB/s peak) even during computation periods when primarily read operations would be expected",
+    "solutions": [
+      "Verify if application is performing unnecessary checkpointing or logging",
+      "Check filesystem journaling behavior and mount options",
+      "Review tmpfs usage patterns for potential improvements"
+    ]
+  }
+]

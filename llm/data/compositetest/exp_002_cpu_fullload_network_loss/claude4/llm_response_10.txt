@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high I/O wait percentage reaching over 22% and sustained high disk utilization above 87%.",
+    "root_causes": "Severe disk I/O bottleneck causing processes to block waiting for disk operations to complete.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are causing the highest disk I/O load.",
+      "Check disk health with 'smartctl -a /dev/sdX' to rule out hardware issues.",
+      "Monitor disk queue depth and consider upgrading to faster storage (SSD) if using traditional HDDs.",
+      "Optimize application I/O patterns or implement read/write caching strategies."
+    ]
+  },
+  {
+    "anomaly": "High memory usage reaching 96% with significant swap activity and memory pressure.",
+    "root_causes": "Memory resource exhaustion forcing the system to rely heavily on swap space.",
+    "solutions": [
+      "The swap usage has increased to over 53%, indicating active memory swapping which contributes to I/O wait.",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes.",
+      "Consider adding more physical RAM or optimizing memory usage patterns of running applications.",
+      "Monitor for memory leaks in long-running processes."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage has reached critical levels at over 98% capacity.",
+    "root_causes": "Disk space exhaustion preventing normal system operations and potentially causing application failures.",
+    "solutions": [
+      "Immediately free up disk space by removing unnecessary files or logs.",
+      "Use 'du -sh /*' to identify directories consuming the most space.",
+      "Consider expanding the filesystem or adding additional storage.",
+      "Implement automated log rotation and cleanup policies to prevent future space exhaustion."
+    ]
+  }
+]

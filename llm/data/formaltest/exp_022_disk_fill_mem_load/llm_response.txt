@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage, indicating severe disk I/O bottleneck.",
+    "root_causes": "Disk I/O load from intensive read/write operations.",
+    "solutions": [
+      "Investigate high disk I/O processes using 'iotop' or 'pidstat -d'.",
+      "Check for memory pressure causing excessive swapping with 'vmstat 1'.",
+      "Monitor disk latency metrics to identify storage subsystem issues."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with very low available memory and high swap usage.",
+    "root_causes": "Memory resource load exceeding physical RAM capacity.",
+    "solutions": [
+      "Identify memory-intensive processes with 'ps aux --sort=-%mem'.",
+      "Check for memory leaks in running applications.",
+      "Consider adding more physical memory or optimizing application memory usage."
+    ]
+  },
+  {
+    "anomaly": "High system load average despite decreasing CPU usage over time.",
+    "root_causes": "Processes blocked on I/O operations causing load accumulation.",
+    "solutions": [
+      "Analyze processes in 'D' state (uninterruptible sleep) using 'ps aux'.",
+      "Investigate disk I/O performance and filesystem health.",
+      "Check for network filesystem latency if applicable."
+    ]
+  },
+  {
+    "anomaly": "Significant number of major page faults indicating heavy memory paging activity.",
+    "root_causes": "Memory pressure forcing frequent swapping to disk.",
+    "solutions": [
+      "Monitor swap activity with 'vmstat 1' to confirm swapping.",
+      "Optimize application memory usage or add more physical RAM.",
+      "Consider tuning swappiness parameter if swapping is excessive."
+    ]
+  }
+]

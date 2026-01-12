@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Sudden memory usage spike at 07:08:28 with memory_available_bytes dropping by 35%",
+    "root_causes": "Application memory allocation patterns during execution of ft_cgC job causing aggressive memory consumption",
+    "solutions": [
+      "Profile memory usage of ft_cgC application to identify memory leaks or inefficient allocation patterns",
+      "Consider adjusting job memory limits in Slurm configuration for similar future jobs",
+      "Evaluate whether the workload benefits from memory optimizations or algorithmic improvements"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O operations with disk_written_bytes_total reaching 384990749696 bytes",
+    "root_causes": "Intensive disk write operations from completed ft_cgC job during its execution window",
+    "solutions": [
+      "Analyze application I/O patterns to identify opportunities for optimization",
+      "Consider utilizing tmpfs or RAM disk for temporary files if appropriate",
+      "Evaluate whether output volume matches expectations for this computation"
+    ]
+  },
+  {
+    "anomaly": "Sporadic network retransmissions (node_netstat_Tcp_RetransSegs) during job execution",
+    "root_causes": "Possible network congestion or packet loss during MPI communications for ft_cgC",
+    "solutions": [
+      "Verify network infrastructure health and configuration",
+      "Check MPI implementation and configuration for the job",
+      "Consider using --network=ipgni in Slurm for MPI jobs if available"
+    ]
+  }
+]

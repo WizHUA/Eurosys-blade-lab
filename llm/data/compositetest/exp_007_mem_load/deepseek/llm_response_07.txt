@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space nearly exhausted",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing heavy swapping",
+    "solutions": [
+      "Investigate memory usage patterns of completed job ft_ftC which ran during this period",
+      "Check for memory leaks in the application code",
+      "Consider increasing physical memory or optimizing job memory requirements"
+    ]
+  },
+  {
+    "anomaly": "High CPU I/O wait percentage (up to 53.98%)",
+    "root_causes": "Disk I/O bottleneck likely caused by heavy swapping activity",
+    "solutions": [
+      "Monitor disk I/O queues during similar jobs",
+      "Optimize data access patterns to reduce disk I/O",
+      "Consider using faster storage media for temporary files"
+    ]
+  },
+  {
+    "anomaly": "Abnormal batch job exit code (0:15) despite main job completion",
+    "root_causes": "Possible cleanup or post-processing failure after main job completion",
+    "solutions": [
+      "Examine batch job logs for post-processing errors",
+      "Review job script for proper cleanup procedures",
+      "Check system resource limits that may have been hit during cleanup"
+    ]
+  }
+]

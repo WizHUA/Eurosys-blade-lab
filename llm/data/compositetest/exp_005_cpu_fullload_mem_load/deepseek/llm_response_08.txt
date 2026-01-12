@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with significant system load during job execution",
+    "root_causes": "CPU-intensive computational workload from the ft_cgC job consuming system resources",
+    "solutions": [
+      "Review the ft_cgC job's resource requirements and optimize its CPU utilization",
+      "Consider implementing CPU throttling or process prioritization for similar high-load jobs",
+      "Monitor system performance during peak load periods to identify potential bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations during job execution",
+    "root_causes": "Memory-intensive operations from the computational job causing variable memory usage patterns",
+    "solutions": [
+      "Analyze the job's memory usage patterns to optimize memory allocation",
+      "Consider implementing memory limits or cgroups for similar jobs",
+      "Monitor memory pressure metrics to identify potential memory leaks or inefficient usage"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O operations showing periodic spikes",
+    "root_causes": "Job performing intensive read/write operations during computation phases",
+    "solutions": [
+      "Optimize the job's disk I/O patterns to reduce contention",
+      "Consider using faster storage or implementing caching mechanisms",
+      "Monitor disk latency metrics during job execution to identify performance bottlenecks"
+    ]
+  }
+]

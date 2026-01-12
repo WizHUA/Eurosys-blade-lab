@@ -1,0 +1,77 @@
+======================================================================
+$ blade create script delay -h
+======================================================================
+Sleep in script
+
+Usage:
+  blade create script delay
+
+Examples:
+
+# Add commands to the script "start0() { sleep 10.000000 ...}"
+blade create script delay --time 10000 --file test.sh --function-name start0
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --file string              Script file full path (required)
+      --function-name string     function name in shell (required)
+  -h, --help                     help for delay
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --time string              sleep time, unit is millisecond (required)
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create script exit -h
+======================================================================
+Exit script with specify message and code
+
+Usage:
+  blade create script exit
+
+Examples:
+
+# Add commands to the script "start0() { echo this-is-error-message; exit 1; ... }"
+blade create script exit --exit-code 1 --exit-message this-is-error-message --file test.sh --function-name start0
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --exit-code string         Exit code
+      --exit-message string      Exit message
+      --file string              Script file full path (required)
+      --function-name string     function name in shell (required)
+  -h, --help                     help for exit
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

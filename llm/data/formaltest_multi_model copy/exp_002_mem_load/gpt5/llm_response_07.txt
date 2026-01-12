@@ -1,0 +1,23 @@
+[
+  {
+    "anomaly": "Transient severe memory pressure with heavy swapping between 07:04:28–07:05:13 (mem_available_bytes fell from ~5.49 GiB to ~2.18–2.55 GiB; memory_free_bytes dropped to ~0.28–0.57 GiB; anon_memory_percent surged to ~58%; committed_as reached ~10.9 GiB > RAM; swap_out_rate ~160–170/s with swap_in_rate much lower).",
+    "root_causes": "A sudden increase in anonymous memory allocations by the running workload (job 276: ft_cgC) led to overcommit (committed_as > physical RAM) and aggressive reclaim, causing sustained swap-outs and low available memory.",
+    "solutions": [
+      "Constrain the job's memory usage with Slurm/cgroup limits (e.g., --mem or memory.max) and size the job to fit node RAM.",
+      "Investigate the allocation spike around 07:04:28 using smem/pmap/pidstat/top to identify processes driving anon memory growth and fix leaks or reduce per-process footprint.",
+      "Reduce concurrency or problem size to lower peak working set, or run on a node with more RAM for this workload.",
+      "Harden memory policy to prevent overcommit thrash (e.g., set vm.overcommit_memory=2 and tune vm.overcommit_ratio) for this queue/partition.",
+      "Review swap policy: if swapping is hurting performance, lower vm.swappiness for this node/queue and rely on strict job memory limits to fail fast instead of thrashing."
+    ]
+  },
+  {
+    "anomaly": "Excessive process churn: sustained high process_forks_rate (~4.5k–6.5k/s) with elevated context_switches_rate (~1.2k–1.7k/s) during the window.",
+    "root_causes": "The job is spawning many short-lived processes (high fork/exec activity) relative to only ~8–14 processes running, causing scheduler overhead and potential cache/TLB thrash.",
+    "solutions": [
+      "Refactor the workflow to reuse workers (MPI ranks, persistent pools, or threads) instead of frequent fork/exec of short tasks.",
+      "Batch fine-grained tasks into larger units of work to reduce fork rate; verify launch patterns in job scripts (e.g., shell loops, Python multiprocessing).",
+      "Profile churn with pidstat -rl -wt 1 and perf sched to pinpoint the components creating the most forks and context switches.",
+      "Use Slurm/cgroup pids limits to catch pathological spikes and ensure the job stays within expected process counts."
+    ]
+  }
+]

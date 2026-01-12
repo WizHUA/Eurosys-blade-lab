@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Intermittent swap storms despite ample free memory",
+    "root_causes": "Baseline swap usage is high (~46.6% of 2 GiB in use) and swap activity spikes (page_swap_out_rate ≈166.6/s and page_swap_in_rate ≈17.3/s at 07:10:28) occur while memory_available_bytes remains ~5.6–6.7 GiB and memory_usage_percent ~18–32%. This pattern indicates aggressive reclaim/swappiness or job-level memory control (e.g., cgroup limits) driving swapping despite low global memory pressure.",
+    "solutions": [
+      "Verify per-job cgroup memory and swap limits for job 276 (memory.current, memory.high, memory.max, memory.swap.max under /sys/fs/cgroup) and check if the job is hitting memory.high or swap limits.",
+      "Lower vm.swappiness on compute nodes (e.g., sysctl vm.swappiness=10) or enable/adjust zswap to reduce swapping of anonymous pages.",
+      "If policy allows, disable swap usage for compute jobs (e.g., Slurm cgroup: ConstrainRAMSpace/AllowedSwapSpace or memory.swap.max=0 for job slices).",
+      "Right-size job memory requests/limits for ft_cgC; ensure the working set fits RAM to avoid reclaim of active pages.",
+      "During a maintenance window, clear stale swapped pages (swapoff -a; swapon -a) to reset the baseline, then monitor vmstat 1 and /proc/vmstat for si/so."
+    ]
+  },
+  {
+    "anomaly": "Bursts of TCP retransmissions during the job",
+    "root_causes": "TCP retransmissions rate rises (tcp_retransmissions_rate up to ~2.07/s at 07:10:43; node_netstat_Tcp_RetransSegs ~7.5/s at 07:10:28) without corresponding NIC error/drop counters, suggesting transient congestion or path-level issues rather than interface faults.",
+    "solutions": [
+      "Inspect NIC and link counters for hidden issues: ethtool -S <iface>, ip -s link, and switch port counters during the window to confirm no errors/discards.",
+      "Validate end-to-end MTU (1500 reported) and offload settings (TSO/GRO/LRO) across the MPI path to avoid fragmentation or resegmentation.",
+      "Correlate retransmission spikes with application phases (capture tcpdump or use perf/netstat sampling) to identify communication hotspots.",
+      "If links are oversubscribed, schedule or QoS-throttle concurrent network-heavy jobs to reduce transient congestion."
+    ]
+  },
+  {
+    "anomaly": "Prior OOM kill detected on the node (not increasing during this window)",
+    "root_causes": "vm_oom_kills_total=1 across all samples indicates at least one out-of-memory kill since boot, which can be associated with past under-provisioned jobs or misconfigured memory limits.",
+    "solutions": [
+      "Review kernel logs for the OOM event details and timestamp (dmesg -T | grep -i 'Out of memory' or journalctl -k).",
+      "Audit historical Slurm job memory usage versus limits and adjust job memory requests or cgroup limits accordingly.",
+      "Consider enabling stronger memory accounting and alerts (cgroup memory.high notifications) to catch impending OOM before kill."
+    ]
+  }
+]

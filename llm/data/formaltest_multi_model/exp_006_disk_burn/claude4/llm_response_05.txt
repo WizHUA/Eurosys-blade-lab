@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion causing swap thrashing and system instability.",
+    "root_causes": "Memory usage spiked from 32% to 35% while available memory dropped dramatically from 5.6GB to 5.3GB, indicating rapid memory consumption by running processes.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top' to locate the source of high memory consumption.",
+      "Monitor swap activity with 'vmstat 1' to confirm the extent of swap thrashing indicated by the high page_swap_in_rate and page_swap_out_rate.",
+      "Consider killing or restarting memory-intensive processes if they appear to have memory leaks.",
+      "Increase available swap space or add more physical RAM if memory demands consistently exceed capacity."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation causing system performance degradation.",
+    "root_causes": "Disk I/O usage jumped from 0% to over 60% with massive increases in read/write operations, likely caused by memory swapping and high disk activity from running processes.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the highest disk I/O load.",
+      "The correlation between memory pressure and disk I/O suggests swap-related I/O - resolving memory issues will likely reduce disk load.",
+      "Monitor disk queue depth and latency using 'iostat -x 1' to assess storage subsystem performance.",
+      "Consider moving high I/O workloads to faster storage or implementing I/O throttling for non-critical processes."
+    ]
+  },
+  {
+    "anomaly": "High system CPU load with significant I/O wait time impacting overall performance.",
+    "root_causes": "CPU system time increased dramatically from 0.9% to 17.8% while I/O wait time rose from near 0% to 4.9%, indicating the kernel is spending excessive time managing I/O operations.",
+    "solutions": [
+      "The high system CPU usage combined with I/O wait suggests the kernel is overwhelmed with I/O management tasks.",
+      "Address the root memory and disk I/O issues first, as resolving these will likely reduce the CPU system load.",
+      "Monitor CPU usage patterns with 'top' and 'htop' to confirm the correlation between I/O activity and system CPU time.",
+      "Consider tuning kernel I/O scheduler settings if the problem persists after resolving memory pressure."
+    ]
+  }
+]

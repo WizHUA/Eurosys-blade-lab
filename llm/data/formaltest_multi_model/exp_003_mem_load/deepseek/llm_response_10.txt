@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes with significant anonymous memory usage increase",
+    "root_causes": "Application memory allocation patterns causing high anonymous memory usage and reduced cache efficiency",
+    "solutions": [
+      "Profile application memory usage patterns using tools like valgrind/massif",
+      "Consider optimizing memory allocation strategies in the application",
+      "Monitor memory pressure metrics more closely during similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O latency spikes during high memory pressure periods",
+    "root_causes": "Memory pressure leading to increased page cache flushing and potential swapping activity",
+    "solutions": [
+      "Investigate if the workload would benefit from larger memory nodes",
+      "Optimize filesystem cache parameters for this type of workload",
+      "Monitor disk latency metrics alongside memory pressure indicators"
+    ]
+  },
+  {
+    "anomaly": "Network throughput fluctuations during compute-intensive phases",
+    "root_causes": "Resource contention between compute and communication phases of the application",
+    "solutions": [
+      "Profile network usage patterns throughout the application's execution",
+      "Consider adjusting process affinity to balance compute and network resources",
+      "Monitor network retransmission rates during different application phases"
+    ]
+  }
+]

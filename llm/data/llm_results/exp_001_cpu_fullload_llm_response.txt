@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization increased from ~30% to over 80% during the monitoring period.",
+    "root_causes": "CPU resource load from a computationally intensive job.",
+    "solutions": [
+      "Review the job 'ft_cgC' which was running during this period as the likely source of high CPU usage.",
+      "Use 'top' or 'htop' to confirm CPU consumption by specific processes if the job is still active.",
+      "Consider adjusting job scheduling to avoid peak load times if this causes system-wide performance issues."
+    ]
+  },
+  {
+    "anomaly": "System load (load_1min) spiked from 1.77 to 4.88, indicating high process contention.",
+    "root_causes": "CPU resource load from multiple running processes.",
+    "solutions": [
+      "Monitor running processes with 'ps aux' to identify if multiple jobs or processes are competing for CPU resources.",
+      "Check if system daemons or background tasks are contributing to the load during job execution.",
+      "Consider using process prioritization (nice levels) to manage CPU contention between jobs."
+    ]
+  },
+  {
+    "anomaly": "Memory usage remained stable at ~33-34%, but swap usage was consistently high at ~46%.",
+    "root_causes": "Memory resource allocation and potential memory pressure from active jobs.",
+    "solutions": [
+      "Monitor swap activity with 'vmstat 1' to check for swapping activity despite sufficient free memory.",
+      "Review the job 'ft_cgC' memory requirements and optimize if possible to reduce swap dependency.",
+      "Consider increasing physical memory or optimizing system swappiness settings if swap usage is problematic."
+    ]
+  }
+]

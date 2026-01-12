@@ -1,0 +1,43 @@
+[
+  {
+    "anomaly": "Severe transient memory pressure and swap thrashing between 23:16:25–23:17:10.",
+    "root_causes": "The running job (ft_cgC) drove anonymous memory and commit beyond physical RAM, triggering heavy paging: memory_committed_as rose to ~12.07 GiB (> 8.28 GiB RAM), memory_available_bytes fell to ~0.93 GiB, swap_free_bytes dropped (~1.19 GiB to ~0.95 GiB), and swap activity spiked (page_swap_in_rate up to ~339k/s, page_swap_out_rate up to ~139k/s). vm_oom_kills_total remained constant (3), indicating no new OOM, but the node was under acute memory stress.",
+    "solutions": [
+      "Enforce strict Slurm memory limits for the job (e.g., --mem/--mem-per-cpu) and ensure cgroup memory controllers are active (MemoryMax/MemoryHigh) so excess usage is contained within the job cgroup.",
+      "Profile and reduce the job’s peak memory footprint (e.g., smaller problem size, fewer in-memory copies, adjust algorithm parameters, split into stages).",
+      "Reduce swap thrashing risk by lowering vm.swappiness on compute nodes and/or placing swap on the fastest local device if swap must be used.",
+      "Consider larger-memory nodes or fewer concurrent ranks/threads per node to align working set with available RAM.",
+      "Implement memory overcommit controls (e.g., vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio) as a cluster policy to prevent system-wide thrash."
+    ]
+  },
+  {
+    "anomaly": "Sustained high disk I/O load correlated with swapping and write bursts.",
+    "root_causes": "During and after the memory-pressure window, disk I/O utilization and throughput surged: disk_io_usage_percent rose from ~12% to ~52%, disk_read_rate peaked at ~347 MB/s and disk_write_rate at ~176 MB/s, with disk_io_now > 0 and processes_blocked > 0; CPU iowait climbed to ~5.9%. This pattern indicates the storage subsystem was stressed by swap traffic and large sequential I/O from the job.",
+    "solutions": [
+      "Throttle I/O from the job using cgroup I/O controls (io.max/blkio.throttle) or job QoS to prevent node-wide contention.",
+      "Place heavy scratch I/O on fast local SSD/NVMe and ensure swap (if needed) is on the fastest device.",
+      "Use iostat/iotop to confirm the top contributors; if the job is the source, stagger or limit concurrent writers/collectives in the workflow.",
+      "Tune writeback behavior (e.g., reduce concurrent flushers in the job, batch writes) to avoid long bursts that stall other tasks.",
+      "If persistent, move I/O-heavy phases to nodes/storage tiers sized for the required bandwidth."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the window (risk of filling node storage).",
+    "root_causes": "Filesystem usage jumped from ~73.35% to ~85.97%; filesystem_free_bytes dropped by ~10.6 GiB while disk_written_bytes_total increased by ~11.4 GiB within minutes, indicating the job produced large outputs or temporary files.",
+    "solutions": [
+      "Direct temporary and bulk outputs to per-node scratch or a capacity tier designed for burst writes; avoid filling system partitions.",
+      "Enable per-job storage quotas/limits and automatic cleanup of intermediate files on job completion.",
+      "Audit the job’s output paths and file staging; compress or stream results where feasible to reduce space usage.",
+      "Set alerting thresholds to preemptively notify at >80% and >90% usage to avoid out-of-space failures."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization dominated by system and iowait time during the peak event.",
+    "root_causes": "cpu_usage_percent peaked near ~91% with elevated cpu_system_percent (~31%) and cpu_iowait_percent (~4–6%), coinciding with intense paging and disk activity. This indicates CPU cycles were spent in kernel/I/O rather than useful compute.",
+    "solutions": [
+      "Reduce job concurrency (threads/ranks) to match memory bandwidth and capacity, mitigating paging and kernel overhead.",
+      "Pin threads and balance CPU/memory affinity (e.g., OMP/numa settings) to lower page faults and cache misses.",
+      "Resolve the underlying memory and I/O bottlenecks (above); once swap and I/O bursts subside, CPU time will shift back to user work."
+    ]
+  }
+]

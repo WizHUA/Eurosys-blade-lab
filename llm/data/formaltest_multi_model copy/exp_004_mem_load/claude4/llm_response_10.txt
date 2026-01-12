@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure and potential memory thrashing during job execution.",
+    "root_causes": "Memory usage jumped from 32% to 55% at 07:08:28 during job ft_cgC execution, with significant increases in memory allocation and page swapping activity.",
+    "solutions": [
+      "Monitor 'page_swap_in_rate' and 'page_swap_out_rate' which show active swapping starting at 07:08:28",
+      "Review the memory requirements of job 'ft_cgC' as it appears to be memory-intensive",
+      "Consider reducing the memory footprint of the application or increasing available memory",
+      "Use 'ps aux --sort=-%mem' to identify specific processes consuming excessive memory"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity correlating with memory pressure.",
+    "root_causes": "Disk write activity increased dramatically from 10KB/s to over 160KB/s starting at 07:08:28, likely due to memory swapping and application I/O demands.",
+    "solutions": [
+      "The 'disk_write_rate_bytes_per_sec' shows a 15x increase during the memory pressure period",
+      "Use 'iotop' to identify which processes are generating the high disk I/O",
+      "Consider optimizing the application's I/O patterns or using faster storage",
+      "Monitor 'disk_io_usage_percent' to ensure the storage subsystem is not becoming a bottleneck"
+    ]
+  }
+]

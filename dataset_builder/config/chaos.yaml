@@ -1,0 +1,666 @@
+# ChaosBlade工具配置
+chaosblade:
+  command: "blade"
+  timeout: 60
+
+# 异常类型定义
+fault_types:
+  # CPU相关故障
+  cpu_fullload:
+    type: "cpu"
+    subtype: "fullload"
+    description: "CPU满负载故障"
+    default_params:
+      cpu-percent: 70
+      timeout: 60
+    param_ranges:
+      cpu-percent: [50, 100]
+      timeout: [30, 300]
+
+  # RAM内存负载故障  
+  mem_load_ram:
+    type: "mem"
+    subtype: "load"
+    description: "RAM内存负载故障"
+    default_params:
+      mode: "ram"
+      mem-percent: 70
+      timeout: 60
+    param_ranges:
+      mem-percent: [50, 95]
+      timeout: [30, 300]
+
+  # Buffer内存负载故障
+  mem_load_buffer:
+    type: "mem"
+    subtype: "load"
+    description: "Buffer内存负载故障"
+    default_params:
+      mode: "buffer"
+      mem-percent: 70
+      timeout: 60
+    param_ranges:
+      mem-percent: [50, 95]
+      timeout: [30, 300]
+
+  # Stack内存负载故障
+  mem_load_stack:
+    type: "mem"
+    subtype: "load"
+    description: "Stack内存负载故障"
+    default_params:
+      mode: "stack"
+      mem-percent: 70
+      timeout: 60
+    param_ranges:
+      mem-percent: [50, 95]
+      timeout: [30, 300]
+
+  # 网络丢包故障
+  network_loss:
+    type: "network"
+    subtype: "loss"
+    description: "网络包丢失故障"
+    default_params:
+      percent: "50"
+      interface: "ens33"
+      timeout: 60
+    param_ranges:
+      percent: ["1", "90"]
+      timeout: [30, 300]
+
+  # 磁盘读写负载故障
+  disk_burn:
+    type: "disk"
+    subtype: "burn"
+    description: "磁盘读写负载故障"
+    default_params:
+      read: true
+      write: true
+      path: "/tmp"
+      size: "100"
+      timeout: 60
+    param_ranges:
+      size: ["50", "500"]
+      timeout: [30, 300]
+
+  # 磁盘填充故障
+  disk_fill:
+    type: "disk"
+    subtype: "fill"
+    description: "磁盘空间填充故障"
+    default_params:
+      path: "/tmp"
+      size: "100"
+      percent: "90"
+      timeout: 60
+    param_ranges:
+      size: ["50", "1000"]
+      percent: ["50", "90"]
+      timeout: [30, 300]
+
+# 故障注入计划
+chaos_plans:
+  empty_plan:
+    description: "空计划"
+    faults: []
+
+  formaltest:
+    description: "7个单独异常 + 21个组合异常 (约55min)"
+    faults:
+      # ==================== 单独异常阶段 (7个) ====================
+      
+      # T+60s: CPU负载
+      - fault_type: "cpu_fullload"
+        inject_delay: 60
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+
+      # T+180s: RAM内存负载
+      - fault_type: "mem_load_ram"
+        inject_delay: 180
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+
+      # T+300s: Buffer内存负载
+      - fault_type: "mem_load_buffer"
+        inject_delay: 300
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+
+      # T+420s: Stack内存负载
+      - fault_type: "mem_load_stack"
+        inject_delay: 420
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+
+      # T+540s: 网络丢包
+      - fault_type: "network_loss"
+        inject_delay: 540
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+
+      # T+660s: 磁盘读写负载
+      - fault_type: "disk_burn"
+        inject_delay: 660
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+780s: 磁盘填充
+      - fault_type: "disk_fill"
+        inject_delay: 780
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # ==================== 组合异常阶段 (21个) ====================
+      
+      # T+900s: CPU + RAM
+      - fault_type: "cpu_fullload"
+        inject_delay: 900
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "mem_load_ram"
+        inject_delay: 900
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+
+      # T+1020s: CPU + Buffer
+      - fault_type: "cpu_fullload"
+        inject_delay: 1020
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "mem_load_buffer"
+        inject_delay: 1020
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+
+      # T+1140s: CPU + Stack
+      - fault_type: "cpu_fullload"
+        inject_delay: 1140
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "mem_load_stack"
+        inject_delay: 1140
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+
+      # T+1260s: CPU + Network
+      - fault_type: "cpu_fullload"
+        inject_delay: 1260
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "network_loss"
+        inject_delay: 1260
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+
+      # T+1380s: CPU + Disk Burn
+      - fault_type: "cpu_fullload"
+        inject_delay: 1380
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "disk_burn"
+        inject_delay: 1380
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+1500s: CPU + Disk Fill
+      - fault_type: "cpu_fullload"
+        inject_delay: 1500
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "disk_fill"
+        inject_delay: 1500
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # T+1620s: RAM + Buffer
+      - fault_type: "mem_load_ram"
+        inject_delay: 1620
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+      - fault_type: "mem_load_buffer"
+        inject_delay: 1620
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+
+      # T+1740s: RAM + Stack
+      - fault_type: "mem_load_ram"
+        inject_delay: 1740
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+      - fault_type: "mem_load_stack"
+        inject_delay: 1740
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+
+      # T+1860s: RAM + Network
+      - fault_type: "mem_load_ram"
+        inject_delay: 1860
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+      - fault_type: "network_loss"
+        inject_delay: 1860
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+
+      # T+1980s: RAM + Disk Burn
+      - fault_type: "mem_load_ram"
+        inject_delay: 1980
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+      - fault_type: "disk_burn"
+        inject_delay: 1980
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+2100s: RAM + Disk Fill
+      - fault_type: "mem_load_ram"
+        inject_delay: 2100
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "ram"
+      - fault_type: "disk_fill"
+        inject_delay: 2100
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # T+2220s: Buffer + Stack
+      - fault_type: "mem_load_buffer"
+        inject_delay: 2220
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+      - fault_type: "mem_load_stack"
+        inject_delay: 2220
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+
+      # T+2340s: Buffer + Network
+      - fault_type: "mem_load_buffer"
+        inject_delay: 2340
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+      - fault_type: "network_loss"
+        inject_delay: 2340
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+
+      # T+2460s: Buffer + Disk Burn
+      - fault_type: "mem_load_buffer"
+        inject_delay: 2460
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+      - fault_type: "disk_burn"
+        inject_delay: 2460
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+2580s: Buffer + Disk Fill
+      - fault_type: "mem_load_buffer"
+        inject_delay: 2580
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "buffer"
+      - fault_type: "disk_fill"
+        inject_delay: 2580
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # T+2700s: Stack + Network
+      - fault_type: "mem_load_stack"
+        inject_delay: 2700
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+      - fault_type: "network_loss"
+        inject_delay: 2700
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+
+      # T+2820s: Stack + Disk Burn
+      - fault_type: "mem_load_stack"
+        inject_delay: 2820
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+      - fault_type: "disk_burn"
+        inject_delay: 2820
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+2940s: Stack + Disk Fill
+      - fault_type: "mem_load_stack"
+        inject_delay: 2940
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 70
+          mode: "stack"
+      - fault_type: "disk_fill"
+        inject_delay: 2940
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # T+3060s: Network + Disk Burn
+      - fault_type: "network_loss"
+        inject_delay: 3060
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+      - fault_type: "disk_burn"
+        inject_delay: 3060
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+
+      # T+3180s: Network + Disk Fill
+      - fault_type: "network_loss"
+        inject_delay: 3180
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+      - fault_type: "disk_fill"
+        inject_delay: 3180
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+      # T+3300s: Disk Burn + Disk Fill
+      - fault_type: "disk_burn"
+        inject_delay: 3300
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+      - fault_type: "disk_fill"
+        inject_delay: 3300
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "100"
+          path: "/tmp"
+          percent: "90"
+
+  composite_faults:
+    description: "复合故障场景测试 - 8个场景 (约17分钟)"
+    faults:
+      # ==================== 准备阶段 ====================
+      # T+0-60s: 准备时间，无故障注入
+      
+      # ==================== 场景1：内存耗尽引发的磁盘交换风暴 ====================
+      # T+60s: Memory Exhaustion leading to Disk Thrashing
+      - fault_type: "mem_load_ram"
+        inject_delay: 60
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 75
+      - fault_type: "disk_burn"
+        inject_delay: 60  # 稍微延后，模拟内存压力引发的swap风暴
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "200"
+          path: "/tmp"
+
+      # ==================== 场景2：CPU满载下的网络问题 ====================
+      # T+180s: CPU Saturation causing Network Issues (用network_loss模拟网络问题)
+      - fault_type: "cpu_fullload"
+        inject_delay: 180
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 75
+      - fault_type: "network_loss"
+        inject_delay: 180  # CPU饱和后引发网络处理能力下降
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "30"
+          interface: "ens33"
+
+      # ==================== 场景3：磁盘写满导致的系统压力 ====================
+      # T+300s: Disk Full leading to System Stress (用CPU+内存模拟应用重试压力)
+      - fault_type: "disk_fill"
+        inject_delay: 300
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "500"
+          path: "/tmp"
+          percent: "95"
+      - fault_type: "cpu_fullload"
+        inject_delay: 300  # 磁盘满后应用重试导致CPU压力
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 60
+
+      # ==================== 场景4：网络丢包引发的资源风暴 ====================
+      # T+420s: Network Loss causing Resource Storm
+      - fault_type: "network_loss"
+        inject_delay: 420
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "50"
+          interface: "ens33"
+      - fault_type: "cpu_fullload"
+        inject_delay: 420  # 网络重传消耗CPU
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 70
+      - fault_type: "disk_burn"
+        inject_delay: 420  # 重试机制导致磁盘I/O异常
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "150"
+          path: "/tmp"
+
+      # ==================== 场景5：内存压力与CPU的恶性循环 ====================
+      # T+540s: Memory Pressure and High CPU Vicious Cycle
+      - fault_type: "mem_load_ram"
+        inject_delay: 540
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 90
+      - fault_type: "cpu_fullload"
+        inject_delay: 540  # 内存回收和GC导致CPU压力
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 80
+
+      # ==================== 场景6：I/O密集型作业争抢资源 ====================
+      # T+660s: Competing I/O-intensive Jobs (磁盘+网络争抢)
+      - fault_type: "disk_burn"
+        inject_delay: 660
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "300"
+          path: "/tmp"
+      - fault_type: "network_loss"
+        inject_delay: 660  # I/O争抢影响网络传输性能
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "25"
+          interface: "ens33"
+
+      # ==================== 场景7：综合资源压力测试 ====================
+      # T+780s: Comprehensive Resource Pressure
+      - fault_type: "mem_load_buffer"
+        inject_delay: 780
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 75
+      - fault_type: "disk_fill"
+        inject_delay: 780
+        duration: 60
+        target_node: null
+        custom_params:
+          size: "200"
+          path: "/tmp"
+          percent: "85"
+
+      # ==================== 场景8：多层次故障级联 ====================
+      # T+900s: Multi-layer Failure Cascade
+      - fault_type: "network_loss"
+        inject_delay: 900
+        duration: 60
+        target_node: null
+        custom_params:
+          percent: "40"
+          interface: "ens33"
+      - fault_type: "mem_load_stack"
+        inject_delay: 900  # 网络问题导致缓冲区堆积
+        duration: 60
+        target_node: null
+        custom_params:
+          mem-percent: 80
+      - fault_type: "cpu_fullload"
+        inject_delay: 900  # 内存压力引发CPU处理开销
+        duration: 60
+        target_node: null
+        custom_params:
+          cpu-percent: 75
+
+# 日志配置
+logging:
+  log_file: "logs/chaos.log"
+  level: "INFO"

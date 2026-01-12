@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with usage reaching 92% and significant swapping activity.",
+    "root_causes": "Memory resource exhaustion from the ft_cgC job causing the system to heavily rely on swap space.",
+    "solutions": [
+      "Monitor swap usage with 'vmstat 1' to confirm active swapping - swap usage is at 47.9% indicating heavy memory pressure",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes from the completed ft_cgC job",
+      "Check for memory leaks or inefficient memory allocation in the ft_cgC application",
+      "Consider increasing physical memory or optimizing the job's memory usage patterns"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time indicating storage performance bottleneck.",
+    "root_causes": "Disk I/O load caused by memory swapping and potentially intensive disk operations from the ft_cgC job.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O during job execution",
+      "Monitor disk utilization which peaked at 70% during the job run",
+      "Consider using faster storage or optimizing I/O patterns in the application",
+      "Reducing memory pressure will also help decrease swap-related I/O"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage is critically high at 89-90% capacity.",
+    "root_causes": "Storage space consumption from job outputs, temporary files, or log files generated during the ft_cgC job execution.",
+    "solutions": [
+      "Use 'df -h' and 'du -sh /*' to identify which directories are consuming the most space",
+      "Clean up temporary files and old job outputs that are no longer needed",
+      "Implement automated cleanup policies for completed jobs",
+      "Consider expanding storage capacity or using external storage for large datasets"
+    ]
+  }
+]

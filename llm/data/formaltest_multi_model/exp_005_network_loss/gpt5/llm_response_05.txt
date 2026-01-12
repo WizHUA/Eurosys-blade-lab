@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "Sudden step-change increase in memory usage and committed memory around 07:09:58 without corresponding swap activity",
+    "root_causes": "The node’s anon and committed memory (Committed_AS) rise sharply (e.g., committed_as_bytes from ~5.77 GB to ~7.14 GB) while swap_in/out rates remain ~0, indicating the job increased working set but stayed within RAM; this can reflect memory-intensive phases or memory overcommit risk if sustained.",
+    "solutions": [
+      "Correlate the memory jump with workload phases in job 276 (ft_cgC) by inspecting application logs and timestamps.",
+      "Profile memory allocation (e.g., with mallopt/mallctl stats or /proc/<pid>/smaps_rollup) to confirm working set growth vs. transient cache.",
+      "Set cgroup memory.high limits for future runs to prevent unbounded growth leading to eventual swapping.",
+      "Enable jemalloc/malloc tracing or use heap profilers to catch inadvertent leaks if growth was unintended."
+    ]
+  },
+  {
+    "anomaly": "Intermittent spikes in disk IO time and write-time metrics indicating short bursts of IO pressure",
+    "root_causes": "disk_io_time_seconds_total and disk_write_time_seconds_total increase in bursts (e.g., write_time jumps ~36s across intervals) with disk_io_usage_percent rising, suggesting periodic flush or checkpoint behavior causing IO stalls.",
+    "solutions": [
+      "Align application checkpoint/flush intervals to avoid synchronized bursts (stagger or lengthen intervals).",
+      "Enable write coalescing or adjust dirty_ratio/dirty_background_ratio to smooth kernel flushing.",
+      "Verify filesystem free space and inode headroom (both adequate now) but monitor during peak to avoid sudden ENOSPC.",
+      "Use iostat -x 1 and blktrace during the interval to validate queue depth and latency patterns."
+    ]
+  },
+  {
+    "anomaly": "Network transmit/receive rates and packet rates climb steadily with brief surges; TCP retransmissions appear during 07:10:28–07:10:58 window",
+    "root_causes": "tcp_retransmissions_rate and node_netstat_Tcp_RetransSegs show non-zero rates/spikes alongside higher packet rates, indicating transient congestion or path variability while the job communicates.",
+    "solutions": [
+      "Inspect switch port counters and NIC ethtool -S for errors or pauses during 07:10:28–07:10:58.",
+      "Enable ECN or tune TCP parameters (rmem/wmem, net.core.netdev_max_backlog) appropriate to the link speed (MTU 1500 shown).",
+      "Pin MPI traffic to a dedicated QoS class if shared network contention is suspected.",
+      "Capture a short packet trace during the surge to confirm retransmission causes (loss vs. reordering)."
+    ]
+  },
+  {
+    "anomaly": "Kernel pressure metrics indicate brief IO and memory pressure waits during the mid-window",
+    "root_causes": "io_pressure_waiting_rate and memory_pressure_waiting_rate show small but non-zero values coincident with IO spikes, suggesting threads occasionally stalled on IO and memory reclaim.",
+    "solutions": [
+      "Reduce synchronous IO in the hot path (use asynchronous or buffered writes where feasible).",
+      "Increase page cache effectiveness by ensuring adequate free memory headroom before IO bursts.",
+      "Tune scheduler and IO scheduler (mq-deadline/none) depending on the storage backend characteristics."
+    ]
+  }
+]

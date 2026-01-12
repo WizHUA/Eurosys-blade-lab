@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Rising TCP retransmissions and SYN retransmissions during the job window, indicating network packet loss or congestion.",
+    "root_causes": "Network path instability or congestion: tcp_retransmissions_rate increases from ~0.05/s to ~1.9/s and node_netstat counters (Tcp_RetransSegs and TCPSynRetrans) spike up to ~7.5/s around 07:10:28, while NIC-level error/drop counters remain at 0, pointing to upstream path issues (switch/peer, MTU mismatch, or buffer pressure) rather than a local NIC fault.",
+    "solutions": [
+      "Inspect NIC and switch counters for errors/drops: ethtool -S <iface>, ip -s link, and switch port stats; review dmesg for NIC resets.",
+      "Verify end-to-end MTU consistency (e.g., ping -M do -s <size>) and ensure all nodes/links use the same MTU; correct any mismatch.",
+      "Assess congestion on the fabric: check per-port utilization and buffering on the TOR/aggregation switches; apply QoS or rate-limiting if oversubscribed.",
+      "Tune host networking: set IRQ/RPS/RFS affinity for the NIC queues; verify GRO/LRO/TSO settings to reduce per-packet overhead.",
+      "Correlate retrans spikes with job 276 (ft_cgC) flows using ss -ti or tcpdump to identify offending flows/peers."
+    ]
+  },
+  {
+    "anomaly": "Transient swap activity spike despite ample free and available memory.",
+    "root_causes": "At 07:10:28, page_swap_in_rate (~17/s) and page_swap_out_rate (~167/s) surge while swap_free_bytes (~1.07 GiB) and memory_available_bytes (~5.2–5.6 GiB) remain high, suggesting aggressive reclaim/swappiness or cgroup-driven paging rather than true memory exhaustion.",
+    "solutions": [
+      "Confirm and reduce vm.swappiness (e.g., sysctl vm.swappiness=10) to discourage swapping on compute nodes.",
+      "Check the job’s cgroup memory limits and pressure (systemd/Slurm cgroups) to rule out limit-induced paging; raise limits if appropriate.",
+      "Monitor with vmstat 1 and sar -B to verify whether swap IO persists; if recurrent, consider disabling swap on this node or increasing RAM.",
+      "Review reclaim-related tunables (vm.vfs_cache_pressure, vm.min_free_kbytes) and workload memory patterns to avoid unnecessary paging."
+    ]
+  },
+  {
+    "anomaly": "System reports at least one historical OOM kill (vm_oom_kills_total=1) on the node.",
+    "root_causes": "An earlier workload exceeded available/cgroup-allowed memory causing the kernel OOM killer to terminate a process; the counter remains non-zero though it does not increase in this time window.",
+    "solutions": [
+      "Audit dmesg and /var/log/kern.log for the OOM event details (process, cgroup, and timestamp).",
+      "Adjust Slurm/cgroup memory requests and limits for similar jobs; ensure headroom for page cache and kernel memory.",
+      "If memory pressure is common, increase node RAM or provision sufficient swap (or disable swap for strict compute nodes while ensuring workloads fit in RAM).",
+      "Enable alerting on OOM events to react promptly when they occur."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to critical resource exhaustion.",
+    "root_causes": "Memory usage spiked from 33% to 73% during the monitoring period, indicating excessive memory consumption by running processes.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top -o %MEM'",
+      "Check if the completed job 'ft_cgC' left behind any orphaned processes or memory leaks",
+      "Monitor swap usage trends as the system approaches memory limits",
+      "Consider implementing memory limits for future jobs using cgroups or Slurm memory constraints"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in I/O wait time and disk activity during memory pressure period.",
+    "root_causes": "I/O wait increased substantially when memory usage was highest, suggesting system began swapping to disk due to memory exhaustion.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O during memory pressure events",
+      "Monitor swap in/out rates using 'vmstat 1' to confirm swapping activity",
+      "Consider adding more physical memory to reduce reliance on swap space",
+      "Implement I/O throttling for memory-intensive jobs to prevent system-wide performance degradation"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization remained elevated throughout the monitoring period with high system load.",
+    "root_causes": "CPU usage consistently above 48% with load averages increasing from 4.59 to 4.1, indicating sustained computational workload.",
+    "solutions": [
+      "Verify that the completed job 'ft_cgC' has fully terminated and released all CPU resources",
+      "Use 'htop' or 'top' to identify any remaining high-CPU processes",
+      "Check for any background system processes that may have been triggered by the job completion",
+      "Monitor CPU pressure metrics to ensure the system can handle the current workload distribution"
+    ]
+  }
+]

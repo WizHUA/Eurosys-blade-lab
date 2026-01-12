@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time indicating severe storage performance degradation.",
+    "root_causes": "Massive disk write operations creating a storage bottleneck, with write rates reaching over 260GB/s and sustained high I/O utilization above 60%.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are responsible for the intense disk write activity.",
+      "Check if the 'ft_cgC' job or its cleanup processes are performing large file operations that could be optimized.",
+      "Monitor disk health using 'smartctl' to ensure the storage hardware is not failing.",
+      "Consider implementing I/O scheduling policies or cgroups to limit disk bandwidth for compute jobs."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage has increased significantly to over 90% capacity.",
+    "root_causes": "Rapid consumption of available disk space, likely from the completed job generating large output files or temporary data.",
+    "solutions": [
+      "Identify large files or directories using 'du -sh /*' and 'find / -size +1G -type f' to locate space consumers.",
+      "Review the output and temporary files from job 'ft_cgC' which completed during this timeframe.",
+      "Implement automated cleanup policies for temporary job files and old output data.",
+      "Consider expanding storage capacity or implementing data archival procedures for completed job results."
+    ]
+  }
+]

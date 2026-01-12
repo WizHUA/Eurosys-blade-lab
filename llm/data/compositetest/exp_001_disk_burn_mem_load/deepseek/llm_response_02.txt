@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage spiking to 88.7% and swap usage increasing to 55.6%",
+    "root_causes": "Memory-intensive application (ft_cgC) consuming large amounts of RAM and triggering heavy swapping activity",
+    "solutions": [
+      "Monitor application memory usage patterns to identify memory leaks or inefficient allocation",
+      "Increase physical memory allocation for nodes running memory-intensive jobs",
+      "Optimize application code to reduce memory footprint or implement better memory management"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity with disk utilization reaching 52.2% and significant write operations",
+    "root_causes": "Application writing large amounts of temporary data or swapping due to memory pressure",
+    "solutions": [
+      "Check if application is using temporary files excessively and optimize I/O patterns",
+      "Consider using faster storage (NVMe) for temporary files",
+      "Monitor disk health to ensure hardware isn't failing"
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage spiking to 31.3% indicating kernel overhead",
+    "root_causes": "System handling memory management operations and context switches due to memory pressure",
+    "solutions": [
+      "Reduce context switches by optimizing process scheduling",
+      "Investigate if kernel parameters need tuning for high memory workloads",
+      "Monitor system calls to identify any inefficient operations"
+    ]
+  }
+]

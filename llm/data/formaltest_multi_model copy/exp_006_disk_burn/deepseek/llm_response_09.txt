@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure causing swapping and performance degradation",
+    "root_causes": "Memory usage peaked at 75% while swap space was heavily utilized, indicating insufficient RAM for workload demands",
+    "solutions": [
+      "Increase physical memory allocation for workload",
+      "Investigate memory usage patterns in completed job ft_cgC",
+      "Adjust memory limits for future similar jobs"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity correlating with memory pressure",
+    "root_causes": "Disk write operations spiked to 461GB likely due to memory swapping",
+    "solutions": [
+      "Monitor swap-in/swap-out rates to confirm swapping activity",
+      "Consider job resubmission with more memory allocation",
+      "Review storage subsystem performance"
+    ]
+  },
+  {
+    "anomaly": "CPU system usage spiked to 17% while running",
+    "root_causes": "Increased system time suggests kernel overhead from memory management and I/O handling",
+    "solutions": [
+      "Profile system call activity during high CPU system periods",
+      "Check for potential process blocking during IO wait",
+      "Consider NUMA-aware process placement"
+    ]
+  }
+]

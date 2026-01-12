@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage, indicating severe disk I/O bottleneck.",
+    "root_causes": "Disk I/O load from intensive read/write operations.",
+    "solutions": [
+      "Investigate processes causing high disk I/O using 'iotop' or 'iostat -x 1'.",
+      "Check if the job 'ft_ftC' was performing intensive I/O operations before completion.",
+      "Monitor disk latency metrics and consider optimizing I/O patterns or moving to faster storage."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with swap space nearly exhausted.",
+    "root_causes": "Memory resource load exceeding physical RAM capacity.",
+    "solutions": [
+      "Review memory usage patterns of recently completed job 'ft_ftC'.",
+      "Check for memory leaks in applications that were running during the high memory usage period.",
+      "Consider adding more physical memory or tuning swappiness parameters to reduce swap usage."
+    ]
+  },
+  {
+    "anomaly": "High system load average with significant number of blocked processes.",
+    "root_causes": "Resource contention from I/O wait and memory pressure.",
+    "solutions": [
+      "Analyze the 'processes_blocked' metric which reached 10, indicating processes waiting for I/O.",
+      "Use 'ps aux' to identify processes in 'D' state (uninterruptible sleep).",
+      "Address the underlying I/O and memory bottlenecks to reduce system load."
+    ]
+  }
+]

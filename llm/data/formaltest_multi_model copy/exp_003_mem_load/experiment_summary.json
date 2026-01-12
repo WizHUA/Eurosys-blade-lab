@@ -1,0 +1,115 @@
+{
+  "experiment_name": "exp_003_mem_load",
+  "timestamp": "2025-09-21T23:06:14.086074",
+  "models_tested": [
+    "gpt5"
+  ],
+  "runs_per_model": 10,
+  "fewshot_files_used": [
+    "shot1.txt",
+    "shot2.txt",
+    "shot3.txt",
+    "shot4.txt"
+  ],
+  "results": {
+    "gpt5": {
+      "model_short_name": "gpt5",
+      "model_full_name": "openai/gpt-5",
+      "total_runs": 10,
+      "successful_runs": 10,
+      "success_rate": "100.0%",
+      "results": [
+        {
+          "run_id": 1,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_01.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:51:56.461030"
+        },
+        {
+          "run_id": 2,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_02.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:53:13.977302"
+        },
+        {
+          "run_id": 3,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_03.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:54:17.481951"
+        },
+        {
+          "run_id": 4,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_04.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:56:09.482464"
+        },
+        {
+          "run_id": 5,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_05.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:57:10.667958"
+        },
+        {
+          "run_id": 6,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_06.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T22:58:22.574308"
+        },
+        {
+          "run_id": 7,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_07.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T23:00:28.419158"
+        },
+        {
+          "run_id": 8,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_08.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T23:03:34.524315"
+        },
+        {
+          "run_id": 9,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_09.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T23:04:46.874384"
+        },
+        {
+          "run_id": 10,
+          "success": true,
+          "anomaly_count": 3,
+          "response_file": "llm_response_10.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-21T23:06:14.085441"
+        }
+      ]
+    }
+  }
+}

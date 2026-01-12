@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with rising CPU iowait and queueing",
+    "root_causes": "Between 23:22:25 and 23:23:25, disk activity surged: disk_io_usage_percent climbed from ~0.46% to 54.9%, cpu_iowait_percent rose from ~0.03% to 3.77%, io_pressure_waiting_rate escalated (e.g., to 0.0379–0.0822), and processes_blocked became non-zero while read/write rates reached ~200–500 MB/s. This is consistent with the running job (ft_cgC) issuing heavy read/write operations that saturated the storage device.",
+    "solutions": [
+      "Identify top I/O consumers with iotop -oPa and pidstat -d 1 to confirm the offending processes.",
+      "Check per-device saturation with iostat -x 1 (watch %util, await, svctm, and queue depth) and smartctl for device health.",
+      "Throttle or isolate the workload: apply ionice (idle/best-effort), and use cgroup I/O controls (io.max/io.weight) to limit bandwidth/IOPS for the job.",
+      "Reduce writeback bursts: lower vm.dirty_ratio and vm.dirty_background_ratio (or use dirty_bytes variants) to smooth writeback.",
+      "If possible, direct large I/O to faster or less contended storage (local NVMe or parallel FS) and split output across multiple targets."
+    ]
+  },
+  {
+    "anomaly": "Intense swap churn despite ample available memory",
+    "root_causes": "Swap activity spiked dramatically while memory_available_bytes remained >5 GB and page cache ballooned: page_swap_in/out rates jumped from ~160/60 per sec to 495,869/182,222 per sec; swap_usage_percent stayed ~47.8% with swap_free_bytes nearly constant. Simultaneous growth of memory_cached_bytes (≈0.4 GB → ≈4.9–5.0 GB) indicates the kernel favored page cache during heavy file I/O, driving swap churn of anonymous memory.",
+    "solutions": [
+      "Confirm with vmstat 1 and sar -B; if verified, reduce vm.swappiness (e.g., 10–20) to prefer reclaiming cache over swapping anonymous memory.",
+      "Constrain job memory and swap: set cgroup memory.swap.max=0 (or a low ceiling) for the job to prevent swap thrash.",
+      "Advise the application to avoid unnecessary caching (use O_DIRECT or posix_fadvise(DONTNEED)/madvise) for large sequential I/O.",
+      "After the job, free cache if needed (echo 1 > /proc/sys/vm/drop_caches) in maintenance windows to recover from cache bloat.",
+      "If swap resides on slow media, move it to faster storage or add RAM to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption approaching high utilization",
+    "root_causes": "Filesystem usage increased quickly from ~73.36% to ~87.05% within minutes while disk_write_rate exceeded 100 MB/s, indicating the job generated large output or temporary files. Filesystem_avail_bytes dropped from ~22.3 GB to ~10.9 GB during the window.",
+    "solutions": [
+      "Inspect job output and temporary directories; remove or relocate large intermediates (e.g., to node-local scratch) and clean up stale files.",
+      "Enforce or adjust per-job quotas/limits to prevent sudden space exhaustion and enable early alerts (e.g., at 80–85%).",
+      "If sustained capacity is required, expand the filesystem or redirect heavy outputs to a higher-capacity/throughput storage tier.",
+      "Enable compression or streaming of results where applicable to reduce on-disk footprint."
+    ]
+  }
+]

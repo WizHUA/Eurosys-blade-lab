@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU pressure spikes correlating with increased system time usage",
+    "root_causes": "The CPU system percent increased from 0.9% to 17.8% during the spike, indicating kernel space processing overhead",
+    "solutions": [
+      "Profile kernel operations using 'perf' to identify specific system calls causing the overhead",
+      "Check for context switch rates which increased from ~1255/s to 1919/s during the pressure period",
+      "Monitor interrupt rates which spiked from ~4485 to 6930 interrupts/sec"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure leading to increased page faults and swap activity",
+    "root_causes": "Available memory dropped to 168MB with page fault rates reaching 30k/sec and swap_in operations at 573MB/sec",
+    "solutions": [
+      "Investigate memory usage patterns of recently completed job 'ft_cgC' which may not have fully released resources",
+      "Analyze process memory maps via 'pmap -x' for any potential memory leaks",
+      "Consider adjusting swappiness parameter if premature swapping is detected"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with elevated latency during peak periods",
+    "root_causes": "Disk write latency increased from 2.4ms to 4.9ms while write IOPS reached 195/sec",
+    "solutions": [
+      "Check filesystem journal activity via 'journalctl -f' during I/O intensive operations",
+      "Monitor pending I/O operations with 'iostat -x 1' for possible device saturation",
+      "Verify filesystem health and check for fragmentation on the storage volume"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with significant swapping activity",
+    "root_causes": "Memory demand exceeds available physical RAM, triggering aggressive swapping",
+    "solutions": [
+      "Monitor 'memory_active_anon_bytes' and 'memory_inactive_anon_bytes' to identify memory-hungry processes",
+      "Check Slurm job memory limits and adjust allocations for memory-intensive jobs",
+      "Review application code for memory leaks or inefficient memory usage patterns"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity during memory pressure",
+    "root_causes": "Swapping causing disk contention with application I/O operations",
+    "solutions": [
+      "Investigate 'disk_io_time_seconds_total' spikes correlating with swap activity",
+      "Consider adding more physical memory or reducing job memory requirements",
+      "Separate swap partitions onto dedicated storage devices if swapping is unavoidable"
+    ]
+  },
+  {
+    "anomaly": "TCP retransmissions and connection timeouts during high load",
+    "root_causes": "Network congestion or system overload affecting MPI communication",
+    "solutions": [
+      "Monitor 'node_netstat_Tcp_RetransSegs' and 'node_netstat_TcpExt_TCPTimeouts' metrics",
+      "Check network infrastructure health and MPI job communication patterns",
+      "Consider adjusting MPI job parameters or network QoS settings"
+    ]
+  }
+]

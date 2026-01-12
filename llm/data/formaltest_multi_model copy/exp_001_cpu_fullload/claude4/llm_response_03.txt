@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization rapidly increased from 30% to over 80% during job execution, indicating computational stress.",
+    "root_causes": "The 'ft_cgC' job is computationally intensive, causing sustained high CPU load with user CPU time dominating the utilization pattern.",
+    "solutions": [
+      "Monitor the specific processes using 'top' or 'htop' to confirm CPU-bound behavior is expected for this workload type",
+      "Verify that the job is not experiencing performance degradation due to thermal throttling by checking CPU temperatures",
+      "Consider adjusting job scheduling policies if this level of CPU utilization impacts other system services"
+    ]
+  },
+  {
+    "anomaly": "Progressive increase in system load from 1.77 to 4.75, exceeding the number of CPU cores.",
+    "root_causes": "High computational demand from the running job is creating process queue saturation beyond the system's 8-core capacity.",
+    "solutions": [
+      "Use 'vmstat' or 'iostat' to determine if the load is CPU-bound or waiting on I/O operations",
+      "Check if the job is creating more threads than optimal for the available CPU cores",
+      "Monitor memory usage patterns to ensure the load increase is not due to memory pressure causing swapping"
+    ]
+  },
+  {
+    "anomaly": "Steady increase in memory consumption with available memory decreasing from 5.4GB to 5.4GB.",
+    "root_causes": "The computational job appears to have a growing memory footprint, though still within acceptable bounds for the 8GB system.",
+    "solutions": [
+      "Monitor memory usage trends using 'free -m' at regular intervals to ensure it doesn't approach swap usage",
+      "Check if the job has expected memory growth patterns or if there might be a memory leak",
+      "Verify that the job's memory requirements are within the allocated resources in the job submission"
+    ]
+  }
+]

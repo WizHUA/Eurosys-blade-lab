@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space nearly exhausted during job execution.",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing heavy swapping activity.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to confirm swap utilization patterns.",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes from the completed 'ft_cgC' job.",
+      "Review job resource requirements and consider requesting more memory or optimizing memory usage patterns.",
+      "Check for memory leaks in the application code that may have caused excessive memory consumption."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with sustained write operations throughout the monitoring period.",
+    "root_causes": "Disk I/O load from a combination of application data writes and memory swapping to disk.",
+    "solutions": [
+      "The disk write rate exceeded 100MB/s consistently, indicating intensive I/O operations.",
+      "Use 'iotop' to identify which processes were responsible for the high disk write activity.",
+      "Consider optimizing I/O patterns in the application or using faster storage solutions.",
+      "Monitor disk utilization to ensure the storage subsystem can handle the I/O load without becoming a bottleneck."
+    ]
+  },
+  {
+    "anomaly": "Significant filesystem space consumption during job execution.",
+    "root_causes": "Application generating large amounts of temporary or output data consuming available disk space.",
+    "solutions": [
+      "Filesystem usage increased from 89% to 90% during the job execution period.",
+      "Clean up temporary files and old job outputs to free disk space.",
+      "Implement automatic cleanup policies for completed jobs to prevent disk space exhaustion.",
+      "Consider expanding storage capacity or using external storage for large datasets."
+    ]
+  }
+]

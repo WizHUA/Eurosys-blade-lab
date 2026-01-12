@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system performance degradation and swap activity.",
+    "root_causes": "Memory usage increased dramatically from 32% to 55% during job execution, with active anonymous memory jumping from 1.6GB to 3.4GB, indicating the completed job 'ft_cgC' consumed excessive memory resources.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to establish appropriate memory limits",
+      "Implement memory cgroups or Slurm memory limits to prevent jobs from consuming excessive system memory",
+      "Consider increasing available memory on nodes running memory-intensive computational jobs",
+      "Review the ft_cgC application for potential memory leaks or inefficient memory allocation patterns"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity with high write latency during job execution.",
+    "root_causes": "Disk write activity surged from minimal levels to over 160KB/s with I/O utilization reaching 6.4%, likely caused by memory pressure forcing swap activity and the computational job's I/O requirements.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes generating high disk I/O during similar job runs",
+      "Consider faster storage solutions or I/O optimization for memory-intensive workloads",
+      "Implement I/O scheduling policies to prioritize system processes over batch job I/O",
+      "Monitor swap usage and consider disabling swap or using faster swap storage to reduce I/O bottlenecks"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient critical filesystem usage spike to ~95.36% (avail dropped to ~3.89 GiB) between 23:20:25 and 23:21:10, then recovered (~22.33 GiB avail).",
+    "root_causes": "A large, short-lived write burst consistent with temporary/output files created and then removed during the running job window (ft_cgC); evidenced by filesystem_usage_percent jumping from ~73.36% to ~95.36% and returning within minutes without read-only/errors.",
+    "solutions": [
+      "Identify which paths grew during that interval by listing recently modified large files in the job's working/scratch directories and correlating with the job timeline.",
+      "Ensure the job writes large intermediates to a designated scratch (e.g., local NVMe or /scratch) and enable automatic per-job cleanup (SLURM epilog).",
+      "Set filesystem alerts and soft quotas at 90% to prevent near-full conditions; reserve free space to maintain metadata operations.",
+      "If this pattern recurs, expand capacity or separate high-churn scratch data onto a different volume."
+    ]
+  },
+  {
+    "anomaly": "Swap storm with disk I/O contention at 23:19:40: swap_out ~31.8k pages/s, swap_in ~323 pages/s, disk I/O usage ~62.4%, CPU iowait ~8%.",
+    "root_causes": "Intense memory reclaim and swapping by the workload caused heavy write I/O and elevated iowait, degrading performance at the start of the window.",
+    "solutions": [
+      "Right-size job memory usage versus available RAM to avoid swapping (reduce per-node concurrency or increase memory allocation).",
+      "Profile the job to find memory hotspots and reduce peak footprint (e.g., smaller working sets, streaming I/O).",
+      "Lower kernel swappiness and verify swap configuration on compute nodes to minimize swapping under load.",
+      "Monitor per-process I/O and swap activity during runs (e.g., iotop, perf, psi) and address offenders."
+    ]
+  },
+  {
+    "anomaly": "Persistent non-zero swapping with ~48–54% of swap occupied and continued swap-in/out activity (hundreds of pages/s) despite low overall RAM usage (~32–33%).",
+    "root_causes": "A portion of memory remains swapped while free/available RAM exists, keeping latency elevated due to ongoing page faults and swap traffic throughout the interval.",
+    "solutions": [
+      "After draining workloads, clear stale swap usage (maintenance window: swapoff/swapon or reboot) to restore fully resident working sets.",
+      "Track major page faults and swap rates alongside job steps; if recurring, reduce memory pressure per task or adjust placement to keep hot data resident.",
+      "Place frequently accessed temporary data on fast local storage to avoid coupling paging with filesystem I/O."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU usage spiked to 83% with load average reaching 4.88 on an 8-core system",
+    "root_causes": "High CPU utilization from the running ft_cgC job causing resource contention",
+    "solutions": [
+      "Investigate ft_cgC job's CPU usage patterns to optimize its computational efficiency",
+      "Consider CPU affinity/pinning to prevent thread migration overhead",
+      "Monitor CPU cache misses which could indicate inefficient memory access patterns"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increased with active memory usage reaching 74% of total",
+    "root_causes": "Memory-intensive operations from the FT benchmark job consuming system RAM",
+    "solutions": [
+      "Profile ft_cgC's memory allocation patterns",
+      "Consider node-exclusive scheduling for memory-intensive jobs",
+      "Monitor memory bandwidth utilization to detect potential bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O operations during job execution",
+    "root_causes": "Benchmark job reading/writing temporary data or checkpoints",
+    "solutions": [
+      "Check if job can use RAM disk or faster local storage",
+      "Verify optimal I/O block sizes are being used",
+      "Consider using parallel I/O libraries if the job supports them"
+    ]
+  }
+]

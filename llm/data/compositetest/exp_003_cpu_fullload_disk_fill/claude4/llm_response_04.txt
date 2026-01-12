@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O activity with significant write operations and elevated I/O wait time.",
+    "root_causes": "Intensive disk write operations causing storage bottleneck, indicated by write rates exceeding 32MB/s and I/O wait time reaching 7.97%.",
+    "solutions": [
+      "Use 'iotop' to identify the specific processes responsible for the high disk write activity.",
+      "Check if the completed job 'ft_cgC' left any background processes or temporary files causing continued I/O activity.",
+      "Monitor disk utilization with 'iostat -x 1' to confirm if the storage subsystem is the bottleneck.",
+      "Consider optimizing application I/O patterns or upgrading storage infrastructure if this is a recurring issue."
+    ]
+  },
+  {
+    "anomaly": "Significant filesystem usage increase during monitoring period.",
+    "root_causes": "Filesystem usage jumped from 73.35% to 95.36% indicating rapid consumption of available disk space.",
+    "solutions": [
+      "Use 'du -sh /*' to identify which directories consumed the most space during the job execution.",
+      "Check for large temporary files or logs created by the 'ft_cgC' job that may not have been cleaned up properly.",
+      "Implement automated cleanup procedures for completed jobs to prevent disk space exhaustion.",
+      "Monitor job output directories and implement disk space quotas if necessary."
+    ]
+  },
+  {
+    "anomaly": "Elevated system load and CPU pressure during post-job cleanup phase.",
+    "root_causes": "System experiencing moderate CPU contention with load averaging 5.7 and CPU pressure around 3.1%.",
+    "solutions": [
+      "Check for any background processes or cleanup scripts running after job completion using 'ps aux' and 'top'.",
+      "Review system logs for any automated maintenance tasks that may be running concurrently.",
+      "Consider scheduling intensive cleanup operations during off-peak hours to reduce system impact."
+    ]
+  }
+]

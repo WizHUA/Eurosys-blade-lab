@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes with significant swap usage during job execution",
+    "root_causes": "Memory-intensive job causing high memory pressure and triggering swap usage",
+    "solutions": [
+      "Monitor memory usage patterns of ft_cgC job to identify memory hotspots",
+      "Increase physical memory allocation or optimize job's memory usage",
+      "Adjust swappiness parameter to better manage swap usage during high memory pressure"
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage spikes above 30% during job execution",
+    "root_causes": "Kernel overhead from managing memory pressure and swap operations",
+    "solutions": [
+      "Analyze system call activity during high CPU system time periods",
+      "Check for excessive context switching or interrupt handling",
+      "Review kernel parameters related to memory management"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure increases significantly during job execution",
+    "root_causes": "Swap activity and job I/O operations causing disk contention",
+    "solutions": [
+      "Separate swap partitions onto dedicated high-performance storage",
+      "Consider using faster storage for job I/O operations",
+      "Implement I/O throttling or prioritization for critical processes"
+    ]
+  }
+]

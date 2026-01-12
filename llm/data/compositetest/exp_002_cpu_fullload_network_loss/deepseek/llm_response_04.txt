@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with elevated load averages",
+    "root_causes": "CPU utilization consistently above 68% with 1-minute load averages peaking at 8.37, indicating system is overloaded",
+    "solutions": [
+      "Investigate CPU-bound processes using 'top' or 'htop'",
+      "Check current running jobs for CPU-intensive tasks",
+      "Consider adjusting process priorities or cgroups if necessary"
+    ]
+  },
+  {
+    "anomaly": "Significant disk I/O wait time (up to 22.49%)",
+    "root_causes": "Disk I/O bottlenecks likely caused by heavy read/write operations from completed job",
+    "solutions": [
+      "Monitor disk I/O using 'iotop' to identify processes",
+      "Check filesystem utilization and I/O wait statistics",
+      "Consider optimizing storage layout or adding faster storage"
+    ]
+  },
+  {
+    "anomaly": "High memory pressure with low available memory",
+    "root_causes": "Memory usage consistently high (up to 36.23%) with low free memory (minimum 226MB)",
+    "solutions": [
+      "Investigate memory usage with 'free -h' and 'ps aux --sort=-%mem'",
+      "Check for memory leaks in recently completed jobs",
+      "Consider adding swap space or adjusting memory limits"
+    ]
+  }
+]

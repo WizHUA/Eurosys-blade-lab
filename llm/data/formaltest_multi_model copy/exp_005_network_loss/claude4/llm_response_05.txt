@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "High CPU usage with elevated I/O wait and swap activity during job execution period.",
+    "root_causes": "Memory pressure from the ft_cgC job causing increased swapping and I/O contention, leading to CPU cycles being consumed by system processes managing memory and disk operations.",
+    "solutions": [
+      "Monitor memory usage patterns for the ft_cgC job type to determine if it requires more memory allocation per node",
+      "Consider increasing available memory or implementing memory limits to prevent excessive swapping",
+      "Use 'iotop' and 'vmstat' to confirm swap activity correlation with I/O wait spikes",
+      "Review job submission parameters to ensure adequate resource allocation for computational workloads"
+    ]
+  },
+  {
+    "anomaly": "Network activity fluctuations with periodic TCP connection establishment and retransmission patterns.",
+    "root_causes": "Network communication patterns from the ft_cgC computational job, possibly involving data transfer or inter-process communication that creates periodic network load.",
+    "solutions": [
+      "The TCP ActiveOpens and RetransSegs metrics show intermittent activity correlating with job execution phases",
+      "Monitor network bandwidth utilization during similar computational jobs to establish baseline patterns",
+      "Check if the application requires network-based data exchange or distributed computing communication",
+      "Verify network infrastructure can handle computational job communication requirements without packet loss"
+    ]
+  }
+]

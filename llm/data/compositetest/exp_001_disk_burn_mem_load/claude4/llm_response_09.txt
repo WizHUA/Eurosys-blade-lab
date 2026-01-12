@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage climbing from 36% to 89% and swap usage reaching 55%.",
+    "root_causes": "Memory resource exhaustion caused by the running job 'ft_cgC' consuming excessive memory beyond available physical RAM.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify specific memory consumers.",
+      "Check if the job 'ft_cgC' has memory leaks or inefficient memory allocation patterns.",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact.",
+      "Review job configuration to ensure memory requirements are within system capacity."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O bottleneck with utilization reaching 52% and massive write activity.",
+    "root_causes": "Disk I/O load caused by heavy swapping activity due to memory pressure and intensive write operations from the running job.",
+    "solutions": [
+      "The disk write rate peaked at over 400MB/s indicating severe I/O stress from swapping and job operations.",
+      "Use 'iotop' to identify processes causing the high disk I/O load.",
+      "Resolving the memory pressure issue will significantly reduce swap-related I/O activity.",
+      "Consider using faster storage or optimizing job I/O patterns to reduce disk pressure."
+    ]
+  },
+  {
+    "anomaly": "CPU usage saturation reaching 91% with high system CPU time indicating kernel overhead.",
+    "root_causes": "CPU resource load from memory management overhead and I/O processing due to severe memory pressure.",
+    "solutions": [
+      "High system CPU time (31% at peak) indicates significant kernel overhead from memory management and swapping.",
+      "Use 'top' or 'htop' to monitor CPU usage patterns and identify if the overhead is from memory management.",
+      "The primary solution is addressing the memory pressure to reduce kernel overhead.",
+      "Consider job scheduling adjustments to prevent resource contention."
+    ]
+  }
+]

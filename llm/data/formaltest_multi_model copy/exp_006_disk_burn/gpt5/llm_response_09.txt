@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Escalating disk I/O saturation with rising I/O pressure and iowait",
+    "root_causes": "During 07:12:28–07:13:28, disk_io_usage_percent surged from ~11.6% to ~60.2%, read/write throughput spiked (e.g., disk_read_rate_bytes_per_sec ~148 MB/s -> ~587 MB/s; disk_write_rate_bytes_per_sec ~70 MB/s -> ~198 MB/s), cpu_iowait_percent climbed from ~0.7% to ~4.9%, processes_blocked appeared (up to 2), and io_pressure_waiting_rate rose from ~0 to ~0.81. These are consistent with an I/O-bound workload driving the block layer hard while job 276 (ft_cgC) was active in this window.",
+    "solutions": [
+      "Identify I/O-heavy processes (iotop -oPa, pidstat -d 1) and correlate with job 276 (ft_cgC).",
+      "Throttle the job’s storage impact using cgroups/Slurm (e.g., io.max/blkio to cap IOPS/throughput) or schedule it on faster storage (local NVMe or higher-tier filesystem).",
+      "Reduce writeback bursts by tuning vm.dirty_background_bytes and vm.dirty_bytes to smaller, byte-based limits to smooth writeback.",
+      "Evaluate and adjust application I/O patterns (batch size, concurrency, flush frequency, readahead) to favor larger sequential I/O.",
+      "Validate disk/array health and queue depth (iostat -x 1, smartctl -H) and ensure the chosen I/O scheduler and IRQ affinity are appropriate."
+    ]
+  },
+  {
+    "anomaly": "Sustained swap storm and evidence of prior OOM kill",
+    "root_causes": "page_swap_in_rate/page_swap_out_rate jumped from ~0 to hundreds of thousands per second (e.g., ~413k/172k at 07:13:28), while swap usage stayed high (~46.6% free ~1.146 GB of 2.0 GB). vm_oom_kills_total=1 indicates at least one OOM event on this boot. Memory_free briefly collapsed to ~128 MB (07:12:28) with heavy cache/inactive_file growth, suggesting aggressive reclaim and swap churn under load.",
+    "solutions": [
+      "Pinpoint top memory consumers (ps aux --sort=-rss, smem, pmap) within the job and reduce memory footprint or concurrency.",
+      "Harden memory control via Slurm/cgroups (memory.max/memory.high) so offending jobs throttle or fail fast instead of causing node-wide OOM/swap thrash.",
+      "Tune vm.swappiness (typically lower for compute nodes) and ensure overcommit settings (vm.overcommit_memory/ratio) align with workload behavior.",
+      "If feasible for this workflow, allocate more RAM to the node or to the job, or reduce dataset working set size (chunking/tiling).",
+      "After the workload, consider safely dropping page cache (sync; echo 3 > /proc/sys/vm/drop_caches) to recover cache-heavy memory, not during peak I/O."
+    ]
+  },
+  {
+    "anomaly": "Rising kernel/interrupt overhead and context switching",
+    "root_causes": "cpu_system_percent increased significantly (~0.9% -> ~17.8%), interrupts_rate rose (~4.5k/s -> ~6.9k/s), context_switches_rate increased, and softnet/pressure metrics climbed alongside disk activity. This indicates kernel time dominated by storage/IRQ handling as I/O ramped up.",
+    "solutions": [
+      "Confirm interrupt sources (perf top, cat /proc/interrupts) and ensure irqbalance is active and IRQ affinity/NIC/blk-mq queues are distributed across CPUs.",
+      "Reduce kernel overhead by curbing the I/O load (see I/O throttling/tuning above) and minimizing small synchronous I/O from the application.",
+      "Validate that the filesystem and mount options are appropriate for the access pattern (e.g., noatime, adequate readahead) to reduce metadata churn."
+    ]
+  }
+]

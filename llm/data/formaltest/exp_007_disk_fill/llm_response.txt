@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "CPU utilization drops from 76% to 48% over the time window, indicating a significant reduction in computational load.",
+    "root_causes": "Completion of the computationally intensive job 'ft_cgC'.",
+    "solutions": [
+      "Confirm job completion status using 'sacct -j 276'.",
+      "Monitor system for return to baseline CPU usage patterns."
+    ]
+  },
+  {
+    "anomaly": "System load decreases from 5.52 to 4.35 while CPU usage drops, indicating proper load reduction.",
+    "root_causes": "Reduction in active processes following job completion.",
+    "solutions": [
+      "Verify process count reduction with 'ps aux | wc -l'.",
+      "Check for any lingering processes from the completed job."
+    ]
+  },
+  {
+    "anomaly": "Memory usage remains stable at approximately 78-80% throughout the period, indicating persistent memory pressure.",
+    "root_causes": "High memory allocation that persists after job completion, possibly due to caching or un-reclaimed memory.",
+    "solutions": [
+      "Check memory cache usage with 'free -h' and consider clearing caches if necessary.",
+      "Monitor for memory leaks in system processes using 'smem' or similar tools."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity shows significant reduction in write rates from ~139MB/s to near zero, indicating job-related I/O has ceased.",
+    "root_causes": "Completion of I/O-intensive operations from the 'ft_cgC' job.",
+    "solutions": [
+      "Verify disk I/O has returned to baseline with 'iostat -x 1'.",
+      "Check for any pending write operations with 'iotop'."
+    ]
+  }
+]

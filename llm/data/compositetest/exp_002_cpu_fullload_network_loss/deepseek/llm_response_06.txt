@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High memory pressure and swapping activity despite completed jobs",
+    "root_causes": "Memory-intensive job 'ft_cgC' completed but system hasn't fully reclaimed memory resources",
+    "solutions": [
+      "Run 'sync; echo 3 > /proc/sys/vm/drop_caches' to clear system caches",
+      "Check for memory leaks in recently completed applications",
+      "Monitor slabinfo (/proc/slabinfo) for unreclaimed kernel objects"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O with high io_wait percentages",
+    "root_causes": "Possible lingering storage operations from completed MPI job's checkpoint/restart activities",
+    "solutions": [
+      "Verify completion of all pending filesystem sync operations",
+      "Check for orphaned temporary files in job working directories",
+      "Investigate possible filesystem metadata operations hanging"
+    ]
+  },
+  {
+    "anomaly": "Unusually high TCP network metrics post-job completion",
+    "root_causes": "Network connections from MPI job weren't properly torn down",
+    "solutions": [
+      "Check for orphaned network connections using 'ss -ta'",
+      "Verify MPI implementation's cleanup routines executed correctly",
+      "Monitor TCP memory usage (/proc/sys/net/ipv4/tcp_mem)"
+    ]
+  }
+]

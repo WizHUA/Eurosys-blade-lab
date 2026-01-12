@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes and OOM kill events detected during job execution",
+    "root_causes": "Job 'ft_cgC' consumed over 4GB of active anonymous memory (anon_memory_percent spiked to 62.6%) leading to memory exhaustion",
+    "solutions": [
+      "Increase memory allocation for compute nodes running similar jobs",
+      "Optimize memory usage in the application code",
+      "Implement memory monitoring alerts to catch issues before OOM kills occur"
+    ]
+  },
+  {
+    "anomaly": "High TCP retransmission rates during compute phase",
+    "root_causes": "Network congestion or packet loss during MPI communications for job 'ft_cgC'",
+    "solutions": [
+      "Verify network infrastructure health (switches/cabling)",
+      "Consider using higher performance network interconnects for MPI jobs",
+      "Test with different MPI transport protocols (TCP vs RDMA)"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure spikes during job execution",
+    "root_causes": "Job 'ft_cgC' generated heavy disk writes (over 385GB total) during computation",
+    "solutions": [
+      "Optimize application I/O patterns to reduce write operations",
+      "Consider using faster storage or local SSDs for temporary files",
+      "Implement I/O throttling for compute jobs"
+    ]
+  }
+]

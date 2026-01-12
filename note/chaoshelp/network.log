@@ -1,0 +1,417 @@
+======================================================================
+$ blade create network corrupt -h
+======================================================================
+Corrupt experiment
+
+Usage:
+  blade create network corrupt
+
+Examples:
+
+# Access to the specified IP request packet is corrupted, 80% of the time
+blade create network corrupt --percent 80 --destination-ip 180.101.49.12 --interface eth0
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --destination-ip string    destination ip. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1.
+      --exclude-ip string        Exclude ips. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1
+      --exclude-port string      Exclude local ports. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 22,8000. This flag is invalid when --local-port or --remote-port is specified
+      --force                    Forcibly overwrites the original rules
+  -h, --help                     help for corrupt
+      --ignore-peer-port         ignore excluding all ports communicating with this port, generally used when the ss command does not exist
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --interface string         Network interface, for example, eth0 (required)
+      --local-port string        Ports for local service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --percent string           Corruption percent, must be positive integer without %, for example, --percent 50 (required)
+      --protocol string          specify protocol for example tcp udp icmp 
+      --remote-port string       Ports for remote service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network delay -h
+======================================================================
+Delay experiment
+
+Usage:
+  blade create network delay
+
+Examples:
+
+# Access to native 8080 and 8081 ports is delayed by 3 seconds, and the delay time fluctuates by 1 second
+blade create network delay --time 3000 --offset 1000 --interface eth0 --local-port 8080,8081
+
+# Local access to external 14.215.177.39 machine (ping www.baidu.com obtained IP) port 80 delay of 3 seconds
+blade create network delay --time 3000 --interface eth0 --remote-port 80 --destination-ip 14.215.177.39
+
+# Do a 5 second delay for the entire network card eth0, excluding ports 22 and 8000 to 8080
+blade create network delay --time 5000 --interface eth0 --exclude-port 22,8000-8080
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --destination-ip string    destination ip. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1.
+      --exclude-ip string        Exclude ips. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1
+      --exclude-port string      Exclude local ports. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 22,8000. This flag is invalid when --local-port or --remote-port is specified
+      --force                    Forcibly overwrites the original rules
+  -h, --help                     help for delay
+      --ignore-peer-port         ignore excluding all ports communicating with this port, generally used when the ss command does not exist
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --interface string         Network interface, for example, eth0 (required)
+      --local-port string        Ports for local service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --offset string            Delay offset time, ms
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --protocol string          specify protocol for example tcp udp icmp 
+      --remote-port string       Ports for remote service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --time string              Delay time, ms (required)
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network dns -h
+======================================================================
+Dns experiment
+
+Usage:
+  blade create network dns
+
+Examples:
+
+# The domain name www.baidu.com is not accessible
+blade create network dns --domain www.baidu.com --ip 10.0.0.0
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --domain string            Domain name (required)
+  -h, --help                     help for dns
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --ip string                Domain ip (required)
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network dns_down -h
+======================================================================
+Make DNS is not accessible.
+
+Usage:
+  blade create network dns_down
+
+Examples:
+
+# The domain name www.baidu.com is not accessible while test1.com and test2.com are accessible.
+blade create network dns_down --allow_domain test1.com,test2.com
+
+Flags:
+      --allow_domain string      Domain names that resolve normally even when DNS is unavailable, with multiple domain names separated by ','. For example: test1.com,test2.com
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+  -h, --help                     help for dns_down
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network drop -h
+======================================================================
+Drop network data
+
+Usage:
+  blade create network drop
+
+Examples:
+
+# Block incoming connection from the source ip 10.10.10.10
+blade create network drop --source-ip 10.10.10.10 --network-traffic in
+
+# Block incoming connection to the destination ip 10.10.10.10
+blade create network drop --destination-ip 10.10.10.10 --network-traffic in
+
+# Block incoming connection from the port 80
+blade create network drop --source-port 80 --network-traffic in
+
+# Block incoming connection to the port 80 and 81
+blade create network drop --destination-port 80,81 --network-traffic in
+
+# Block outgoing connection to the port 80
+blade create network drop --destination-port 80 --network-traffic out
+
+# Block outgoing connection to the specific domain
+blade create network drop --string-pattern baidu.com --network-traffic out
+
+# Block outgoing connection to the specific domain on port 80
+blade create network drop --destination-port 80 --string-pattern baidu.com --network-traffic out
+
+
+Flags:
+      --blade-release string      Blade release package，use this flag when the channel is ssh
+      --channel string            Select the channel for execution, and you can now select SSH
+      --destination-ip string     The destination ip address of packet
+      --destination-port string   The destination port of packet
+  -h, --help                      help for drop
+      --install-path string       install path default /opt/chaosblade，use this flag when the channel is ssh
+      --network-traffic string    The direction of network traffic
+      --override-blade-release    Override blade release，use this flag when the channel is ssh
+      --source-ip string          The source ip address of packet
+      --source-port string        The source port of packet
+      --ssh-host string           Use this flag when the channel is ssh
+      --ssh-key string            Use this flag when the channel is ssh
+      --ssh-key-passphrase        Use this flag when the channel is ssh
+      --ssh-port string           Use this flag when the channel is ssh
+      --ssh-user string           Use this flag when the channel is ssh
+      --string-pattern string     The string that is contained in the packet
+      --timeout string            set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network duplicate -h
+======================================================================
+Duplicate experiment
+
+Usage:
+  blade create network duplicate
+
+Examples:
+
+# Specify the network card eth0 and repeat the packet by 10%
+blade create network duplicate --percent=10 --interface=eth0
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --destination-ip string    destination ip. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1.
+      --exclude-ip string        Exclude ips. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1
+      --exclude-port string      Exclude local ports. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 22,8000. This flag is invalid when --local-port or --remote-port is specified
+      --force                    Forcibly overwrites the original rules
+  -h, --help                     help for duplicate
+      --ignore-peer-port         ignore excluding all ports communicating with this port, generally used when the ss command does not exist
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --interface string         Network interface, for example, eth0 (required)
+      --local-port string        Ports for local service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --percent string           Duplication percent, must be positive integer without %, for example, --percent 50 (required)
+      --protocol string          specify protocol for example tcp udp icmp 
+      --remote-port string       Ports for remote service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network loss -h
+======================================================================
+Loss network package
+
+Usage:
+  blade create network loss
+
+Examples:
+
+# Access to native 8080 and 8081 ports lost 70% of packets
+blade create network loss --percent 70 --interface eth0 --local-port 8080,8081
+
+# The machine accesses external 14.215.177.39 machine (ping www.baidu.com) 80 port packet loss rate 100%
+blade create network loss --percent 100 --interface eth0 --remote-port 80 --destination-ip 14.215.177.39
+
+# Do 60% packet loss for the entire network card Eth0, excluding ports 22 and 8000 to 8080
+blade create network loss --percent 60 --interface eth0 --exclude-port 22,8000-8080
+
+# Realize the whole network card is not accessible, not accessible time 20 seconds. After executing the following command, the current network is disconnected and restored in 20 seconds. Remember!! Don't forget -timeout parameter
+blade create network loss --percent 100 --interface eth0 --timeout 20
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --destination-ip string    destination ip. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1.
+      --exclude-ip string        Exclude ips. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1
+      --exclude-port string      Exclude local ports. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 22,8000. This flag is invalid when --local-port or --remote-port is specified
+      --force                    Forcibly overwrites the original rules
+  -h, --help                     help for loss
+      --ignore-peer-port         ignore excluding all ports communicating with this port, generally used when the ss command does not exist
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --interface string         Network interface, for example, eth0 (required)
+      --local-port string        Ports for local service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --percent string           loss percent, [0, 100] (required)
+      --protocol string          specify protocol for example tcp udp icmp 
+      --remote-port string       Ports for remote service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network occupy -h
+======================================================================
+Occupy the specify port, if the port is used, it will return fail, except add --force flag
+
+Usage:
+  blade create network occupy
+
+Examples:
+
+#Specify port 8080 occupancy
+blade c network occupy --port 8080 --force
+
+# The machine accesses external 14.215.177.39 machine (ping www.baidu.com) 80 port packet loss rate 100%
+blade create network loss --percent 100 --interface eth0 --remote-port 80 --destination-ip 14.215.177.39
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --cgroup-root string       cgroup root path, default value /sys/fs/cgroup
+      --channel string           Select the channel for execution, and you can now select SSH
+      --force                    Force kill the process which is using the port
+  -h, --help                     help for occupy
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --port string              The port occupied (required)
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create network reorder -h
+======================================================================
+Reorder experiment
+
+Usage:
+  blade create network reorder
+
+Examples:
+# Access the specified IP request packet disorder
+blade c network reorder --correlation 80 --percent 50 --gap 2 --time 500 --interface eth0 --destination-ip 180.101.49.12
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --correlation string       Correlation on previous packet, value is between 0 and 100 (required)
+      --destination-ip string    destination ip. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1.
+      --exclude-ip string        Exclude ips. Support for using mask to specify the ip range such as 92.168.1.0/24 or comma separated multiple ips, for example 10.0.0.1,11.0.0.1
+      --exclude-port string      Exclude local ports. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 22,8000. This flag is invalid when --local-port or --remote-port is specified
+      --force                    Forcibly overwrites the original rules
+      --gap string               Packet gap, must be positive integer
+  -h, --help                     help for reorder
+      --ignore-peer-port         ignore excluding all ports communicating with this port, generally used when the ss command does not exist
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --interface string         Network interface, for example, eth0 (required)
+      --local-port string        Ports for local service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --percent string           Packets are sent immediately percentage, must be positive integer without %, for example, --percent 50 (required)
+      --protocol string          specify protocol for example tcp udp icmp 
+      --remote-port string       Ports for remote service. Support for configuring multiple ports, separated by commas or connector representing ranges, for example: 80,8000-8080
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --time string              Delay time, must be positive integer, unit is millisecond, default value is 10
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

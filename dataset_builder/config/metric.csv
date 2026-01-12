@@ -1,0 +1,20 @@
+中文含义,name,query
+"--- CPU ---",,
+CPU空闲模式时间,cpu_idle_seconds,node_cpu_seconds_total{mode="idle"}
+CPU用户模式时间,cpu_user_seconds,node_cpu_seconds_total{mode="user"}
+CPU系统模式时间,cpu_system_seconds,node_cpu_seconds_total{mode="system"}
+CPU等待IO时间,cpu_iowait_seconds,node_cpu_seconds_total{mode="iowait"}
+CPU中断处理时间,cpu_irq_seconds,node_cpu_seconds_total{mode="irq"}
+CPU软中断处理时间,cpu_softirq_seconds,node_cpu_seconds_total{mode="softirq"}
+CPU优先级调整时间,cpu_nice_seconds,node_cpu_seconds_total{mode="nice"}
+CPU虚拟化被盗时间,cpu_steal_seconds,node_cpu_seconds_total{mode="steal"}
+CPU总使用率,cpu_usage_percent,100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)
+系统1分钟负载,load_1min,node_load1
+系统5分钟负载,load_5min,node_load5
+系统15分钟负载,load_15min,node_load15
+上下文切换率,context_switches_rate,rate(node_context_switches_total[1m])
+中断频率,interrupts_rate,rate(node_intr_total[1m])
+进程创建频率,process_forks_rate,rate(node_forks_total[1m])
+运行态进程数,processes_running,node_procs_running
+阻塞态进程数,processes_blocked,node_procs_blocked
+CPU压力等待时间率,cpu_pressure_waiting_rate,rate(node_pressure_cpu_waiting_seconds_total[1m])

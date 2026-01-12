@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spikes to over 64% and then returns to normal, indicating a memory-intensive workload.",
+    "root_causes": "Memory resource load from a computational job.",
+    "solutions": [
+      "Monitor memory usage patterns to identify if the spike correlates with the 'ft_cgC' job execution.",
+      "Check if the job has memory leaks by analyzing its memory allocation patterns over time.",
+      "Consider increasing available memory or optimizing the job's memory usage if this pattern causes performance issues."
+    ]
+  },
+  {
+    "anomaly": "High system load averaging around 5-6 with occasional spikes to 6.36, indicating CPU contention.",
+    "root_causes": "CPU resource load from active processes.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes contributing to high load averages.",
+      "Check if the load spikes correlate with the completion time of the 'ft_cgC' job at 07:28:52.",
+      "Consider optimizing CPU-bound tasks or distributing workload across more nodes if load consistently high."
+    ]
+  },
+  {
+    "anomaly": "Page swap activity detected with non-zero swap_in/swap_out rates, indicating memory pressure.",
+    "root_causes": "Memory resource contention leading to swapping.",
+    "solutions": [
+      "Monitor 'vmstat 1' to confirm swap activity (si/so columns).",
+      "Investigate if the swapping occurs during the memory usage spike period.",
+      "Consider adding more physical memory or reducing memory-intensive workloads if swapping becomes frequent."
+    ]
+  }
+]

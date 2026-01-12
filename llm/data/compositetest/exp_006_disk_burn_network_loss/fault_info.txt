@@ -1,0 +1,18 @@
+Fault Types: disk-burn, network-loss
+Experiment IDs: c434b5fac702d49f, c2ca30bead635c5c
+Injection Time Range: 2025-09-22 23:26:15 - 2025-09-22 23:27:19
+Fault Commands:
+blade status c434b5fac702d49f
+blade status c2ca30bead635c5c
+
+Detailed Fault Information:
+1. ID: c434b5fac702d49f
+   Type: disk-burn
+   Create: 2025-09-22 23:26:15
+   End: 2025-09-22 23:27:19
+
+2. ID: c2ca30bead635c5c
+   Type: network-loss
+   Create: 2025-09-22 23:26:15
+   End: 2025-09-22 23:27:18
+

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and active swapping degrading system performance.",
+    "root_causes": "Memory resource exhaustion with swap usage at 47.9% and significant swap activity indicated by page_swap_in_rate and page_swap_out_rate metrics.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify applications consuming excessive memory.",
+      "Check if the completed job 'ft_cgC' left behind any memory leaks or zombie processes that are still consuming resources.",
+      "Consider increasing physical memory or implementing memory limits for future jobs to prevent swap thrashing.",
+      "Use 'vmstat 1' to monitor ongoing swap activity and 'free -h' to track memory recovery."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with sustained utilization above 70%.",
+    "root_causes": "Intensive disk operations likely caused by memory swapping and high I/O wait times reaching up to 7.69% of CPU time.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O and determine if they are related to swapping or application activity.",
+      "Monitor disk read/write rates which show extremely high values (271GB/s read rate at peak) indicating potential I/O bottleneck.",
+      "Consider implementing I/O scheduling optimizations or upgrading storage subsystem if this pattern persists.",
+      "Verify storage health using 'smartctl' to ensure the high I/O is not caused by failing hardware."
+    ]
+  },
+  {
+    "anomaly": "High system load and CPU pressure inconsistent with reported CPU usage.",
+    "root_causes": "System load averaging 6.8 with significant I/O wait and memory pressure causing processes to queue for resources.",
+    "solutions": [
+      "Investigate the high number of running processes (up to 14) and blocked processes to understand resource contention.",
+      "Use 'ps aux' to check for processes in 'D' (uninterruptible sleep) state which contribute to load average.",
+      "Monitor context switches rate which is elevated, indicating potential scheduler pressure.",
+      "Consider job scheduling policies to prevent resource conflicts during job completion phases."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory usage spike from 33% to 73% during job execution period.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job consuming excessive RAM, indicated by dramatic drop in free memory from 3.38GB to 282MB and increase in anonymous memory usage.",
+    "solutions": [
+      "Monitor the specific memory allocation patterns of the 'ft_cgC' job using 'ps aux --sort=-%mem' and memory profiling tools",
+      "Check for memory leaks in the application code or inefficient memory management practices",
+      "Consider implementing memory limits using cgroups or Slurm memory constraints to prevent future memory exhaustion",
+      "Evaluate if the job requires more memory allocation or if it can be optimized to use memory more efficiently"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time and I/O wait during memory pressure period.",
+    "root_causes": "System overhead from memory management operations including page swapping, memory reclamation, and increased kernel activity due to memory pressure.",
+    "solutions": [
+      "The CPU system time increased from 1.7% to 4.2% indicating heavy kernel activity related to memory management",
+      "Monitor swap activity using 'vmstat 1' to confirm if swapping is occurring despite available swap space",
+      "Use 'iotop' to identify processes causing I/O wait spikes during memory pressure periods",
+      "Consider tuning kernel memory management parameters like vm.swappiness if swapping behavior is suboptimal"
+    ]
+  }
+]

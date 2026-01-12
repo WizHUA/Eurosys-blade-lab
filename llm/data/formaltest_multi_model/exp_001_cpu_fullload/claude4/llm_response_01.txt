@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "High CPU usage spike from 30% to 83% during job execution period.",
+    "root_causes": "CPU resource load from computationally intensive job 'ft_cgC' executing on the node.",
+    "solutions": [
+      "Monitor job completion as the high CPU usage appears to be from the legitimate workload 'ft_cgC' which completed successfully.",
+      "Use 'top' or 'htop' to verify that CPU usage returns to normal levels after job completion.",
+      "Consider implementing CPU limits or resource quotas if this level of CPU usage impacts other workloads."
+    ]
+  },
+  {
+    "anomaly": "Sustained high disk I/O activity with significant write operations during job execution.",
+    "root_causes": "Disk I/O load from job 'ft_cgC' performing intensive write operations, likely computational output or intermediate data storage.",
+    "solutions": [
+      "Verify that disk I/O returns to baseline levels after job completion at 07:28:52.",
+      "Monitor disk utilization and consider optimizing I/O patterns if this affects system performance.",
+      "Evaluate if faster storage or I/O optimization could benefit similar computational workloads."
+    ]
+  }
+]

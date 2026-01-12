@@ -1,0 +1,42 @@
+[
+  {
+    "anomaly": "Extreme memory pressure leading to swap exhaustion and high memory allocation failures",
+    "root_causes": "Memory leak in application causing continuous memory consumption until swap space depletion",
+    "solutions": [
+      "Investigate memory allocation patterns in the application",
+      "Implement garbage collection or memory cleanup routines",
+      "Increase swap space configuration",
+      "Consider upgrading physical memory capacity"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in page faults indicating inefficient memory access patterns",
+    "root_causes": "Faulty memory management causing excessive minor/major page faults",
+    "solutions": [
+      "Profile application memory access patterns",
+      "Optimize data structures and algorithms",
+      "Increase memory allocation strategically",
+      "Monitor memory usage trends closely"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O performance degradation during peak memory pressure",
+    "root_causes": "Excessive swapping overwhelming disk I/O subsystem",
+    "solutions": [
+      "Analyze disk I/O patterns",
+      "Optimize flush and sync operations",
+      "Consider faster storage solutions",
+      "Separate swap partitions from application data"
+    ]
+  },
+  {
+    "anomaly": "Elevated network traffic potentially affecting job completion",
+    "root_causes": "Intensive network communication during MPI job execution",
+    "solutions": [
+      "Review MPI communication patterns",
+      "Optimize message sizes",
+      "Implement network throttling",
+      "Monitor network congestion"
+    ]
+  }
+]

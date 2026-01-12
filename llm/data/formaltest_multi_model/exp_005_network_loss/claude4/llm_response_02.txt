@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Memory usage has increased significantly from 18% to 32% during the monitoring period.",
+    "root_causes": "Memory resource pressure from currently running processes or memory allocation patterns.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes.",
+      "Monitor memory allocation patterns of active jobs to determine if this is expected behavior.",
+      "Check for memory leaks in running applications if the increase continues without corresponding workload changes."
+    ]
+  },
+  {
+    "anomaly": "CPU usage shows moderate fluctuation with peaks around 51% followed by stabilization at 48%.",
+    "root_causes": "CPU resource load from computational workloads with varying intensity patterns.",
+    "solutions": [
+      "Use 'top' or 'htop' to monitor CPU usage patterns and identify specific processes causing fluctuations.",
+      "Analyze workload scheduling to understand if the CPU usage patterns align with expected job behavior.",
+      "Consider CPU affinity settings if consistent performance is required."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with dramatic swap space usage increase during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job consuming excessive RAM, forcing the system to rely heavily on swap space.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' memory usage patterns to determine if it exceeded expected memory requirements",
+      "Review job submission parameters to ensure adequate memory allocation for similar workloads",
+      "Consider implementing memory limits or cgroups to prevent future jobs from consuming all available system memory",
+      "Analyze if the job's memory usage pattern indicates a memory leak or inefficient algorithm that could be optimized"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time and I/O wait during memory pressure period.",
+    "root_causes": "System overhead from memory management operations including swapping, page faults, and kernel memory allocation activities.",
+    "solutions": [
+      "CPU system time increased from 1.7% to 4.2% indicating heavy kernel activity during memory pressure",
+      "Monitor page fault rates and swap activity to confirm memory thrashing patterns",
+      "Consider adding more physical RAM to reduce reliance on swap space for memory-intensive workloads",
+      "Implement job scheduling policies that consider memory requirements to prevent resource contention"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity correlating with memory pressure events.",
+    "root_causes": "Increased disk activity due to swap operations and potential application I/O during memory-constrained execution.",
+    "solutions": [
+      "Disk write rate increased significantly during the memory pressure period, confirming swap activity",
+      "Monitor disk utilization patterns to distinguish between application I/O and system swap operations",
+      "Consider using faster storage (SSD) for swap partitions if memory pressure events are frequent",
+      "Optimize application memory usage to reduce dependency on disk-based virtual memory"
+    ]
+  }
+]

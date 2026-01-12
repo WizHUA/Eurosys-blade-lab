@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Sudden surge in shared memory and page cache accompanied by heavy swapping.",
+    "root_causes": "The running workload rapidly allocated large shared memory (Shmem grew from ~10 MB to ~4.7–5.2 GB) and drove page cache growth (cache_usage_percent rose from ~5% to ~60%), triggering massive swap activity (page_swap_in_rate/page_swap_out_rate spiked from ~160/60 to tens–hundreds of thousands per second). This indicates memory pressure and thrashing caused by the job’s use of shared memory and aggressive file caching.",
+    "solutions": [
+      "Inspect and cap shared memory use: check df -h /dev/shm and ls -lh /dev/shm; if applicable, limit tmpfs size (mount -o remount,size=...) or configure the application to use smaller shared memory segments.",
+      "Enforce job memory limits via Slurm (e.g., --mem/--mem-per-cpu) and cgroups to prevent node-wide swapping.",
+      "Tune VM behavior if appropriate: lower vm.swappiness to reduce anonymous memory swapping; consider adjusting readahead and application I/O patterns to avoid overfilling page cache.",
+      "Identify top memory consumers (ps aux --sort=-rss or smem -rt) and validate the application’s shared-memory configuration."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation and rapid filesystem space consumption.",
+    "root_causes": "Read/write throughput and I/O utilization climbed sharply (disk_read_rate_bytes_per_sec and disk_write_rate_bytes_per_sec jumped to 0.23–0.51 GB/s total; disk_io_usage_percent rose from <1% to ~51–55%). Filesystem usage increased quickly from ~73.36% to ~87.05%, indicating large, sustained writes during the job.",
+    "solutions": [
+      "Redirect heavy I/O to high-throughput local scratch or parallel file system; avoid writing to the root filesystem.",
+      "Find and manage large writers: use iotop -oPa, pidstat -d 1, and lsof +D <path> to identify offending processes and files.",
+      "Purge or archive temporary/output files promptly; implement per-job disk quotas/reservations.",
+      "Consider batching and buffering writes, or using O_DIRECT/posix_fadvise to reduce cache pollution where applicable."
+    ]
+  },
+  {
+    "anomaly": "Rising CPU system and I/O wait overhead correlated with memory and I/O pressure.",
+    "root_causes": "cpu_system_percent increased from ~1–4% to ~12–16% and cpu_iowait_percent rose to ~2.5% while context switches and interrupts stayed elevated, consistent with kernel overhead from reclaim, swapping, and high I/O rates.",
+    "solutions": [
+      "Reduce memory churn and I/O amplification by addressing the shared memory and caching behavior (see above).",
+      "Throttle per-job concurrency or I/O via Slurm/cgroup (cpuset and io.max) to reduce kernel overhead.",
+      "Monitor kernel reclaim and writeback (vmstat 1, iostat -x 1) and tune vm.dirty_ratio/vm.dirty_background_ratio if writeback spikes cause stalls."
+    ]
+  }
+]

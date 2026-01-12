@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Critical memory exhaustion and swap thrashing during job runtime",
+    "root_causes": "The node is heavily oversubscribed on memory while job 285 (ft_ftC) was running: memory_usage_percent ~99.2–99.7% with memory_available_bytes as low as 26–71 MiB, swap_usage_percent ~99.96% with swap_free_bytes dropping to 8–49 KiB, memory_committed_as_bytes ~13.6 GiB > physical 7.7 GiB, and extremely high page activity (page_swap_in/out up to ~107k/54k per second and page_major_faults_rate peaking ~4k/s).",
+    "solutions": [
+      "Enforce accurate Slurm memory limits for the job (e.g., --mem/--mem-per-cpu) and enable cgroup memory enforcement to prevent oversubscription.",
+      "Reschedule similar workloads to nodes with more RAM or reduce the job's memory footprint (smaller working set, chunked processing).",
+      "Tune overcommit to reduce risk (set vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio) and lower vm.swappiness to limit aggressive swapping.",
+      "Consider enabling zswap/zram or placing swap on a faster device (NVMe) to mitigate swap latency if swapping cannot be avoided.",
+      "Identify top consumers with ps/top/smem/pidstat and review application memory behavior for leaks or unnecessary caching."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O saturation and CPU iowait caused by swapping",
+    "root_causes": "Sustained high disk load while memory is exhausted: disk_io_usage_percent ~62–87% with read/write throughput up to ~100 MB/s/55 MB/s and thousands of IOPS, cpu_iowait_percent very high (up to ~54%), and many blocked processes (processes_blocked up to 13), all consistent with swap-induced I/O thrashing.",
+    "solutions": [
+      "Address the memory oversubscription first (see above) to eliminate swap-driven I/O.",
+      "Throttle I/O from offending processes using cgroups blkio if needed to protect system responsiveness.",
+      "Validate storage health and latency with iostat/blktrace; ensure swap resides on the fastest available device.",
+      "If persistent, isolate such jobs to dedicated nodes or schedule them off-peak to reduce contention."
+    ]
+  },
+  {
+    "anomaly": "Evidence of prior OOM events on the node",
+    "root_causes": "vm_oom_kills_total = 5 indicates the kernel has killed processes due to out-of-memory conditions (counter did not increase during the window but remains elevated), consistent with the observed memory pressure.",
+    "solutions": [
+      "Review kernel logs (dmesg/journalctl) to identify which processes were OOM-killed and why.",
+      "Enable Slurm cgroup memory enforcement and set per-job limits to trigger early job termination rather than system-wide OOM.",
+      "Increase node RAM capacity or adjust workload placement to match memory demand and prevent future OOMs."
+    ]
+  }
+]

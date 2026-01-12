@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Severe memory pressure with dramatic drop in available memory and excessive disk I/O indicating heavy swapping activity.",
+    "root_causes": "Memory resource exhaustion causing the system to heavily rely on swap space, evidenced by memory_free_bytes dropping from 3.7GB to 168MB and massive disk write activity reaching 460GB/s.",
+    "solutions": [
+      "Use 'free -h' and 'vmstat 1' to confirm the extent of swap utilization and active swapping.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' or 'top'.",
+      "Check if the completed job 'ft_cgC' left any lingering processes or memory leaks using 'pgrep' and 'ps'.",
+      "Consider restarting services or rebooting the node if memory cannot be reclaimed normally."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation with utilization reaching over 60% and massive write throughput.",
+    "root_causes": "Disk I/O bottleneck caused primarily by memory swapping activity, with disk write rates spiking to 460GB/s and disk utilization jumping from 0% to over 60%.",
+    "solutions": [
+      "Use 'iotop -ao' to identify processes causing the high disk I/O.",
+      "Monitor swap activity with 'swapon -s' and 'cat /proc/swaps' to confirm swap usage.",
+      "The primary solution is to resolve the memory pressure issue, which will naturally reduce the swap-induced I/O load.",
+      "Consider temporarily disabling swap if the system becomes unresponsive, but ensure sufficient physical memory is available first."
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage dramatically increased from 0.9% to over 17%, indicating kernel-level resource contention.",
+    "root_causes": "High kernel CPU usage caused by memory management overhead during intensive swapping and I/O operations.",
+    "solutions": [
+      "Monitor kernel threads and system calls using 'perf top' or 'htop' to identify specific kernel activities.",
+      "The elevated system CPU time is a symptom of the memory/swap thrashing and should resolve once memory pressure is alleviated.",
+      "Use 'vmstat 1' to monitor context switches and system calls which are likely elevated due to memory management overhead."
+    ]
+  }
+]

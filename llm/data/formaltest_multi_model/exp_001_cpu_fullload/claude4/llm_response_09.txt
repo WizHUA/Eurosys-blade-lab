@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Abnormal disk write activity during periods when job ft_cgC was not running.",
+    "root_causes": "High disk write rates (up to 275KB/s) observed at 07:01:58 and later periods, which is inconsistent with typical system behavior when no active jobs are present.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the unexpected disk write activity.",
+      "Check system logs (/var/log/syslog, /var/log/messages) for any background maintenance tasks or services causing disk writes.",
+      "Monitor for potential disk caching, log rotation, or system service activity that may be contributing to the write load.",
+      "Verify that no other jobs or background processes are inadvertently writing large amounts of data to disk."
+    ]
+  },
+  {
+    "anomaly": "Intermittent spikes in network activity with inconsistent patterns.",
+    "root_causes": "Network receive rates fluctuating dramatically from 31 bytes/s to 431 bytes/s, and transmit rates varying between 0-421 bytes/s, suggesting irregular network communication patterns.",
+    "solutions": [
+      "Use 'netstat -i' and 'ss -tuln' to identify active network connections and services.",
+      "Monitor network traffic with 'tcpdump' or 'wireshark' to characterize the nature of the irregular traffic.",
+      "Check for any network monitoring tools, backup processes, or remote management services that may be causing periodic network activity.",
+      "Verify that no unauthorized network services or processes are running on the node."
+    ]
+  }
+]

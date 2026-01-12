@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant network performance degradation with heavy packet loss and connection issues.",
+    "root_causes": "Network infrastructure experiencing severe congestion or hardware failures affecting TCP transmission reliability.",
+    "solutions": [
+      "TCP retransmission rate spiked from 0.0 to 7.5 per second at 07:10:28, indicating critical packet loss during job execution.",
+      "Check network infrastructure health including switches, cables, and NIC statistics for hardware failures.",
+      "Monitor network bandwidth utilization and implement QoS policies to prioritize critical traffic.",
+      "Investigate if the 'ft_cgC' job's communication patterns are overwhelming the network infrastructure."
+    ]
+  },
+  {
+    "anomaly": "High memory pressure with increasing usage and potential swapping activity.",
+    "root_causes": "Memory resource load from running job exceeding optimal memory allocation thresholds.",
+    "solutions": [
+      "Memory usage increased from 18% to 32% during the monitoring period, approaching concerning levels.",
+      "Monitor swap activity using 'vmstat' and 'iostat' to detect if system is experiencing memory pressure.",
+      "Review the 'ft_cgC' job memory requirements and consider optimizing memory allocation or job scheduling.",
+      "Implement memory monitoring alerts to prevent future memory exhaustion scenarios."
+    ]
+  },
+  {
+    "anomaly": "Elevated I/O wait time and disk activity indicating storage performance bottleneck.",
+    "root_causes": "Disk I/O load from application workload and potential memory pressure causing increased disk activity.",
+    "solutions": [
+      "I/O wait time and disk write rates show intermittent spikes, particularly around 07:10:28 and 07:11:13.",
+      "Use 'iotop' to identify processes causing high disk I/O and determine if it's application-driven or system swapping.",
+      "Monitor disk utilization and consider I/O scheduling optimizations for better performance.",
+      "Evaluate storage subsystem performance and consider faster storage solutions if I/O becomes a persistent bottleneck."
+    ]
+  }
+]

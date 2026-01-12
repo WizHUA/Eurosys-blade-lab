@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme I/O wait time and disk utilization indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load caused by excessive disk activity with utilization reaching 67% and I/O wait consuming up to 6% of CPU time.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are responsible for the intense disk read/write activity.",
+      "Monitor disk queue depth and latency using 'iostat -x 1' to confirm the storage subsystem is the bottleneck.",
+      "Consider optimizing the job's I/O patterns or using faster storage if the workload requires high I/O throughput.",
+      "Check if multiple processes are competing for disk access and consider I/O scheduling optimizations."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high page swap activity indicating insufficient available RAM.",
+    "root_causes": "Memory resource load with active swapping occurring, as evidenced by sustained page swap-in rates reaching 257K pages/sec.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' to confirm swapping activity and identify memory-intensive processes.",
+      "Use 'ps aux --sort=-%mem' to identify processes consuming the most memory.",
+      "Consider increasing available memory or optimizing the application's memory usage patterns.",
+      "Review the job's memory requirements against available system memory to prevent future swapping."
+    ]
+  },
+  {
+    "anomaly": "High context switching rate indicating excessive process scheduling overhead.",
+    "root_causes": "CPU scheduling load with context switches reaching up to 1776 per second, suggesting high process contention or frequent I/O blocking.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes with high context switch rates and frequent state changes.",
+      "Monitor process states to determine if high context switching is due to I/O blocking or CPU contention.",
+      "Consider process affinity settings to reduce migration between CPU cores.",
+      "Evaluate if the application can be optimized to reduce the frequency of system calls or I/O operations."
+    ]
+  }
+]

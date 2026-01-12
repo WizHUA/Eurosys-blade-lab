@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Sustained swapping with nearly half of swap space in use and high swap-out activity during the job window",
+    "root_causes": "Memory overcommit/pressure while job 276 (ft_cgC) was running: swap_usage_percent stayed ~46.6% across all samples, page_swap_out_rate was persistently high (~47–188 pages/s), and memory_committed_as_bytes peaked at ~9.06 GiB, exceeding physical RAM (8.28 GiB). This indicates the kernel is actively swapping due to the combined workload footprint.",
+    "solutions": [
+      "Right-size the job memory request in Slurm (--mem/--mem-per-cpu) or reduce the job’s memory footprint.",
+      "Enforce memory isolation with cgroups (Slurm cgroup plugin) and set memory.high/memory.max per job to prevent node-wide swapping.",
+      "Tune vm.swappiness down (e.g., 10–20) after testing to reduce anonymous memory swapping.",
+      "Identify top memory consumers and potential leaks using ps aux --sort=-%mem, smem, and slabtop; remediate or restart offending processes.",
+      "Reduce co-located background services on the node during jobs, or provision additional RAM if sustained pressure is expected."
+    ]
+  },
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions and timeouts around 07:06:43–07:06:58",
+    "root_causes": "Short bursts of packet loss or congestion on the network path: node_netstat Tcp_RetransSegs spiked to ~30/s, TCPSynRetrans to ~6/s, and TCPTimeouts to ~15/s at 07:06:58 (smaller spike at 07:06:43), while NIC error/drop counters remained near zero. This pattern suggests loss/delay beyond the host NIC (e.g., upstream path or transient contention).",
+    "solutions": [
+      "Check switch/port counters and host NIC statistics (ethtool -S, ip -s link) for the 07:06:43–07:06:58 window to identify CRC, FCS, overrun, or pause events.",
+      "Verify link speed/duplex and MTU consistency end-to-end; disable problematic offloads if errors correlate (TSO/GRO/LRO test).",
+      "Run controlled throughput/latency tests (iperf3, ping with loss/jitter logging) between relevant peers to reproduce and localize the issue.",
+      "If bursts recur with similar workloads, consider QoS/traffic shaping or isolating latency-sensitive job traffic on a less contended network."
+    ]
+  },
+  {
+    "anomaly": "Non-zero OOM killer count reported (vm_oom_kills_total=1)",
+    "root_causes": "The kernel has killed at least one process due to memory exhaustion at some point; combined with high swap usage and committed memory exceeding physical RAM, the node is at risk of intermittent OOM events during heavy phases.",
+    "solutions": [
+      "Inspect dmesg and journalctl -k for OOM entries and timestamps; correlate with job 276 events and offending processes.",
+      "Strengthen memory enforcement via Slurm cgroups (memory.max/memory.high) to contain per-job memory growth and avoid node-wide OOM.",
+      "Review vm.overcommit_memory and vm.overcommit_ratio to reduce aggressive overcommit on compute nodes.",
+      "Add alerting on rising swap activity and committed_as exceeding physical RAM to intervene before OOM (e.g., systemd-oomd early action)."
+    ]
+  }
+]

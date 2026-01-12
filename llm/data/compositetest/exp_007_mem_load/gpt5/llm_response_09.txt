@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Critical memory exhaustion and swap thrashing during job 285 (ft_ftC)",
+    "root_causes": "Memory demand far exceeded available RAM: memory_available_bytes fell to 26,476,544 bytes (23:29:10), memory_usage_percent stayed ~99–99.7%, anon_memory_percent ~89–90%, and swap_free_bytes dropped to 8,192 bytes (23:28:40) with swap_usage_percent ≈100%. Page activity shows heavy thrashing (page_major_faults_rate in the thousands/sec and page_swap_in/out rates peaking at ~140k/19k per sec at 23:29:25). vm_oom_kills_total=5 indicates prior OOM events. These point to the running job driving memory overcommit and forcing continuous swapping.",
+    "solutions": [
+      "Enforce accurate job memory limits and cgroup enforcement (e.g., Slurm --mem/--mem-per-cpu) for job 285 and re-tune its memory footprint; right-size input/problem size or reduce process concurrency.",
+      "Identify the largest RSS consumers within the job (e.g., scontrol listpids 285 | xargs -I{} ps -o pid,ppid,user,cmd,rss,vsz -p {}; smem -tk) and remediate leaks or excessive caching/buffering.",
+      "If the workload genuinely needs more memory, schedule on a higher-memory node or increase node RAM; as a stopgap, add faster local swap, but prioritize reducing memory use to avoid thrashing.",
+      "Lower swap pressure and protect node stability by tuning/validating swappiness and by canceling or suspending the job if swap_free_bytes remains near zero and major faults stay elevated.",
+      "Add monitoring/alerts on memory_available_bytes and swap_free_bytes thresholds to preempt OOM conditions."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O saturation with very high CPU iowait",
+    "root_causes": "Sustained storage contention coinciding with swap thrashing: disk_io_usage_percent rose to 86.84% (23:28:25) and remained >60%; cpu_iowait_percent peaked at 53.99% (23:28:25). Processes_blocked reached 13, indicating many tasks stuck in uninterruptible I/O. High disk throughput and IOPS align with large page_swap_in/out rates, so memory pressure is driving heavy swap I/O and stalling the CPU.",
+    "solutions": [
+      "Address the memory thrashing first (see above) to remove swap I/O as the dominant source of disk pressure.",
+      "Pinpoint top I/O issuers (iotop -oPa, pidstat -d 1, iostat -x 1) and reduce write/read concurrency or batch I/O into larger, fewer operations.",
+      "Use faster local scratch for job working sets and ensure the job writes temporary data to local SSD/NVMe rather than shared or slow storage.",
+      "Apply I/O throttling for non-critical processes (ionice or cgroup I/O limits) so critical paths aren’t starved during bursts.",
+      "Track disk latency/queue depth continuously and alert when disk_io_usage_percent sustains above ~70% together with cpu_iowait_percent spikes."
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load with many tasks blocked on I/O rather than computing",
+    "root_causes": "Load averages rose to 11.9/8.38/4.88 (23:29:40) while cpu_user_percent remained relatively low and cpu_iowait/system dominated, with processes_blocked peaking at 13. This indicates load primarily from threads waiting on disk (swap and I/O), not productive CPU work.",
+    "solutions": [
+      "Reduce I/O queueing by fixing memory pressure and staggering or throttling concurrent I/O issuers within the job.",
+      "Monitor D-state offenders (ps -eo pid,stat,wchan,cmd --sort=stat | grep ' D ') and optimize their access patterns (e.g., sequential reads, buffered writes, fewer parallel writers).",
+      "If applicable for this workflow, pre-stage input data to local storage, and commit results in controlled batches to avoid saturating the backing filesystem."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high memory usage and swap thrashing indicating memory exhaustion.",
+    "root_causes": "Memory resource load from intensive computation causing the system to heavily utilize swap space.",
+    "solutions": [
+      "Memory usage is at 99.6% with swap usage at 99.99%, indicating severe memory pressure from the completed job 'ft_ftC'.",
+      "Monitor for memory leaks in applications as the high memory usage persists even after job completion.",
+      "Consider increasing available memory or implementing memory limits for future jobs to prevent system-wide impact.",
+      "Use 'free -h' and 'ps aux --sort=-%mem' to identify any remaining memory-intensive processes."
+    ]
+  },
+  {
+    "anomaly": "Severe I/O bottleneck with extremely high disk utilization and wait times.",
+    "root_causes": "Disk I/O load caused by heavy swap activity due to memory exhaustion and application I/O demands.",
+    "solutions": [
+      "Disk I/O utilization peaks at 86.8% with sustained high levels throughout the monitoring period.",
+      "The high I/O wait percentage (up to 53.9%) indicates processes are frequently blocked waiting for disk operations.",
+      "Resolve memory pressure to reduce swap-related I/O, which is likely the primary contributor to the disk bottleneck.",
+      "Use 'iotop' to identify specific processes causing high disk I/O and consider I/O scheduling optimizations."
+    ]
+  },
+  {
+    "anomaly": "CPU performance degradation due to I/O wait and system overhead.",
+    "root_causes": "CPU resource load from system management tasks dealing with memory pressure and I/O bottlenecks.",
+    "solutions": [
+      "CPU usage shows high system time and I/O wait, reducing effective compute availability for applications.",
+      "The combination of memory pressure and I/O bottleneck is causing significant CPU cycles to be spent on system overhead.",
+      "Address the root memory and I/O issues to restore normal CPU performance characteristics.",
+      "Monitor CPU pressure metrics which show waiting processes due to resource contention."
+    ]
+  }
+]

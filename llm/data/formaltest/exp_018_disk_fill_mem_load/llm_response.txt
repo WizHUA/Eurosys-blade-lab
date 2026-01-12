@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with available memory dropping below 100 MB and swap usage exceeding 90%.",
+    "root_causes": "Memory resource load from one or more memory-intensive processes.",
+    "solutions": [
+      "Check memory usage with 'ps aux --sort=-%mem' to identify the process consuming the most memory.",
+      "Monitor swap activity with 'vmstat 1' to confirm heavy swapping ('si'/'so' columns).",
+      "The job 'ft_ftC' completed with exit code 0:15, which may indicate it was terminated due to memory issues; review its resource requests and actual usage."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization (consistently above 75%) and elevated system load.",
+    "root_causes": "CPU resource load from computationally intensive tasks.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes with high CPU usage.",
+      "Review the completed job 'ft_ftC' as it was active during this period and may have contributed to the load.",
+      "Check for runaway processes or background tasks that might be consuming CPU resources post-job completion."
+    ]
+  },
+  {
+    "anomaly": "Significant disk I/O activity with high disk I/O time percentage.",
+    "root_causes": "Disk I/O load, potentially from application I/O or swapping due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk read/write rates.",
+      "The high swap usage likely contributes to disk I/O; resolving memory pressure may reduce I/O load.",
+      "Check filesystem usage; the root filesystem is at 90%+ usage, which can degrade performance."
+    ]
+  }
+]

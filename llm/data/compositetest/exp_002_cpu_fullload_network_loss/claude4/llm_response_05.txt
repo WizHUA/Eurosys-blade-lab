@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time, indicating a severe storage bottleneck.",
+    "root_causes": "Disk I/O load, likely caused by intensive file operations and memory swapping activity.",
+    "solutions": [
+      "The 'cpu_iowait_percent' is consistently above 7% and reaches 22% at 23:18:55, which is critically high.",
+      "Use 'iotop' to identify which processes are responsible for the intense disk read/write activity.",
+      "Check disk utilization with 'iostat -x 1' to confirm storage device saturation.",
+      "Consider optimizing I/O-intensive operations or upgrading storage subsystem performance."
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with heavy swapping activity.",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing excessive swap usage.",
+    "solutions": [
+      "Swap usage is at 54% and increasing, indicating memory exhaustion.",
+      "Page swap rates are extremely high with swap_out_rate reaching 210,064 pages/sec at 23:17:55.",
+      "Use 'free -h' and 'vmstat 1' to monitor ongoing swapping activity in real-time.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and consider process optimization or adding more RAM."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization with unbalanced resource consumption patterns.",
+    "root_causes": "CPU resource load from computationally intensive workload with significant system overhead.",
+    "solutions": [
+      "CPU usage fluctuates between 68-84% with high user time (47-59%) indicating compute-intensive operations.",
+      "System CPU time varies significantly (2-14%) suggesting kernel overhead from I/O operations.",
+      "Monitor process activity with 'top' to identify specific workloads causing the high CPU consumption.",
+      "Consider load balancing if multiple jobs are competing for CPU resources."
+    ]
+  }
+]

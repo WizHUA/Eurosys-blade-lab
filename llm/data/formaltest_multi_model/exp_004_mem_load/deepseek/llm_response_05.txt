@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike with significant increase in active anonymous memory usage",
+    "root_causes": "Application memory allocation pattern during FT job execution causing memory pressure",
+    "solutions": [
+      "Analyze memory usage patterns of FT job using 'ps aux --sort=-%mem' during execution",
+      "Consider optimizing memory allocation in the FT application code",
+      "Monitor swap activity with 'vmstat 1' to verify if swapping is impacting performance"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O activity during job execution",
+    "root_causes": "FT job generating significant disk writes during computation",
+    "solutions": [
+      "Use 'iotop' to identify specific disk I/O patterns from the FT job",
+      "Consider implementing memory caching or buffering in the application to reduce disk writes",
+      "Evaluate if temporary files can be written to faster storage or RAM disk"
+    ]
+  },
+  {
+    "anomaly": "Elevated context switching rate during computation phase",
+    "root_causes": "FT job creating multiple threads/processes leading to scheduler overhead",
+    "solutions": [
+      "Analyze thread count and scheduling behavior with 'pidstat -t'",
+      "Consider optimizing thread/process count in the FT application",
+      "Check CPU affinity settings to reduce cross-core migrations"
+    ]
+  }
+]

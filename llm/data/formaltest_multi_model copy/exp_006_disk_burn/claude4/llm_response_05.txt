@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage spiking from 32% to 84% during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job consuming excessive RAM, leading to significant swap activity and memory allocation failures.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' memory requirements and adjust Slurm memory limits to prevent future over-allocation",
+      "The swap activity increased dramatically with page_swap_in_rate jumping from 0.58 to over 573K pages/sec, indicating severe memory pressure",
+      "Review application memory allocation patterns and consider implementing memory-efficient algorithms or data structures",
+      "Increase physical RAM on the node or implement better memory resource management policies"
+    ]
+  },
+  {
+    "anomaly": "CPU usage escalated from 48% to 77% with extremely high I/O wait times reaching 17.8%.",
+    "root_causes": "CPU resource contention combined with severe disk I/O bottleneck caused by excessive swap activity and application disk operations.",
+    "solutions": [
+      "The disk I/O utilization reached 60% with extremely high read/write rates (587GB/s read, 197GB/s write), indicating storage subsystem overload",
+      "Implement faster storage solutions such as NVMe SSDs or optimize disk I/O patterns in the application",
+      "Consider distributing I/O operations across multiple storage devices or implementing asynchronous I/O",
+      "Monitor disk queue depth and implement I/O scheduling optimizations to reduce wait times"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage increased from 73% to 85% during job execution, approaching capacity limits.",
+    "root_causes": "Disk space consumption by the job's data output or temporary files, combined with reduced available space due to system operations.",
+    "solutions": [
+      "Implement automated cleanup policies for temporary files and intermediate job outputs",
+      "Monitor job disk space requirements and implement quotas to prevent filesystem exhaustion",
+      "Consider expanding filesystem capacity or implementing data compression for job outputs",
+      "Set up alerts for filesystem usage thresholds to prevent future capacity issues"
+    ]
+  }
+]

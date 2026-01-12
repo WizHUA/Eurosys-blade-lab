@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage (79-83%) with significant user-space CPU time (67-74%)",
+    "root_causes": "Compute-intensive job (ft_cgC) consuming majority of CPU resources during its execution window",
+    "solutions": [
+      "Review job resource requirements and adjust CPU allocation if possible",
+      "Check for potential optimization opportunities in the application code",
+      "Consider scheduling compute-intensive jobs during lower utilization periods"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with 92% memory usage and high swap activity",
+    "root_causes": "Job memory requirements exceeding physical RAM capacity, leading to heavy swapping",
+    "solutions": [
+      "Increase physical memory allocation for compute nodes",
+      "Optimize application memory usage or reduce problem size",
+      "Adjust Slurm job memory requirements to better match actual needs"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O operations during job execution",
+    "root_causes": "Job performing significant disk read/write operations (100+ TB total disk activity)",
+    "solutions": [
+      "Consider using faster storage (NVMe/SSD) for I/O intensive jobs",
+      "Implement data caching or buffering in the application",
+      "Review filesystem performance and consider parallel filesystem options"
+    ]
+  }
+]

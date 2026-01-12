@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with extremely low available memory and high swap usage.",
+    "root_causes": "System memory exhausted with only 185MB free out of 8GB total, forcing heavy reliance on swap space which has degraded to 47% usage.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and consider terminating non-essential services.",
+      "Monitor swap activity with 'vmstat 1' to confirm swapping is causing performance degradation.",
+      "Consider adding more physical RAM or optimizing application memory usage patterns.",
+      "Review the completed job 'ft_cgC' logs to understand if it caused memory leaks or excessive allocation."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization indicating storage bottleneck.",
+    "root_causes": "Disk I/O utilization reaching 70% with high write activity, likely caused by memory pressure forcing swap operations and application I/O demands.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and prioritize resolving memory pressure to reduce swap-related I/O.",
+      "Monitor disk queue length and latency with 'iostat -x 1' to assess storage subsystem performance.",
+      "Consider I/O scheduling optimizations or faster storage if the bottleneck persists after memory issues are resolved.",
+      "Implement application-level I/O throttling if the workload consistently generates high disk activity."
+    ]
+  },
+  {
+    "anomaly": "High CPU usage with disproportionate system load indicating resource contention.",
+    "root_causes": "CPU usage averaging 75-80% with load averages consistently above 5.0 on what appears to be an 8-core system, suggesting resource competition between processes.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify CPU-intensive processes and assess if they can be optimized or scheduled differently.",
+      "Check for processes in 'D' state (uninterruptible sleep) that might be waiting for I/O, contributing to high load averages.",
+      "Consider implementing CPU affinity or cgroups to isolate workloads and prevent resource contention.",
+      "Monitor context switch rates which are elevated, indicating potential scheduler pressure."
+    ]
+  }
+]

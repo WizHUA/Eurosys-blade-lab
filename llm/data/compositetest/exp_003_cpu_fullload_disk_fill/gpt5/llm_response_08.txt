@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Rapid filesystem space depletion leading to a near-full state during the job window",
+    "root_causes": "The filesystem usage jumped from ~73.36% to ~95.36% between 23:20:10 and 23:20:25, with filesystem_free_bytes dropping from ~25.98 GB to ~7.53 GB and filesystem_avail_bytes from ~22.33 GB to ~3.89 GB. This aligns with sustained write activity (e.g., disk_write_rate_bytes_per_sec up to ~32.7 MB/s at 23:19:40), indicating the running workload (ft_cgC) wrote large volumes of data to the filesystem within a short interval.",
+    "solutions": [
+      "Immediately free space on the affected filesystem by removing or archiving large temporary or intermediate outputs produced by job 284 (ft_cgC).",
+      "Redirect per-job scratch/intermediate data to node-local storage and stage out results at the end of the job (configure Slurm prolog/epilog to clean scratch).",
+      "Enforce project/user quotas or per-job disk limits to prevent the filesystem from exceeding 90% usage.",
+      "Set monitoring alerts and temporarily throttle/schedule I/O-heavy jobs when filesystem usage exceeds 90%.",
+      "If growth is expected, expand the filesystem capacity or provision a dedicated high-throughput scratch filesystem."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap usage with active swapping despite moderate memory usage",
+    "root_causes": "Swap usage remained high (swap_usage_percent ~53.79% at 23:19:40, ~47.83% later) with significant swap traffic (page_swap_out_rate ~31,839/s and page_swap_in_rate ~323/s at 23:19:40) even though memory_usage_percent hovered around ~33% and memory_available_bytes stayed >5 GB. This suggests aggressive reclaim/swappiness or cgroup memory constraints causing swap activity. vm_oom_kills_total is non-zero (3), indicating prior memory pressure events on this node.",
+    "solutions": [
+      "Audit memory limits for the job cgroup (memory.high/memory.max) and Slurm --mem/--mem-per-cpu requests; raise limits or reduce the job's working set to avoid reclaim into swap.",
+      "Lower vm.swappiness (e.g., to 10) and verify reclaim settings (vm.min_free_kbytes, watermarks) to reduce proactive swapping.",
+      "Identify processes consuming swap (e.g., smem -rs swap or /proc/*/smaps) and tune or refactor them to reduce resident footprint.",
+      "If swapping is expected, ensure swap resides on fast storage and is adequately sized; otherwise consider adding RAM for this node profile.",
+      "Review application memory behavior (allocations vs. residency) and enable in-application checkpoints instead of large resident buffers."
+    ]
+  },
+  {
+    "anomaly": "Transient high disk I/O saturation and elevated CPU iowait",
+    "root_causes": "At 23:19:40, cpu_iowait_percent peaked at ~7.97% with disk_io_usage_percent ~62.43% and disk_write_rate_bytes_per_sec ~32.7 MB/s. This I/O pressure coincides with heavy swapping and large sequential writes, and later coincides with a near-full filesystem, both of which increase latency and metadata overhead.",
+    "solutions": [
+      "Use iotop/blktrace to pinpoint top writers and throttle them via cgroup I/O controls (io.max/ionice) during peak contention.",
+      "Route high-throughput scratch I/O to node-local SSD/tmpfs and stage results to the shared filesystem after computation.",
+      "Maintain >10–15% free space on the filesystem to avoid fragmentation and metadata contention; defer I/O-heavy jobs until space is recovered.",
+      "Tune writeback settings (e.g., dirty_background_bytes/dirty_bytes) to smooth bursts and reduce long iowait spikes.",
+      "Coordinate job scheduling to limit concurrent heavy writers on the same filesystem."
+    ]
+  }
+]

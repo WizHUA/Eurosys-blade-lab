@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Sustained swap occupancy (~46.6% of 2 GiB) with bursts of swap-out (≈24 ops/s) while memory committed exceeds physical RAM during 07:06:28–07:07:13.",
+    "root_causes": "Anonymous memory grew rapidly (memory_active_anon_bytes ~1.68 GiB → ~3.43 GiB; memory_committed_as_bytes ~7.51 GiB → ~9.06 GiB > ~7.71 GiB RAM), reducing memory_available_bytes (~5.50 GiB → ~3.73 GiB) and causing swap churn; kernel overcommit allows allocations beyond physical memory.",
+    "solutions": [
+      "Audit job 276 (ft_cgC) memory footprint and enforce Slurm/cgroup limits (e.g., sacct -j 276 --format=JobID,MaxRSS,MaxVMSize; ensure memory limits match workload).",
+      "Tune overcommit to reduce risk (sysctl vm.overcommit_memory=2 and set vm.overcommit_ratio appropriately for the node).",
+      "Lower background swapping on compute nodes (e.g., sysctl vm.swappiness=10–20) and confirm swap activity (vmstat 1).",
+      "Identify and cap large anonymous allocations (ps/top/smem; inspect per-process RSS/VSZ; verify no memory leaks).",
+      "If workloads require it, reduce concurrent memory usage on the node or increase RAM; defer swapoff operations to maintenance windows if needed."
+    ]
+  },
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions and timeouts around 07:06:58.",
+    "root_causes": "node_netstat counters show bursts (Tcp_RetransSegs ≈30/s, TCPSynRetrans ≈6/s, TCPTimeouts ≈15/s) while interface error/drop counters remain 0, indicating brief packet loss or congestion along the path rather than NIC faults.",
+    "solutions": [
+      "Inspect NIC and switch counters for the affected window (ethtool -S, switch port errors, interface logs) and check dmesg for driver resets.",
+      "Validate end-to-end MTU consistency to avoid fragmentation-induced loss (e.g., ping -M do with jumbo sizes where applicable).",
+      "Measure path health with iperf3 and increase sampling granularity to catch microbursts; correlate with other nodes participating in the job.",
+      "Review TCP stack settings for HPC traffic (e.g., congestion control, ECN) and MPI runtime retry/backoff settings if applicable."
+    ]
+  },
+  {
+    "anomaly": "Historical OOM event recorded on the node (vm_oom_kills_total=1) prior to or during the broader job window.",
+    "root_causes": "At least one process was killed by the kernel OOM killer since boot, consistent with observed memory overcommit and swap usage on this node.",
+    "solutions": [
+      "Review kernel logs for OOM details (dmesg -T | grep -i oom) and identify the victim process and trigger.",
+      "Tighten memory enforcement for jobs (Slurm --mem/--mem-per-cpu with cgroup memory.max) to prevent future OOM kills.",
+      "Re-evaluate node overcommit and swappiness policies on compute nodes used for memory-intensive workloads."
+    ]
+  }
+]

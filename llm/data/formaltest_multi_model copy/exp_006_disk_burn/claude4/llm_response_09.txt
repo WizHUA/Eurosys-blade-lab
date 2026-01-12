@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme CPU utilization spike reaching 76.7% with system and iowait components heavily elevated.",
+    "root_causes": "Heavy system load from completed job 'ft_cgC' causing sustained high CPU system time and I/O wait, indicating intensive kernel operations and disk bottleneck.",
+    "solutions": [
+      "Monitor job resource usage patterns using 'sacct -j 276 --format=JobID,JobName,MaxRSS,MaxVMSize,AveCPU,CPUTime,Elapsed' to understand resource consumption profile.",
+      "Check if the job involves heavy file I/O operations that could be optimized or require faster storage.",
+      "Consider implementing CPU and I/O limits for similar jobs using cgroups or Slurm resource constraints.",
+      "Review system logs during job execution time (07:01:13 to 07:28:52) to identify specific bottlenecks."
+    ]
+  },
+  {
+    "anomaly": "Massive memory pressure with available memory dropping from 5.6GB to 5.4GB and swap activity increasing significantly.",
+    "root_causes": "Memory consumption from the 'ft_cgC' job causing system to use swap space extensively, as evidenced by increased page swap out rates reaching 193K pages/sec.",
+    "solutions": [
+      "Analyze memory usage patterns of the completed job to determine if it exceeded expected memory requirements.",
+      "Monitor swap usage with 'vmstat 1' during future similar jobs to detect memory pressure early.",
+      "Consider increasing physical RAM or implementing memory limits for jobs to prevent system-wide memory exhaustion.",
+      "Review job's memory allocation requests versus actual usage to optimize resource planning."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O bottleneck with utilization reaching 60% and extremely high write rates exceeding 461MB/sec.",
+    "root_causes": "Intensive disk write operations from the job causing sustained high disk utilization and contributing to overall system slowdown through I/O wait time.",
+    "solutions": [
+      "Use 'iotop' during similar job execution to identify specific processes causing high disk I/O.",
+      "Consider using faster storage (NVMe SSDs) or implementing I/O scheduling optimizations for compute-intensive jobs.",
+      "Evaluate if job can benefit from temporary local storage instead of shared filesystem for intermediate data.",
+      "Implement I/O throttling or prioritization to prevent single jobs from saturating disk subsystem."
+    ]
+  }
+]

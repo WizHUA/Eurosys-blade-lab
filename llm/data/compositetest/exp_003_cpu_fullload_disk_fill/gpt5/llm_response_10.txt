@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Filesystem usage surged from ~73% to ~95% (near full) and remained high, with available space dropping to ~3.9 GiB.",
+    "root_causes": "Large write activity from the running job consumed space rapidly. Evidence: filesystem_usage_percent jumped from ~73.36% to ~95.35% around 23:20:25, with filesystem_avail_bytes falling to ~3.89 GiB; earlier elevated disk_write activity preceded this increase.",
+    "solutions": [
+      "Immediately locate and remove large or temporary outputs from the job (e.g., use 'du -sh *' and 'ncdu' on the affected mount).",
+      "Check for deleted-but-open files holding space with 'lsof +L1' and restart offending processes if needed.",
+      "Set alert thresholds (e.g., 85%/90%) and enforce per-user/project quotas; add Slurm epilog cleanup for per-job scratch.",
+      "Redirect large outputs/checkpoints to high-capacity scratch/parallel storage or expand the filesystem if the growth is expected."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap usage and bursts of swapping despite ample free memory.",
+    "root_causes": "Kernel/policy-driven swapping of cold pages or memory control settings caused swap activity without true RAM pressure. Evidence: swap_usage_percent ~48–54% with page_swap_out_rate peaking (~3.18e4/s at 23:19:40) while memory_available_bytes stayed ~5.5 GiB.",
+    "solutions": [
+      "Confirm live swap behavior with 'vmstat 1' (si/so) or 'sar -W 1'; identify processes with 'smem -sw' or 'top' sorted by RES.",
+      "Reduce swapping on compute nodes: tune 'vm.swappiness' to 1–10 (via sysctl) or disable swap if policy allows; verify zswap/zram settings.",
+      "Review cgroup memory limits for the job; prefer appropriate 'memory.high'/'memory.max' to avoid unnecessary swapping.",
+      "If swapping is tied to file-backed mmap patterns, adjust application I/O (e.g., use larger buffers, avoid unnecessary mmap, or use tmpfs/local SSD for scratch)."
+    ]
+  },
+  {
+    "anomaly": "Transient storage bottleneck with elevated disk busy time and CPU iowait.",
+    "root_causes": "Write-heavy activity and swap traffic saturated the block device temporarily. Evidence: disk_io_usage_percent peaked at ~62% with cpu_iowait_percent ~8% at 23:19:40, accompanied by high page_swap_out_rate and elevated disk write throughput.",
+    "solutions": [
+      "Stagger or aggregate writes (fewer concurrent writers, larger buffered I/O); for MPI workloads, enable collective I/O.",
+      "Use node-local SSD ($TMPDIR) for scratch and stage outputs to shared storage after computation; tune filesystem striping for large files.",
+      "Monitor 'iostat -x 1' and 'pidstat -d 1' to pinpoint top I/O contributors during runs.",
+      "Verify device health and kernel logs (smartctl -a, dmesg) to rule out hardware/media issues."
+    ]
+  }
+]

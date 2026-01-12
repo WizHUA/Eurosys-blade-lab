@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage is critically high (>98%) with extremely low available memory (<100 MB), indicating severe memory pressure.",
+    "root_causes": "Memory resource load from one or more memory-intensive processes.",
+    "solutions": [
+      "Check running processes with 'ps aux --sort=-%mem' to identify memory hogs.",
+      "Investigate the 'ft_ftC' job and its batch script for potential memory leaks or excessive allocation.",
+      "Monitor 'vm_oom_kills_total' for Out-of-Memory killer activity; a value of 3 indicates processes have been terminated due to memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O wait time (consistently >20%), indicating a severe storage bottleneck.",
+    "root_causes": "Disk I/O load, likely caused by heavy swapping due to memory pressure and application I/O.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk read/write activity.",
+      "The high 'page_swap_in_rate' and 'page_swap_out_rate' confirm heavy swapping is contributing to I/O load.",
+      "Resolving the memory pressure is the primary solution to reduce swap-induced I/O."
+    ]
+  },
+  {
+    "anomaly": "Network transmit and receive rates surge abnormally high in the final two snapshots.",
+    "root_causes": "Network resource load from a process initiating high-volume network transfers.",
+    "solutions": [
+      "Use 'nethogs' or 'iftop' to identify the process responsible for the sudden network traffic spike.",
+      "Check if the 'ft_ftC' job involved a data staging or result transfer phase that coincided with the network surge.",
+      "Verify network bandwidth and configuration to ensure it can handle the observed traffic loads."
+    ]
+  }
+]

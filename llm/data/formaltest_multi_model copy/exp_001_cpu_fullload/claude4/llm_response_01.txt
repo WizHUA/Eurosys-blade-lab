@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization exhibits extreme volatility, spiking from 30% to 83% and then stabilizing around 79%.",
+    "root_causes": "Computational workload from the 'ft_cgC' job causing irregular CPU demand patterns, likely due to algorithm phases with varying computational intensity.",
+    "solutions": [
+      "Monitor the specific processes using 'top' or 'htop' to identify which components of the ft_cgC job are causing CPU spikes.",
+      "Review the job's algorithm implementation for optimization opportunities to smooth CPU usage patterns.",
+      "Consider CPU affinity settings to isolate the job to specific cores and prevent interference with system processes.",
+      "Implement resource monitoring within the application to better understand computational phases."
+    ]
+  },
+  {
+    "anomaly": "System load increases dramatically from 1.77 to 4.88, indicating severe resource contention.",
+    "root_causes": "High number of processes competing for CPU resources, exceeding the system's 8-core capacity by a significant margin.",
+    "solutions": [
+      "Use 'ps aux' to identify all running processes and their resource consumption patterns.",
+      "The load average of 4.88 on an 8-core system indicates 61% oversubscription - consider job scheduling optimizations.",
+      "Monitor process states with 'vmstat' to identify if processes are waiting for I/O or CPU resources.",
+      "Evaluate if the ft_cgC job should be configured with resource limits to prevent system overload."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity shows erratic patterns with significant write operations increasing over time.",
+    "root_causes": "Application performing intensive file operations, likely related to computational output or checkpoint writing.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity.",
+      "Disk write rates increased from 240KB/s to 177MB/s, indicating possible checkpoint or result output phases.",
+      "Consider optimizing I/O patterns within the application, such as buffering writes or using asynchronous I/O.",
+      "Evaluate if faster storage or I/O optimization techniques could improve overall job performance."
+    ]
+  }
+]

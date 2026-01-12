@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure indicated by extremely low free memory and high anonymous memory usage.",
+    "root_causes": "Memory resource exhaustion from the completed job 'ft_cgC' which appears to have consumed large amounts of memory, with anonymous memory usage reaching 43% of total system memory.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to determine if this is expected behavior or a memory leak.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints.",
+      "Review the application's memory allocation patterns and consider optimizing memory usage if excessive.",
+      "Increase available memory on the node if this level of usage is required for normal operation."
+    ]
+  },
+  {
+    "anomaly": "High system load relative to CPU utilization, suggesting resource contention.",
+    "root_causes": "System load averaging over 4.0 on an 8-core system while CPU usage remains around 48-52%, indicating processes waiting for resources other than CPU.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes in 'D' state that may be waiting for I/O operations.",
+      "Check if the high memory pressure is causing processes to wait for memory allocation or swap operations.",
+      "Monitor disk I/O patterns to determine if storage bottlenecks are contributing to the load.",
+      "Consider investigating network I/O if the job involves significant network operations."
+    ]
+  }
+]

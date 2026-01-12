@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe but brief memory pressure with heavy swapping around 07:08:28–07:09:13",
+    "root_causes": "A sharp rise in anonymous memory drove the node into swap: memory_available_bytes fell from ~5.6 GiB to ~3.7 GiB, memory_active_anon_bytes jumped from ~1.58 GiB to ~3.43 GiB, page_faults_rate spiked to ~5.7k/s, and page_swap_out_rate surged up to ~167/s (with swap_in bursts). This indicates the running workload rapidly allocated/modified anon memory, triggering swap thrashing.",
+    "solutions": [
+      "Identify top memory consumers: ps -eo pid,comm,rss,vsz --sort=-rss | head; for candidates, run pmap -x <pid>.",
+      "Corroborate swap pressure live: vmstat 1 and sar -B 1 to watch si/so and faults.",
+      "Reduce the job’s memory footprint (e.g., smaller working sets, tune caches, limit concurrency) or split the workload.",
+      "Right-size the job’s memory request/limit (cgroup/Slurm) so it is scheduled on nodes with sufficient RAM.",
+      "Consider lowering vm.swappiness (e.g., to 10) to reduce swap aggressiveness, testing impact carefully."
+    ]
+  },
+  {
+    "anomaly": "Memory overcommit exceeded physical RAM during the same window",
+    "root_causes": "memory_committed_as_bytes rose to ~9.05 GiB while MemTotal is ~8.28 GiB at ~07:08:28, increasing risk of swapping and potential OOM (vm_oom_kills_total did not increase in this window).",
+    "solutions": [
+      "Enforce stricter overcommit policy: sysctl vm.overcommit_memory=2 and set vm.overcommit_ratio appropriately for this node.",
+      "Align application memory allocation with available RAM; cap via cgroup memory.high/memory.max as appropriate.",
+      "Adjust Slurm job memory requests to reflect peak usage and steer jobs to higher-memory nodes when needed.",
+      "Monitor committed_as and swap activity during similar runs to validate headroom."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmission and SYN-retransmission spike at ~07:08:28",
+    "root_causes": "node_netstat counters show Tcp_RetransSegs ~30/s, TCPSynRetrans ~6/s, and Tcp_OutRsts ~24/s at 07:08:28 while interface error/drop counters remained zero, consistent with brief congestion or stack-level resets rather than link errors.",
+    "solutions": [
+      "Inspect NIC and switch counters/logs for the timeframe (ethtool -S, switch port stats) and dmesg for driver resets.",
+      "Verify path MTU consistency (MTU 1500 reported) and offload settings; misconfigurations can cause retransmissions.",
+      "If the job is network-sensitive, isolate traffic (QoS/traffic shaping) or schedule during lower contention periods.",
+      "Capture a short packet trace during recurrence (tcpdump) to confirm loss vs. application resets."
+    ]
+  }
+]

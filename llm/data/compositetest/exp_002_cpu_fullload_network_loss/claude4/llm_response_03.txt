@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage reaching critical levels and active swapping occurring.",
+    "root_causes": "System is experiencing memory exhaustion with swap utilization around 54% and consistent swap in/out activity, indicating insufficient physical memory for current workload demands.",
+    "solutions": [
+      "Monitor swap activity using 'vmstat 1' to confirm the extent of swapping and identify memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Check if the completed job 'ft_cgC' left behind any memory-consuming processes or memory leaks that persist after job completion",
+      "Consider increasing physical memory allocation or optimizing job memory requirements to prevent future swap thrashing",
+      "Use 'free -h' and 'cat /proc/meminfo' to get detailed memory breakdown and identify specific memory usage patterns"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization consistently above 60% with peak at 87%.",
+    "root_causes": "Disk subsystem is heavily loaded, likely due to combination of memory swapping activity and intensive disk operations from the computational job.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes causing high disk I/O activity and determine if it's related to swap operations or application data",
+      "Monitor disk queue depth and latency using 'iostat -x 1' to assess storage performance bottlenecks",
+      "Consider implementing I/O scheduling optimizations or upgrading storage subsystem if this becomes a recurring pattern",
+      "Evaluate if reducing memory pressure through job optimization could alleviate disk I/O load from swapping"
+    ]
+  },
+  {
+    "anomaly": "CPU pressure and high I/O wait times indicating system resource contention.",
+    "root_causes": "System is experiencing resource contention with CPU pressure rates and I/O wait times suggesting processes are waiting for disk operations to complete.",
+    "solutions": [
+      "The high 'cpu_iowait_percent' values (up to 22%) indicate CPUs are frequently waiting for I/O operations to complete",
+      "Use 'top' with 'f' key to add I/O wait column and identify processes in 'D' state that are blocked on disk operations",
+      "Consider job scheduling optimizations to prevent simultaneous memory and I/O intensive workloads",
+      "Monitor system pressure metrics using 'cat /proc/pressure/cpu' and '/proc/pressure/io' for detailed resource contention analysis"
+    ]
+  }
+]

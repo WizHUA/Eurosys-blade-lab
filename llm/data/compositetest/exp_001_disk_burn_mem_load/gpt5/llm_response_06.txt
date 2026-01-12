@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap thrashing during job runtime",
+    "root_causes": "While job ft_cgC was running, anonymous memory grew sharply (anon_memory_percent up to ~76.06%) and committed memory exceeded RAM (memory_committed_as_bytes ≈ 12.07 GB > memory_total_bytes ≈ 8.28 GB). memory_available_bytes collapsed to ~0.93 GB, swap usage rose (swap_usage_percent from ~44.51% to ~55.58%), and swap traffic spiked (page_swap_in_rate up to ~391,783/s and page_swap_out_rate up to ~172,434/s). Major faults and page faults surged concurrently. No OOM kills occurred, indicating the kernel protected the job by heavy swapping, causing stalls.",
+    "solutions": [
+      "Right-size the job’s memory request/limit in Slurm (e.g., --mem/--mem-per-cpu) and enforce cgroup memory limits to prevent swap thrashing; prefer fail-fast over prolonged swapping.",
+      "Reduce the workload’s memory footprint (e.g., smaller problem size, enable in-application tiling/streaming, fix leaks) and profile with /proc/<pid>/smaps or heap profilers.",
+      "If the working set legitimately exceeds node RAM, schedule on higher-memory nodes or increase node RAM capacity.",
+      "Lower vm.swappiness for compute nodes (policy permitting) to reduce tendency to swap, and consider cgroup v2 memory.swap.max to cap or disable swap for jobs."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation correlated with paging and heavy job writes",
+    "root_causes": "As swapping intensified, disk load climbed sharply: disk_io_usage_percent rose to ~52.22%, disk_read_rate_bytes_per_sec peaked at ~401 MB/s and disk_write_rate_bytes_per_sec at ~177 MB/s, with disk_total_iops > 1,060. CPU iowait increased (up to ~5.88%) and processes_blocked became non-zero, consistent with storage contention driven by swap-in/out bursts and job write activity.",
+    "solutions": [
+      "Resolve the primary memory pressure to remove swap I/O (see memory solutions).",
+      "Place job scratch/output on higher-throughput local NVMe or a parallel filesystem; avoid slower or contended volumes.",
+      "Apply I/O cgroup limits (io.max/blkio) to prevent single jobs from saturating the device and starving the system.",
+      "Review I/O patterns and batching in the application to smooth write bursts; tune kernel writeback (vm.dirty_*) conservatively if large dirty spikes recur."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the run",
+    "root_causes": "Filesystem usage grew quickly from ~73.35% to ~85.97%, with filesystem_free_bytes dropping by ~10.3–10.8 GB over the window. disk_written_bytes_total increased by ~11.4 GB in the same period, indicating large outputs or spill files produced by the job.",
+    "solutions": [
+      "Redirect large outputs and temporary files to appropriate scratch or parallel storage and enable periodic staging/cleanup.",
+      "Enforce per-job quotas and log size limits; compress or aggregate outputs if feasible.",
+      "Add monitoring/alerts for rapid free-space drops to prevent job failures from full filesystems and schedule cleanup after job completion."
+    ]
+  }
+]

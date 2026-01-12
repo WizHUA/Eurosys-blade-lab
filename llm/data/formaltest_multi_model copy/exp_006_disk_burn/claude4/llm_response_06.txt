@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and excessive swap activity causing system performance degradation.",
+    "root_causes": "Memory resource exhaustion with swap usage climbing to 47% and massive swapping activity (573,695 KB/sec swap-in) indicating the system is heavily relying on disk-based virtual memory.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify which applications are consuming excessive RAM",
+      "The completed job 'ft_cgC' may have left behind processes or memory leaks - check for zombie processes or lingering memory allocations",
+      "Consider increasing physical RAM or implementing memory limits for future jobs to prevent swap thrashing",
+      "Use 'vmstat 1' to monitor ongoing swap activity and 'free -h' to track memory recovery"
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O bottleneck with utilization reaching 60% and massive write activity.",
+    "root_causes": "Disk I/O saturation caused by combination of heavy swap activity (197MB/sec write rate) and application I/O demands, creating a storage performance bottleneck.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load",
+      "The massive write activity (587MB/sec peak) is likely related to memory pressure and swap operations",
+      "Consider implementing I/O throttling or using faster storage (NVMe SSD) for swap partitions",
+      "Monitor disk queue depth and latency using 'iostat -x 1' to assess storage subsystem health"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spike to 77% with high system load indicating resource contention.",
+    "root_causes": "CPU load increase driven by system overhead from memory management, I/O wait operations, and kernel activity related to swap thrashing and memory pressure handling.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify CPU-intensive processes and their resource consumption patterns",
+      "The high iowait percentage (4.87%) indicates CPU cycles lost to waiting for disk operations",
+      "Address the underlying memory pressure issue to reduce CPU overhead from swap management",
+      "Monitor system load trends to determine if this is a temporary spike or sustained performance issue"
+    ]
+  }
+]

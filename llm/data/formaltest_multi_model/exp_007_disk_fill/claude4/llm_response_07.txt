@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe disk I/O bottleneck with extremely high utilization and wait times.",
+    "root_causes": "Storage subsystem experiencing heavy load, likely from intensive disk operations during the ft_cgC job execution.",
+    "solutions": [
+      "The disk I/O utilization reached 67% at 07:13:43, indicating significant storage bottleneck.",
+      "Use 'iotop' to identify specific processes causing high disk I/O activity.",
+      "Monitor disk queue depth and consider I/O scheduling optimizations or faster storage devices.",
+      "The high disk write rates (up to 172MB/s) suggest the job may benefit from SSD storage or striped disk arrays."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure causing significant page swapping activity.",
+    "root_causes": "System experiencing memory shortage leading to active swapping of pages to disk.",
+    "solutions": [
+      "Page swap-out rates peaked at 257,685 pages/sec at 07:13:43, indicating severe memory pressure.",
+      "Use 'free -h' and 'vmstat 1' to monitor current memory usage and swapping activity.",
+      "Identify memory-intensive processes with 'ps aux --sort=-%mem' and consider job memory limits.",
+      "The memory available dropped significantly during job execution, suggesting insufficient RAM for the workload."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with usage exceeding 90%.",
+    "root_causes": "Disk space consumption has reached critical levels, potentially from job output or temporary files.",
+    "solutions": [
+      "Filesystem usage climbed to 90.34% during job execution, approaching critical capacity.",
+      "Use 'du -sh /*' to identify large directories consuming disk space.",
+      "Clean up temporary files, old job outputs, or consider expanding storage capacity.",
+      "Implement disk space monitoring and cleanup policies to prevent future space shortages."
+    ]
+  }
+]

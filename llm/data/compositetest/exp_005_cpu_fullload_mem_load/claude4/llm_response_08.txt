@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with system memory usage reaching 92.6% and swap utilization at 47.9%.",
+    "root_causes": "Memory resource exhaustion due to high memory consumption by active processes, likely related to the completed 'ft_cgC' job that ran for over 10 minutes with intensive memory usage patterns.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to locate any remaining processes consuming excessive memory.",
+      "Monitor swap activity with 'vmstat 1' to confirm ongoing swapping and memory pressure.",
+      "Review the 'ft_cgC' job configuration and memory allocation to prevent future memory exhaustion.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints."
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU utilization ranging from 65-83% with significant I/O wait time.",
+    "root_causes": "CPU resource load combined with disk I/O bottleneck, indicated by high I/O wait percentages (up to 7.7%) and elevated disk utilization reaching 70%.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity.",
+      "Monitor disk performance with 'iostat -x 1' to confirm I/O bottleneck patterns.",
+      "The high disk write rates (up to 139MB/s) suggest intensive disk operations that may be related to memory swapping or job output.",
+      "Consider optimizing I/O patterns or using faster storage for compute jobs with high I/O requirements."
+    ]
+  }
+]

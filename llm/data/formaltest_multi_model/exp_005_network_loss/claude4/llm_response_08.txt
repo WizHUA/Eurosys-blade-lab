@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure and increasing memory usage during job execution.",
+    "root_causes": "Memory resource load from the completed 'ft_cgC' job causing sustained high memory consumption and pressure on the system.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to identify potential memory leaks or inefficient memory allocation.",
+      "Check if the job is properly releasing memory resources after completion.",
+      "Consider implementing memory limits using cgroups or Slurm memory constraints for future runs of this job type.",
+      "Review the application code for memory optimization opportunities, particularly in conjugate gradient computations."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity with significant write operations during the monitoring period.",
+    "root_causes": "Disk I/O load from checkpoint writing or result output operations associated with the computational job.",
+    "solutions": [
+      "The disk write rate peaked at over 174 MB/s, indicating intensive output operations during job execution.",
+      "Monitor disk utilization patterns to ensure adequate I/O bandwidth for concurrent jobs.",
+      "Consider optimizing output frequency and buffer sizes to reduce I/O overhead.",
+      "Evaluate if faster storage or I/O scheduling optimizations could improve performance for similar workloads."
+    ]
+  }
+]

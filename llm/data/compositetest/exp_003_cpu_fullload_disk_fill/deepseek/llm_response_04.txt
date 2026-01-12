@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU I/O wait time (7.97%) despite moderate overall CPU usage",
+    "root_causes": "Disk I/O bottleneck causing processes to wait for storage operations",
+    "solutions": [
+      "Check disk utilization metrics and identify process causing high I/O",
+      "Verify filesystem health and storage device performance",
+      "Consider optimizing job to reduce disk I/O requirements"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load (7.5 load_1min) disproportionate to CPU usage",
+    "root_causes": "Processes blocked waiting for I/O resources",
+    "solutions": [
+      "Investigate processes blocked in D state using 'ps aux'",
+      "Check disk queue lengths and response times",
+      "Review job's memory access patterns"
+    ]
+  },
+  {
+    "anomaly": "High page fault rate indicating memory pressure",
+    "root_causes": "Potential memory contention from concurrent jobs",
+    "solutions": [
+      "Analyze memory usage patterns during job execution",
+      "Consider allocating more memory resources",
+      "Check if swap usage indicates memory contention"
+    ]
+  }
+]

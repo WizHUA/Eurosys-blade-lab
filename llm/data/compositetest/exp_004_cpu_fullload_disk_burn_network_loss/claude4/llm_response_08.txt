@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time causing severe system performance degradation.",
+    "root_causes": "Disk I/O bottleneck with I/O wait percentage spiking from 0.03% to 16.5%, indicating storage subsystem cannot keep up with demand from the computational job.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the highest disk I/O load",
+      "Check disk health and performance metrics using 'iostat -x 1' to identify bottlenecks",
+      "Consider moving temporary files or working directories to faster storage if available",
+      "Optimize application I/O patterns to reduce random access and increase sequential operations"
+    ]
+  },
+  {
+    "anomaly": "Memory usage has escalated to dangerous levels with significant swapping activity.",
+    "root_causes": "Memory pressure from computational workload causing system to heavily utilize swap space, with swap usage at 47.8% and active swapping occurring.",
+    "solutions": [
+      "Monitor memory usage patterns with 'free -h' and 'vmstat 1' to track swapping activity",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Consider increasing available memory or optimizing the application's memory usage patterns",
+      "Implement memory limits using cgroups to prevent single jobs from consuming excessive system resources"
+    ]
+  },
+  {
+    "anomaly": "CPU system time has increased dramatically indicating kernel overhead.",
+    "root_causes": "High kernel CPU usage from 1.3% to 16.5% suggests excessive system calls or kernel processing, likely related to heavy I/O operations and memory management.",
+    "solutions": [
+      "Use 'perf top' to identify which kernel functions are consuming the most CPU time",
+      "Monitor system calls using 'strace' on the problematic processes to identify inefficient patterns",
+      "Check for I/O-related kernel bottlenecks that may be causing high system CPU usage",
+      "Consider tuning kernel parameters related to I/O scheduling and memory management"
+    ]
+  }
+]

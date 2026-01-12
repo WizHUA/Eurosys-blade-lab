@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space nearly exhausted during high I/O wait periods.",
+    "root_causes": "Memory resource exhaustion forcing the system to heavily utilize swap space, causing performance degradation.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to identify memory-intensive processes.",
+      "Check for memory leaks in applications using 'ps aux --sort=-%mem' and 'top' commands.",
+      "Consider adding more physical RAM or optimizing application memory usage to reduce swap dependency.",
+      "Review swap configuration and consider increasing swap space as a temporary measure."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O wait time indicating severe storage performance bottleneck.",
+    "root_causes": "Storage subsystem unable to keep up with I/O demands, likely exacerbated by memory pressure causing excessive swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O activity.",
+      "Check disk utilization with 'iostat -x 1' to monitor queue depths and response times.",
+      "Consider upgrading to faster storage (SSD) or implementing RAID for better performance.",
+      "Optimize application I/O patterns and consider using memory-mapped files where appropriate."
+    ]
+  },
+  {
+    "anomaly": "High filesystem usage approaching capacity limits.",
+    "root_causes": "Filesystem utilization has reached critical levels with available space dropping significantly.",
+    "solutions": [
+      "Use 'df -h' and 'du -sh /*' to identify directories consuming the most space.",
+      "Clean up temporary files, old logs, and unnecessary data to free up space.",
+      "Consider expanding filesystem capacity or adding additional storage volumes.",
+      "Implement automated cleanup policies for temporary and log files."
+    ]
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Sudden spike in anonymous memory with overcommit beyond physical RAM during job runtime",
+    "root_causes": "The running job (ft_cgC) drove a rapid increase in anonymous memory and committed virtual memory: memory_active_anon_bytes rose from ~1.68 GiB to ~2.78 GiB at 07:06:28 and ~3.43 GiB by 07:06:58; memory_committed_as_bytes jumped from ~7.51 GiB to ~8.53–9.06 GiB, exceeding the 7.71–7.72 GiB physical RAM. memory_available_bytes simultaneously dropped from ~5.5 GiB to ~3.7–4.4 GiB. vm_oom_kills_total is 1, indicating an OOM kill has occurred on this node at some point; combined, this reflects risky overcommit behavior during the job.",
+    "solutions": [
+      "Constrain the job's memory via Slurm (e.g., --mem or cgroup MemoryMax) to its measured peak plus headroom to prevent overcommit-induced reclaim/OOM.",
+      "Audit the application’s memory usage (smem/smaps, heap profiling) to identify leaks or oversized problem parameters.",
+      "Set stricter overcommit policy on the node (vm.overcommit_memory=2 and appropriate vm.overcommit_ratio) if jobs routinely oversubscribe RAM.",
+      "Add per-QOS or partition memory limits to avoid concurrent overcommit across jobs.",
+      "If the workload legitimately needs more memory, provision nodes with higher RAM or adjust job sizing."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap usage (~46.6% of 2 GiB) with minimal swap I/O",
+    "root_causes": "swap_free_bytes stays near 1.146 GiB (swap_usage_percent ~46.6%) across the window while page_swap_in_rate/page_swap_out_rate remain very low, indicating long-lived pages were previously swapped out and have not returned to RAM. This coexists with only moderate memory usage (memory_usage_percent ~33–55%) but a drop in memory_available_bytes during the spike, which can degrade latency-sensitive workloads.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., to 10–20) to reduce swapping of cold pages on compute nodes.",
+      "During a maintenance window, consider swapoff && swapon to clear stale swapped pages (ensure adequate free RAM and drain workloads first).",
+      "Keep job memory within limits (Slurm --mem/cgroups) to minimize future swap pressure.",
+      "Monitor page_major_faults_rate and swap rates; if they rise with the workload, prioritize memory optimization or node RAM upgrades."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmission/SYN-retrans spike around 07:06:58 without link errors",
+    "root_causes": "node_netstat counters show non-zero TCP retransmissions and SYN retries (e.g., Tcp_RetransSegs ≈ 30.003 and TCPSynRetrans ≈ 6.001 at 07:06:58) while network_receive_errors_rate and network drops remain 0. This suggests brief congestion or path variability on the 1 GbE fabric (network_mtu_bytes=1500, network_speed_bytes=125000000).",
+    "solutions": [
+      "Check NIC and switch counters for the time window (ethtool -S, switch port error/discard statistics) and review dmesg for driver resets.",
+      "Verify end-to-end MTU consistency (1500) and offload settings; misconfigurations can increase retransmissions.",
+      "Run targeted link tests (iperf3) during similar job patterns to confirm stability and throughput headroom.",
+      "If retrans spikes correlate with specific nodes or times, consider QoS/traffic shaping or isolating noisy flows."
+    ]
+  }
+]

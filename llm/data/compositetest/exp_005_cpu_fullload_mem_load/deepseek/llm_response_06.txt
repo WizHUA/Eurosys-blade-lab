@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High memory pressure with extensive swapping activity",
+    "root_causes": "Memory-intensive application causing prolonged swapping activity",
+    "solutions": [
+      "Investigate memory usage patterns of ft_cgC job",
+      "Optimize application memory usage or reduce problem size",
+      "Allocate more memory resources or nodes for similar jobs"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation during job execution",
+    "root_causes": "High disk write operations from application or swapping",
+    "solutions": [
+      "Analyze storage access patterns of ft_cgC job",
+      "Consider using faster storage or SSDs",
+      "Optimize application checkpointing/IO operations"
+    ]
+  },
+  {
+    "anomaly": "Elevated CPU usage despite completed job",
+    "root_causes": "Possible cleanup processes or residual workload",
+    "solutions": [
+      "Check system processes for post-job cleanup activities",
+      "Verify application properly terminates all processes",
+      "Monitor system metrics after job completion"
+    ]
+  }
+]

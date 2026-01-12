@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization exhibits extreme escalation from 30% to 83% over a 90-second period during job execution.",
+    "root_causes": "The 'ft_cgC' job is consuming increasingly more CPU resources, indicating either inefficient algorithm scaling or a computational bottleneck in the workload.",
+    "solutions": [
+      "Monitor the specific processes spawned by job 276 using 'top -p $(pgrep -f ft_cgC)' to identify CPU-intensive components.",
+      "Review the ft_cgC application code for potential infinite loops, inefficient algorithms, or memory access patterns causing CPU thrashing.",
+      "Check if the job is properly utilizing available CPU cores or if it's single-threaded causing poor scaling.",
+      "Consider implementing CPU limits using cgroups or Slurm job constraints to prevent resource monopolization."
+    ]
+  },
+  {
+    "anomaly": "System load average increases dramatically from 1.77 to 4.88, indicating severe CPU contention.",
+    "root_causes": "The system load is approaching dangerous levels for an 8-core system, suggesting that processes are queuing for CPU time and the system is becoming oversubscribed.",
+    "solutions": [
+      "Use 'vmstat 1' and 'iostat -x 1' to determine if the high load is CPU-bound or I/O-bound.",
+      "Implement job scheduling policies to prevent multiple CPU-intensive jobs from running simultaneously.",
+      "Monitor the run queue length and consider migrating some workloads to other nodes if available.",
+      "Evaluate if the current job allocation strategy is appropriate for the hardware resources."
+    ]
+  },
+  {
+    "anomaly": "Context switch rate increases significantly from 1788 to 1841 switches per second, indicating system stress.",
+    "root_causes": "High context switching suggests the kernel is spending excessive time managing process scheduling, likely due to CPU resource contention and multiple processes competing for execution time.",
+    "solutions": [
+      "Monitor process priorities and consider using 'nice' or 'ionice' to adjust scheduling priorities for the ft_cgC job.",
+      "Check for any background system processes that might be interfering with the job execution.",
+      "Consider process affinity settings to bind the job to specific CPU cores and reduce context switching overhead.",
+      "Review system configuration for any unnecessary services or daemons that could be disabled during compute jobs."
+    ]
+  }
+]

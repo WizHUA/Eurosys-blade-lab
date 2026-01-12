@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with significant I/O wait time",
+    "root_causes": "The system shows sustained high CPU usage (83.7% peak) with substantial I/O wait time (7.97%), indicating potential disk bottlenecks during job execution",
+    "solutions": [
+      "Check disk I/O performance using 'iostat -x 1' to identify potential storage bottlenecks",
+      "Review the job's I/O patterns and consider optimizing file access patterns",
+      "Verify if the storage subsystem meets the workload requirements"
+    ]
+  },
+  {
+    "anomaly": "Elevated memory pressure with swap usage",
+    "root_causes": "Memory usage remains high (33-34%) with significant swap usage (53.7% of swap space used), suggesting potential memory contention during job execution",
+    "solutions": [
+      "Monitor memory usage patterns with 'vmstat 1' to identify memory-intensive processes",
+      "Consider optimizing job memory requirements or increasing physical memory",
+      "Check for memory leaks in the application code"
+    ]
+  },
+  {
+    "anomaly": "Network performance degradation",
+    "root_causes": "TCP retransmissions and timeouts observed during job execution, indicating potential network congestion or packet loss",
+    "solutions": [
+      "Monitor network traffic with 'iftop' or 'nload' during job execution",
+      "Check network interface statistics for errors or drops",
+      "Consider optimizing MPI communication patterns or using faster interconnects"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU I/O wait time exceeding 20%",
+    "root_causes": "Disk subsystem bottleneck causing processes to wait excessively for I/O operations",
+    "solutions": [
+      "Investigate disk latency metrics to identify bottlenecked storage devices",
+      "Check for concurrent I/O intensive processes competing for disk resources",
+      "Consider optimizing application I/O patterns or distributing load across multiple disks"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with less than 5% free memory",
+    "root_causes": "Application memory demands exceeding available physical RAM, triggering active memory reclamation",
+    "solutions": [
+      "Analyze memory usage patterns of running processes using 'smem' or similar tools",
+      "Consider tuning application memory settings or adding more physical RAM",
+      "Monitor swap activity to determine if the system is thrashing"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load (8+) with moderate CPU utilization",
+    "root_causes": "Processes blocked waiting for I/O and memory resources rather than CPU contention",
+    "solutions": [
+      "Review the process list for processes in D state (uninterruptible sleep)",
+      "Check for disk and network wait times impacting overall system performance",
+      "Consider optimizing the workload scheduling to better balance resource utilization"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory usage spike indicating potential memory leak or inefficient memory management.",
+    "root_causes": "Memory resource pressure from application or system processes consuming excessive memory over time.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to identify if this is a gradual leak or sudden allocation.",
+      "Use 'ps aux --sort=-%mem' to identify the processes consuming the most memory.",
+      "Check application logs for memory allocation patterns or potential memory leaks.",
+      "Consider implementing memory monitoring and alerts to catch similar issues earlier."
+    ]
+  },
+  {
+    "anomaly": "High disk write activity with significant I/O operations indicating storage stress.",
+    "root_causes": "Disk I/O load from intensive write operations, possibly related to application data processing or system operations.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity.",
+      "Monitor disk utilization with 'iostat -x 1' to assess if the storage subsystem is becoming a bottleneck.",
+      "Check if the high write activity is related to the completed 'ft_cgC' job or ongoing system maintenance.",
+      "Consider optimizing application I/O patterns or adding faster storage if this becomes a recurring issue."
+    ]
+  }
+]

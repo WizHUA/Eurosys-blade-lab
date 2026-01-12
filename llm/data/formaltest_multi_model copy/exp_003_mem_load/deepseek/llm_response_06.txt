@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure and increased swapping activity",
+    "root_causes": "Memory usage peaked at 54.98% with swap usage reaching critical levels (46.6%) during job execution",
+    "solutions": [
+      "Check job memory requirements and adjust Slurm job parameters accordingly",
+      "Monitor memory allocation of running processes using 'ps aux --sort=-%mem'",
+      "Consider adding more physical memory or optimizing application memory usage"
+    ]
+  },
+  {
+    "anomaly": "High network transmission rates with packet processing delays",
+    "root_causes": "Network transmit rate spiked to 186852 bytes/sec during job execution, causing softnet processing delays",
+    "solutions": [
+      "Verify network buffer sizes and tuning parameters",
+      "Check for network congestion between compute nodes",
+      "Consider implementing traffic shaping for MPI jobs"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O latency during job processing",
+    "root_causes": "Disk write latency increased to 0.1236ms with high weighted I/O time (103796 seconds)",
+    "solutions": [
+      "Monitor disk health using SMART tools",
+      "Check for storage system bottlenecks",
+      "Consider optimizing I/O patterns in the application"
+    ]
+  }
+]

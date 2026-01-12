@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Active swapping and transient memory overcommit during the job window",
+    "root_causes": "While job 276 (ft_cgC) was running, anonymous memory grew rapidly: memory_committed_as_bytes rose from ~7.5 GB to ~9.06 GB, exceeding physical RAM (8.28 GB). memory_available_bytes dropped to ~3.73 GB and anon_memory_percent climbed to ~43%. Concurrently, swap activity spiked (page_swap_out_rate up to ~189 pages/s and page_swap_in_rate up to ~24 pages/s) with swap already ~46% utilized. This indicates the workload briefly overcommitted memory and pushed inactive pages to swap, increasing memory pressure and risk of latency/OOM.",
+    "solutions": [
+      "Increase the Slurm memory request/limit for ft_cgC (e.g., --mem) or enforce a cgroup memory.max appropriate to the job's peak working set plus headroom.",
+      "Constrain overcommit: set vm.overcommit_memory=2 and tune vm.overcommit_ratio to cap virtual allocations; deploy earlyoom/oomd or PSI-based alerts to act before OOM.",
+      "Reduce swap pressure for latency-sensitive HPC: lower vm.swappiness (e.g., 10–20) and monitor PSI memory; if bursts are expected, consider zswap to mitigate swap latency.",
+      "Profile the job's memory phases (perf, heap profiling) to eliminate transient spikes (e.g., batching allocations, streaming I/O, chunking)."
+    ]
+  },
+  {
+    "anomaly": "High baseline swap occupancy despite multi‑GB RAM available",
+    "root_causes": "Throughout the window, swap usage remained ~46% while memory_available_bytes stayed between ~3.7–5.6 GB and swap_out continued (e.g., ~178 pages/s near 07:07:28). This pattern suggests prior pressure or swappiness policy led to cold pages being left in swap, which can add tail latency and reduce headroom for bursts.",
+    "solutions": [
+      "Lower vm.swappiness on HPC nodes to prefer RAM and avoid lingering swap residency; verify with /proc/sys/vm/swappiness.",
+      "During a maintenance window, run swapoff -a && swapon to repatriate idle pages; then monitor page_swap_in/out rates to confirm improvement.",
+      "Identify processes holding swapped pages (e.g., smem -rs or examining /proc/*/smaps) and restart long-lived daemons that remain heavily swapped.",
+      "Add observability: alert on rising memory_committed_as_bytes approaching total RAM and on sustained page_swap_out_rate to catch regressions early."
+    ]
+  }
+]

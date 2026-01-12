@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Memory usage spike with system load increase from 2.36 to 7.29 over 15 minutes",
+    "root_causes": "Memory-intensive application (likely FT_CGC job) pushing system from 32% to 87% memory utilization",
+    "solutions": [
+      "Check FT_CGC job logs for memory allocation patterns",
+      "Monitor cgroup memory pressure metrics during future job executions",
+      "Consider adjusting job scheduling to avoid memory contention"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O spike exceeding 50% utilization with 688 avg total IOPS",
+    "root_causes": "Job causing heavy disk writes (1.8GB/s peak write rate) with high IO latency",
+    "solutions": [
+      "Verify if FT_CGC job was using disk-based temporary storage",
+      "Check filesystem performance metrics during job execution",
+      "Consider using RAM disk for temporary files in future runs"
+    ]
+  },
+  {
+    "anomaly": "CPU system time increase from 1.2% to 16.5% during job execution",
+    "anomaly": "CPU system time increased from 1.2% to 16.5% during job execution",
+    "root_causes": "Kernel handling I/O wait and system calls from memory-intensive application",
+    "solutions": [
+      "Profile job to identify system call hotspots",
+      "Check for excessive small I/O operations",
+      "Review kernel parameters for optimization opportunities"
+    ]
+  }
+]

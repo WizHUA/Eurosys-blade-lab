@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high memory pressure with nearly exhausted memory resources",
+    "root_causes": "Memory usage at 99%+ with heavy swapping activity and very low available memory",
+    "solutions": [
+      "Investigate memory leaks in the completed 'ft_ftC' job which ran during this period",
+      "Check for memory-intensive processes that may still be running post-job completion",
+      "Increase available memory resources or implement stricter memory limits for jobs"
+    ]
+  },
+  {
+    "anomaly": "Severe CPU I/O wait times (~50% of CPU usage)",
+    "root_causes": "Disk I/O bottleneck likely caused by heavy swapping and memory pressure",
+    "solutions": [
+      "Analyze disk I/O patterns during the high iowait period using iotop",
+      "Optimize job scheduling to avoid memory-intensive jobs overlapping with I/O-heavy jobs",
+      "Consider adding faster storage or implementing I/O scheduling policies"
+    ]
+  },
+  {
+    "anomaly": "Abnormally high system load averaging 9-11 with CPU utilization spikes",
+    "root_causes": "Resource contention between system processes and job execution",
+    "solutions": [
+      "Review system logs during peak load periods for kernel or system process issues",
+      "Check for resource starvation in other jobs running concurrently",
+      "Optimize job placement to better distribute load across nodes"
+    ]
+  }
+]

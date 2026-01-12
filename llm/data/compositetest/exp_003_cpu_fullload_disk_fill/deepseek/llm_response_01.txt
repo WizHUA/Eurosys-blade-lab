@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization (83.7%) combined with elevated system load (7.5) during job execution",
+    "root_causes": "CPU-bound computation from the FT benchmark job causing resource contention",
+    "solutions": [
+      "Check CPU affinity and binding settings for the FT benchmark job",
+      "Monitor process-level CPU utilization during similar jobs using 'top' or 'perf'",
+      "Consider adjusting job scheduling parameters to avoid CPU oversubscription"
+    ]
+  },
+  {
+    "anomaly": "Significant I/O wait time spikes (peaking at 7.97%) during computation",
+    "root_causes": "Possible disk contention from temporary file operations during benchmark execution",
+    "solutions": [
+      "Review if the FT job is using temporary files excessively",
+      "Consider using node-local storage or RAM disks for temporary files",
+      "Monitor disk I/O patterns with 'iostat' during subsequent runs"
+    ]
+  },
+  {
+    "anomaly": "High context switch rate (peaking at 1638/s) during computation",
+    "root_causes": "Thread scheduling overhead from parallel execution of the benchmark",
+    "solutions": [
+      "Verify optimal thread count settings for the FT benchmark",
+      "Check for any core oversubscription in the job configuration",
+      "Consider pinning threads to specific cores if not already implemented"
+    ]
+  }
+]

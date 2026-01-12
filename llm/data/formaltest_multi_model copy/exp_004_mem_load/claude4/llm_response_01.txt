@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swapping activity during job execution",
+    "root_causes": "The ft_cgC job caused extreme memory consumption, dropping available memory from 5.6GB to 3.7GB and triggering heavy swapping activity with swap out rates reaching 167KB/sec",
+    "solutions": [
+      "Monitor the ft_cgC job's memory allocation patterns to identify potential memory leaks or excessive memory usage",
+      "Consider reducing the memory footprint of the job or running it with memory limits using cgroups",
+      "Increase physical memory on the node if this job type is expected to run regularly",
+      "Implement memory monitoring alerts to catch similar issues before they cause system-wide performance degradation"
+    ]
+  },
+  {
+    "anomaly": "Significant disk I/O bottleneck coinciding with memory pressure",
+    "root_causes": "High disk write activity (up to 171MB/sec) combined with increased I/O utilization (6.4%) indicates the system is heavily swapping to disk due to memory exhaustion",
+    "solutions": [
+      "Use faster storage (SSD) for swap partitions to reduce the impact of swapping on system performance",
+      "Optimize the job to reduce memory usage and minimize swapping activity",
+      "Monitor disk I/O patterns using tools like iostat to identify when jobs are causing excessive swapping",
+      "Consider implementing swap throttling or tuning vm.swappiness to control when the system starts swapping"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spike and load average increase during memory pressure period",
+    "root_causes": "CPU usage increased from 48% to 51% with load averages rising, likely due to increased system overhead from memory management and swapping operations",
+    "solutions": [
+      "Profile the ft_cgC job to understand its CPU and memory access patterns",
+      "Consider running memory-intensive jobs during off-peak hours to reduce system impact",
+      "Implement job scheduling policies that consider both CPU and memory requirements",
+      "Use process monitoring tools to identify if the job is CPU-bound or memory-bound for better resource allocation"
+    ]
+  }
+]

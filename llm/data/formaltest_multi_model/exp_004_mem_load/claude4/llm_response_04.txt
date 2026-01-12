@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and potential performance degradation.",
+    "root_causes": "Memory resource exhaustion indicated by dramatic drop in available memory from 5.6GB to 3.7GB and high memory usage climbing to 55%.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify the largest consumers.",
+      "Check for memory leaks in running applications, particularly the recently completed 'ft_cgC' job.",
+      "Evaluate if the node has sufficient memory capacity for the workloads being assigned to it.",
+      "Consider implementing memory limits or quotas for jobs to prevent future memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in active anonymous memory usage indicating memory allocation stress.",
+    "root_causes": "Active anonymous memory increased from 1.5GB to 3.4GB, suggesting heavy allocation of process memory that cannot be easily reclaimed.",
+    "solutions": [
+      "Use 'vmstat 1' to monitor memory allocation patterns and identify if swapping is occurring.",
+      "Investigate the memory usage patterns of computational jobs to ensure they fit within node capacity.",
+      "Review job scheduling policies to prevent memory overcommitment on nodes.",
+      "Consider implementing memory cgroups to better control and monitor per-job memory usage."
+    ]
+  }
+]

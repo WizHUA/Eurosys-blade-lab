@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with less than 1% available memory and extensive swapping activity.",
+    "root_causes": "Memory resource exhaustion with 99% memory usage and active swap utilization indicating the system has run out of physical RAM.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming RAM.",
+      "Monitor swap activity with 'vmstat 1' to confirm ongoing memory paging activity.",
+      "Check if the completed job 'ft_ftC' left behind any memory-mapped files or shared memory segments using 'ipcs -m'.",
+      "Consider increasing available memory or implementing memory limits for future jobs to prevent system exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Severe I/O bottleneck with extremely high disk utilization and wait times.",
+    "root_causes": "Disk I/O subsystem overloaded due to excessive swapping activity and high disk queue depth causing performance degradation.",
+    "solutions": [
+      "Disk utilization consistently above 70% with queue depths exceeding 20 indicates severe I/O contention.",
+      "Use 'iotop' to identify processes generating the highest disk I/O load.",
+      "The high I/O wait percentage (30-50%) suggests the CPU is frequently blocked waiting for disk operations.",
+      "Addressing the memory pressure issue will significantly reduce swap-related I/O load."
+    ]
+  },
+  {
+    "anomaly": "High CPU pressure and context switching indicating resource contention.",
+    "root_causes": "CPU scheduling pressure from multiple processes competing for limited CPU resources combined with I/O wait states.",
+    "solutions": [
+      "Context switch rates above 10,000/sec indicate high process scheduling overhead.",
+      "Use 'top' or 'htop' to identify processes with high CPU usage and frequent context switches.",
+      "The combination of high load average (11.88) and CPU pressure suggests the system is oversubscribed.",
+      "Consider implementing CPU limits or job scheduling policies to prevent resource contention."
+    ]
+  }
+]

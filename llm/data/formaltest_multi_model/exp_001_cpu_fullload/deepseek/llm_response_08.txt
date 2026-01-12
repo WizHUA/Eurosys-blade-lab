@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization spikes to 83% with corresponding increase in system load",
+    "root_causes": "CPU-intensive computation from completed ft_cgC job causing sustained high CPU usage",
+    "solutions": [
+      "Analyze CPU usage patterns during job execution to identify optimization opportunities",
+      "Check if job was properly utilizing available CPU cores",
+      "Review job's computational requirements versus allocated resources"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increasing during job execution",
+    "root_causes": "Memory usage patterns from ft_cgC job causing increased page faults and memory pressure",
+    "solutions": [
+      "Review memory allocation patterns in the application code",
+      "Check if memory usage was properly monitored during job execution",
+      "Consider increasing memory allocation for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "Network activity shows unusual TCP retransmissions and timeouts",
+    "root_causes": "Network congestion or hardware issues during job execution",
+    "solutions": [
+      "Check network infrastructure logs for errors during job runtime",
+      "Verify network bandwidth utilization during job execution",
+      "Review job's network communication patterns for optimization opportunities"
+    ]
+  }
+]

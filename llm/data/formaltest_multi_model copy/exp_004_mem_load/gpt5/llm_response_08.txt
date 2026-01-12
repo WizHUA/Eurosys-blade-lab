@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Acute memory surge with sustained swap churn between 07:08:13 and 07:09:28: memory_usage_percent jumped from ~32% to ~55%, memory_available_bytes fell from 5608181760 to 3722825728, active anonymous memory roughly doubled (1.58 GiB to 3.43 GiB), and page_faults_rate spiked (~5.7k/s) with swap_out bursts up to ~167/s.",
+    "root_causes": "The running workload (ft_cgC) expanded its anonymous working set, driving high page faulting and swap activity while committed memory (9047875584 bytes) exceeded physical RAM (8278052864 bytes). CPU and disk I/O were not saturated, indicating memory pressure as the primary limiter.",
+    "solutions": [
+      "Correlate to job processes and inspect memory growth (ps -eLF --sort -rss, smem -tk, pmap -x, and /proc/PID/smaps_rollup) around 07:08:13–07:08:28.",
+      "Enforce tighter per-job memory limits in Slurm (e.g., --mem/--mem-per-cpu with cgroup enforcement) to keep RSS within RAM and prevent swap churn.",
+      "Reduce swapping on compute nodes (tune vm.swappiness lower, consider zswap/zram if policy allows) and ensure memory affinity/NUMA settings are sane.",
+      "When safe post-job, reclaim stale swapped pages (swapoff -a && swapon -a) to restore RAM residency.",
+      "If the workload legitimately needs >8 GB, schedule on nodes with more RAM or increase the job's requested memory."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap occupancy (~46.6% of 2 GiB) throughout the window despite ample free/available RAM (memory_available_bytes 3.7–5.6 GiB).",
+    "root_causes": "Long-lived inactive pages remain in swap (swap_free_bytes ~1.146 GiB constant) from current or prior processes, and ongoing swap-out bursts occurred without corresponding reduction in swap usage, indicating cold pages not being reclaimed to RAM.",
+    "solutions": [
+      "Identify processes with significant swap footprints (smem -sw or grep 'VmSwap' /proc/*/status) and restart or adjust them if appropriate.",
+      "During maintenance windows, clear stale swap (swapoff -a && swapon -a) to repatriate cold pages into RAM.",
+      "Adjust node policy if swap is undesirable for compute workloads (lower vm.swappiness or disable swap) and rely on cgroup-enforced memory limits to prevent overcommit thrashing."
+    ]
+  },
+  {
+    "anomaly": "Short burst of TCP connection churn and resets around 07:08:28 (tcp_active_opens_rate ~30/s, tcp_passive_opens_rate ~6/s, tcp_out_rsts_rate ~24/s) with zero retransmissions/errors and tcp_current_connections steady at 15.",
+    "root_causes": "Rapid connect/close behavior or remote refusals during the job's activity caused resets without link-level errors, indicating application-driven connection churn rather than network congestion.",
+    "solutions": [
+      "Review application logs around 07:08:28 for retry loops or short-lived connections; confirm if this pattern is expected for ft_cgC.",
+      "Use ss -tanp and tcpdump to capture endpoints issuing/receiving RSTs and verify peer service readiness and firewall policies.",
+      "If frequent short connections are expected, implement connection pooling or reuse to reduce churn and overhead."
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Memory pressure spike with active swapping and major page faults",
+    "root_causes": "Memory demand exceeded available physical RAM during the FT job execution",
+    "solutions": [
+      "Analyze memory usage patterns of the FT benchmark to optimize memory allocation",
+      "Consider node-specific tuning of MPI memory settings for compute-heavy workloads",
+      "Monitor memory pressure metrics during benchmark execution to identify peak demand periods"
+    ]
+  },
+  {
+    "anomaly": "Persistent high CPU utilization with elevated context switches",
+    "root_causes": "Compute-intensive operations from the FT benchmark stressing CPU resources",
+    "solutions": [
+      "Profile CPU usage by thread for the FT application to identify optimization opportunities",
+      "Consider core pinning or CPU affinity settings for MPI processes",
+      "Monitor CPU frequency scaling to ensure maximum performance during compute phases"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spiked to 88.7% with significant swap usage",
+    "root_causes": "Memory-intensive computation during ft_cgC job execution",
+    "solutions": [
+      "Check job memory requirements and adjust Slurm job parameters",
+      "Monitor memory usage patterns for similar jobs",
+      "Consider adding more physical memory to nodes running memory-intensive workloads"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O operations surged to 52.2% utilization",
+    "root_causes": "High disk activity during job execution",
+    "solutions": [
+      "Optimize job I/O patterns or implement caching",
+      "Consider using faster storage for compute nodes",
+      "Check if temporary files can use local node storage instead of shared filesystem"
+    ]
+  },
+  {
+    "anomaly": "CPU system time increased to 31.25% during peak load",
+    "root_causes": "System overhead from managing memory and I/O operations",
+    "solutions": [
+      "Profile application for system call overhead",
+      "Check for unnecessary filesystem operations in job",
+      "Consider using larger memory allocations to reduce swapping"
+    ]
+  }
+]

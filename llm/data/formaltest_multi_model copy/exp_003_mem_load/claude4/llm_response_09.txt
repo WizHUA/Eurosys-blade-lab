@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure and allocation pattern changes during job execution.",
+    "root_causes": "The ft_cgC job caused dramatic memory usage fluctuations, with available memory dropping from 5.5GB to 3.7GB and anonymous memory increasing from 22% to 43%, indicating intensive memory allocation patterns typical of computational workloads.",
+    "solutions": [
+      "Monitor memory allocation patterns of the ft_cgC job type to understand if this is expected behavior or indicates memory leaks",
+      "Consider implementing memory limits or cgroups to prevent future jobs from causing such dramatic memory pressure",
+      "Review job submission parameters to ensure adequate memory reservation for this workload type",
+      "Implement proactive monitoring alerts when available memory drops below critical thresholds"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity with inconsistent performance patterns.",
+    "root_causes": "Disk write activity increased significantly during the job execution, with write rates jumping from 164KB/s to 193KB/s, while read activity remained sporadic, suggesting the job involves substantial data output or checkpointing operations.",
+    "solutions": [
+      "Analyze the ft_cgC job's I/O patterns to determine if high write activity is expected behavior",
+      "Consider implementing I/O scheduling policies to prevent single jobs from monopolizing disk resources",
+      "Monitor disk utilization trends to identify if this pattern affects overall system performance",
+      "Evaluate if faster storage or I/O optimization could benefit this workload type"
+    ]
+  }
+]

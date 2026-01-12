@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization spike to 76% with high system load (load_1min 5.68)",
+    "root_causes": "CPU-intensive computation phase of FT-CG benchmark",
+    "solutions": [
+      "Monitor CPU-bound phases of FT-CG benchmark",
+      "Consider CPU affinity/pinning for benchmark processes",
+      "Verify CPU governor settings for performance mode"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increasing with active swapping (page_swap_in_rate 413337 pages/sec)",
+    "root_causes": "Memory-intensive computation phase exceeding physical RAM",
+    "solutions": [
+      "Monitor memory usage patterns in FT-CG benchmark",
+      "Consider optimizing benchmark memory access patterns",
+      "Verify Slurm memory allocation constraints"
+    ]
+  },
+  {
+    "anomaly": "Network bandwidth utilization spike (network_receive_rate 587Mbps)",
+    "root_causes": "Inter-node communication phase of FT-CG benchmark",
+    "solutions": [
+      "Monitor network patterns during benchmark execution",
+      "Verify network topology for optimal MPI communication",
+      "Consider InfiniBand tuning for MPI workloads"
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "Spike and sustained TCP retransmissions/timeouts with a kernel softnet drop burst during the job window",
+    "root_causes": "At 07:08:28 tcp_retransmissions_rate jumped from ~0 to 10.91/s and remained elevated (17.45/s at 07:08:43–07:08:58, 13.09/s at 07:09:13). tcp_timeouts_rate rose to 3.8/s at 07:09:28. Concurrently, the kernel reported softnet_dropped_rate=5.999/s and softnet_times_squeezed_rate=15/s at 07:08:28, indicating receive backlog pressure. NIC error counters and drops remained 0, pointing to stack/backlog congestion rather than link errors while job 276 (ft_cgC) was running.",
+    "solutions": [
+      "Inspect packet processing/backlog pressure: cat /proc/net/softnet_stat repeatedly and compare with sar -n EDEV 1 to confirm drops; check ethtool -S <iface> for rx_no_buffer and related counters.",
+      "Increase receive backlog and buffers if drops persist: sysctl -w net.core.netdev_max_backlog=<higher>; tune net.core.rmem_max/wmem_max and net.ipv4.tcp_rmem/tcp_wmem to appropriate larger values.",
+      "Distribute IRQ/softirq load: verify irqbalance, set IRQ affinity and enable RPS/XPS so multiple CPUs handle RX queues; if supported, enable/scale RSS (ethtool -L) and adjust interrupt coalescing (ethtool -C).",
+      "Validate upstream network health: check switch/router port error counters and congestion; replace suspect cables/ports; ensure no rate limiting or policing is triggering.",
+      "For the workload, reduce burstiness if possible (e.g., throttle send window or stagger flows) and verify TCP settings (e.g., net.ipv4.tcp_limit_output_bytes, TCP pacing if available)."
+    ]
+  },
+  {
+    "anomaly": "Abrupt memory usage surge with page-fault storm and increased swap activity",
+    "root_causes": "Between 07:08:13 and 07:08:28 memory_usage_percent jumped from ~32.21% to 55.03%, memory_available_bytes fell from ~5.61 GiB to ~3.47–3.74 GiB, and memory_active_anon_bytes rose from ~1.58 GiB to ~3.43 GiB. page_faults_rate spiked from 113/s to ~5.7k/s and stayed >5.4k/s until 07:09:13. Swap I/O appeared (page_swap_out_rate up to 167/s at 07:08:58; page_swap_in_rate up to ~3.7/s), and committed_as exceeded RAM (~9.05 GiB > 8.28 GiB), indicating a working-set expansion by the running job.",
+    "solutions": [
+      "Identify the memory growth source during the spike window: review cgroup memory stats for the job (e.g., cat /sys/fs/cgroup/*/memory.stat) and inspect top/ps/smem for processes driving anon memory.",
+      "Reduce swap pressure: consider lowering vm.swappiness (e.g., to 10–20), ensure swap is on fast storage, and verify no unintended memory overcommit (review vm.overcommit_memory and overcommit_ratio) for this node.",
+      "Right-size the job: set appropriate Slurm memory limits (–-mem/–-mem-per-cpu) or reduce dataset size/concurrency for ft_cgC to avoid page-fault storms.",
+      "If the application supports it, pre-allocate memory or use memory pooling to minimize fault bursts; profile with perf record -e page-faults to locate hot spots.",
+      "Monitor in real time (vmstat 1, sar -B 1) and alert on rapid increases in memory_active_anon/page_faults_rate to catch future phase changes early."
+    ]
+  }
+]

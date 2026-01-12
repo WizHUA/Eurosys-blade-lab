@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient memory availability collapse and severe memory pressure during job runtime",
+    "root_causes": "While job ft_cgC was running, anonymous memory usage spiked (anon_memory_percent up to ~81%), memory_available_bytes fell sharply to ~0.64 GB, and swap was heavily utilized (~47.9% in use with bursts of page_swap_in/out up to ~265k/136k pages/sec earlier). The kernel reclaimed page cache (memory_cached_bytes dropped from ~5.2 GB to ~0.4 GB) to satisfy allocations, causing memory pressure and performance degradation.",
+    "solutions": [
+      "Increase the job's memory request/limit (e.g., Slurm --mem) or reduce the job's working set to avoid entering swap.",
+      "Profile the job's memory footprint (ps/top/smaps) to identify spikes or leaks and optimize allocations (e.g., batching, streaming).",
+      "Tune vm.swappiness lower to reduce swap aggressiveness if appropriate for the workload, and ensure cgroup memory limits reflect actual needs.",
+      "Use local scratch with sufficient capacity and avoid holding large datasets in memory when not needed."
+    ]
+  },
+  {
+    "anomaly": "Severe storage I/O saturation with high CPU iowait",
+    "root_causes": "During the window, disk_io_usage_percent peaked around ~59–70% with very high throughput (disk_read_rate_bytes_per_sec ~272 MB/s and disk_write_rate_bytes_per_sec ~139 MB/s) and cpu_iowait_percent up to ~7.69%. This indicates the job was bottlenecked by heavy disk I/O, exacerbated by swapping activity.",
+    "solutions": [
+      "Place the job’s working set on faster storage (NVMe/SSD or higher-tier filesystem) or reduce concurrent I/O intensity.",
+      "Throttle or schedule I/O (ionice, fewer parallel readers/writers) and stage large inputs to local scratch before processing.",
+      "Monitor with iostat/iotop to pinpoint dominant I/O contributors and adjust access patterns (e.g., larger sequential reads, fewer random small I/Os).",
+      "Mitigate upstream memory pressure (see above) to reduce swap-driven I/O."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity near exhaustion at start of window",
+    "root_causes": "Filesystem_usage_percent was ~89.5–90.1% with limited availability (~8–8.3 GB free), coinciding with heavy write activity. This increases the risk of ENOSPC and fragmentation during intensive I/O.",
+    "solutions": [
+      "Purge temporary and completed outputs, and redirect large scratch/output data to a filesystem with more free space.",
+      "Implement quotas or cleanup policies for job scratch to prevent capacity spikes.",
+      "If sustained capacity is required, expand the filesystem or provision additional storage."
+    ]
+  }
+]

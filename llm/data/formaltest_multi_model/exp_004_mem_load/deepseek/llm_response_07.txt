@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure and swapping activity during job execution",
+    "root_causes": "The job 'ft_cgC' caused significant memory usage, triggering swap activity as seen in the page_swap_out_rate metrics",
+    "solutions": [
+      "Increase memory allocation for similar future jobs",
+      "Optimize the application's memory usage patterns",
+      "Monitor swap usage metrics more closely during job execution"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O operations during job execution",
+    "root_causes": "The completed job showed elevated disk_write_time_seconds_total and disk_read_time_seconds_total metrics",
+    "solutions": [
+      "Investigate if temporary files can be stored in memory instead of disk",
+      "Consider using faster storage for I/O intensive jobs",
+      "Review application I/O patterns for optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "Network activity spikes during job execution",
+    "root_causes": "Network_receive_packets_total and network_transmit_packets_total showed periodic spikes during the job's runtime",
+    "solutions": [
+      "Analyze network traffic patterns for optimization",
+      "Consider dedicated network bandwidth for compute-intensive jobs",
+      "Review MPI configuration for potential tuning opportunities"
+    ]
+  }
+]

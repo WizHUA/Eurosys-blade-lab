@@ -1,0 +1,30 @@
+nohup: 忽略输入
+[92mChecking NPB workloads[0m
+[92mAll NPB workloads are valid.[0m
+[92mChecking SLURM status...[0m
+[92mSLURM is operational: slurm 23.02.7[0m
+[92mPartition "CPU" is available.[0m
+[92midle Node status: CPU*         up   infinite      0    n/a[0m
+[92mExecuting workload plan: light_background[0m
+[94mDescription:              轻量级背景负载[0m
+[91mJob submitted successfully: Submitted batch job 165[0m
+[92mSubmitted job 165: bg_ep (ep_B)[0m
+[91mJob submitted successfully: Submitted batch job 166[0m
+[92mSubmitted job 166: bg_ep (ep_B)[0m
+[91mJob submitted successfully: Submitted batch job 167[0m
+[92mSubmitted job 167: bg_ep (ep_B)[0m
+[94mSimulating workload execution...[0m
+[92mWaiting for   3 jobs to complete (timeout:  600s)[0m
+[94m  3 jobs still running: 165, 166, 167[0m
+[94m  3 jobs still running: 165, 166, 167[0m
+[94m  3 jobs still running: 165, 166, 167[0m
+[94m  2 jobs still running: 166, 167[0m
+[94m  1 jobs still running: 167[0m
+[94m  1 jobs still running: 167[0m
+[92mAll jobs have completed.[0m
+[94mUsing experiment time range: 2025-09-19 12:45:33.099046 to 2025-09-19 12:46:33.430666[0m
+[94mExporting job info from 2025-09-19 12:45:33.099046 to 2025-09-19 12:46:33.430666 to temp/job_info.csv[0m
+[92mJob info exported to temp/job_info.csv (8 records).[0m
+[94mCleaning up WorkloadManager state...[0m
+[92mCancelling 3 jobs...[0m
+[92mWorkloadManager state has been reset.[0m

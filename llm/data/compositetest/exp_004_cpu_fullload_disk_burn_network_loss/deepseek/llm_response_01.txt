@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure observed with memory usage exceeding 60% and heavy swapping activity",
+    "root_causes": "Memory-intensive application (ft_cgC) consuming most available memory resources",
+    "solutions": [
+      "Monitor application memory usage patterns using 'top' or 'htop'",
+      "Consider optimizing the application's memory usage or reducing workload concurrency",
+      "Check for potential memory leaks in the application"
+    ]
+  },
+  {
+    "anomaly": "High CPU system usage peaking at 16.47% indicating significant kernel overhead",
+    "root_causes": "Kernel processing overhead from memory management activities and context switches",
+    "solutions": [
+      "Analyze system calls using 'perf' or 'strace' to identify expensive operations",
+      "Reduce unnecessary context switches by tuning application parameters",
+      "Monitor CPU pressure metrics for sustained periods"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with high disk utilization (peaking at 51.23%)",
+    "root_causes": "Intensive read/write operations from application combined with potential swap activity",
+    "solutions": [
+      "Monitor disk I/O patterns using 'iotop'",
+      "Consider using faster storage or optimizing data access patterns",
+      "Check if swap usage correlates with disk I/O peaks"
+    ]
+  }
+]

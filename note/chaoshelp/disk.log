@@ -1,0 +1,92 @@
+======================================================================
+$ blade create disk burn -h
+======================================================================
+Increase disk read and write io load
+
+Usage:
+  blade create disk burn
+
+Examples:
+
+# The data of rkB/s, wkB/s and % Util were mainly observed. Perform disk read IO high-load scenarios
+blade create disk burn --read --path /home
+
+# Perform disk write IO high-load scenarios
+blade create disk burn --write --path /home
+
+# Read and write IO load scenarios are performed at the same time. Path is not specified. The default is /
+blade create disk burn --read --write
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --cgroup-root string       cgroup root path, default value /sys/fs/cgroup
+      --channel string           Select the channel for execution, and you can now select SSH
+  -h, --help                     help for burn
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --path string              The path of directory where the disk is burning, default value is /
+      --read                     Burn io by read, it will create a 600M for reading and delete it when destroy it
+      --size string              Block size, MB, default is 10
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+      --write                    Burn io by write, it will create a file by value of the size flag, for example the size default value is 10, then it will create a 10M*100=1000M file for writing, and delete it when destroy
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create disk fill -h
+======================================================================
+Fill the specified directory path. If the path is not directory or does not exist, an error message will be returned.
+
+Usage:
+  blade create disk fill
+
+Examples:
+
+# Perform a disk fill of 40G to achieve a full disk (34G available)
+blade create disk fill --path /home --size 40000
+
+# Performs populating the disk by percentage, and retains the file handle that populates the disk
+Command: "blade c disk fill --path /home --percent 80 --retain-handle
+
+# Perform a fixed-size experimental scenario
+blade c disk fill --path /home --reserve 1024
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+  -h, --help                     help for fill
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --path string              The path of directory where the disk is populated, default value is /
+      --percent string           Total percentage of disk occupied by the specified path. If size and the flag exist, use this flag first. The value must be positive integer without %
+      --reserve string           Disk reserve size, unit is MB. The value is a positive integer without unit. If size, percent and reserve flags exist, the priority is as follows: percent > reserve > size
+      --retain-handle            Whether to retain the big file handle, default value is false.
+      --size string              Disk fill size, unit is MB. The value is a positive integer without unit, for example, --size 1024
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

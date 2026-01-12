@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant memory pressure spike with over 3x increase in memory usage from 32% to 55%.",
+    "root_causes": "Memory resource load, indicated by dramatic decrease in available memory from 5.6GB to 3.7GB and increase in anonymous memory usage from 21% to 43%.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-heavy processes that may have caused the spike around 07:08:28",
+      "Monitor the completed job 'ft_cgC' logs to determine if it had memory leaks or inefficient memory usage patterns",
+      "Check if the system has adequate memory for the workload or if memory limits need to be configured",
+      "Review memory allocation patterns and consider implementing memory usage monitoring for future jobs"
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU usage approaching 50% with system load consistently above 3.7.",
+    "root_causes": "CPU resource load from computationally intensive processes, likely from the running job 'ft_cgC'.",
+    "solutions": [
+      "The system load of 3.7-3.9 indicates moderate CPU pressure on this 8-core system",
+      "Monitor CPU usage patterns to ensure the job is utilizing resources efficiently",
+      "Consider CPU affinity settings or cgroup limits if the job needs to coexist with other critical processes",
+      "Verify that the job's CPU requirements align with the allocated resources"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity increase with consistent write operations averaging 164KB/sec.",
+    "root_causes": "Disk I/O load from application data writes, possibly related to the computational job output or temporary file creation.",
+    "solutions": [
+      "Use 'iotop' to monitor which processes are responsible for the disk write activity",
+      "Check if the job is writing large amounts of temporary or output data that could be optimized",
+      "Monitor available disk space to ensure the writes don't lead to disk space exhaustion",
+      "Consider using faster storage or optimizing I/O patterns if this becomes a bottleneck"
+    ]
+  }
+]

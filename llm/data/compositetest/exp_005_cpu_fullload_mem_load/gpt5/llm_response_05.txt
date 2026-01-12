@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient severe memory pressure (memory_usage_percent ~92–93% with memory_available_bytes ~0.6 GiB around 23:24:40–23:25:10; active anonymous memory ~6.6 GiB; swap in use ~48%).",
+    "root_causes": "The ft_cgC job’s peak working set drove RAM usage near exhaustion, evicting page cache and relying on preoccupied swap, leaving little headroom.",
+    "solutions": [
+      "Set and enforce Slurm memory requests/limits to match peak RSS for ft_cgC.",
+      "Profile peak per-rank/process memory; reduce MPI ranks/threads or dataset size to lower anonymous memory demand.",
+      "Monitor and control memory with cgroups; consider reducing vm.swappiness to limit swap residency.",
+      "If this usage is routine, provision more RAM on the node or redirect large in-memory datasets to disk-backed structures."
+    ]
+  },
+  {
+    "anomaly": "Short burst of disk saturation and swap thrashing (~23:23:40–23:23:55): disk_io_usage_percent ~59–70%, disk read/write throughput ~272/139 MB/s, cpu_iowait ~5–8%, very high page_swap_in/out rates.",
+    "root_causes": "A large I/O phase in ft_cgC overlapped with swap activity and page-cache reclaim, saturating storage and causing CPU to wait on I/O.",
+    "solutions": [
+      "Use iostat/iotop during I/O phases to identify top readers/writers and confirm contention.",
+      "Move job scratch I/O to faster storage (local NVMe or parallel filesystem) or throttle via blkio/cgroup I/O limits.",
+      "Tune writeback behavior (e.g., vm.dirty_background_ratio and vm.dirty_ratio) to smooth bursts if they recur.",
+      "Avoid co-scheduling other heavy I/O jobs on the same node during ft_cgC’s peak I/O phase."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity near limit early in the window (filesystem_usage_percent ~89–90%).",
+    "root_causes": "Limited free space reduced writeback headroom during large writes, increasing risk of ENOSPC and performance degradation.",
+    "solutions": [
+      "Purge or archive temporary job data promptly; enforce scratch cleanup policies.",
+      "Increase filesystem capacity or allocate larger per-node scratch storage.",
+      "Deploy quotas/alerts to prevent jobs from approaching capacity and to flag large transient spikes."
+    ]
+  }
+]

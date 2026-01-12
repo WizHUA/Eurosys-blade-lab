@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with high CPU iowait and blocked tasks during the job window.",
+    "root_causes": "The running job (ft_cgC) drives sustained heavy disk writes (up to ~214,873,588 B/s) and high disk utilization (disk_io_usage_percent peaking at ~87%), causing CPU iowait spikes (up to ~22.49%) and processes_blocked rising to 3, indicative of storage contention.",
+    "solutions": [
+      "Redirect job scratch/output to higher-throughput storage (e.g., node-local NVMe or a parallel filesystem) and avoid writing to capacity-constrained local filesystems.",
+      "Stagger or batch large writes and enable asynchronous I/O where possible to reduce synchronous write stalls.",
+      "Tune kernel writeback settings (e.g., vm.dirty_background_bytes and vm.dirty_bytes) to smooth flush behavior during heavy write phases.",
+      "Use iostat/iotop during runs to identify the most I/O-intensive processes and adjust job I/O patterns accordingly.",
+      "Schedule jobs with heavy write phases on nodes verified to have sufficient free space and healthy disks; check dmesg for disk/FS warnings."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity pressure: usage rose to ~98.12% (avail ~1.57 GiB) and later dropped abruptly to ~73.35% (avail ~22.33 GiB).",
+    "root_causes": "Large transient data writes/deletions by the job caused the filesystem to become nearly full, then freed a substantial amount of space, increasing metadata and writeback activity and contributing to I/O stalls.",
+    "solutions": [
+      "Pre-validate free space before job start and enforce per-job scratch directories with automatic cleanup at job end.",
+      "Move large temporary outputs to a dedicated high-capacity scratch filesystem; avoid writing large intermediates to the system/root filesystem.",
+      "Implement quotas or per-project limits to prevent near-full conditions; add alerts when filesystem_usage_percent exceeds configured thresholds (e.g., 90%).",
+      "Compress or stream intermediate results to reduce footprint; remove temporary files progressively rather than at the end to avoid capacity spikes."
+    ]
+  },
+  {
+    "anomaly": "High steady swap utilization (~54% used) despite ample available memory (5–6.45 GiB), with swap activity spikes early in the window.",
+    "root_causes": "Anonymous pages previously swapped out are not being reclaimed, leading to sustained swap use while memory_available remains high; swap activity (page_swap_in/out rates) indicates periodic paging that can add latency when swapped pages are touched.",
+    "solutions": [
+      "Review vm.swappiness and memory cgroup limits; consider lowering swappiness to reduce swapping under load.",
+      "Identify processes incurring major faults and swap activity (use vmstat, perf, or ps -o maj_flt) and optimize their memory access patterns.",
+      "If swap-induced latency affects the job, consider disabling swap on compute nodes or increasing RAM for this workload’s footprint.",
+      "Monitor swap_free and page_faults_rate during runs; target configurations where swap usage remains low when memory_available is high."
+    ]
+  }
+]

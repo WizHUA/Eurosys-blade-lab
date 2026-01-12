@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Memory pressure and sustained high memory usage during job execution",
+    "root_causes": "Memory resource load from the FT CG job which completed at 07:28:52, with memory active bytes remaining high even post-completion",
+    "solutions": [
+      "Check memory profiling for the FT CG application to identify potential memory leaks",
+      "Review job memory allocation versus actual usage to optimize future reservations",
+      "Monitor kswapd activity to determine if memory pressure caused significant swapping"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O operations continuing after job completion",
+    "root_causes": "Potential post-processing or cleanup activity from the FT CG job's temporary working files",
+    "solutions": [
+      "Verify if temporary directories were properly cleaned by the application",
+      "Check filesystem journaling operations that may be completing writes after job termination",
+      "Review application logs for any delayed I/O operations or finalization steps"
+    ]
+  }
+]

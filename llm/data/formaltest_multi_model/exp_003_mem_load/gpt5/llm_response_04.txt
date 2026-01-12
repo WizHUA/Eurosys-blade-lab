@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Transient spike in TCP retransmissions and timeouts during the job window.",
+    "root_causes": "Evidence shows bursts of TCP retransmissions and SYN retransmissions (node_netstat_Tcp_RetransSegs ≈ 30/s and TCPSynRetrans ≈ 6/s at 07:06:58; TCPTimeouts ≈ 15/s at 07:06:43–07:06:58) with zero NIC error/drop counters, indicating network path congestion or upstream instability rather than a local NIC fault.",
+    "solutions": [
+      "Inspect switch/NIC counters for the node and upstream (ethtool -S <iface>, ip -s link, switch port errors) around 07:06:40–07:07:00.",
+      "Validate MTU consistency across the fabric and check for mismatched offload settings; correct any inconsistencies.",
+      "Run point-to-point and all-to-all tests (iperf3, OSU/IMB) to localize the path exhibiting loss/retransmissions.",
+      "If recurring under load, consider QoS/traffic shaping for MPI/control traffic or scheduling to reduce oversubscription on the affected links."
+    ]
+  },
+  {
+    "anomaly": "Short-lived memory surge with increased anonymous memory and swap activity.",
+    "root_causes": "memory_usage_percent jumped from ~33.6% to ~55% (07:05:58→07:06:58) while memory_active_anon_bytes grew (~1.68 GB → ~3.43 GB) and page_swap_out_rate peaked (~188/s), indicating the job briefly expanded its working set, triggering page reclaim and swap writes.",
+    "solutions": [
+      "Profile the job's peak RSS/anonymous memory usage (ps, smem, cgroups) and align Slurm memory requests/limits accordingly.",
+      "Monitor paging (vmstat 1, sar -B) during similar runs to confirm swap-out bursts and correlate with job phases.",
+      "If swap activity is performance-impacting, reduce vm.swappiness (e.g., to 10) on compute nodes or isolate the job in a cgroup with conservative swappiness."
+    ]
+  },
+  {
+    "anomaly": "Persistent swap usage (~46.6% of 2 GB) despite several gigabytes of available RAM.",
+    "root_causes": "swap_free_bytes remained ~1.146 GB while memory_available_bytes stayed >3.7 GB for most samples, suggesting long-lived pages left in swap due to VM aging policies or prior pressure; this can add latency if those pages are touched later.",
+    "solutions": [
+      "During a maintenance window, consider swapoff -a && swapon -a to repatriate stale swapped pages.",
+      "Tune vm.swappiness downward and ensure memory reclamation settings match workload characteristics.",
+      "Audit background services for unnecessary memory footprint that may have originally triggered swapping, and right-size job memory reservations to avoid future swap events."
+    ]
+  }
+]

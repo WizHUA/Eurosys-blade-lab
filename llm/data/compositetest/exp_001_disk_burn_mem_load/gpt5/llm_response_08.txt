@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Acute memory pressure and swapping storm during job runtime",
+    "root_causes": "While job ft_cgC was running, memory_usage_percent surged from ~36% to 88.7% (23:17:10), memory_available_bytes dropped to 933,273,600 bytes, and swap usage jumped from ~44.5% to 55.6%. Swap activity spiked sharply (page_swap_in_rate/page_swap_out_rate rising from ~14.5k/29.9k at 23:16:25 to ~391.8k/172.4k by 23:17:25), indicating the node was thrashing due to a rapid increase in anonymous memory (active_anon + inactive_anon).",
+    "solutions": [
+      "Limit the job’s memory footprint using scheduler-enforced limits (e.g., Slurm --mem) to keep the working set within RAM and prevent node-wide swapping.",
+      "Profile ft_cgC to identify peak RSS and reduce it (e.g., chunk data, lower in-memory concurrency, avoid large anonymous buffers).",
+      "Reduce swapping aggressiveness for the job cgroup or node (e.g., lower vm.swappiness) so reclaim favors cache drop before heavy swap.",
+      "If the workload unavoidably needs more memory, schedule it on higher-memory nodes or increase node RAM."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O saturation correlated with swapping",
+    "root_causes": "As swapping intensified, disk I/O escalated: disk_io_usage_percent climbed from ~0.77% to 52.22%, disk_read/write rates reached ~401,116,961 B/s and ~176,572,006 B/s (23:17:25), cpu_iowait_percent rose to 5.88%, and processes_blocked became non-zero. This is consistent with swap thrash and heavy paging driving the storage subsystem into saturation.",
+    "solutions": [
+      "Address the root cause by eliminating or minimizing swapping (see memory-focused actions).",
+      "Identify I/O-heavy processes during the run (iotop, pidstat -d) and reduce synchronous writes or increase buffering where safe.",
+      "Throttle the job’s I/O if needed (cgroup io.max/ionice) to protect node responsiveness.",
+      "Place temporary/scratch I/O on faster storage and ensure swap resides on the fastest available device."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the run",
+    "root_causes": "filesystem_usage_percent grew from ~73.35% to ~85.97% between 23:15:40 and 23:17:25; filesystem_avail_bytes fell from 22,335,717,376 to 11,764,563,968 bytes. This indicates substantial data output or temporary file growth by the job in a short interval.",
+    "solutions": [
+      "Verify ft_cgC output and temporary directories; delete temporary artifacts at job end.",
+      "Apply per-job/project quotas and alerts to prevent a single job from quickly consuming shared capacity.",
+      "Redirect large, transient outputs to designated scratch space with sufficient capacity."
+    ]
+  },
+  {
+    "anomaly": "Large spike in TCP retransmissions concurrent with system pressure",
+    "root_causes": "tcp_retransmissions_rate increased from ~2/s at 23:15:40 to ~528/s by 23:17:25 while the node experienced heavy swapping and I/O contention; no link-level error counters in the sample indicate a host-side delay/congestion effect causing retransmits.",
+    "solutions": [
+      "Stabilize the node by resolving the memory and I/O pressure to reduce send/ack delays.",
+      "Inspect NIC and switch counters for drops or errors (ethtool -S, switch port stats) and verify no external congestion.",
+      "If the application is sensitive to retransmits, consider pacing or limiting its peak network rate during memory/IO spikes."
+    ]
+  }
+]

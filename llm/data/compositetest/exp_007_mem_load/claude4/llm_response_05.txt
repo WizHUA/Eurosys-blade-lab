@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory exhaustion with system operating at 99.6% memory usage and nearly depleted swap space.",
+    "root_causes": "Memory resource exhaustion from the ft_ftC job which consumed almost all available physical RAM and swap space during its execution.",
+    "solutions": [
+      "Monitor memory usage of future ft_ftC jobs and consider setting memory limits using Slurm's --mem parameter",
+      "Investigate the ft_ftC application for potential memory leaks or inefficient memory allocation patterns",
+      "Consider increasing swap space or adding more physical memory to handle memory-intensive workloads",
+      "Implement memory monitoring alerts to catch similar issues before they cause system instability"
+    ]
+  },
+  {
+    "anomaly": "Sustained high I/O wait time indicating severe storage performance degradation.",
+    "root_causes": "Disk I/O bottleneck caused by excessive memory swapping activity due to memory exhaustion and high disk utilization from the running job.",
+    "solutions": [
+      "The disk I/O usage reaching 86% confirms storage subsystem saturation",
+      "Monitor I/O patterns of the ft_ftC job to determine if it can be optimized for better storage efficiency",
+      "Consider using faster storage (NVMe SSDs) for swap space to reduce I/O wait times during memory pressure events",
+      "Implement I/O scheduling optimizations or consider storage upgrades for better concurrent I/O handling"
+    ]
+  },
+  {
+    "anomaly": "High system pressure across CPU, memory, and I/O subsystems indicating resource contention.",
+    "root_causes": "System resource contention from the memory-intensive ft_ftC job causing cascading effects across all subsystems.",
+    "solutions": [
+      "CPU pressure reaching 0.53% and I/O pressure at 0.48% indicate significant resource waiting times",
+      "Consider implementing resource quotas or job placement policies to prevent single jobs from monopolizing system resources",
+      "Schedule memory-intensive jobs during off-peak hours to minimize impact on system performance",
+      "Evaluate job scheduling policies to ensure better resource distribution across concurrent workloads"
+    ]
+  }
+]

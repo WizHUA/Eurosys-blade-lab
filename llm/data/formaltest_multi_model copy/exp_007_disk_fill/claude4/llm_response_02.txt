@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "CPU utilization remains extremely high while system load has decreased significantly.",
+    "root_causes": "CPU resource load from persistent high-CPU processes, likely from the completed job 'ft_cgC' or related cleanup processes still consuming resources.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes still consuming high CPU after job completion.",
+      "Check for zombie or orphaned processes related to the completed job using 'ps aux | grep ft_cgC'.",
+      "Monitor for any cleanup or post-processing tasks that may be running in the background.",
+      "Consider restarting any stuck services or processes if they are not responding to normal termination signals."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity has dropped to near-zero levels with minimal filesystem utilization.",
+    "root_causes": "Disk I/O subsystem showing very low activity indicating either job completion or potential I/O bottleneck resolution.",
+    "solutions": [
+      "Verify that all expected job outputs have been written to storage successfully.",
+      "Monitor disk health using 'smartctl -a /dev/sdX' to ensure the low activity is not due to hardware issues.",
+      "Check filesystem integrity if the sudden drop in I/O activity was unexpected.",
+      "Review job logs to confirm normal completion and proper cleanup of temporary files."
+    ]
+  }
+]

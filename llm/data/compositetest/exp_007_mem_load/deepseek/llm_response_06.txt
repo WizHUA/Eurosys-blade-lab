@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high memory pressure with 99% memory usage and swap space nearly exhausted",
+    "root_causes": "Memory resource exhaustion likely caused by the completed ft_ftC job and its batch process",
+    "solutions": [
+      "Check memory usage patterns of the completed ft_ftC job to identify memory leaks or inefficient allocations",
+      "Review the batch process exit code 15 which may indicate memory-related termination",
+      "Consider adding swap space or reducing memory requirements for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU I/O wait time averaging 45%",
+    "root_causes": "Disk I/O bottleneck likely caused by memory pressure and swapping activity",
+    "solutions": [
+      "Monitor disk I/O during job execution to identify peak usage periods",
+      "Optimize job I/O patterns or consider using faster storage for I/O-intensive workloads",
+      "Check if the high I/O wait correlates with swap activity and address memory pressure first"
+    ]
+  },
+  {
+    "anomaly": "Abnormal TCP retransmission rates and connection timeouts",
+    "root_causes": "Network instability potentially caused by system resource exhaustion",
+    "solutions": [
+      "Monitor network performance during different job execution phases",
+      "Check for correlation between network issues and memory/CPU pressure peaks",
+      "Review job's network communication patterns for potential optimization"
+    ]
+  }
+]

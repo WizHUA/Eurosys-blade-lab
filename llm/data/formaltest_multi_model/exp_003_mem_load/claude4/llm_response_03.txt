@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing significant performance degradation.",
+    "root_causes": "Memory resource exhaustion indicated by dramatic drop in available memory from 5.6GB to 3.7GB and increasing memory usage from 33% to 55%.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes.",
+      "Check if the completed job 'ft_cgC' left behind any orphaned processes consuming memory.",
+      "Monitor swap usage and consider adding swap space if memory pressure continues.",
+      "Review system logs for potential memory leaks in system services."
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load disproportionate to CPU usage.",
+    "root_causes": "CPU resource load from background processes or I/O wait states, with load consistently above 4.0 on an 8-core system.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes contributing to high load average.",
+      "Check for processes in 'D' (uninterruptible sleep) state that may indicate I/O bottlenecks.",
+      "Verify that the completed job properly cleaned up all its processes and resources.",
+      "Monitor disk I/O patterns to rule out storage-related performance issues."
+    ]
+  }
+]

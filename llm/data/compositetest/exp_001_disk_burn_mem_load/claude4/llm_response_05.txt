@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space exhaustion during computational job execution.",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing system to heavily utilize swap space.",
+    "solutions": [
+      "Monitor memory usage during job execution with 'vmstat 1' to confirm swap activity patterns.",
+      "The swap_usage_percent increased from 44.5% to 54.3% indicating active swapping under load.",
+      "Consider reducing job memory requirements or increasing available physical memory for compute nodes.",
+      "Implement memory limits in job scheduler to prevent jobs from exceeding available physical RAM."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O pressure with utilization reaching critical levels.",
+    "root_causes": "Disk I/O load caused by intensive application I/O combined with memory swapping activity.",
+    "solutions": [
+      "The disk_io_usage_percent escalated from 0.77% to 52.2%, indicating severe I/O bottleneck.",
+      "Use 'iotop' to identify specific processes responsible for the intense disk activity.",
+      "Consider upgrading to faster storage (SSD) or implementing I/O scheduling optimizations.",
+      "The correlation between memory pressure and I/O spike suggests swapping is a major contributor to disk load."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spiked to over 90% with disproportionate system CPU usage.",
+    "root_causes": "CPU resource load from computational workload combined with system overhead from memory management.",
+    "solutions": [
+      "The cpu_system_percent increased dramatically from 2.0% to 31.3%, indicating significant kernel overhead.",
+      "Monitor system calls and context switches as the high system CPU suggests memory management overhead.",
+      "Optimize job resource allocation to prevent system thrashing due to insufficient memory.",
+      "Consider job scheduling policies that account for both CPU and memory requirements together."
+    ]
+  }
+]

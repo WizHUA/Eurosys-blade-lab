@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage has reached critical levels with 99.18% utilization, causing extensive swapping activity and system resource contention.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify the primary memory consumers",
+      "Check if the completed job 'ft_ftC' left behind memory-resident processes or data structures",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent future occurrences",
+      "Review swap usage patterns and consider adjusting swap configuration if memory pressure persists"
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O bottleneck with utilization reaching 66% and high latency.",
+    "root_causes": "Intensive disk activity caused by memory swapping and application I/O demands, creating a storage performance bottleneck.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load",
+      "The extremely high write rates (up to 320GB/sec at 23:27:25) indicate either measurement errors or severe I/O contention",
+      "Verify disk subsystem health and check for hardware issues using 'smartctl' or vendor-specific tools",
+      "Consider implementing I/O scheduling optimizations or upgrading storage infrastructure for I/O-intensive workloads"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization patterns show high system overhead with significant I/O wait time.",
+    "root_causes": "High CPU system time and I/O wait percentage indicate the system is spending considerable resources managing memory pressure and disk operations.",
+    "solutions": [
+      "Monitor CPU usage breakdown to understand the balance between user, system, and I/O wait time",
+      "The high number of blocked processes (up to 17) suggests resource contention that needs investigation",
+      "Consider tuning kernel parameters related to memory management and I/O scheduling",
+      "Evaluate job scheduling policies to prevent resource conflicts between concurrent workloads"
+    ]
+  }
+]

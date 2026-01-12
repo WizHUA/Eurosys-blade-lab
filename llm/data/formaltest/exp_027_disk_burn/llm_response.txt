@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage (consistently above 40%), indicating severe disk I/O bottleneck.",
+    "root_causes": "Disk I/O load from intensive read/write operations.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O.",
+      "Check filesystem usage and consider moving data to less loaded storage.",
+      "Monitor disk latency and queue depth to confirm storage subsystem saturation."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with swap space nearly exhausted (swap_free_bytes dropping to near zero).",
+    "root_causes": "Memory resource load exceeding physical RAM capacity.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "Monitor swap activity with 'vmstat 1' to confirm heavy swapping.",
+      "Consider adding more physical RAM or optimizing application memory usage."
+    ]
+  },
+  {
+    "anomaly": "High system load (load_1min > 8.0) with moderate CPU usage, indicating I/O-bound processes.",
+    "root_causes": "Processes blocked waiting for I/O operations to complete.",
+    "solutions": [
+      "Check 'processes_blocked' metric which shows elevated values (7-9 processes).",
+      "Use 'ps -eo state,pid,cmd | grep \"^D\"' to identify processes in uninterruptible sleep.",
+      "Optimize I/O patterns or move to faster storage media."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage critically high (>80%) with limited available space.",
+    "root_causes": "Storage capacity exhaustion from write-intensive operations.",
+    "solutions": [
+      "Free up disk space by removing temporary files or archiving old data.",
+      "Monitor filesystem growth trends to predict future capacity needs.",
+      "Consider expanding storage capacity or moving data to larger filesystems."
+    ]
+  }
+]

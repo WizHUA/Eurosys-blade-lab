@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions, SYN retransmits, and TCP timeouts around 07:06:58 during job 276 (ft_cgC).",
+    "root_causes": "Network path congestion or transient link issues are indicated by node_netstat counters jumping at 07:06:58 (Tcp_RetransSegs ≈ 30/s, TCPSynRetrans ≈ 6/s, TCPTimeouts ≈ 15/s) while NIC-level errors/drops remain zero. A concurrent surge in tcp_active_opens_rate (≈ 25.8/s at 07:06:28) suggests connection churn that can amplify retransmissions.",
+    "solutions": [
+      "Correlate with the application's logs around 07:06:50–07:07:05 to confirm communication stalls or retries.",
+      "On the node, inspect NIC and driver health: ip -s link and ethtool -S to check CRC, alignment, and drop counters; dmesg for link resets.",
+      "Check the switch port connected to this node for error counters and microbursts during the same window.",
+      "If recurring, throttle background traffic or apply QoS on the fabric used by this workload; ensure MTU and duplex/speed are consistent cluster-wide."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with sustained swap churn between 07:06:28 and 07:07:13 while the job was running.",
+    "root_causes": "memory_available_bytes fell from ≈5.5 GB to ≈3.7 GB, memory_committed_as exceeded physical RAM (≈8.5–9.1 GB vs 8.28 GB), and swap activity spiked (page_swap_out_rate ≈ 178–189/s and page_swap_in_rate up to ≈ 24/s). Active anonymous memory grew sharply (≈1.68 GB to ≈3.43 GB), indicating the workload phase increased pressure on anonymous memory and triggered swapping.",
+    "solutions": [
+      "Identify the processes driving anonymous memory growth: ps aux --sort=-%mem and smem -k; validate expected working set size.",
+      "Constrain job memory to fit node capacity (e.g., Slurm --mem/--mem-per-cpu) or reduce concurrency per node to avoid swap.",
+      "Tune swapping behavior if appropriate (temporarily lower vm.swappiness) and monitor with vmstat 1 to ensure swap-in/out returns to near-zero.",
+      "If the workload legitimately needs more memory, provision additional RAM or schedule on larger-memory nodes."
+    ]
+  }
+]

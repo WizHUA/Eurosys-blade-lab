@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Node experienced severe memory pressure leading to extensive swapping and performance degradation.",
+    "root_causes": "Memory exhaustion caused by job 'ft_ftC' consuming nearly all available RAM, forcing the system to heavily utilize swap space.",
+    "solutions": [
+      "Memory usage reached 99.2% at 23:26:55, indicating complete RAM exhaustion during job execution.",
+      "Swap usage increased from 47.9% to 90.7%, confirming heavy swapping activity that severely impacts performance.",
+      "Monitor job memory requirements more closely and consider implementing memory limits via cgroups or Slurm constraints.",
+      "Investigate if the 'ft_ftC' job has a memory leak or requires more memory allocation than initially anticipated."
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait time and disk utilization causing system performance bottleneck.",
+    "root_causes": "Disk I/O bottleneck caused by heavy swapping activity and intensive disk operations from the running job.",
+    "solutions": [
+      "I/O wait percentage spiked to 26.98% at 23:27:10, indicating severe disk performance issues.",
+      "Disk utilization reached 66.3% with extremely high write rates of 180MB/s, suggesting storage subsystem overload.",
+      "Consider adding more RAM to reduce swapping or upgrading to faster storage (SSD) to handle I/O bursts.",
+      "Implement I/O scheduling policies to prioritize system operations over job I/O during critical periods."
+    ]
+  },
+  {
+    "anomaly": "System load and process contention reached critical levels during job execution.",
+    "root_causes": "High system load and blocked processes indicating resource contention and scheduling delays.",
+    "solutions": [
+      "System load increased from 5.38 to 10.02, exceeding the 8-core capacity and indicating oversubscription.",
+      "Number of blocked processes reached 17 at 23:27:10, showing processes waiting for I/O operations.",
+      "Review job scheduling policies to prevent overloading nodes with memory-intensive workloads.",
+      "Consider implementing CPU and memory resource quotas to prevent single jobs from monopolizing system resources."
+    ]
+  }
+]

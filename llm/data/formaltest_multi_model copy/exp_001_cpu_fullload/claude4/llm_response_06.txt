@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization escalated dramatically from 30% to 83% during job execution, with user CPU time dominating the load.",
+    "root_causes": "Computationally intensive workload from the 'ft_cgC' job consuming excessive CPU resources.",
+    "solutions": [
+      "Monitor the specific processes spawned by job 276 using 'top' or 'htop' to identify CPU-intensive components.",
+      "Consider implementing CPU limits using cgroups or Slurm's CPU constraints to prevent single jobs from monopolizing resources.",
+      "Evaluate if the job requires optimization or if the current resource allocation is appropriate for this workload type.",
+      "Review job scheduling policies to ensure better distribution of CPU-intensive tasks across available nodes."
+    ]
+  },
+  {
+    "anomaly": "System load increased significantly from 1.77 to 4.88, indicating resource contention beyond available CPU cores.",
+    "root_causes": "High system load driven by the compute-intensive job creating more demand than the 8-core system can efficiently handle.",
+    "solutions": [
+      "Use 'vmstat' and 'iostat' to determine if the high load is CPU-bound or if I/O operations are contributing to the bottleneck.",
+      "Consider job partitioning or using multiple nodes to distribute the computational load more effectively.",
+      "Implement load balancing strategies in Slurm configuration to prevent oversubscription of individual nodes.",
+      "Monitor for any processes in uninterruptible sleep state that might be contributing to the load average."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity increased substantially with write operations showing consistent growth throughout the monitoring period.",
+    "root_causes": "The 'ft_cgC' job is generating significant disk write activity, likely related to computational output or temporary file creation.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the highest disk I/O and determine if optimization is possible.",
+      "Consider using faster storage or implementing I/O scheduling policies to minimize impact on system performance.",
+      "Evaluate if the job can utilize in-memory processing or temporary filesystems to reduce disk I/O overhead.",
+      "Monitor disk utilization and queue depth to ensure storage subsystem is not becoming a bottleneck."
+    ]
+  }
+]

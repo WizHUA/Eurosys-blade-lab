@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike with significant anonymous memory usage",
+    "root_causes": "Application memory allocation patterns causing high active_anon memory usage",
+    "solutions": [
+      "Investigate memory allocation patterns in the FT CG application",
+      "Check for memory leaks in the completed job 276.batch",
+      "Consider adjusting Slurm memory limits for similar jobs"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with high write activity",
+    "root_causes": "Application I/O patterns during job execution",
+    "solutions": [
+      "Review FT CG I/O patterns and optimize file access",
+      "Consider using tmpfs for temporary files if possible",
+      "Verify filesystem performance characteristics"
+    ]
+  },
+  {
+    "anomaly": "Network activity spikes during job execution",
+    "root_causes": "MPI communication patterns in the FT CG application",
+    "solutions": [
+      "Analyze MPI communication patterns in the application",
+      "Check network configuration for optimal MPI performance",
+      "Consider adjusting MPI buffer sizes if needed"
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with near-100% swap utilization and active swap thrashing.",
+    "root_causes": "The workload’s memory demand exceeded physical RAM, driving memory_available_bytes down to tens of MB while swap_free_bytes fell to near-zero (as low as 8–49 KB). Memory usage stayed ~99.2–99.7% with memory_committed_as_bytes ~13.6 GB on a node with ~8.3 GB RAM, causing extreme page activity (tens of thousands of page swap-ins/outs per second) and sustained high memory/IO pressure.",
+    "solutions": [
+      "Immediately reduce or stop the offending workload’s memory footprint (lower concurrency, reduce per-process memory use, fix leaks).",
+      "For future runs, request more memory in the scheduler (e.g., increase --mem/--mem-per-cpu) or place the job on a higher-memory node.",
+      "Enforce per-job memory limits via cgroups/Slurm to prevent node-wide swapping (and fail fast if limits are exceeded).",
+      "If short-term stability is required, add a temporary swap file on a fast local SSD; remove once the job is stabilized (note: this mitigates OOM but can prolong slowdown).",
+      "Tune memory behavior only after addressing footprint (e.g., evaluate vm.swappiness and overcommit settings) to reduce aggressive swapping.",
+      "Profile the job’s memory usage (smem, pmap, perf) to identify hot processes/allocators and optimize data structures."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with very high CPU iowait and long I/O queues.",
+    "root_causes": "Sustained swap thrashing and heavy disk activity drove disk_io_usage_percent to ~62–87% with read/write rates peaking above 100 MB/s and cpu_iowait_percent spiking up to ~54%. Processes_blocked rose (up to 13), indicating many tasks waiting in uninterruptible I/O state.",
+    "solutions": [
+      "Resolve the root memory pressure to stop swap storms; this will immediately reduce I/O load.",
+      "Place swap on the fastest available local SSD/NVMe and ensure sufficient throughput; avoid swapping to slow or shared storage.",
+      "Throttle or isolate heavy I/O from the job using ionice and cgroup blkio/IOPS limits to protect system responsiveness.",
+      "Check disk health and kernel logs (dmesg, SMART) for errors contributing to latency.",
+      "If using shared filesystems, stage hot datasets to local scratch to reduce contention and small random I/O.",
+      "Review I/O patterns in the application (batch small writes, increase readahead/buffering) to lower random I/O."
+    ]
+  },
+  {
+    "anomaly": "Elevated system load with many processes blocked in I/O wait.",
+    "root_causes": "Load_1min climbed to ~9–12 while cpu_usage_percent was high and cpu_iowait_percent dominated, with processes_blocked rising to 8–13. This indicates threads piling up in D-state due to storage contention rather than ready-to-run CPU work.",
+    "solutions": [
+      "Identify D-state culprits (ps -eo pid,stat,comm,blkio | iostat -x; inspect /proc/$pid/fd) to locate hot files/devices.",
+      "Reduce concurrent I/O from the job (limit parallel readers/writers) or stagger phases to avoid synchronized bursts.",
+      "Reconfigure the job to use local scratch and consolidate small random I/O into larger sequential operations.",
+      "After stabilizing memory, reassess storage configuration (I/O scheduler, queue depth) to better handle concurrency."
+    ]
+  }
+]

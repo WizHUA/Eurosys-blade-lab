@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High disk I/O wait time (7.97% of CPU time) during job execution",
+    "root_causes": "The completed job ft_cgC appears to have been disk I/O intensive, causing significant wait times during execution",
+    "solutions": [
+      "Check if the job ft_cgC was performing expected disk operations or if this indicates a problem",
+      "Consider optimizing the job's disk access patterns or using faster storage",
+      "Monitor disk health and performance metrics for potential hardware issues"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load (5.74 1-minute load average) with moderate CPU usage (64.95%)",
+    "root_causes": "The system was handling multiple processes during the job execution, with some processes likely waiting for I/O",
+    "solutions": [
+      "Review running processes during the job execution to identify resource contention",
+      "Check if system services were competing with the job for resources",
+      "Consider adjusting job scheduling to reduce overlap with system maintenance tasks"
+    ]
+  },
+  {
+    "anomaly": "Significant memory usage (32.36% used) with active swapping",
+    "root_causes": "The job may have had high memory requirements, causing the system to use swap space",
+    "solutions": [
+      "Analyze the memory requirements of job ft_cgC",
+      "Consider allocating more memory to the node or optimizing the job's memory usage",
+      "Monitor memory usage patterns for potential memory leaks in the application"
+    ]
+  }
+]

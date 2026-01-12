@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Memory usage increased significantly during job execution (from 36% to 89%)",
+    "root_causes": "Job 284 (ft_cgC) appears to be memory-intensive, causing high memory pressure and triggering OOM kills (3 instances recorded)",
+    "solutions": [
+      "Investigate memory allocation patterns in ft_cgC application code",
+      "Increase memory limits/reservations for similar jobs",
+      "Monitor for memory leaks in the application",
+      "Consider memory profiling for optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity with significant page swapping",
+    "root_causes": "Memory pressure caused system to use swap space extensively (swap usage increased from 44.5% to 55.6%)",
+    "solutions": [
+      "Reduce memory pressure by adjusting job scheduling parameters",
+      "Increase physical memory capacity if similar jobs are common",
+      "Optimize application I/O patterns to reduce disk activity",
+      "Consider using faster storage for swap devices"
+    ]
+  },
+  {
+    "anomaly": "CPU usage spiked to 90% with high system time percentage",
+    "root_causes": "Job 284 (ft_cgC) caused high CPU utilization with significant kernel time (system CPU up to 31.25%)",
+    "solutions": [
+      "Profile application to identify CPU hotspots",
+      "Consider thread/process count optimization for the workload",
+      "Check for kernel-level contention points during execution",
+      "Examine CPU affinity settings for the job"
+    ]
+  }
+]

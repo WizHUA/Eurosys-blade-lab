@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High network traffic and TCP retransmissions during MPI job execution",
+    "root_causes": "Network congestion or hardware issues causing packet loss during MPI communications",
+    "solutions": [
+      "Check network interface statistics for errors or dropped packets",
+      "Monitor network bandwidth utilization during MPI jobs",
+      "Verify physical network connections and switch configurations"
+    ]
+  },
+  {
+    "anomaly": "Increased memory pressure and swap usage after job completion",
+    "root_causes": "Incomplete memory release after job termination or memory leaks",
+    "solutions": [
+      "Verify proper job cleanup routines are executed",
+      "Check for potential memory leaks in the application",
+      "Monitor memory usage patterns post-job completion"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity persisting beyond job completion",
+    "root_causes": "Possible insufficient I/O buffering or delayed write operations",
+    "solutions": [
+      "Verify file system sync operations completed successfully",
+      "Check for lingering temporary files or unclosed file handles",
+      "Monitor disk I/O patterns during job shutdown phase"
+    ]
+  }
+]

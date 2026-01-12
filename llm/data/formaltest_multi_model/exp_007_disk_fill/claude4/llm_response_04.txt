@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Filesystem space critically low with usage at 90%.",
+    "root_causes": "Disk space consumption from application data, logs, or temporary files exceeding available capacity.",
+    "solutions": [
+      "Identify large files and directories using 'du -h --max-depth=1 /' and 'find / -size +1G -type f 2>/dev/null'",
+      "Clean up old log files, temporary files, and application data that may be consuming excessive space",
+      "Review job output files and data from the completed 'ft_cgC' job that may have left large files on disk",
+      "Consider expanding filesystem capacity or implementing log rotation policies"
+    ]
+  },
+  {
+    "anomaly": "Excessive disk I/O activity with extremely high write rates up to 264 GB/sec.",
+    "root_causes": "Intensive disk write operations likely from application data processing or system operations.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity",
+      "Monitor if this is related to cleanup operations from the recently completed job",
+      "Check if system is performing background maintenance tasks like filesystem sync or defragmentation",
+      "Consider I/O throttling if the disk activity is impacting system performance"
+    ]
+  }
+]

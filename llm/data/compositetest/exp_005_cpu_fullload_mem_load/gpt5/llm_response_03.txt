@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe memory pressure with heavy swapping and kernel OOM kills during the job window.",
+    "root_causes": "Swap usage stayed high (~47.7% with swap_free_bytes ~1.12 GB), page swap-in/out rates spiked (page_swap_in_rate ~265k/s and page_swap_out_rate ~136k/s at 23:23:40), and vm_oom_kills_total=3 indicates out-of-memory events. Memory commitment exceeded physical RAM (memory_committed_as_bytes up to ~11.99 GB > 7.72 GB), correlating with the RUNNING/COMPLETED ft_cgC job timeframe.",
+    "solutions": [
+      "Review dmesg and journalctl for OOM-killer logs to identify which processes were terminated.",
+      "Enforce stricter Slurm memory limits (e.g., --mem) and ensure cgroup memory OOM handling is active for jobs.",
+      "Reduce the application's memory footprint (e.g., lower concurrency, batch sizes, or problem size), or optimize allocations to avoid oversubscription.",
+      "Increase physical RAM on the node or provision faster local swap (NVMe) if memory oversubscription is unavoidable.",
+      "Tune VM settings prudently (e.g., lower vm.swappiness) to reduce swap thrashing and prioritize keeping working sets in RAM."
+    ]
+  },
+  {
+    "anomaly": "Abrupt page cache eviction and large disk I/O fluctuations.",
+    "root_causes": "memory_cached_bytes collapsed from ~5.21 GB to ~0.40 GB at 23:24:10, indicating aggressive cache reclamation under memory pressure. Disk throughput oscillated sharply (read ~272 MB/s and write ~139 MB/s at 23:23:40; later a write spike ~245 MB/s at 23:25:10), and disk_io_usage_percent peaked ~70%, consistent with cache churn and swap-induced I/O.",
+    "solutions": [
+      "Verify VFS cache behavior and reclaim pressure (e.g., vm.vfs_cache_pressure) and adjust if cache thrash is harming performance.",
+      "Stage heavy I/O to faster local scratch or parallel file system; avoid writing large outputs to slower storage during peak memory pressure.",
+      "Profile the job’s I/O patterns (strace/iotop, perf) to reduce synchronous writes or adopt buffered/batched I/O where appropriate.",
+      "Ensure sufficient filesystem space and monitor writeback; align checkpoint/output intervals to mitigate large bursts."
+    ]
+  },
+  {
+    "anomaly": "Elevated CPU iowait and system time due to storage contention.",
+    "root_causes": "cpu_iowait_percent peaked around 7.7% with cpu_system_percent >11% during high disk activity and swapping, while load_1min remained ~6–6.8 with processes_running up to 17, indicating time spent waiting on I/O rather than pure compute.",
+    "solutions": [
+      "Mitigate swapping (see memory-pressure actions) to reduce I/O stalls.",
+      "Move I/O-intensive phases to higher-performance storage (NVMe/parallel FS) or schedule jobs away from nodes under heavy disk load.",
+      "Use iostat, pidstat, and blktrace/iotop to pinpoint offending processes and throttling needs (ionice/cgroups blkio).",
+      "If persistent, consider separating compute and I/O phases or staggering checkpoints to smooth disk load."
+    ]
+  }
+]

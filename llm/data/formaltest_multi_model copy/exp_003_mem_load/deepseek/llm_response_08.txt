@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "High memory pressure (54.98%) and swap usage (46.6%) observed during job execution",
+    "root_causes": "The ft_cgC job appears to be memory-intensive, consuming system memory and triggering swap usage. Memory available dropped significantly from 5.5GB to 3.73GB during peak usage.",
+    "solutions": [
+      "Increase memory allocation for compute jobs",
+      "Optimize memory usage in the application code",
+      "Add more physical memory to the node"
+    ]
+  },
+  {
+    "anomaly": "Increased IO pressure (5.25 disk avg queue size) and disk utilization peaks at 88.24%",
+    "root_causes": "The job is generating significant disk I/O operations (88 writes completed/sec peak) creating a bottleneck in storage performance.",
+    "solutions": [
+      "Use local SSDs or faster storage for temporary files",
+      "Optimize job I/O patterns to reduce disk operations",
+      "Increase disk I/O bandwidth"
+    ]
+  },
+  {
+    "anomaly": "CPU usage spikes to 94% with sustained high load averages (9.83 1-minute load)",
+    "root_causes": "The compute-intensive job is fully utilizing CPU resources, indicated by high user CPU time (50.16%) and system CPU time (1.24%).",
+    "solutions": [
+      "Review job parallelization to better distribute load",
+      "Consider using nodes with more cores for this workload",
+      "Check for CPU-bound processes that could be optimized"
+    ]
+  },
+  {
+    "anomaly": "Multiple major page faults (0.04/sec) and page swap in/out activity detected",
+    "root_causes": "Memory pressure is forcing the system to swap pages to disk, indicated by 188.73 pages swapped in per second at peak.",
+    "solutions": [
+      "Increase available RAM to reduce swapping",
+      "Adjust swappiness settings for this workload",
+      "Monitor for memory leaks in application"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Severe memory pressure with rapid memory consumption and excessive swapping activity.",
+    "root_causes": "Memory resource exhaustion due to intensive application workload causing system to heavily rely on swap space.",
+    "solutions": [
+      "Monitor swap activity with 'vmstat 1' - page_swap_in_rate peaked at 495,868 pages/sec indicating critical memory shortage",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top' to locate the source of memory consumption",
+      "Memory usage increased from 32% to 37% while available memory dropped significantly, suggesting a memory leak or inefficient memory management in the completed job 'ft_cgC'"
+    ]
+  },
+  {
+    "anomaly": "Critical disk I/O saturation with extremely high utilization and latency.",
+    "root_causes": "Disk I/O subsystem overwhelmed by combination of application I/O demands and memory swapping activity.",
+    "solutions": [
+      "Disk utilization reached 54% with massive I/O rates - disk_write_rate peaked at 507MB/sec indicating severe bottleneck",
+      "Use 'iotop' to identify processes causing high disk activity and correlate with the memory pressure",
+      "Consider upgrading storage subsystem or implementing I/O throttling to prevent system-wide performance degradation",
+      "Investigate if the completed job 'ft_cgC' was performing intensive file operations that saturated the storage"
+    ]
+  },
+  {
+    "anomaly": "Excessive CPU system time indicating kernel overhead from resource contention.",
+    "root_causes": "High kernel CPU usage due to intensive memory management and I/O operations.",
+    "solutions": [
+      "CPU system time increased from 1.2% to 16.4%, indicating significant kernel overhead from swap and I/O management",
+      "Monitor system calls and interrupts to identify sources of kernel CPU consumption",
+      "The combination of memory pressure and disk saturation is forcing the kernel to work excessively hard managing resources"
+    ]
+  }
+]

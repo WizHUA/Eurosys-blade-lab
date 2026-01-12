@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with high CPU iowait during job runtime",
+    "root_causes": "The running job (ft_cgC) generated sustained heavy I/O, driving disk_io_usage_percent up to ~87% with cpu_iowait_percent spiking to ~22.5% and multiple processes_blocked>0; write throughput was tens to hundreds of MB/s while read/write queue time accumulated rapidly.",
+    "solutions": [
+      "Profile device-level I/O: run iostat -xz 1 and sar -d 1 to confirm queue depth, await, svctm, and identify the busiest LUNs/devices.",
+      "Check storage health and pathing: smartctl -a on backing devices and dmesg for I/O errors or resets.",
+      "Place job scratch on higher-throughput storage (node-local NVMe or dedicated parallel FS) and ensure sequential large-block writes when possible.",
+      "Limit per-job I/O concurrency using ionice/cgroups (blkio) and tune application write batching to reduce small random I/O.",
+      "Verify and tune scheduler/mount options appropriate for the media (e.g., mq-deadline/none for SSD, noatime) and ensure sufficient stripe/RAID configuration."
+    ]
+  },
+  {
+    "anomaly": "Filesystem nearly filled during the window, then abruptly freed",
+    "root_causes": "Filesystem_usage_percent rose from ~94% to ~98% (filesystem_avail_bytes fell to ~1.6–2.4 GB) and later dropped to ~73%, indicating large transient writes by the job followed by cleanup; near-full conditions can degrade metadata performance and risk ENOSPC.",
+    "solutions": [
+      "Enforce per-user/project quotas and pre-run disk space checks; refuse or defer jobs if projected space is insufficient.",
+      "Redirect temporary and checkpoint data to dedicated scratch with automatic cleanup (Slurm Epilog to purge $TMPDIR).",
+      "Add alerts at 85–90% usage and investigate large directories/files (du -xh --max-depth=1) during high-water marks.",
+      "If frequent, expand capacity or provide larger high-throughput scratch for such workloads."
+    ]
+  },
+  {
+    "anomaly": "High swap utilization with bursts of swap I/O despite ample available RAM",
+    "root_causes": "Swap usage hovered around ~54% (swap_free_bytes ~0.98–0.99 GB of 2 GB) with large page_swap_in/out rates (e.g., >100k/s early), adding I/O latency even while memory_available_bytes stayed ~5–6.5 GB; indicates prior or ongoing swapping and cache/anon page churn.",
+    "solutions": [
+      "Reduce swappiness on compute nodes (e.g., sysctl vm.swappiness=10) to bias against swapping active workloads.",
+      "Ensure Slurm memory limits match job requirements to avoid swap thrash; audit processes with high RSS (ps/top).",
+      "If policy allows, consider zswap or minimizing swap usage on compute nodes; alternatively add RAM for this node class.",
+      "After peak swapping, consider swapoff && swapon during maintenance to reclaim swapped pages and reset behavior."
+    ]
+  }
+]

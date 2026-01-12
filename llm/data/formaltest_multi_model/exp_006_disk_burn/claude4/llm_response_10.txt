@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory resource exhaustion with available memory dropping from 5.6GB to 1.4GB, indicating severe memory leak or runaway process consumption.",
+    "solutions": [
+      "Identify memory-consuming processes using 'ps aux --sort=-%mem' and 'top' to find the source of memory consumption.",
+      "Check for memory leaks in recently completed job 'ft_cgC' or any remaining processes from that job.",
+      "Monitor swap usage and consider adding swap space temporarily if memory cannot be freed immediately.",
+      "Kill any runaway processes consuming excessive memory to restore system stability."
+    ]
+  },
+  {
+    "anomaly": "Massive disk I/O spike with write rates reaching 423GB/sec, indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load caused by excessive swapping due to memory pressure and possible large file operations from the completed job.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the massive I/O load and their specific operations.",
+      "Check disk utilization reaching 60% which indicates the storage subsystem is severely stressed.",
+      "Investigate if the completed 'ft_cgC' job left behind large temporary files that need cleanup.",
+      "Consider temporarily throttling I/O-intensive operations until memory pressure is resolved."
+    ]
+  },
+  {
+    "anomaly": "CPU usage escalating from 48% to 75% with system CPU time increasing dramatically.",
+    "root_causes": "CPU resource load from kernel operations handling memory management, swapping, and I/O operations under extreme system stress.",
+    "solutions": [
+      "The high system CPU usage (17.8%) indicates kernel overhead from memory management and I/O operations.",
+      "Monitor 'vmstat 1' to track the relationship between CPU usage, memory pressure, and swap activity.",
+      "Focus on resolving memory pressure as the primary issue, which should reduce CPU overhead from kernel operations.",
+      "Check system logs for any kernel messages related to memory allocation failures or OOM conditions."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with dramatic memory usage increase from 33% to 55% during job execution.",
+    "root_causes": "The ft_cgC job is consuming excessive memory resources, causing significant reduction in available memory and potential swapping activity.",
+    "solutions": [
+      "Monitor the ft_cgC job's memory usage pattern using 'ps aux --sort=-%mem' to identify peak memory consumption",
+      "Review job configuration and input parameters to determine if memory requirements can be optimized",
+      "Consider implementing memory limits using cgroups or Slurm memory constraints to prevent future memory exhaustion",
+      "Analyze if the job requires more memory allocation or if there are memory leaks in the application"
+    ]
+  },
+  {
+    "anomaly": "Moderate CPU pressure increase with sustained high CPU utilization around 48-52%.",
+    "root_causes": "The computational workload from the ft_cgC job is creating consistent CPU demand, leading to elevated system load and processing delays.",
+    "solutions": [
+      "Use 'top' or 'htop' to monitor CPU usage patterns and identify if the job is CPU-bound",
+      "Check if the job can benefit from CPU affinity settings or NUMA optimization",
+      "Consider job scheduling optimization to distribute CPU-intensive workloads across multiple nodes",
+      "Monitor for potential CPU throttling or thermal issues that might affect performance"
+    ]
+  }
+]

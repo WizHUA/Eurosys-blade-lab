@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with massive swapping activity causing system performance degradation.",
+    "root_causes": "Memory resource exhaustion leading to heavy swap usage, with swap out rates reaching 193K-573K pages per second and memory usage climbing from 32% to 35%.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify memory-intensive processes consuming excessive RAM",
+      "Monitor 'vmstat 1' to confirm the extent of swapping activity indicated by the high page_swap_out_rate",
+      "Consider increasing system memory or optimizing memory usage patterns of running applications",
+      "Review the completed job 'ft_cgC' which may have left memory-intensive processes or allocated large amounts of memory that weren't properly released"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with sustained write operations causing storage bottleneck.",
+    "root_causes": "Massive disk write operations reaching 461-587 GB/sec write rates, likely caused by memory swapping and application I/O combined.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the intense disk write activity",
+      "The disk utilization reached 60% which indicates the storage subsystem is under severe stress",
+      "Consider I/O scheduling optimizations or faster storage to handle the sustained write load",
+      "Address the root memory pressure issue to reduce swap-related disk activity"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spike with high system time indicating kernel overhead from resource contention.",
+    "root_causes": "CPU usage increased dramatically from 48% to 76% with significant system time (up to 17%), suggesting kernel overhead from memory management and I/O operations.",
+    "solutions": [
+      "Monitor CPU breakdowns using 'sar' or 'top' to identify if system time remains elevated",
+      "The high system CPU time correlates with the memory pressure and disk I/O, indicating kernel overhead from swap management",
+      "Consider tuning swappiness parameters or memory overcommit settings to reduce kernel overhead",
+      "Review system configuration for optimal memory and I/O management parameters"
+    ]
+  }
+]

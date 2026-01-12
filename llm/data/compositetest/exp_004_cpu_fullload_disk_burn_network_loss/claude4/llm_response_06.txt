@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to extreme disk I/O activity and system performance degradation.",
+    "root_causes": "Memory exhaustion forcing extensive swapping to disk, causing cascading performance issues across the system.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to identify the source of memory consumption",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes that may be consuming excessive RAM",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact",
+      "Review swap configuration and consider adding more swap space as a temporary measure while addressing root cause"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O utilization reaching critical levels with extremely high throughput rates.",
+    "root_causes": "Heavy swapping activity due to memory pressure combined with potential application I/O requirements.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load",
+      "Monitor disk queue depths and latencies using 'iostat -x 1' to assess storage subsystem performance",
+      "Consider implementing I/O prioritization or throttling for non-critical processes during high-load periods",
+      "Evaluate storage infrastructure capacity and performance characteristics to ensure adequate throughput"
+    ]
+  },
+  {
+    "anomaly": "CPU system time percentage significantly elevated indicating kernel overhead.",
+    "root_causes": "High kernel activity likely due to memory management, I/O operations, and context switching under resource pressure.",
+    "solutions": [
+      "Analyze kernel activity using 'perf top' to identify the most expensive kernel functions",
+      "Monitor context switch rates and interrupt handling to identify potential bottlenecks",
+      "Review system configuration for unnecessary services or processes that may be contributing to kernel overhead",
+      "Consider tuning kernel parameters related to memory management and I/O scheduling"
+    ]
+  }
+]

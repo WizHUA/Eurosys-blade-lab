@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure increasing with significant swap usage",
+    "root_causes": "Memory-intensive application (ft_cgC) consuming large amounts of RAM, forcing system to use swap space",
+    "solutions": [
+      "Monitor application memory usage patterns with 'ps aux --sort=-%mem'",
+      "Consider increasing physical memory allocation for compute nodes",
+      "Optimize application memory management or reduce workload size"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity during application execution",
+    "root_causes": "Application performing extensive disk operations, possibly due to memory pressure forcing swap usage",
+    "solutions": [
+      "Check disk I/O patterns with 'iotop' during job execution",
+      "Consider using faster storage or RAM disks for temporary files",
+      "Review application I/O patterns for optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "CPU usage fluctuations with moderate system load",
+    "root_causes": "Application processing phases causing variable CPU utilization",
+    "solutions": [
+      "Analyze application CPU usage patterns with 'top -H' for thread-level insights",
+      "Consider adjusting CPU affinity settings for better utilization",
+      "Review application parallelization strategy for more consistent load"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "System experiencing severe memory pressure with swap space nearly exhausted and high memory usage.",
+    "root_causes": "Memory resource exhaustion caused by intensive workload consuming available RAM and forcing heavy swap usage.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to confirm swap activity patterns.",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming RAM.",
+      "Consider terminating or reducing memory allocation for non-critical processes to free up RAM.",
+      "Evaluate if the job 'ft_ftC' requires memory configuration tuning or if the node needs more physical memory."
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait times indicating severe storage bottleneck affecting system performance.",
+    "root_causes": "Disk I/O subsystem overloaded due to combination of heavy swap activity and intensive disk operations from running workload.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and their read/write patterns.",
+      "Check disk utilization with 'iostat -x 1' to confirm storage device saturation levels.",
+      "Prioritize resolving memory pressure to reduce swap-induced I/O load on storage subsystem.",
+      "Consider storage performance optimization or hardware upgrades if disk I/O patterns persist."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spikes with significant time spent in I/O wait state affecting computational efficiency.",
+    "root_causes": "CPU cycles wasted waiting for slow disk operations due to memory pressure forcing swap usage.",
+    "solutions": [
+      "Monitor CPU breakdown with 'top' or 'htop' to confirm I/O wait percentage trends.",
+      "Address memory pressure as primary issue since it's causing the I/O bottleneck affecting CPU efficiency.",
+      "Use 'vmstat 1' to correlate CPU I/O wait with swap in/out activity patterns.",
+      "Consider workload scheduling adjustments to prevent memory-intensive jobs from overwhelming system resources."
+    ]
+  }
+]

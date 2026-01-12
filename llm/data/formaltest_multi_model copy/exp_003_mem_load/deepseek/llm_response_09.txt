@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure increasing with significant swap usage",
+    "root_causes": "High memory demand from completed job 'ft_cgC' causing system to use swap space",
+    "solutions": [
+      "Monitor memory usage patterns of similar jobs to adjust resource requests",
+      "Consider increasing physical memory allocation for memory-intensive jobs",
+      "Optimize application memory management to reduce swap dependency"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with elevated read/write operations",
+    "root_causes": "Post-processing or cleanup activities following job completion",
+    "solutions": [
+      "Check for unnecessary disk operations during job cleanup phase",
+      "Consider implementing delayed write operations for non-critical data",
+      "Evaluate storage subsystem performance for potential bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "Network traffic spikes during monitoring period",
+    "root_causes": "Job completion triggering data transfers or logging operations",
+    "solutions": [
+      "Review network configuration for job completion handlers",
+      "Implement traffic shaping for post-job network operations",
+      "Monitor network bandwidth usage during job teardown phases"
+    ]
+  }
+]

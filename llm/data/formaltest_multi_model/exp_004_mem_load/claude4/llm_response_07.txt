@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Significant memory usage spike from 32% to 55% during job execution, indicating memory-intensive workload exceeding available resources.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to understand peak memory requirements.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints.",
+      "Evaluate if the node has sufficient memory for the workload or if job should be scheduled on higher-memory nodes.",
+      "Check for memory leaks in the application code if memory usage continues to grow during execution."
+    ]
+  },
+  {
+    "anomaly": "Abnormal disk I/O activity with extremely high write rates.",
+    "root_causes": "Disk write rates spiked to over 170GB/sec which is unrealistic and indicates measurement errors or system stress.",
+    "solutions": [
+      "Verify disk monitoring tools are functioning correctly and not reporting erroneous values.",
+      "Check if the job is performing unexpected I/O operations such as core dumps or excessive logging.",
+      "Monitor disk utilization and queue depths to identify potential storage bottlenecks.",
+      "Review application I/O patterns to ensure efficient data handling."
+    ]
+  }
+]

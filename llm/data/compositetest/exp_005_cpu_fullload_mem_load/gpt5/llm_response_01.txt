@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe transient memory pressure with heavy swapping and overcommit during the job window.",
+    "root_causes": "Available memory fell to ~0.6 GiB while anonymous memory dominated (~81%), swap usage reached ~48% with swap-out spikes (up to ~3.7e4 pages/s), and committed memory exceeded physical RAM (~12 GiB > 8 GiB). OOM kill count is non-zero (3). This indicates the job (ft_cgC) oversubscribed memory, triggering swap thrashing and cache reclaim.",
+    "solutions": [
+      "Constrain job memory explicitly (e.g., Slurm --mem or cgroup memory.max) to keep working sets within RAM plus headroom.",
+      "Tighten kernel overcommit (vm.overcommit_memory=2 and an appropriate vm.overcommit_ratio) to prevent commit far beyond physical RAM.",
+      "Reduce swap aggressiveness (e.g., vm.swappiness=10–20) to mitigate swap storms under pressure.",
+      "Profile the job’s memory footprint (smem, pmap, /usr/bin/time -v) and fix leaks or reduce in-memory dataset sizes.",
+      "If swap is required, place it on faster storage and ensure sufficient swap I/O bandwidth."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation correlated with swapping and writeback.",
+    "root_causes": "Disk I/O usage peaked (≈59–70%) with very high read/write throughput while swap activity spiked, and CPU iowait rose (up to ~7.7%). The storage pressure is secondary to memory thrashing, causing sustained paging and writeback.",
+    "solutions": [
+      "Alleviate the underlying memory pressure (see above) to remove swap-induced I/O.",
+      "Throttle I/O from the job if needed (ionice or cgroup I/O limits) to protect system responsiveness.",
+      "Tune writeback settings to avoid large dirty bursts (e.g., vm.dirty_background_ratio and vm.dirty_ratio).",
+      "Validate storage health and headroom (iostat, smartctl) and ensure swap resides on the fastest available device."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity spiked near critical (≈89.5%) with large, rapid swings during the run.",
+    "root_causes": "The job likely created and removed large temporary data, causing usage to jump near 90% and then drop to ~73% within minutes, increasing risk of ENOSPC events during peaks.",
+    "solutions": [
+      "Direct temporary and checkpoint data to node-local or dedicated scratch with automatic cleanup (Slurm prolog/epilog).",
+      "Set alerts/quotas around 85% usage to prevent jobs from pushing the filesystem to full.",
+      "Review the job’s I/O patterns and compress or stream intermediates to reduce on-disk footprint."
+    ]
+  }
+]

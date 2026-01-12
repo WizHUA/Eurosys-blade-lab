@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Abrupt swap storm and disk I/O saturation beginning ~07:12:28, with sustained high read/write throughput and rising I/O pressure.",
+    "root_causes": "During the ft_cgC job window, the node entered an I/O-heavy phase that expanded the page cache and triggered heavy swapping (page_swap_in_rate ≈145,076/s and page_swap_out_rate ≈69,125/s at 07:12:28). This drove disk_io_usage_percent from ~0.06% (07:11:43) to 11.6% (07:12:28) → 26.9% (07:12:43) → 42.6% (07:12:58) → 54.8% (07:13:13) → 60.2% (07:13:28), while disk read/write rates spiked (e.g., reads ≈462 MB/s, writes ≈187 MB/s at 07:12:58). Free RAM dipped as low as ~128 MB at 07:12:28, causing frequent reclamation and swap churn despite swap remaining ~46.6% utilized. The workload’s working set plus file I/O exceeded practical memory headroom, thrashing storage.",
+    "solutions": [
+      "Constrain the job’s memory and swap to avoid thrash: enable Slurm/cgroup controls (memory.high/memory.max and memory.swap.max=0 for the job) or reduce job memory footprint/concurrency.",
+      "Stage I/O to faster local storage (NVMe/SSD) or a high-throughput scratch area; avoid writing to the OS/root filesystem.",
+      "Tune VM/OS for less swapping (e.g., lower vm.swappiness) and adjust readahead if sequential I/O is excessive.",
+      "Reduce simultaneous writers/ranks and use collective buffering/MPI-IO or batched checkpoints to smooth I/O bursts.",
+      "Profile and verify with iostat/iotop/blktrace and per-cgroup blkio/io.max to confirm the top I/O contributors and enforce throttles if needed."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption spike (filesystem_usage_percent jumped from ~73.3% to ~85.6% within minutes, then partially receded).",
+    "root_causes": "The job produced large transient outputs/checkpoints (disk_write_rate_bytes_per_sec up to ~187 MB/s and read ~462 MB/s), quickly consuming space (e.g., 78.0% at 07:12:28 → 81.96% at 07:12:43 → 85.61% at 07:12:58), which can degrade performance and risk ENOSPC stalls.",
+    "solutions": [
+      "Redirect temporary and checkpoint data to a dedicated high-capacity scratch filesystem and enforce per-job quotas/cleanup policies.",
+      "Schedule periodic cleanup of transient files and validate that the job removes intermediates promptly.",
+      "Increase filesystem capacity or stripe/tune the target storage if sustained spikes are expected for this workflow."
+    ]
+  },
+  {
+    "anomaly": "Elevated kernel/IO wait and blocked tasks indicating I/O backpressure (cpu_system_percent up to ~17.8%, cpu_iowait_percent up to ~4.9%, processes_blocked > 0).",
+    "root_causes": "Storage contention from intense read/write bursts and swap churn increased kernel time and I/O wait; processes entered D-state (processes_blocked reached 2 at 07:12:43) while load_1min climbed (~3.86 → ~5.68), consistent with threads queued on slow storage rather than CPU saturation.",
+    "solutions": [
+      "Throttle job I/O (cgroup io.max/blkio.weight) and reduce write concurrency; use ionice for non-critical writers.",
+      "Enable writeback throttling/tuning (e.g., dirty_* sysctls) to prevent large dirty-page spikes from overwhelming disks.",
+      "If using shared storage, stagger I/O phases across ranks/tasks or checkpoint less frequently to reduce contention."
+    ]
+  }
+]

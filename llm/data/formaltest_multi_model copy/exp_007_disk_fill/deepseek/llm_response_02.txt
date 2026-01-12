@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure despite job completion, with high cached memory and low free memory",
+    "root_causes": "Memory not being properly released after job completion, possibly due to memory leaks or improper cleanup in the FT application",
+    "solutions": [
+      "Check application logs for memory leak indications in the completed FT job",
+      "Monitor for zombie processes or orphaned memory allocations",
+      "Consider implementing explicit memory cleanup routines in the application"
+    ]
+  },
+  {
+    "anomaly": "Consistently high system load (4-5) with no currently running compute jobs",
+    "root_causes": "System processes consuming resources post-job completion, or potential background tasks not properly terminated",
+    "solutions": [
+      "Analyze process list for unexpected high-CPU processes",
+      "Check for stuck or lingering MPI processes",
+      "Review system logs for abnormal process activity"
+    ]
+  },
+  {
+    "anomaly": "Unexplained periodic disk I/O activity after job completion",
+    "root_causes": "Possible post-processing or cleanup operations consuming resources",
+    "solutions": [
+      "Verify if the application includes post-run cleanup operations",
+      "Check filesystem for temporary files being processed",
+      "Monitor disk activity by process to identify the source"
+    ]
+  }
+]

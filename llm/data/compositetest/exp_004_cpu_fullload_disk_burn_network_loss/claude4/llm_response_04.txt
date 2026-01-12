@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and potential out-of-memory condition with active swapping.",
+    "root_causes": "Memory resource exhaustion indicated by dramatic drop in available memory from 5.59GB to 5.39GB and increasing swap usage.",
+    "solutions": [
+      "Monitor for OOM killer activity as vm_oom_kills_total shows 3 kills have occurred",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to find processes consuming excessive memory",
+      "Check if the completed job 'ft_cgC' left behind any memory leaks or zombie processes",
+      "Consider increasing swap space or adding more physical memory to prevent future OOM conditions"
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation with utilization reaching over 50%.",
+    "root_causes": "Intensive disk activity from memory swapping and application I/O operations during job execution.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity",
+      "Monitor swap activity with 'vmstat 1' to confirm swapping is driving the high I/O",
+      "Consider upgrading to faster storage (NVMe/SSD) to handle I/O-intensive workloads",
+      "Implement I/O scheduling optimizations or consider moving swap to a dedicated high-speed device"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in system CPU time and context switches indicating kernel overhead.",
+    "root_causes": "High kernel activity from memory management, I/O operations, and process scheduling under resource pressure.",
+    "solutions": [
+      "System CPU time increased to 16.5% indicating heavy kernel load from memory and I/O management",
+      "Context switches reached over 2100/sec showing high process scheduling overhead",
+      "Tune kernel parameters for memory management (vm.swappiness, vm.dirty_ratio) to reduce swap pressure",
+      "Consider process affinity settings to reduce context switching for CPU-intensive jobs"
+    ]
+  }
+]

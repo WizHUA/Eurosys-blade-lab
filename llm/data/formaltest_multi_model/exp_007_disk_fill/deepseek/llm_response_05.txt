@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with significant system load despite completed job",
+    "root_causes": "Residual processes or cleanup tasks from completed job ft_cgC continuing to consume resources",
+    "solutions": [
+      "Check for orphaned processes from job 276 using 'ps -ef | grep 276'",
+      "Verify job cleanup scripts executed properly after ft_cgC completion",
+      "Monitor process tree for unexpected child processes of the completed batch job"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure persists after job completion with high cache usage",
+    "root_causes": "Memory not being properly released after job completion, possibly due to memory leaks or shared memory segments",
+    "solutions": [
+      "Check for unreleased shared memory segments with 'ipcs -m'",
+      "Verify memory caches are being properly dropped using 'echo 3 > /proc/sys/vm/drop_caches'",
+      "Monitor slabinfo for memory leaks using 'cat /proc/meminfo | grep Slab'"
+    ]
+  },
+  {
+    "anomaly": "Unexpected disk I/O activity continuing post-job completion",
+    "root_causes": "Background filesystem operations or logging activities persisting after main workload",
+    "solutions": [
+      "Check active disk operations with 'iotop -o'",
+      "Verify filesystem journal flushing with 'journalctl --flush'",
+      "Monitor for rogue logging processes with 'lsof +L1'"
+    ]
+  }
+]

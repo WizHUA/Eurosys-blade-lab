@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Significant memory usage spike from 32% to 55% during job execution period.",
+    "root_causes": "Memory resource load from the completed job 'ft_cgC' which ran for 27 minutes and likely consumed substantial memory resources.",
+    "solutions": [
+      "Monitor memory usage patterns for similar jobs to establish baseline requirements and prevent future memory pressure.",
+      "Review the 'ft_cgC' job configuration and input data size to determine if memory allocation was appropriate.",
+      "Consider implementing memory limits or reservations for jobs of this type to prevent impact on system performance."
+    ]
+  },
+  {
+    "anomaly": "TCP connection activity increase correlating with memory usage changes.",
+    "root_causes": "Network communication patterns associated with the computational job, possibly involving data transfer or inter-process communication.",
+    "solutions": [
+      "Active connection opens increased from 0 to 3.8 per second during the memory spike period, suggesting network-intensive operations.",
+      "Monitor network traffic patterns to determine if the job requires specific network bandwidth allocation.",
+      "Evaluate if the job's network communication requirements align with available cluster network resources."
+    ]
+  }
+]

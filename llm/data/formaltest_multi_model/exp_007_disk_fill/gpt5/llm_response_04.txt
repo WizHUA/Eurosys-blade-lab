@@ -1,0 +1,39 @@
+[
+  {
+    "anomaly": "Transient but severe swap thrashing and disk I/O contention between 07:13:43–07:14:13.",
+    "root_causes": "The running workload drove heavy swap activity (page_swap_in_rate peaking at ~257k/s and page_swap_out_rate >135k/s with swap_usage_percent ~46.6%) alongside high I/O load (disk_io_usage_percent ~68%→53%, io_wait_percent ~6.16%) and many blocked processes (processes_blocked up to 14), indicating memory reclaim and swapping coupled with sustained writeback.",
+    "solutions": [
+      "Constrain the job’s memory footprint or set appropriate cgroup memory limits to avoid swapping; verify the job’s peak RSS versus available RAM.",
+      "Lower vm.swappiness and review vm.dirty_background_ratio/vm.dirty_ratio to reduce long writeback bursts that coincide with swapping.",
+      "Place large checkpoint/output writes on fast local scratch and batch writes (larger, fewer I/O operations) to reduce I/O queueing.",
+      "Monitor in real time with vmstat 1 and iostat -x 1 during similar runs to confirm swap and device queue depths; if persistent, consider adding RAM or reducing job concurrency."
+    ]
+  },
+  {
+    "anomaly": "Abrupt collapse of page cache with a large writeback flush around 07:14:13.",
+    "root_causes": "memory_cached_bytes dropped from ~5.33 GB to ~0.53 GB while memory_free_bytes jumped (>5.26 GB) and disk_write_rate_bytes_per_sec spiked (>150 MB/s), consistent with a forced cache reclaim or application-driven fsync/sync that flushed page cache.",
+    "solutions": [
+      "Check for drop_caches or sync usage (cron, prolog/epilog, or application) and disable unless required.",
+      "Avoid unnecessary fsync()/O_SYNC; use buffered I/O where safe or O_DIRECT for large sequential writes to bypass cache thrash.",
+      "Tune writeback (e.g., dirty_expire_centisecs/dirty_writeback_centisecs) to smooth flushes and prevent sudden cache evacuations."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity swings rapidly and reaches high utilization (~90%).",
+    "root_causes": "filesystem_usage_percent oscillates from ~73% to ~90% within minutes with large changes in filesystem_avail_bytes, indicating large, bursty file creation/deletion by the workload that risks filling the filesystem.",
+    "solutions": [
+      "Direct large temporary outputs to a high-capacity scratch filesystem and clean up promptly after use.",
+      "Enable per-user/project quotas or job-level cleanup to prevent accidental fill-ups.",
+      "Alert when utilization exceeds a threshold (e.g., 90%) to proactively throttle or reschedule I/O-heavy phases."
+    ]
+  },
+  {
+    "anomaly": "Short spike of TCP connection churn and resets at 07:14:43 without packet loss.",
+    "root_causes": "node_netstat shows Tcp_ActiveOpens ~30/s, Tcp_PassiveOpens ~6/s, and Tcp_OutRsts ~24/s during one interval, while retransmissions and errors remain near zero, indicating rapid connect/close behavior or endpoint resets initiated by applications.",
+    "solutions": [
+      "Inspect application and MPI logs for rapid connection setup/teardown and unexpected resets; correlate with job phase transitions.",
+      "Capture ss -ti and conntrack stats during the event window to identify endpoints and causes.",
+      "If excessive connection churn is expected, increase ephemeral port range and tune TIME_WAIT reuse settings cautiously; otherwise, consolidate connections (e.g., persistent channels) to reduce churn."
+    ]
+  }
+]

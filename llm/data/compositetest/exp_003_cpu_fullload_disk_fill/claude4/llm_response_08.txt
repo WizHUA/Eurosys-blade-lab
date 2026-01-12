@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O subsystem experiencing severe performance degradation with I/O utilization consistently above 60%.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and determine if they can be throttled or rescheduled.",
+      "Check disk health using 'smartctl -a /dev/sdX' to identify potential hardware failures or degraded performance.",
+      "Monitor disk queue depth and latency metrics to determine if the storage subsystem is overloaded.",
+      "Consider moving I/O intensive workloads to different storage tiers or implementing I/O scheduling policies."
+    ]
+  },
+  {
+    "anomaly": "Critical filesystem space exhaustion with usage jumping from 73% to 95%.",
+    "root_causes": "Rapid consumption of available disk space, likely from the completed job 'ft_cgC' generating large output files or temporary data.",
+    "solutions": [
+      "Immediately identify large files using 'du -sh /*' and 'find / -size +1G -type f' to locate space consumers.",
+      "Clean up temporary files, logs, and job output data that may no longer be needed.",
+      "Implement disk quota policies to prevent individual jobs from consuming excessive storage space.",
+      "Set up automated monitoring and alerts for filesystem usage to prevent future space exhaustion."
+    ]
+  }
+]

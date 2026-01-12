@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with available memory dropping from 5.2GB to 933MB during job execution.",
+    "root_causes": "Memory resource load from the ft_cgC job consuming excessive amounts of system memory, leading to critical memory shortage.",
+    "solutions": [
+      "Monitor the ft_cgC job's memory allocation patterns using 'ps aux --sort=-%mem' to identify if it has memory leaks or inefficient memory usage.",
+      "Review job resource limits and consider setting stricter memory constraints using Slurm's --mem parameter.",
+      "Check if the job requires optimization for memory usage or if it needs to be run on nodes with larger memory capacity.",
+      "Monitor swap usage trends as the system may start swapping heavily if memory pressure continues."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with write operations reaching 540MB/s and I/O utilization at 52%.",
+    "root_causes": "Disk I/O load from intensive write operations, likely related to the computational job's data output or potential memory swapping due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify the specific processes generating the high disk write activity.",
+      "Monitor if the high I/O is legitimate job output or caused by memory swapping due to the severe memory pressure.",
+      "Consider optimizing the job's I/O patterns or using faster storage if this is expected behavior.",
+      "Evaluate if the job can be configured to use more efficient I/O buffering or batch writes."
+    ]
+  },
+  {
+    "anomaly": "CPU I/O wait time spiked from 0.1% to 5.9%, indicating system is waiting for disk operations.",
+    "root_causes": "CPU resource contention caused by processes waiting for disk I/O operations to complete, creating a bottleneck.",
+    "solutions": [
+      "The high I/O wait correlates directly with the extreme disk write activity observed.",
+      "Address the underlying disk I/O issues to reduce CPU time spent waiting for storage operations.",
+      "Consider if the storage subsystem can handle the current I/O load or if it needs optimization.",
+      "Monitor if this I/O wait pattern continues after addressing the memory and disk I/O issues."
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "CPU utilization surges from ~30% to over 80% during the monitoring period.",
+    "root_causes": "CPU resource load from computational workload.",
+    "solutions": [
+      "Review the completed job 'ft_cgC' as it was active during the CPU surge period.",
+      "Use 'top' or 'perf' to analyze historical CPU usage patterns for similar jobs.",
+      "Check for any background processes that might have started concurrently with the job."
+    ]
+  },
+  {
+    "anomaly": "System load (load_1min) increases dramatically from 1.77 to 4.88.",
+    "root_causes": "High number of processes competing for CPU resources.",
+    "solutions": [
+      "Monitor 'processes_running' which increased from 13 to 17 during high load periods.",
+      "Analyze process scheduling statistics ('schedstat_running_rate') for bottlenecks.",
+      "Consider adjusting process priorities or using CPU affinity for critical workloads."
+    ]
+  },
+  {
+    "anomaly": "Memory usage shows significant fluctuation with increased paging activity.",
+    "root_causes": "Memory pressure from application workload.",
+    "solutions": [
+      "Monitor 'page_swap_in_rate' and 'page_swap_out_rate' which show active swapping behavior.",
+      "Check 'vm_oom_kills_total' to see if any processes were killed due to memory pressure.",
+      "Review memory allocation patterns of the 'ft_cgC' application for optimization opportunities."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O patterns show intermittent high write activity bursts.",
+    "root_causes": "Storage I/O load from application data operations.",
+    "solutions": [
+      "Analyze 'disk_write_rate_bytes_per_sec' which shows spikes up to ~200KB/s.",
+      "Check filesystem usage patterns as 'filesystem_usage_percent' remains consistently high at ~73%.",
+      "Consider optimizing application I/O patterns or adding storage cache if this is a frequent pattern."
+    ]
+  }
+]

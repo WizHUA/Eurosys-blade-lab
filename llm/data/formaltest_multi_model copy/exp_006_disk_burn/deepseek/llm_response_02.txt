@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with sustained system load exceeding available cores",
+    "root_causes": "CPU resource contention from computational workload",
+    "solutions": [
+      "Check job scheduler logs for improper core allocation",
+      "Verify if the completed ft_cgC job fully released resources",
+      "Monitor CPU pressure metrics for potential throttling"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations with sudden drops in available memory",
+    "root_causes": "Memory-intensive operations during job execution",
+    "solutions": [
+      "Analyze memory usage patterns of MPI applications",
+      "Check for memory leaks in completed jobs",
+      "Review slab cache utilization metrics"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O wait times during peak load periods",
+    "root_causes": "Storage subsystem bottleneck",
+    "solutions": [
+      "Profile disk I/O patterns during job execution",
+      "Check filesystem throughput limits",
+      "Consider using tmpfs for temporary job files"
+    ]
+  }
+]

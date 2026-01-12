@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing high swap usage and performance degradation",
+    "root_causes": "Memory overcommitment during computational workload leading to paging and swapping activity",
+    "solutions": [
+      "Check memory allocation for application 'ft_cgC' against available system memory",
+      "Monitor processes using 'top' sorted by memory usage (press 'M') to identify memory-intensive operations",
+      "Consider optimizing application memory usage or running with fewer concurrent processes"
+    ]
+  },
+  {
+    "anomaly": "Spikes in disk I/O operations correlating with memory pressure events",
+    "root_causes": "Increased page swapping due to memory pressure causing disk activity",
+    "solutions": [
+      "Review swap configuration and consider increasing if system regularly needs swap during normal operation",
+      "Use 'iotop' to monitor disk I/O processes and identify if swap is primary I/O source",
+      "Consider adjusting vm.swappiness parameter if swap activity is impacting performance"
+    ]
+  },
+  {
+    "anomaly": "Abnormal TCP retransmission rate increase during compute-intensive phase",
+    "root_causes": "Network performance degradation potentially caused by CPU/memory pressure affecting network stack",
+    "solutions": [
+      "Monitor network retransmit rates during different job phases using 'netstat -s' output",
+      "Check for packet drops at network interfaces with 'ethtool -S' commands",
+      "Consider adjusting TCP stack parameters if retransmits correlate with system load"
+    ]
+  }
+]

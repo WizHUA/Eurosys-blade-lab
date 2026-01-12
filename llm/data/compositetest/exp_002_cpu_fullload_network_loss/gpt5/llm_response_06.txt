@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Shared filesystem usage spiked to a critical level (94–98% full) during the job, accompanied by very high sustained write throughput (≈150–215 MB/s) and high disk I/O utilization (≈60–87%).",
+    "root_causes": "The running job (ft_cgC) generated large volumes of output to the shared filesystem, temporarily filling it (filesystem_usage_percent rose from 94.12% to 98.12%) while disk_write_rate_bytes_per_sec and disk_io_usage_percent were elevated; space was later reclaimed (usage dropped to 73.36%), consistent with creation and deletion of large temporary/checkpoint files.",
+    "solutions": [
+      "Identify the exact directories/files responsible (e.g., per-job workdir) and confirm cleanup occurred; audit recent large file creations and deletions.",
+      "Redirect heavy, transient output to node-local scratch or a dedicated high-throughput scratch filesystem; set TMPDIR accordingly in job prologue.",
+      "Enforce per-job/project quota and automatic cleanup of temporary files on job completion; set alerts at <90% usage to prevent ENOSPC events.",
+      "If using a parallel filesystem, tune striping/chunk sizes and I/O patterns to reduce metadata pressure and write amplification.",
+      "Stage output in chunks (checkpoint rotation) and compress where feasible to lower instantaneous capacity pressure.",
+      "Consider increasing filesystem capacity or reserving operational headroom to avoid near-full conditions under bursty workloads."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O contention with high CPU iowait and blocked processes during the write burst.",
+    "root_causes": "Storage was saturated by the job’s write activity: cpu_iowait_percent rose to 12–22.49% (and stayed elevated for several intervals), disk_io_usage_percent peaked at ≈87%, and processes_blocked rose up to 3, indicating threads waiting on I/O completion.",
+    "solutions": [
+      "Pinpoint the top I/O contributors during the window (e.g., iotop, pidstat -d) and verify access patterns (large sequential writes vs small random).",
+      "Move heavy I/O phases to node-local NVMe or a higher-throughput tier; aggregate and stage-out after compute phases.",
+      "Apply I/O throttling or QoS (cgroups io.max/blkio) to prevent a single job from saturating the device and stalling the node.",
+      "Tune the I/O stack: confirm the appropriate scheduler (mq-deadline/none for SSD; deadline for HDD), readahead settings, and queue depths.",
+      "Validate device/SAN health (SMART, controller logs) to rule out latent hardware issues exacerbating I/O wait."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap residency (~54% used) with an early burst of swap activity despite ample available memory (>5 GB available).",
+    "root_causes": "Legacy swapped-out pages and aggressive reclaim led to swap churn (page_swap_in_rate and page_swap_out_rate spiked early) while memory_available_bytes remained high, indicating unnecessary swap residency rather than true memory pressure.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., to 10) to prefer keeping inactive pages in RAM and avoid swap churn under light pressure.",
+      "During maintenance, consider temporarily swapping off (swapoff -a && swapon) to repatriate cold pages and reset swap residency.",
+      "Monitor si/so (vmstat) and page fault rates for recurrence; if swap spikes align with specific workloads, adjust those applications’ memory usage patterns.",
+      "Ensure jobs use appropriate in-memory caching and avoid oversubscription that could trigger reclaim and swapping."
+    ]
+  }
+]

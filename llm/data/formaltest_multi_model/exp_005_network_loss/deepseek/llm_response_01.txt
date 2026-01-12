@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Significant TCP retransmissions observed during job execution",
+    "root_causes": "Network congestion or packet loss occurring during MPI communications",
+    "solutions": [
+      "Investigate network infrastructure health checks",
+      "Verify MPI job's communication parameters",
+      "Monitor retransmission rates during similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O activity without corresponding job activity",
+    "root_causes": "Possible filesystem operations or temporary file handling after job completion",
+    "solutions": [
+      "Check for cleanup processes running post-job",
+      "Verify filesystem cache behavior",
+      "Monitor disk activity patterns"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations during monitoring period",
+    "root_causes": "Potential memory management overhead from job completion",
+    "solutions": [
+      "Analyze memory usage patterns across jobs",
+      "Check for memory leaks in completed applications",
+      "Monitor memory pressure trends"
+    ]
+  }
+]

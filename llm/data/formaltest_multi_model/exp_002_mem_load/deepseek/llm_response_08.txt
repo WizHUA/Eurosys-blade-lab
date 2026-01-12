@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High memory pressure with significant anonymous memory usage",
+    "root_causes": "The 'memory_active_anon_bytes' spiked to 5GB during job execution, indicating heavy memory usage by application processes",
+    "solutions": [
+      "Investigate the memory usage patterns of the completed ft_cgC job",
+      "Check if the job's memory requirements exceed available resources",
+      "Consider adjusting Slurm memory limits or job parameters to prevent OOM situations"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O operations during job execution",
+    "root_causes": "Disk writes peaked at 168MB/s during active job period, suggesting heavy I/O workload",
+    "solutions": [
+      "Review the job's I/O patterns and consider optimizing file operations",
+      "Check if temporary files are being properly cleaned up",
+      "Evaluate using a faster storage medium or local SSD for I/O-intensive jobs"
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU usage during entire job duration",
+    "root_causes": "CPU user time consistently above 50% for 27 minutes, indicating compute-bound workload",
+    "solutions": [
+      "Profile the application for potential optimization opportunities",
+      "Consider using more CPU cores if the workload is parallelizable",
+      "Verify if CPU frequency scaling is enabled and processors are running at full speed"
+    ]
+  }
+]

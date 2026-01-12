@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spiked to critical levels with swap usage reaching 99%",
+    "root_causes": "Memory exhaustion during job execution causing heavy swapping and OOM kills",
+    "solutions": [
+      "Investigate memory leaks in the 'ft_ftC' application code",
+      "Increase memory allocation for similar jobs",
+      "Monitor swap usage thresholds and implement alerts"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure reached critical levels with high write latency",
+    "root_causes": "Intensive disk activity during job execution combined with memory swapping",
+    "solutions": [
+      "Optimize application I/O patterns to reduce disk writes",
+      "Consider using faster storage or SSDs for temporary files",
+      "Increase filesystem cache size if memory permits"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time percentage (26%) during peak memory pressure",
+    "root_causes": "Kernel overhead from managing memory swapping and OOM killer activity",
+    "solutions": [
+      "Reduce memory pressure to lower kernel overhead",
+      "Monitor for potential memory fragmentation issues",
+      "Consider tuning swappiness parameter for better swap management"
+    ]
+  }
+]

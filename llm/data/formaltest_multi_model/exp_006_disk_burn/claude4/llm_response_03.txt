@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory exhaustion from high memory usage (78% peak) combined with intensive memory allocation patterns, causing the system to struggle with available memory resources.",
+    "solutions": [
+      "Monitor memory usage with 'free -m' and 'vmstat 1' to identify current memory pressure levels.",
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes.",
+      "Consider adding more RAM to the system or optimizing applications to use memory more efficiently.",
+      "Review the completed job 'ft_cgC' for memory usage patterns that may have caused this pressure."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity causing system bottleneck.",
+    "root_causes": "Intensive disk operations with write rates exceeding 400MB/s and read rates over 580MB/s, likely caused by memory pressure forcing excessive swapping and application I/O demands.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity.",
+      "Monitor disk utilization with 'iostat -x 1' to confirm I/O bottleneck severity.",
+      "Consider upgrading to faster storage (SSD) or implementing I/O throttling for compute jobs.",
+      "Optimize applications to reduce I/O operations or implement better buffering strategies."
+    ]
+  },
+  {
+    "anomaly": "High system load with significant I/O wait times indicating resource contention.",
+    "root_causes": "System load reaching 5.68 combined with I/O wait percentages up to 4.87%, indicating processes are waiting for disk operations to complete.",
+    "solutions": [
+      "Use 'top' with 'f' to display I/O wait column and identify processes in 'D' state.",
+      "Check if the high I/O wait is related to the memory pressure causing swap activity.",
+      "Consider load balancing across multiple storage devices or implementing storage tiering.",
+      "Review job scheduling policies to prevent multiple I/O-intensive jobs from running simultaneously."
+    ]
+  }
+]

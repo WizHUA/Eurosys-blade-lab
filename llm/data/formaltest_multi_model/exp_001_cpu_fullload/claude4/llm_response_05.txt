@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Sustained high disk I/O activity with elevated write rates and increasing I/O wait times.",
+    "root_causes": "Heavy disk write operations from the completed job 'ft_cgC' causing persistent I/O bottleneck.",
+    "solutions": [
+      "Monitor disk utilization with 'iostat -x 1' to identify which storage devices are experiencing high load.",
+      "Use 'iotop' to identify specific processes still performing heavy I/O operations after job completion.",
+      "Check for any lingering cleanup processes or data synchronization tasks that may be writing large amounts of data to disk.",
+      "Consider implementing I/O throttling for future jobs if the storage subsystem cannot handle the write load."
+    ]
+  },
+  {
+    "anomaly": "Progressive increase in system load and CPU utilization throughout the monitoring period.",
+    "root_causes": "CPU resource contention from computational workload with load balancing issues across cores.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes consuming high CPU resources and verify if they are related to the completed job.",
+      "Check for any background processes or cleanup tasks that may be consuming CPU cycles after job completion.",
+      "Monitor per-core CPU utilization using 'mpstat -P ALL 1' to identify if the load is evenly distributed.",
+      "Review job scheduling parameters to ensure proper CPU affinity and resource allocation for future similar workloads."
+    ]
+  }
+]

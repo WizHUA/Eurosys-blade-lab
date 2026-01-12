@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with growing queue depth and rising CPU iowait during the job window.",
+    "root_causes": "The running job (ft_cgC) is driving sustained high storage throughput (disk_read_rate_bytes_per_sec up to ~5.9e8 B/s and disk_write_rate_bytes_per_sec ~2.0e8 B/s) with disk_io_usage_percent climbing from ~0.06 to >60%, io_pressure_waiting_rate/stalled_rate increasing, processes_blocked > 0, and cpu_iowait_percent peaking near 4.9%. Swap usage remains steady, indicating workload-driven I/O rather than swap thrashing.",
+    "solutions": [
+      "Pinpoint offending I/O by job/process and device: iostat -x 1, pidstat -d 1, and iotop -o -P; map PIDs to Slurm job 276.",
+      "Redirect large intermediates to fast local scratch (e.g., /scratch) and stage-out results; if already local, reduce I/O concurrency or shard across devices.",
+      "Apply per-job I/O limits with cgroups (io.max/io.weight) or ionice to protect system services and other jobs.",
+      "Verify storage health and tuning: check device latency/queue (iostat -x), scheduler/readahead settings, and run smartctl -a if persistently slow.",
+      "If using shared filesystems, coordinate scheduling or throttle concurrent I/O-heavy jobs on the same mount."
+    ]
+  },
+  {
+    "anomaly": "Rising TCP retransmissions/timeouts with kernel receive-backlog drops indicating network instability.",
+    "root_causes": "tcp_retransmissions_rate escalates from near zero to ~33/s with tcp_timeouts_rate ~10–11/s; network_receive_errors_rate and softnet_dropped_rate become non-zero, pointing to packet loss or RX backlog pressure (NIC/driver, switch port errors, MTU/offload mismatch, or transient congestion).",
+    "solutions": [
+      "Inspect NIC and link health: ethtool -S <iface>, ip -s link, and dmesg for resets/errors; swap cable/port if errors present.",
+      "Validate end-to-end MTU and offload settings (e.g., ethtool -K) and test with ping -M do -s <jumbo_size> to rule out fragmentation/mismatch.",
+      "Increase RX path capacity: tune net.core.netdev_max_backlog and rmem_max/wmem_max, enable RPS/RFS, and set IRQ affinity to spread NIC interrupts.",
+      "If fabric congestion is suspected, rate-limit the job’s traffic or schedule fewer network-heavy tasks concurrently; monitor with ss -s and sar -n TCP."
+    ]
+  },
+  {
+    "anomaly": "Filesystem utilization spike and aggressive page-cache growth causing very low free memory (but adequate available memory).",
+    "root_causes": "filesystem_usage_percent peaks around 85.6% while disk write rates surge; memory_free_bytes dips to ~1.3e8 as cached/inactive_file exceed 5e9 bytes. This reflects heavy file I/O and caching by the running job rather than true memory exhaustion (memory_available_bytes remains ~5–6.5 GiB).",
+    "solutions": [
+      "Ensure the job writes to a scratch filesystem with sufficient headroom; clean temporary outputs promptly after each step.",
+      "Set per-user/job quotas or alerts when filesystem usage exceeds 80% to avoid capacity contention.",
+      "If cache growth impacts co-located jobs, tune writeback (vm.dirty_bytes/ratio) and consider periodic drop_caches during maintenance windows.",
+      "For recurring spikes, provision nodes with larger/faster local storage or pre-stage datasets to reduce repeated shared-storage reads."
+    ]
+  }
+]

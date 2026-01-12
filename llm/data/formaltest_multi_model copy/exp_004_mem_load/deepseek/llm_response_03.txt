@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spiked to 55% with significant swap usage during job execution",
+    "root_causes": "The compute-intensive FT-CG benchmark job caused sustained memory pressure, triggering active swapping",
+    "solutions": [
+      "Review job's memory requirements and adjust Slurm memory limits",
+      "Check for memory leaks in the application code",
+      "Consider adding more physical memory to prevent swap usage"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with high page swap activity during job run",
+    "root_causes": "Memory pressure led to increased page swapping and disk writes",
+    "solutions": [
+      "Monitor page swap rates during job runs to identify memory-bound workloads",
+      "Optimize application memory access patterns",
+      "Consider using faster storage for swap space"
+    ]
+  },
+  {
+    "anomaly": "High CPU usage (90%+) during the entire job duration",
+    "root_causes": "Compute-intensive characteristic of the FT-CG benchmark",
+    "solutions": [
+      "Verify CPU affinity settings for optimal core utilization",
+      "Check for CPU throttling or thermal issues",
+      "Consider scaling across more nodes if performance is inadequate"
+    ]
+  }
+]

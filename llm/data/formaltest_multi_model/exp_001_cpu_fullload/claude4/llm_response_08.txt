@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O activity with significant write operations occurring during job execution.",
+    "root_causes": "High disk write rates indicate intensive data output operations from the completed ft_cgC job, causing elevated I/O wait times and system load.",
+    "solutions": [
+      "Monitor disk utilization during job execution to identify if this is expected behavior for the ft_cgC workload.",
+      "Consider using faster storage (NVMe/SSD) for jobs with high I/O requirements.",
+      "Implement I/O throttling or scheduling policies to prevent single jobs from saturating disk resources.",
+      "Optimize application I/O patterns by using buffered writes or asynchronous I/O operations."
+    ]
+  },
+  {
+    "anomany": "High network activity with significant packet transmission rates during the monitoring period.",
+    "root_causes": "Network traffic spikes correlate with job execution phases, suggesting data transfer or communication-intensive operations.",
+    "solutions": [
+      "Monitor network bandwidth utilization to ensure the workload is not exceeding available capacity.",
+      "Check for network bottlenecks or congestion that could impact job performance.",
+      "Consider implementing Quality of Service (QoS) policies for network traffic prioritization.",
+      "Verify that network interface configurations are optimized for high-throughput workloads."
+    ]
+  }
+]

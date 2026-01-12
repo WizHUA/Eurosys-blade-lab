@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "Transient spike in TCP retransmissions and SYN retransmits indicating brief network instability during the job window.",
+    "root_causes": "Kernel netstat counters show a burst of network issues (node_netstat_Tcp_RetransSegs ≈ 30, node_netstat_TcpExt_TCPSynRetrans ≈ 6, TCPTimeouts ≈ 15 at 07:02:43) consistent with packet loss or intermittent link congestion affecting active connections while job 276 (ft_cgC) was running.",
+    "solutions": [
+      "Inspect NIC and driver health on the node: ethtool -S <iface>, dmesg | grep -i -E \"nic|eth|reset|xmit|rx\" for errors or resets.",
+      "Check switch port counters and logs for CRC/FCS errors, drops, or flaps on the connected port during the same time window.",
+      "Verify link parameters and MTU consistency end-to-end (autonegotiation, speed/duplex, jumbo frames) and replace suspect cables if physical errors are observed.",
+      "Capture a short packet trace during the workload (tcpdump -i <iface> -s0 -w /tmp/netdiag.pcap) to confirm retransmissions and identify flows most affected.",
+      "If congestion is expected, consider isolating heavy traffic or applying QoS/traffic shaping for similar jobs."
+    ]
+  },
+  {
+    "anomaly": "High swap occupancy (~46.6% used) despite ample free/available RAM and minimal swap I/O activity.",
+    "root_causes": "swap_free_bytes ≈ 1.146 GB of 2 GB (swap_usage_percent ≈ 46.61%) while memory_available_bytes ≈ 5.48 GB and page_swap_in/out rates are near zero, indicating previously swapped pages remain resident (likely inactive) due to swappiness or earlier pressure, which can increase latency via occasional major faults.",
+    "solutions": [
+      "Review and, if appropriate for this node, lower vm.swappiness (e.g., sysctl vm.swappiness=10) to reduce future swapping of inactive pages.",
+      "Identify processes with significant swapped pages (smem -sw, smem -r -k, or grep VmSwap /proc/*/status) and address memory usage patterns.",
+      "During a maintenance window, consider swapoff -a && swapon -a to repatriate stale swapped pages without disrupting running jobs.",
+      "Ensure cgroup memory limits (memory.high/memory.max) are configured to prevent sudden pressure that forces swap in HPC jobs.",
+      "Optionally enable/tune zswap to mitigate disk swap latency if swap is required."
+    ]
+  }
+]

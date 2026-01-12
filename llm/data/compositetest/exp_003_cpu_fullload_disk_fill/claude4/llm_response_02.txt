@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe disk I/O bottleneck with sustained high utilization and wait times.",
+    "root_causes": "Disk I/O load from intensive read/write operations causing system performance degradation.",
+    "solutions": [
+      "Use 'iotop' to identify the specific processes causing the high disk I/O activity.",
+      "Check if the 'ft_cgC' job or its batch process is performing intensive file operations that could be optimized.",
+      "Consider moving temporary files to a faster storage tier or implementing I/O throttling for batch jobs.",
+      "Monitor disk health using 'smartctl' to ensure the storage device is not failing."
+    ]
+  },
+  {
+    "anomaly": "Network activity shows intermittent TCP connection management events.",
+    "root_causes": "Application attempting periodic connection establishment and management during job execution.",
+    "solutions": [
+      "Monitor application logs to determine if the connection activity is expected behavior for the 'ft_cgC' job.",
+      "Review network configuration to ensure optimal settings for the application's communication patterns.",
+      "Consider implementing connection pooling if the application frequently establishes new connections.",
+      "Verify that firewall or network policies are not causing connection timeouts requiring retries."
+    ]
+  }
+]

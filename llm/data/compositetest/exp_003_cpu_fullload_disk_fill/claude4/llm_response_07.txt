@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load causing system performance degradation, with I/O wait consuming up to 8% of CPU time and disk utilization reaching over 60%.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are responsible for the intense disk I/O activity.",
+      "Check disk health using 'smartctl -a /dev/sdX' to identify potential hardware issues.",
+      "Monitor disk queue length and consider upgrading to faster storage (SSD) if mechanical drives are causing bottlenecks.",
+      "Evaluate if the completed job 'ft_cgC' left behind any lingering I/O operations or temporary files."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with 95% utilization.",
+    "root_causes": "Storage capacity exhaustion likely caused by job output files, temporary data, or log accumulation.",
+    "solutions": [
+      "Immediately identify large files using 'du -sh /*' and 'find / -size +1G -type f' to locate space consumers.",
+      "Clean up temporary files in /tmp, /var/tmp, and job-specific working directories.",
+      "Review and rotate system logs that may have grown excessively large.",
+      "Implement automated cleanup policies for completed job outputs and temporary files."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure indicators showing system under moderate memory stress.",
+    "root_causes": "Memory resource load from active processes and system overhead, with memory pressure waiting rate indicating competition for memory resources.",
+    "solutions": [
+      "Use 'free -h' and 'ps aux --sort=-%mem' to identify memory-intensive processes.",
+      "Check if any processes from the completed job are still consuming memory.",
+      "Monitor swap usage patterns to determine if additional physical memory is needed.",
+      "Consider implementing memory limits for future jobs to prevent system-wide memory pressure."
+    ]
+  }
+]

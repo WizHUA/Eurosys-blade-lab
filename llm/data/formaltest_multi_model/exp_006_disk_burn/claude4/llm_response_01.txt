@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with available memory dropping from 5.6GB to 5.4GB and memory usage spiking above 35%.",
+    "root_causes": "Memory resource exhaustion with active swapping indicated by high page swap in/out rates (573K+ pages per second) and memory writeback activity (25MB).",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify the primary memory consumers.",
+      "Check for memory leaks in applications by monitoring process memory usage over time.",
+      "Consider reducing the memory footprint of running applications or adding more physical RAM to the system.",
+      "Review swap configuration and consider increasing swap space if memory pressure persists."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with usage climbing from 73% to 85% and available space dropping from 22GB to 12GB.",
+    "root_causes": "Rapid disk space consumption, likely from application data, logs, or temporary files generated during job execution.",
+    "solutions": [
+      "Use 'du -sh /*' to identify which directories are consuming the most space.",
+      "Check for large log files in /var/log and application-specific log directories.",
+      "Clean up temporary files and consider implementing log rotation policies.",
+      "Monitor disk usage trends and plan for storage expansion if growth continues."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with write rates exceeding 450MB/s and I/O utilization reaching 60%.",
+    "root_causes": "Intense disk write operations, likely from memory swapping combined with application I/O from the completed 'ft_cgC' job.",
+    "solutions": [
+      "Use 'iotop' to identify processes responsible for high disk I/O activity.",
+      "The high disk write rates correlate with memory pressure, indicating swap activity is a major contributor.",
+      "Consider optimizing application I/O patterns or using faster storage devices (SSD) for swap and temporary files.",
+      "Monitor I/O wait times and consider I/O scheduling optimizations for the workload type."
+    ]
+  }
+]

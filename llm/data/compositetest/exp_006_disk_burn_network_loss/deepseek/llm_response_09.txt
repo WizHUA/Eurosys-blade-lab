@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swapping activity",
+    "root_causes": "Memory usage spiked to 98% with heavy swapping activity, causing excessive disk I/O and system load",
+    "solutions": [
+      "Investigate the completed 'ft_ftC' job for memory leaks or improper resource requests",
+      "Check logs for OOM killer activity around the time of high memory pressure",
+      "Review and adjust Slurm memory limits for similar jobs"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time and context switches",
+    "root_causes": "CPU system usage reached 26.98% with over 6,000 context switches/sec, indicating kernel overhead from excessive swapping",
+    "solutions": [
+      "Monitor 'sar' or 'pidstat' data to identify processes causing high system CPU usage",
+      "Check for thrashing due to memory pressure impacting CPU efficiency",
+      "Review vm.swappiness setting and consider lowering it for HPC workloads"
+    ]
+  },
+  {
+    "anomaly": "Unusual job exit condition",
+    "root_causes": "Batch job completed with ExitCode=0:15, suggesting possible signal termination or resource limit hit",
+    "solutions": [
+      "Examine job's STDERR/STDOUT logs for termination clues",
+      "Check Slurm accounting for job's max memory usage vs requested",
+      "Review system logs for signals sent to the job process"
+    ]
+  }
+]

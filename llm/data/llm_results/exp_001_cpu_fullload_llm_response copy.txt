@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization spikes from ~30% to over 80% within a short time window.",
+    "root_causes": "CPU resource load from computational workload",
+    "solutions": [
+      "Identify CPU-intensive processes using 'top' or 'htop'",
+      "Check if the job 'ft_cgC' is causing expected computational load",
+      "Monitor CPU temperature to ensure no thermal throttling"
+    ]
+  },
+  {
+    "anomaly": "System load increases dramatically from 1.77 to 4.88 while processes running count remains stable",
+    "root_causes": "I/O wait or other resource contention causing process queueing",
+    "solutions": [
+      "Check disk I/O metrics for bottlenecks",
+      "Investigate if processes are waiting for I/O operations",
+      "Monitor system interrupts and context switches"
+    ]
+  },
+  {
+    "anomaly": "Network traffic shows unusual patterns with receive rate dropping from 431 to 13 bytes/sec while transmit remains active",
+    "root_causes": "Network connectivity issue or application communication pattern change",
+    "solutions": [
+      "Check network interface status and errors",
+      "Verify application communication patterns",
+      "Monitor TCP retransmissions and connection states"
+    ]
+  }
+]

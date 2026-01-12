@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to swap exhaustion and OOM kills",
+    "root_causes": "Memory usage spiked to 98.58% with swap space nearly exhausted (99.99% used), triggering multiple OOM kills",
+    "solutions": [
+      "Investigate memory leaks in the recently completed 'ft_ftC' job which ran during the memory pressure period",
+      "Review Slurm job memory limits and adjust allocations to prevent swap exhaustion",
+      "Monitor memory usage patterns of similar jobs to identify resource requirements"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time (26.98%) indicating kernel overhead",
+    "root_causes": "Kernel spending excessive time handling memory management and process scheduling during memory pressure events",
+    "solutions": [
+      "Analyze kernel logs (dmesg) for memory management events during the high system CPU period",
+      "Consider tuning vm.swappiness to reduce aggressive swapping behavior",
+      "Check for memory cgroup pressure that might be causing excessive kernel overhead"
+    ]
+  },
+  {
+    "anomaly": "Abnormal TCP retransmission spikes during job execution",
+    "root_causes": "Network congestion or packet loss during MPI communication phases of the job",
+    "solutions": [
+      "Check network interface statistics for packet errors/drops during the job execution window",
+      "Review MPI job's communication pattern and message sizes",
+      "Consider adjusting TCP buffer sizes or congestion control algorithm for HPC workloads"
+    ]
+  }
+]

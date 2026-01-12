@@ -1,0 +1,665 @@
+# CPU相关指标
+cpu:
+  cpu_idle_seconds:
+    description: "CPU空闲模式时间"
+    query: 'node_cpu_seconds_total{mode="idle"}'
+    
+  cpu_user_seconds:
+    description: "CPU用户模式时间"
+    query: 'node_cpu_seconds_total{mode="user"}'
+    
+  cpu_system_seconds:
+    description: "CPU系统模式时间"
+    query: 'node_cpu_seconds_total{mode="system"}'
+    
+  cpu_iowait_seconds:
+    description: "CPU等待IO时间"
+    query: 'node_cpu_seconds_total{mode="iowait"}'
+    
+  cpu_irq_seconds:
+    description: "CPU中断处理时间"
+    query: 'node_cpu_seconds_total{mode="irq"}'
+    
+  cpu_softirq_seconds:
+    description: "CPU软中断处理时间"
+    query: 'node_cpu_seconds_total{mode="softirq"}'
+    
+  cpu_nice_seconds:
+    description: "CPU优先级调整时间"
+    query: 'node_cpu_seconds_total{mode="nice"}'
+    
+  cpu_steal_seconds:
+    description: "CPU虚拟化被盗时间"
+    query: 'node_cpu_seconds_total{mode="steal"}'
+    
+  cpu_usage_percent:
+    description: "CPU总使用率"
+    query: '100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)'
+    
+  cpu_user_percent:
+    description: "CPU用户态使用率"
+    query: 'avg(rate(node_cpu_seconds_total{mode="user"}[1m])) * 100'
+    
+  cpu_system_percent:
+    description: "CPU系统态使用率"
+    query: 'avg(rate(node_cpu_seconds_total{mode="system"}[1m])) * 100'
+    
+  cpu_iowait_percent:
+    description: "CPU等待IO使用率"
+    query: 'avg(rate(node_cpu_seconds_total{mode="iowait"}[1m])) * 100'
+    
+  context_switches_rate:
+    description: "上下文切换率"
+    query: 'rate(node_context_switches_total[1m])'
+    
+  interrupts_rate:
+    description: "中断频率"
+    query: 'rate(node_intr_total[1m])'
+    
+  process_forks_rate:
+    description: "进程创建频率"
+    query: 'rate(node_forks_total[1m])'
+
+# 系统负载指标
+load:
+  load_1min:
+    description: "系统1分钟负载"
+    query: 'node_load1'
+    
+  load_5min:
+    description: "系统5分钟负载"
+    query: 'node_load5'
+    
+  load_15min:
+    description: "系统15分钟负载"
+    query: 'node_load15'
+
+# 进程指标
+processes:
+  processes_running:
+    description: "运行态进程数"
+    query: 'node_procs_running'
+    
+  processes_blocked:
+    description: "阻塞态进程数"
+    query: 'node_procs_blocked'
+
+# 内存相关指标
+memory:
+  memory_total_bytes:
+    description: "总内存大小"
+    query: 'node_memory_MemTotal_bytes'
+    
+  memory_free_bytes:
+    description: "空闲内存大小"
+    query: 'node_memory_MemFree_bytes'
+    
+  memory_available_bytes:
+    description: "可用内存大小"
+    query: 'node_memory_MemAvailable_bytes'
+    
+  memory_cached_bytes:
+    description: "缓存内存大小"
+    query: 'node_memory_Cached_bytes'
+    
+  memory_buffers_bytes:
+    description: "缓冲区内存大小"
+    query: 'node_memory_Buffers_bytes'
+    
+  memory_active_anon_bytes:
+    description: "活跃匿名内存"
+    query: 'node_memory_Active_anon_bytes'
+    
+  memory_active_file_bytes:
+    description: "活跃文件内存"
+    query: 'node_memory_Active_file_bytes'
+    
+  memory_inactive_anon_bytes:
+    description: "非活跃匿名内存"
+    query: 'node_memory_Inactive_anon_bytes'
+    
+  memory_inactive_file_bytes:
+    description: "非活跃文件内存"
+    query: 'node_memory_Inactive_file_bytes'
+    
+  memory_shmem_bytes:
+    description: "共享内存大小"
+    query: 'node_memory_Shmem_bytes'
+    
+  memory_kreclaimable_bytes:
+    description: "内核可回收内存"
+    query: 'node_memory_KReclaimable_bytes'
+    
+  memory_sunreclaim_bytes:
+    description: "内核不可回收内存"
+    query: 'node_memory_SUnreclaim_bytes'
+    
+  memory_page_tables_bytes:
+    description: "页表内存大小"
+    query: 'node_memory_PageTables_bytes'
+    
+  memory_kernel_stack_bytes:
+    description: "内核栈内存大小"
+    query: 'node_memory_KernelStack_bytes'
+    
+  memory_mapped_bytes:
+    description: "映射内存大小"
+    query: 'node_memory_Mapped_bytes'
+    
+  memory_committed_as_bytes:
+    description: "已提交内存大小"
+    query: 'node_memory_Committed_AS_bytes'
+    
+  memory_dirty_bytes:
+    description: "脏页内存大小"
+    query: 'node_memory_Dirty_bytes'
+    
+  memory_writeback_bytes:
+    description: "待写回内存大小"
+    query: 'node_memory_Writeback_bytes'
+    
+  memory_usage_percent:
+    description: "内存使用率"
+    query: '(1 - node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes) * 100'
+    
+  cache_usage_percent:
+    description: "缓存使用率"
+    query: '(node_memory_Cached_bytes/node_memory_MemTotal_bytes) * 100'
+    
+  buffer_usage_percent:
+    description: "缓冲区使用率"
+    query: '(node_memory_Buffers_bytes/node_memory_MemTotal_bytes) * 100'
+    
+  anon_memory_percent:
+    description: "匿名内存使用率"
+    query: '((node_memory_Active_anon_bytes + node_memory_Inactive_anon_bytes)/node_memory_MemTotal_bytes) * 100'
+
+# Swap相关指标
+swap:
+  swap_total_bytes:
+    description: "Swap总大小"
+    query: 'node_memory_SwapTotal_bytes'
+    
+  swap_free_bytes:
+    description: "Swap空闲大小"
+    query: 'node_memory_SwapFree_bytes'
+    
+  swap_cached_bytes:
+    description: "Swap缓存大小"
+    query: 'node_memory_SwapCached_bytes'
+    
+  swap_usage_percent:
+    description: "Swap使用率"
+    query: '(1 - node_memory_SwapFree_bytes/node_memory_SwapTotal_bytes) * 100'
+
+# 虚拟内存统计
+vmstat:
+  page_faults_rate:
+    description: "页错误率"
+    query: 'rate(node_vmstat_pgfault[1m])'
+    
+  page_major_faults_rate:
+    description: "主页错误率"
+    query: 'rate(node_vmstat_pgmajfault[1m])'
+    
+  page_swap_in_rate:
+    description: "页面换入率"
+    query: 'rate(node_vmstat_pgpgin[1m])'
+    
+  page_swap_out_rate:
+    description: "页面换出率"
+    query: 'rate(node_vmstat_pgpgout[1m])'
+    
+  vm_oom_kills_total:
+    description: "OOM杀死进程数"
+    query: 'node_vmstat_oom_kill'
+
+# 磁盘相关指标
+disk:
+  disk_read_bytes_total:
+    description: "磁盘读取字节总数"
+    query: 'node_disk_read_bytes_total{device="sda"}'
+    
+  disk_written_bytes_total:
+    description: "磁盘写入字节总数"
+    query: 'node_disk_written_bytes_total{device="sda"}'
+    
+  disk_reads_completed_total:
+    description: "磁盘读操作完成数"
+    query: 'node_disk_reads_completed_total{device="sda"}'
+    
+  disk_writes_completed_total:
+    description: "磁盘写操作完成数"
+    query: 'node_disk_writes_completed_total{device="sda"}'
+    
+  disk_read_time_seconds_total:
+    description: "磁盘读取时间"
+    query: 'node_disk_read_time_seconds_total{device="sda"}'
+    
+  disk_write_time_seconds_total:
+    description: "磁盘写入时间"
+    query: 'node_disk_write_time_seconds_total{device="sda"}'
+    
+  disk_io_time_seconds_total:
+    description: "磁盘IO总时间"
+    query: 'node_disk_io_time_seconds_total{device="sda"}'
+    
+  disk_io_weighted_time_seconds_total:
+    description: "磁盘加权IO时间"
+    query: 'node_disk_io_time_weighted_seconds_total{device="sda"}'
+    
+  disk_io_now:
+    description: "当前进行的IO操作数"
+    query: 'node_disk_io_now{device="sda"}'
+    
+  disk_reads_merged_total:
+    description: "磁盘读取合并数"
+    query: 'node_disk_reads_merged_total{device="sda"}'
+    
+  disk_writes_merged_total:
+    description: "磁盘写入合并数"
+    query: 'node_disk_writes_merged_total{device="sda"}'
+    
+  disk_io_usage_percent:
+    description: "磁盘IO使用率"
+    query: 'rate(node_disk_io_time_seconds_total{device="sda"}[1m]) * 100'
+    
+  disk_read_rate_bytes_per_sec:
+    description: "磁盘读取速率"
+    query: 'rate(node_disk_read_bytes_total{device="sda"}[1m])'
+    
+  disk_write_rate_bytes_per_sec:
+    description: "磁盘写入速率"
+    query: 'rate(node_disk_written_bytes_total{device="sda"}[1m])'
+    
+  disk_read_iops:
+    description: "磁盘读取IOPS"
+    query: 'rate(node_disk_reads_completed_total{device="sda"}[1m])'
+    
+  disk_write_iops:
+    description: "磁盘写入IOPS"
+    query: 'rate(node_disk_writes_completed_total{device="sda"}[1m])'
+    
+  disk_total_iops:
+    description: "磁盘总IOPS"
+    query: 'rate(node_disk_reads_completed_total{device="sda"}[1m]) + rate(node_disk_writes_completed_total{device="sda"}[1m])'
+
+# 文件系统指标
+filesystem:
+  filesystem_size_bytes:
+    description: "文件系统总大小"
+    query: 'node_filesystem_size_bytes{mountpoint="/"}'
+    
+  filesystem_avail_bytes:
+    description: "文件系统可用空间"
+    query: 'node_filesystem_avail_bytes{mountpoint="/"}'
+    
+  filesystem_free_bytes:
+    description: "文件系统空闲空间"
+    query: 'node_filesystem_free_bytes{mountpoint="/"}'
+    
+  filesystem_readonly:
+    description: "文件系统只读状态"
+    query: 'node_filesystem_readonly{mountpoint="/"}'
+    
+  filesystem_usage_percent:
+    description: "文件系统使用率"
+    query: '(1 - node_filesystem_avail_bytes{mountpoint="/"}/node_filesystem_size_bytes{mountpoint="/"}) * 100'
+    
+  filesystem_files_total:
+    description: "文件系统inode总数"
+    query: 'node_filesystem_files{mountpoint="/"}'
+    
+  filesystem_files_free:
+    description: "文件系统inode空闲数"
+    query: 'node_filesystem_files_free{mountpoint="/"}'
+    
+  filesystem_inode_usage_percent:
+    description: "inode使用率"
+    query: '(1 - node_filesystem_files_free{mountpoint="/"}/node_filesystem_files{mountpoint="/"}) * 100'
+    
+  filefd_allocated:
+    description: "已分配文件描述符数"
+    query: 'node_filefd_allocated'
+    
+  filefd_maximum:
+    description: "最大文件描述符数"
+    query: 'node_filefd_maximum'
+    
+  filefd_usage_percent:
+    description: "文件描述符使用率"
+    query: '(node_filefd_allocated/node_filefd_maximum) * 100'
+
+# 网络相关指标
+network:
+  network_receive_bytes_total:
+    description: "网络接收字节总数"
+    query: 'node_network_receive_bytes_total{device="ens33"}'
+    
+  network_transmit_bytes_total:
+    description: "网络发送字节总数"
+    query: 'node_network_transmit_bytes_total{device="ens33"}'
+    
+  network_receive_packets_total:
+    description: "网络接收数据包总数"
+    query: 'node_network_receive_packets_total{device="ens33"}'
+    
+  network_transmit_packets_total:
+    description: "网络发送数据包总数"
+    query: 'node_network_transmit_packets_total{device="ens33"}'
+    
+  network_receive_errs_total:
+    description: "网络接收错误总数"
+    query: 'node_network_receive_errs_total{device="ens33"}'
+    
+  network_transmit_errs_total:
+    description: "网络发送错误总数"
+    query: 'node_network_transmit_errs_total{device="ens33"}'
+    
+  network_receive_drop_total:
+    description: "网络接收丢包总数"
+    query: 'node_network_receive_drop_total{device="ens33"}'
+    
+  network_transmit_drop_total:
+    description: "网络发送丢包总数"
+    query: 'node_network_transmit_drop_total{device="ens33"}'
+    
+  network_receive_fifo_total:
+    description: "网络接收FIFO错误"
+    query: 'node_network_receive_fifo_total{device="ens33"}'
+    
+  network_transmit_fifo_total:
+    description: "网络发送FIFO错误"
+    query: 'node_network_transmit_fifo_total{device="ens33"}'
+    
+  network_receive_frame_total:
+    description: "网络接收帧错误"
+    query: 'node_network_receive_frame_total{device="ens33"}'
+    
+  network_transmit_carrier_total:
+    description: "网络发送载波错误"
+    query: 'node_network_transmit_carrier_total{device="ens33"}'
+    
+  network_transmit_colls_total:
+    description: "网络发送冲突总数"
+    query: 'node_network_transmit_colls_total{device="ens33"}'
+    
+  network_up:
+    description: "网络接口状态"
+    query: 'node_network_up{device="ens33"}'
+    
+  network_mtu_bytes:
+    description: "网络接口MTU"
+    query: 'node_network_mtu_bytes{device="ens33"}'
+    
+  network_speed_bytes:
+    description: "网络接口速度"
+    query: 'node_network_speed_bytes{device="ens33"}'
+    
+  network_receive_rate_bytes_per_sec:
+    description: "网络接收速率"
+    query: 'rate(node_network_receive_bytes_total{device="ens33"}[1m])'
+    
+  network_transmit_rate_bytes_per_sec:
+    description: "网络发送速率"
+    query: 'rate(node_network_transmit_bytes_total{device="ens33"}[1m])'
+    
+  network_receive_packets_rate:
+    description: "网络接收包速率"
+    query: 'rate(node_network_receive_packets_total{device="ens33"}[1m])'
+    
+  network_transmit_packets_rate:
+    description: "网络发送包速率"
+    query: 'rate(node_network_transmit_packets_total{device="ens33"}[1m])'
+    
+  network_receive_errors_rate:
+    description: "网络接收错误率"
+    query: 'rate(node_network_receive_errs_total{device="ens33"}[1m])'
+    
+  network_transmit_errors_rate:
+    description: "网络发送错误率"
+    query: 'rate(node_network_transmit_errs_total{device="ens33"}[1m])'
+    
+  network_receive_drop_rate:
+    description: "网络接收丢包率"
+    query: 'rate(node_network_receive_drop_total{device="ens33"}[1m])'
+    
+  network_transmit_drop_rate:
+    description: "网络发送丢包率"
+    query: 'rate(node_network_transmit_drop_total{device="ens33"}[1m])'
+
+# TCP/UDP协议栈指标
+netstat:
+  tcp_current_connections:
+    description: "TCP当前连接数"
+    query: 'node_netstat_Tcp_CurrEstab'
+    
+  tcp_active_opens_rate:
+    description: "TCP主动打开连接数"
+    query: 'rate(node_netstat_Tcp_ActiveOpens[1m])'
+    
+  tcp_passive_opens_rate:
+    description: "TCP被动打开连接数"
+    query: 'rate(node_netstat_Tcp_PassiveOpens[1m])'
+    
+  tcp_timeouts_rate:
+    description: "TCP超时率"
+    query: 'rate(node_netstat_TcpExt_TCPTimeouts[1m])'
+    
+  tcp_retransmissions_rate:
+    description: "TCP重传率"
+    query: 'rate(node_netstat_Tcp_RetransSegs[1m])'
+    
+  tcp_syn_retrans_rate:
+    description: "TCP SYN重传率"
+    query: 'rate(node_netstat_TcpExt_TCPSynRetrans[1m])'
+    
+  tcp_listen_overflows_rate:
+    description: "TCP监听队列溢出率"
+    query: 'rate(node_netstat_TcpExt_ListenOverflows[1m])'
+    
+  tcp_listen_drops_rate:
+    description: "TCP监听队列丢弃率"
+    query: 'rate(node_netstat_TcpExt_ListenDrops[1m])'
+    
+  tcp_resets_sent_rate:
+    description: "TCP重置连接率"
+    query: 'rate(node_netstat_Tcp_OutRsts[1m])'
+    
+  tcp_segments_received_rate:
+    description: "TCP接收段速率"
+    query: 'rate(node_netstat_Tcp_InSegs[1m])'
+    
+  tcp_segments_sent_rate:
+    description: "TCP发送段速率"
+    query: 'rate(node_netstat_Tcp_OutSegs[1m])'
+    
+  tcp_receive_errors_rate:
+    description: "TCP接收错误率"
+    query: 'rate(node_netstat_Tcp_InErrs[1m])'
+    
+  udp_receive_datagrams_rate:
+    description: "UDP接收数据报速率"
+    query: 'rate(node_netstat_Udp_InDatagrams[1m])'
+    
+  udp_transmit_datagrams_rate:
+    description: "UDP发送数据报速率"
+    query: 'rate(node_netstat_Udp_OutDatagrams[1m])'
+    
+  udp_receive_errors_rate:
+    description: "UDP接收错误率"
+    query: 'rate(node_netstat_Udp_InErrors[1m])'
+    
+  udp_no_ports_rate:
+    description: "UDP无端口错误率"
+    query: 'rate(node_netstat_Udp_NoPorts[1m])'
+    
+  icmp_receive_msgs_rate:
+    description: "ICMP接收消息速率"
+    query: 'rate(node_netstat_Icmp_InMsgs[1m])'
+    
+  icmp_transmit_msgs_rate:
+    description: "ICMP发送消息速率"
+    query: 'rate(node_netstat_Icmp_OutMsgs[1m])'
+    
+  icmp_receive_errors_rate:
+    description: "ICMP接收错误率"
+    query: 'rate(node_netstat_Icmp_InErrors[1m])'
+    
+  sockets_used:
+    description: "已使用socket数量"
+    query: 'node_sockstat_sockets_used'
+    
+  tcp_mem_bytes:
+    description: "TCP分配内存"
+    query: 'node_sockstat_TCP_mem_bytes'
+    
+  udp_mem_bytes:
+    description: "UDP分配内存"
+    query: 'node_sockstat_UDP_mem_bytes'
+
+# 系统与时间服务指标
+system:
+  systemd_units_active:
+    description: "systemd活跃服务数"
+    query: 'node_systemd_units{state="active"}'
+    
+  systemd_units_inactive:
+    description: "systemd非活跃服务数"
+    query: 'node_systemd_units{state="inactive"}'
+    
+  systemd_units_failed:
+    description: "systemd失败服务数"
+    query: 'node_systemd_units{state="failed"}'
+    
+  systemd_system_running:
+    description: "systemd系统运行状态"
+    query: 'node_systemd_system_running'
+    
+  system_time_seconds:
+    description: "系统时间戳"
+    query: 'node_time_seconds'
+    
+  system_boot_time_seconds:
+    description: "系统启动时间"
+    query: 'node_boot_time_seconds'
+    
+  system_uptime_seconds:
+    description: "系统运行时间"
+    query: 'node_time_seconds - node_boot_time_seconds'
+    
+  time_sync_status:
+    description: "时间同步状态"
+    query: 'node_timex_sync_status'
+    
+  time_offset_seconds:
+    description: "时间偏移量"
+    query: 'node_timex_offset_seconds'
+    
+  time_max_error_seconds:
+    description: "时间最大误差"
+    query: 'node_timex_maxerror_seconds'
+    
+  time_estimated_error_seconds:
+    description: "时间估计误差"
+    query: 'node_timex_estimated_error_seconds'
+    
+  time_frequency_adjustment_ratio:
+    description: "时间频率调整比率"
+    query: 'node_timex_frequency_adjustment_ratio'
+    
+  time_loop_time_constant:
+    description: "时间循环时间常数"
+    query: 'node_timex_loop_time_constant'
+    
+  time_status:
+    description: "时间状态标志"
+    query: 'node_timex_status'
+    
+  time_zone_offset_seconds:
+    description: "时间时区偏移"
+    query: 'node_time_zone_offset_seconds'
+
+# 熵和随机数指标
+entropy:
+  entropy_available_bits:
+    description: "可用熵位数"
+    query: 'node_entropy_available_bits'
+    
+  entropy_pool_size_bits:
+    description: "熵池大小"
+    query: 'node_entropy_pool_size_bits'
+    
+  entropy_usage_percent:
+    description: "熵使用率"
+    query: '(1 - node_entropy_available_bits/node_entropy_pool_size_bits) * 100'
+
+# 软件中断和网络处理指标
+softnet:
+  softnet_processed_total:
+    description: "软网络数据包处理总数"
+    query: 'node_softnet_processed_total'
+    
+  softnet_dropped_total:
+    description: "软网络数据包丢弃总数"
+    query: 'node_softnet_dropped_total'
+    
+  softnet_times_squeezed_total:
+    description: "软网络队列挤压次数"
+    query: 'node_softnet_times_squeezed_total'
+    
+  softnet_processed_rate:
+    description: "软网络处理速率"
+    query: 'rate(node_softnet_processed_total[1m])'
+    
+  softnet_dropped_rate:
+    description: "软网络丢包率"
+    query: 'rate(node_softnet_dropped_total[1m])'
+    
+  softnet_squeezed_rate:
+    description: "软网络挤压率"
+    query: 'rate(node_softnet_times_squeezed_total[1m])'
+
+# ARP指标
+arp:
+  arp_entries:
+    description: "ARP表条目数"
+    query: 'node_arp_entries'
+
+# 压力指标 (PSI - Pressure Stall Information)
+pressure:
+  cpu_pressure_waiting_rate:
+    description: "CPU压力等待时间率"
+    query: 'rate(node_pressure_cpu_waiting_seconds_total[1m])'
+    
+  memory_pressure_waiting_rate:
+    description: "内存压力等待时间率"
+    query: 'rate(node_pressure_memory_waiting_seconds_total[1m])'
+    
+  memory_pressure_stalled_rate:
+    description: "内存压力阻塞时间率"
+    query: 'rate(node_pressure_memory_stalled_seconds_total[1m])'
+    
+  io_pressure_waiting_rate:
+    description: "IO压力等待时间率"
+    query: 'rate(node_pressure_io_waiting_seconds_total[1m])'
+    
+  io_pressure_stalled_rate:
+    description: "IO压力阻塞时间率"
+    query: 'rate(node_pressure_io_stalled_seconds_total[1m])'
+
+# 调度统计指标
+schedstat:
+  schedstat_running_rate:
+    description: "调度运行时间"
+    query: 'rate(node_schedstat_running_seconds_total[1m])'
+    
+  schedstat_waiting_rate:
+    description: "调度等待时间"
+    query: 'rate(node_schedstat_waiting_seconds_total[1m])'
+
+# 监控配置
+config:
+  prometheus_url: "http://localhost:9090"
+  default_interval: 15  # 秒
+  query_timeout: 30     # 秒

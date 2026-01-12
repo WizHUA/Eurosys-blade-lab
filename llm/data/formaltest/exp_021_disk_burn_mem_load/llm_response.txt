@@ -1,0 +1,36 @@
+[
+  {
+    "anomaly": "CPU utilization is critically high, primarily due to an extreme increase in I/O wait time.",
+    "root_causes": "Disk I/O load causing severe system performance degradation.",
+    "solutions": [
+      "Investigate the cause of the high I/O wait using 'iotop' to identify processes with excessive disk activity.",
+      "Check for heavy swapping activity due to memory pressure, as this can contribute to I/O wait.",
+      "Review the filesystem for potential issues (e.g., nearing full capacity) that might be slowing down I/O operations."
+    ]
+  },
+  {
+    "anomaly": "System load is excessively high and increasing, far exceeding the number of CPU cores.",
+    "root_causes": "CPU resource load from processes waiting for I/O or other resources.",
+    "solutions": [
+      "Use 'top' or 'htop' to view the running processes and identify those in 'D' state (uninterruptible sleep, often due to I/O).",
+      "The high load is likely a symptom of the I/O bottleneck; resolving the I/O issue should reduce the load."
+    ]
+  },
+  {
+    "anomaly": "Memory pressure is severe, with very low available memory and high swap usage.",
+    "root_causes": "Memory resource load, likely exacerbated by the I/O bottleneck causing processes to stall.",
+    "solutions": [
+      "Monitor 'vmstat 1' to confirm swapping activity (si/so columns).",
+      "Identify memory-hungry processes with 'ps aux --sort=-%mem' and consider terminating non-critical ones if possible."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O utilization is extremely high, indicating a storage bottleneck.",
+    "root_causes": "Disk I/O load from application activity and potential swapping.",
+    "solutions": [
+      "The 'disk_io_usage_percent' is consistently above 70%, which is critical.",
+      "Use 'iostat -x 1' to get detailed disk statistics and identify the specific device causing the bottleneck.",
+      "Check the health of the storage system (e.g., RAID array, network filesystem) for potential degradation."
+    ]
+  }
+]

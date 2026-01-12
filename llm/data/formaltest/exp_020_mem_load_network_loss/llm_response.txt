@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Memory usage is critically high at 99%, with extremely low available memory (less than 100 MB).",
+    "root_causes": "Memory resource load from one or more memory-intensive processes.",
+    "solutions": [
+      "Use 'top' or 'htop' sorted by memory usage to identify processes consuming excessive RAM.",
+      "Check if the recently completed job 'ft_ftC' or its batch script left behind memory-intensive processes.",
+      "Investigate the high 'memory_committed_as_bytes' value, which indicates significant memory overcommitment."
+    ]
+  },
+  {
+    "anomaly": "Swap usage is extremely high (over 90%), indicating heavy swapping activity.",
+    "root_causes": "Memory resource load forcing the system to use swap space extensively.",
+    "solutions": [
+      "Monitor swap activity with 'vmstat 1' to confirm continuous swapping ('si'/'so' columns).",
+      "The low 'swap_free_bytes' and high 'swap_usage_percent' confirm swap exhaustion.",
+      "Addressing the primary memory pressure should reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O utilization is consistently high (over 80%), indicating a storage bottleneck.",
+    "root_causes": "Disk I/O load from application activity and possibly swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk read/write rates.",
+      "The high 'disk_io_time_percent' values suggest the storage subsystem is saturated.",
+      "Check if the completed job 'ft_ftC' involved heavy I/O operations that might be lingering."
+    ]
+  },
+  {
+    "anomaly": "High system load average (around 6.0) persists despite moderate CPU usage.",
+    "root_causes": "System resource load from I/O wait and blocked processes.",
+    "solutions": [
+      "The number of 'processes_blocked' (up to 8) correlates with high I/O wait times.",
+      "Use 'ps aux' to check for processes in 'D' (uninterruptible sleep) state, often due to I/O.",
+      "The load average remaining high suggests ongoing resource contention post-job completion."
+    ]
+  }
+]

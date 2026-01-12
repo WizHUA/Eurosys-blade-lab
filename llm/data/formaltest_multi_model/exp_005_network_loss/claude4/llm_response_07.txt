@@ -1,0 +1,12 @@
+[
+  {
+    "anomaly": "System experiencing moderate memory pressure with increased memory usage and reduced available memory.",
+    "root_causes": "Memory resource consumption from active processes and cached data, leading to reduced free memory and increased buffer/cache usage.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify high memory consumers.",
+      "Check if the completed job 'ft_cgC' left any persistent memory allocations or shared memory segments.",
+      "Clear system caches if safe to do so using 'echo 1 > /proc/sys/vm/drop_caches' to free up cached memory.",
+      "Verify that all job-related processes have properly terminated and released their memory allocations."
+    ]
+  }
+]

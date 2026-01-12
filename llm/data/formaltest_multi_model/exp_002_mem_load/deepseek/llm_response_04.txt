@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes with significant anonymous memory allocation",
+    "root_causes": "Memory-intensive application (ft_cgC) consuming large amounts of anonymous memory (active_anon_bytes reaching 5GB)",
+    "solutions": [
+      "Monitor application memory usage patterns using 'ps aux --sort=-%mem' during execution",
+      "Consider optimizing the FT_CG application's memory management",
+      "Evaluate if additional swap space would help handle memory spikes"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time percentage during memory-intensive operations",
+    "root_causes": "Kernel overhead from managing memory allocation/deallocation and potential swapping activity",
+    "solutions": [
+      "Check for excessive page faults using 'vmstat 1' during job execution",
+      "Monitor kernel CPU usage breakdown with 'pidstat -t 1'",
+      "Consider tuning vm.swappiness parameter if excessive swapping is observed"
+    ]
+  },
+  {
+    "anomaly": "Network traffic spikes coinciding with memory pressure events",
+    "root_causes": "Possible MPI communication overhead during memory-intensive phases of FT_CG computation",
+    "solutions": [
+      "Profile application network usage patterns with MPI profiling tools",
+      "Check for network congestion during memory-intensive phases",
+      "Consider adjusting MPI task distribution to balance memory and network load"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes causing swap usage surges",
+    "root_causes": "Memory-intensive application (ft_ftC) consuming most system memory leading to heavy swapping activity",
+    "solutions": [
+      "Review Slurm job 285 memory allocation requirements and adjust accordingly",
+      "Investigate potential memory leaks in the ft_ftC application",
+      "Consider adding more compute nodes or memory capacity to the cluster"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O pressure during job execution",
+    "root_causes": "Disk writes exceeding 690MB/s during peak periods of job execution",
+    "solutions": [
+      "Implement I/O throttling for disk-intensive jobs",
+      "Consider using faster storage tier for I/O-heavy workloads",
+      "Optimize application I/O patterns (e.g., larger block sizes, buffered writes)"
+    ]
+  },
+  {
+    "anomaly": "Irregular TCP connection patterns observed",
+    "root_causes": "Possible network communication issues during MPI job execution",
+    "solutions": [
+      "Verify MPI configuration and network stack settings",
+      "Check for network hardware issues or congestion",
+      "Profile job's network communication patterns"
+    ]
+  }
+]

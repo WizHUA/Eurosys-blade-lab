@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with frequent swap activity",
+    "root_causes": "Process memory requirements exceeding available physical RAM, leading to heavy swapping",
+    "solutions": [
+      "Investigate memory usage patterns of the completed job ft_ftC to identify memory leaks or inefficient memory allocation",
+      "Increase physical memory allocation for compute nodes or optimize job memory requirements",
+      "Adjust swappiness parameter to reduce aggressive swapping behavior"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait times correlating with memory pressure events",
+    "root_causes": "Disk I/O contention from swapping operations and job I/O requirements",
+    "solutions": [
+      "Monitor disk I/O during job execution to identify bottleneck sources",
+      "Consider using local storage or faster storage solutions for I/O-intensive jobs",
+      "Implement I/O throttling or scheduling policies to prevent resource starvation"
+    ]
+  },
+  {
+    "anomaly": "Spikes in system load despite moderate CPU usage",
+    "root_causes": "Resource contention between jobs and system processes during job completion phase",
+    "solutions": [
+      "Review job scheduling parameters to better isolate compute resources",
+      "Check for runaway processes or clean-up tasks post job completion",
+      "Monitor for scheduler-induced conflicts during job termination phase"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Kernel Out-Of-Memory (OOM) kill occurred during the job window.",
+    "root_causes": "vm_oom_kills_total=1 across samples indicates an OOM event. memory_committed_as_bytes (≈7.5–9.1e9) exceeded memory_total_bytes (8.278e9) while swap_usage_percent remained ~46.6% and page_swap_out_rate was elevated, evidencing memory overcommit by running workloads (job 276 ft_cgC was active in this window).",
+    "solutions": [
+      "Identify the OOM victim and trigger time: dmesg -T | grep -i 'Out of memory' and journalctl -k --since '2025-09-20 07:00'.",
+      "Enforce Slurm/cgroup memory limits so jobs cannot overcommit system RAM (e.g., Slurm --mem/--mem-per-cpu, TaskPlugin=cgroup, ConstrainRAMSpace).",
+      "Adjust application memory usage or request more memory for the job; if needed, spread the workload across more nodes.",
+      "Tune kernel overcommit policy (vm.overcommit_memory=2 and appropriate vm.overcommit_ratio) to prevent committed memory from exceeding physical+swap capacity."
+    ]
+  },
+  {
+    "anomaly": "Sustained high swap-out activity (swap churn) despite moderate CPU and disk utilization.",
+    "root_causes": "page_swap_out_rate is persistently high (~161–189/s in multiple samples) with swap_usage_percent ~46.6%. memory_available_bytes drops (≈5.5e9 → 3.7e9) while active anonymous memory grows, indicating the working set exceeds RAM and the node is actively swapping.",
+    "solutions": [
+      "Locate top memory consumers (e.g., top/htop, ps aux --sort=-%mem, smem) and reduce their footprint or repartition the workload.",
+      "Lower swappiness (e.g., vm.swappiness=10–20) or consider disabling swap on compute nodes if policy allows; then monitor page_swap_in/out rates.",
+      "Set stricter per-job memory limits and reservations in Slurm to prevent swap thrash (enforce cgroup memory).",
+      "If this pattern persists, provision more RAM for the node or schedule memory-intensive phases across additional nodes."
+    ]
+  },
+  {
+    "anomaly": "Transient spike in TCP retransmissions, SYN retransmits, and timeouts around 07:06:58.",
+    "root_causes": "node_netstat counters show Tcp_RetransSegs≈30, TCPSynRetrans≈6, and TCPTimeouts≈15 at 07:06:58 (near-zero in adjacent samples), indicating short-lived packet loss or congestion; link-level error/drop counters remained at 0.",
+    "solutions": [
+      "Check NIC/link health around the event: ethtool -S <iface>, ip -s link, and dmesg -T | grep -i 'eth' for driver/reset messages.",
+      "Verify switch ports and cabling (errors, MTU/duplex mismatch) and correlate switch logs with the timestamp.",
+      "If reproducible, capture a short tcpdump during job runs and verify TCP offloads (TSO/GRO/LRO) and host firewall/IDS settings are not inducing SYN drops.",
+      "Coordinate with network operations to apply QoS/traffic shaping if contention with other traffic is suspected."
+    ]
+  }
+]

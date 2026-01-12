@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Transient near-full filesystem: filesystem_usage_percent jumped from ~73.36% to ~95.36% (filesystem_avail_bytes dropped to ~3,893,669,888–3,893,707,264) between 23:20:25 and 23:21:10, then returned to ~73.36% by 23:21:25.",
+    "root_causes": "Large temporary/checkpoint or output writes from the active job (ft_cgC) created sizable files that were later removed; this aligns with elevated disk write/IO usage in the same window.",
+    "solutions": [
+      "Audit the job's output and temporary directories for that interval to identify large transient files and enable automatic cleanup at job end.",
+      "Redirect job scratch/tmp (e.g., $TMPDIR) to a higher-capacity or parallel filesystem and avoid writing intermediates to the nearly full filesystem.",
+      "Set per-job disk quotas and alerts when filesystem_usage_percent exceeds 90% to prevent ENOSPC during runs.",
+      "If this usage is expected, expand the filesystem or provision additional dedicated scratch capacity."
+    ]
+  },
+  {
+    "anomaly": "Burst of heavy swapping and I/O wait at 23:19:40 (page_swap_out_rate ≈ 31,839/s, page_swap_in_rate ≈ 323/s, cpu_iowait_percent ≈ 7.97%, disk_io_usage_percent ≈ 62.43%) despite low memory usage (~33% used, memory_available_bytes ≈ 5.53 GB).",
+    "root_causes": "Aggressive swapping or working-set thrashing during the job (ft_cgC) caused unnecessary paging to disk even though RAM was available, increasing I/O wait and degrading performance.",
+    "solutions": [
+      "Inspect per-process memory and swap usage (smem, top, /proc/<pid>/smaps) around job start to identify tasks causing paging.",
+      "Reduce swapping aggressiveness (e.g., lower vm.swappiness) or cap swap for batch jobs via cgroup memory.swap.max.",
+      "Align job memory requests/limits with actual working set; consider pre-faulting or mlocking critical buffers to avoid paging.",
+      "Monitor page_major_faults_rate and cpu_iowait_percent in future runs; if spikes recur, profile memory access patterns or add RAM."
+    ]
+  }
+]

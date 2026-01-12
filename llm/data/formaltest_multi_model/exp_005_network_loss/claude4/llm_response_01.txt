@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Memory usage is abnormally high at 32% with significant reduction in available memory during job execution.",
+    "root_causes": "The completed job 'ft_cgC' appears to have consumed substantial memory resources, with memory usage climbing from 18% to 32% and available memory dropping significantly.",
+    "solutions": [
+      "Monitor memory consumption patterns of the 'ft_cgC' job type to identify if this is expected behavior or a memory leak.",
+      "Check if the job properly releases memory resources upon completion using 'ps aux' and memory profiling tools.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm's memory constraints to prevent excessive memory consumption."
+    ]
+  },
+  {
+    "anomaly": "Moderate increase in disk I/O activity during the monitoring period.",
+    "root_causes": "Disk write operations increased significantly, likely related to the computational job writing results or temporary data.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes generating the disk I/O load.",
+      "Monitor filesystem usage to ensure adequate free space for job output and temporary files.",
+      "Consider optimizing job I/O patterns or using faster storage for frequently accessed data."
+    ]
+  }
+]

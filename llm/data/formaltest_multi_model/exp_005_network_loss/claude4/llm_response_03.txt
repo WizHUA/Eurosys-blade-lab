@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Sustained high CPU utilization with disproportionate system load averaging 3.8",
+    "root_causes": "CPU resource load from computationally intensive processes or background tasks creating resource contention",
+    "solutions": [
+      "Use 'top' or 'htop' to identify the specific processes contributing to the high system load",
+      "Check system logs for any post-job cleanup or maintenance tasks that might be consuming CPU resources",
+      "Analyze the process states; a high number of processes in 'D' (disk wait) state could point to an I/O bottleneck causing the load"
+    ]
+  },
+  {
+    "anomaly": "Memory usage has increased significantly from 18% to 32% over the monitoring period",
+    "root_causes": "Memory resource load, likely from active processes or memory leaks consuming available RAM",
+    "solutions": [
+      "Use 'free -h' and 'vmstat 1' to monitor memory utilization trends",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Monitor for potential memory leaks in running applications or system services"
+    ]
+  }
+]

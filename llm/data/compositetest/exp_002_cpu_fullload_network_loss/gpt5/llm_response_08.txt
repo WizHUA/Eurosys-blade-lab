@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O contention with high iowait during job execution.",
+    "root_causes": "The running job (ft_cgC) is driving sustained storage pressure: disk_io_usage_percent climbs as high as ~87.0% (23:18:40) with cpu_iowait_percent peaking at ~22.49% (23:18:55). Read/write throughput is significant (e.g., ~149 MB/s reads and ~215 MB/s writes at 23:17:55) and IOPS are elevated, causing blocked processes (processes_blocked up to 3). This indicates the workload is storage‑bound and saturating the device queue.",
+    "solutions": [
+      "Profile per-process I/O with iotop/pidstat -d to confirm the offending PIDs from job 284 (ft_cgC).",
+      "Throttle or isolate the job’s I/O using cgroups/io.max (or blkio on older systems) and ionice to prevent device queue saturation.",
+      "Stage large, sequential I/O to node-local NVMe/scratch and batch flush results back to the shared filesystem.",
+      "Tune storage path: select an I/O scheduler suited for mixed workloads (e.g., BFQ for HDD, none/mq-deadline for SSD), and adjust read-ahead (blockdev --setra) for sequential access.",
+      "If the code supports it, use direct I/O or larger buffered I/O to reduce page cache churn, and batch small writes to lower IOPS."
+    ]
+  },
+  {
+    "anomaly": "Transient near-full filesystem condition followed by abrupt space recovery.",
+    "root_causes": "Filesystem usage rises to ~98.12% (avail ~1.57 GiB at 23:19:25) then drops to ~73.35% (avail ~22.34 GiB at 23:19:40). This points to the job creating large temporary files and removing them shortly after, a pattern that can trigger ENOSPC risks for concurrent workloads.",
+    "solutions": [
+      "Redirect large temporary outputs to a designated per-node or per-job scratch area with quotas/cleanup policies.",
+      "Set proactive alerting and job admission guards at 85–90% filesystem usage to prevent ENOSPC during bursts.",
+      "Have the application write to unique scratch paths and perform staged, incremental transfers rather than bulk spikes.",
+      "Implement post-job cleanup hooks to ensure immediate removal of scratch artifacts and verify the job’s temp paths."
+    ]
+  },
+  {
+    "anomaly": "Bursty swap activity despite moderate overall memory pressure.",
+    "root_causes": "Swap usage percent remains ~54% but page_swap_in/out rates spike (e.g., swap-in ~145,640/s and swap-out ~210,065/s at 23:17:55), while memory_free_bytes is low and cache dominates (cache_usage_percent ~61%). The kernel likely reclaims/rotates anonymous pages to preserve page cache for I/O, causing latency.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., to 10) and tune writeback thresholds (vm.dirty_background_ratio/bytes, vm.dirty_ratio/bytes) to reduce swap churn during heavy I/O.",
+      "Increase requested memory for the job or cap its cache impact (consider O_DIRECT for bulk reads/writes where appropriate).",
+      "Validate that node swap is aligned with site policy; if swap is not desired on compute nodes, consider reducing or disabling it after assessing workload impact.",
+      "Use numastat and perf mem to detect hot memory pages and rebalance or pin threads to reduce reclaim pressure."
+    ]
+  }
+]

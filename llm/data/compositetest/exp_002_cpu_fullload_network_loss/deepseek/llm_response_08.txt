@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with 83-84% load despite job completion",
+    "root_causes": "Potential zombie processes or unfinished cleanup from completed job 284 (ft_cgC)",
+    "solutions": [
+      "Check for zombie processes using 'ps -ef | grep defunct' and clean up if found",
+      "Verify all job cleanup scripts completed successfully for job 284",
+      "Inspect system logs for any failed post-job processing steps for the completed NAS benchmark"
+    ]
+  },
+  {
+    "anomaly": "Spikes in disk I/O wait time up to 22.49% CPU usage",
+    "root_causes": "Possible filesystem cleanup or temporary file deletion operations post-job",
+    "solutions": [
+      "Monitor 'iotop' to identify any lingering disk-intensive processes",
+      "Check for large temporary files in /tmp or job workspaces that might be getting cleaned",
+      "Verify filesystem caching behavior with 'free -m'"
+    ]
+  },
+  {
+    "anomaly": "Memory usage remaining high after job completion (only 238MB free)",
+    "root_causes": "Memory not being released properly by completed application or system cache not being dropped",
+    "solutions": [
+      "Check for memory leaks in the application using 'pmap -x' on any remaining processes",
+      "Consider manually dropping caches if needed (echo 3 > /proc/sys/vm/drop_caches)",
+      "Verify swap usage patterns with 'vmstat 1' for potential memory pressure"
+    ]
+  }
+]

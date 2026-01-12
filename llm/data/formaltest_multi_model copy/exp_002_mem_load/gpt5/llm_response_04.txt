@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Transient but severe memory pressure and overcommit during the job window",
+    "root_causes": "Between 07:04:28 and 07:05:13, memory_free_bytes dropped from ~3.38 GiB to ~0.53 GiB and memory_available_bytes from ~5.49 GiB to ~2.55 GiB, while memory_committed_as_bytes jumped to 10,911,182,848 bytes, exceeding RAM+swap (8,278,052,864 + 2,147,479,552 = 10,425,532,416 bytes). Active anonymous memory rose sharply (e.g., to 4,664,414,208 bytes) with page_faults_rate peaking >7,700/s, indicating the running job (276|ft_cgC) rapidly allocated/committed memory beyond physical capacity.",
+    "solutions": [
+      "Enforce per-job memory limits in Slurm (e.g., --mem/--mem-per-cpu) and ensure cgroup memory.max is active for jobs.",
+      "Audit the job's memory allocation pattern (e.g., with heaptrack or valgrind massif) and reduce problem size or peak working set.",
+      "Configure stricter overcommit policy (vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio) to prevent commit beyond RAM+swap.",
+      "If workload requires it, reduce concurrency on the node or provision additional RAM.",
+      "Add alerting on memory_available_bytes and memory_committed_as_bytes to catch future spikes earlier."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap occupancy (~46.6% of 2 GiB) despite ample available RAM",
+    "root_causes": "swap_total_bytes is 2,147,479,552 and swap_free_bytes remains ~1,146,806,272 across samples (≈1.0 GiB used) while memory_available_bytes is 2.55–5.49 GiB, suggesting pages remain swapped out from prior pressure and are not being repatriated (likely aggressive swappiness or long-lived inactive anon). This can increase latency for touched pages.",
+    "solutions": [
+      "During a maintenance window, clear stale swap (swapoff -a && swapon -a) to repatriate infrequently used pages.",
+      "Lower vm.swappiness (e.g., to 10–20) to reduce the tendency to swap when RAM is available.",
+      "Identify processes with large swap footprints (e.g., smem -rs swap or /proc/*/smaps_rollup) and optimize their memory usage.",
+      "Apply cgroup v2 memory.swap.max to cap swap per job and prevent cross-job interference."
+    ]
+  },
+  {
+    "anomaly": "Historical OOM kill observed on the node",
+    "root_causes": "vm_oom_kills_total=1 across all samples indicates the kernel OOM killer has been triggered since boot, consistent with prior memory overcommit or runaway allocations (potentially from a job).",
+    "solutions": [
+      "Review kernel logs for the OOM event (dmesg -T | grep -E 'Out of memory|Killed process') and correlate with Slurm job logs.",
+      "Tighten Slurm memory limits and ensure cgroup memory.oom.group is set so OOMs are contained within the offending job.",
+      "Adopt conservative overcommit settings or reduce job concurrency to avoid future OOM conditions."
+    ]
+  }
+]

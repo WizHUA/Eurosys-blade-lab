@@ -1,0 +1,22 @@
+\begin{table}[ht]
+\centering
+\footnotesize
+\caption{Diagnosis Accuracy (\%) of LLMs on Multi-Anomaly Scenarios}
+\label{tab:compound_failure_acc}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{@{}p{1.2cm}ccc@{}}
+\toprule
+\textbf{Type} & \textbf{Claude4} & \textbf{DeepSeek} & \textbf{GPT-5} \\
+\midrule
+H2+H3      & 100.0 & 100.0 & 100.0 \\
+H1+N1      & 80.0  & 60.0  & 40.0  \\
+H4+S1+S2   & 90.0  & 80.0  & 100.0 \\
+N2+H1+H3   & 100.0 & 100.0 & 40.0  \\
+E1+S2      & 80.0  & 100.0 & 100.0 \\
+S1+N2      & 70.0  & 90.0  & 30.0  \\
+N1+S1      & 100.0 & 100.0 & 100.0 \\
+H4+S2      & 80.0  & 90.0  & 80.0  \\
+\bottomrule
+\end{tabular}
+\end{table}

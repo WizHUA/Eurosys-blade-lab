@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage at 92.6% and minimal available memory remaining.",
+    "root_causes": "Memory resource exhaustion caused by applications consuming nearly all available physical RAM, forcing the system to rely heavily on swap space.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top -o %MEM'",
+      "Check if the completed job 'ft_cgC' left behind memory-consuming background processes or memory leaks",
+      "Monitor swap usage with 'vmstat 1' to confirm active swapping is occurring",
+      "Consider increasing available memory or implementing memory limits for future jobs"
+    ]
+  },
+  {
+    "anomaly": "Significant filesystem space consumption with usage at 89-90%.",
+    "root_causes": "Disk space utilization approaching critical levels, likely from job output, temporary files, or log accumulation.",
+    "solutions": [
+      "Use 'du -sh /*' to identify directories consuming the most disk space",
+      "Check for large temporary files in /tmp, /var/tmp, and job working directories",
+      "Review and clean up old log files in /var/log",
+      "Verify if the completed 'ft_cgC' job generated large output files that need cleanup or archival"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time indicating storage performance bottleneck.",
+    "root_causes": "Storage subsystem experiencing performance degradation due to high memory pressure forcing excessive swapping and potential disk contention.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest I/O load",
+      "Monitor disk utilization with 'iostat -x 1' to check for saturated storage devices",
+      "The high I/O wait correlates with memory pressure, so resolving memory issues should reduce I/O load",
+      "Consider implementing I/O scheduling optimizations or upgrading storage if the bottleneck persists"
+    ]
+  }
+]

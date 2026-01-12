@@ -1,0 +1,21 @@
+[
+  {
+    "anomaly": "Severe memory pressure with usage spiking to 73.7% and available memory dropping to 2.2GB",
+    "root_causes": "Memory resource exhaustion caused by the running 'ft_cgC' job consuming excessive amounts of system memory",
+    "solutions": [
+      "Monitor the 'ft_cgC' job for memory leaks or inefficient memory allocation patterns",
+      "Use 'ps aux --sort=-%mem' to identify the specific processes consuming the most memory",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints",
+      "Check if the job requires more memory than the node can provide and consider job rescheduling"
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load averaging 4.1-4.2 on an 8-core system with moderate CPU usage",
+    "root_causes": "CPU resource contention from background processes or I/O wait states caused by memory pressure",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes in 'D' (uninterruptible sleep) state that may be waiting for I/O",
+      "Check for swap activity that could be causing processes to wait for memory pages to be read from disk",
+      "Monitor disk I/O patterns to determine if storage bottlenecks are contributing to the high load"
+    ]
+  }
+]

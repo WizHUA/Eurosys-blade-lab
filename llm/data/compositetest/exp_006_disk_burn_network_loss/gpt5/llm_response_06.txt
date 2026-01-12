@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap exhaustion and kernel OOM kills during job 285 (ft_ftC).",
+    "root_causes": "The node's available memory collapsed (memory_available_bytes fell to ~117 MB at 23:26:25), swap space was effectively exhausted (swap_free_bytes dropped to 28,672 bytes at 23:26:25), and page swapping surged (page_swap_out_rate peaked at ~45,375 B/s and page_swap_in_rate at ~2,754 B/s). The kernel OOM kill counter increased from 3 to 5 between 23:26:10 and 23:27:10, indicating processes were killed due to out-of-memory while job 285 was running.",
+    "solutions": [
+      "Enforce accurate memory requests/limits for the job via Slurm (e.g., --mem/--mem-per-cpu) and enable cgroup memory enforcement to prevent host-wide OOM.",
+      "Profile the job’s peak memory usage and reduce memory footprint (batch sizes, data tiling, in-memory caching limits) or request more memory.",
+      "Tune swapping behavior (e.g., lower vm.swappiness) only after confirming workload needs; prefer adding RAM on nodes regularly hitting OOM.",
+      "Immediately after such events, drain and health-check the node (verify no critical daemons were OOM-killed) before returning it to service."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with very high CPU I/O wait and many blocked processes.",
+    "root_causes": "Swap thrashing and heavy application I/O drove the disk subsystem near saturation: disk_io_usage_percent spiked up to ~98.9% (23:26:10) and stayed elevated (36–66% later). Disk throughput reached hundreds of MB/s (e.g., ~260–320 MB/s reads and ~115–180 MB/s writes), cpu_iowait_percent climbed as high as ~27% (23:27:10), and processes_blocked peaked at 17, indicating threads stalled in D-state on I/O.",
+    "solutions": [
+      "Mitigate root memory pressure to stop swap thrashing, which is a primary driver of the I/O overload.",
+      "Place swap and job scratch on faster storage (e.g., local SSD/NVMe) or separate them from shared filesystems to reduce contention.",
+      "For the job, batch and buffer I/O (larger sequential writes, fewer small random I/Os), and use node-local scratch directories with staged copy-out.",
+      "Monitor per-device latency and queue depth; if persistent, consider increasing I/O parallelism limits or upgrading storage bandwidth."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the job window (usage rose from ~73.36% to ~83.49%).",
+    "root_causes": "The job produced large output or spill data in a short time, increasing filesystem_usage_percent by ~10 percentage points on an ~78 GB filesystem, consistent with the observed high write rates.",
+    "solutions": [
+      "Redirect temporary and large intermediate files to node-local scratch and clean them in job epilog.",
+      "Set user/project quotas or per-job limits to prevent sudden exhaustion of shared filesystem space.",
+      "Review the job’s output/logging verbosity and checkpoint frequency to reduce unnecessary writes, and schedule cleanup of residual files."
+    ]
+  }
+]

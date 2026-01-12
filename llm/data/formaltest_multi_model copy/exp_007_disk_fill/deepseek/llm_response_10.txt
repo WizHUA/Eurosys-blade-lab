@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage averaging 65-76% despite job completion",
+    "root_causes": "Potential lingering processes or cleanup tasks after job completion consuming CPU resources",
+    "solutions": [
+      "Check for orphaned processes related to completed job ft_cgC",
+      "Analyze system logs for post-job cleanup activities",
+      "Monitor CPU usage patterns in subsequent job cycles"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with 78% memory usage",
+    "root_causes": "Memory not being fully released after job completion",
+    "solutions": [
+      "Verify memory release in job script cleanup section",
+      "Check for memory leaks in application code",
+      "Consider adjusting Slurm job memory limits"
+    ]
+  },
+  {
+    "anomaly": "Network activity spikes coinciding with job execution",
+    "root_causes": "Network-intensive MPI communications during job execution",
+    "solutions": [
+      "Review MPI implementation for optimal network utilization",
+      "Check network infrastructure performance logs",
+      "Consider network QoS settings for HPC jobs"
+    ]
+  }
+]

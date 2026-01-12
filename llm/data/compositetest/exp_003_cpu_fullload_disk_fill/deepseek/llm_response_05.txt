@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High system load averaging 5.5-7.5 on 8-core CPU despite job completion",
+    "root_causes": "Residual processes or cleanup activities from completed job ft_cgC consuming resources",
+    "solutions": [
+      "Check for orphaned Slurm processes using 'scontrol show job 284' and clean up if needed",
+      "Examine system logs for post-job cleanup activities with 'grep ft_cgC /var/log/syslog'",
+      "Monitor processes with 'top -u slurm' to identify any remaining job-related activity"
+    ]
+  },
+  {
+    "anomaly": "Elevated CPU usage (60-80%) persisting after job completion",
+    "root_causes": "Potential memory management overhead from recent large job execution",
+    "solutions": [
+      "Verify memory cleanup with 'free -h' and check for memory leaks",
+      "Monitor slab cache usage with 'slabtop' to identify lingering allocations",
+      "Consider tuning kernel parameters for large HPC jobs if pattern persists"
+    ]
+  },
+  {
+    "anomaly": "Irregular disk I/O patterns with write rates fluctuating between 100MB/s and 30MB/s",
+    "root_causes": "Possible filesystem cleanup operations or metadata updates post-job",
+    "solutions": [
+      "Monitor ongoing disk activity with 'iotop -o'",
+      "Check filesystem journal operations with 'journalctl -f'",
+      "Verify Lustre/FS metadata operations if using parallel filesystem"
+    ]
+  }
+]

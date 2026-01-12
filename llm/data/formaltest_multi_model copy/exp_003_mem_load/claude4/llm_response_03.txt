@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with dramatic fluctuations in memory availability and swap usage patterns.",
+    "root_causes": "Memory resource exhaustion from the 'ft_cgC' job causing the system to rely heavily on swap space, with available memory dropping from 5.6GB to 3.7GB during peak usage periods.",
+    "solutions": [
+      "Monitor the completed 'ft_cgC' job pattern to understand its memory allocation behavior and set appropriate memory limits for future similar jobs",
+      "Consider implementing memory cgroups to prevent individual jobs from consuming excessive system memory",
+      "Evaluate if the node has sufficient RAM for the workload types being submitted, as the job ran for 27 minutes with sustained memory pressure",
+      "Review swap configuration and consider increasing swap space or optimizing swap usage patterns"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization peaks above 50% with high system load and significant I/O wait times during job execution.",
+    "root_causes": "CPU resource contention from intensive computational workload combined with memory pressure causing increased I/O wait as the system manages swap operations.",
+    "solutions": [
+      "The load averages increasing from 4.08 to 4.11 on an 8-core system indicates moderate but sustained resource pressure",
+      "Monitor I/O wait patterns which peaked at 1.45% during memory pressure periods, suggesting correlation between memory and I/O bottlenecks",
+      "Consider CPU affinity settings or job scheduling policies to better distribute computational load",
+      "Evaluate if the workload characteristics of 'ft_cgC' type jobs require dedicated resource allocation"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system to exhaust available memory and heavily utilize swap space.",
+    "root_causes": "Memory resource load from the ft_cgC job exceeding available physical RAM, leading to aggressive swapping and memory reclamation.",
+    "solutions": [
+      "The memory_available_bytes drops dramatically from 5.28GB to 933MB, indicating severe memory exhaustion.",
+      "Swap usage increases from 44.5% to 55.6%, confirming heavy swapping activity affecting system performance.",
+      "Page swap rates spike dramatically (page_swap_in_rate reaches 391,782 and page_swap_out_rate reaches 172,433), indicating intense memory pressure.",
+      "Consider increasing available memory or optimizing the ft_cgC job's memory usage patterns."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity causing severe storage bottleneck.",
+    "root_causes": "Disk I/O load caused by combination of application I/O from ft_cgC job and intensive memory swapping operations.",
+    "solutions": [
+      "Disk utilization reaches critical levels at 52.2%, with disk write rates spiking to 401GB/sec and read rates to 176GB/sec.",
+      "The correlation between memory pressure and disk I/O suggests swapping is the primary cause of the I/O bottleneck.",
+      "Use 'iotop' to confirm that swap operations are dominating disk activity.",
+      "Consider using faster storage or implementing memory optimization to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "CPU system time consumption increases dramatically, indicating kernel overhead from resource management.",
+    "root_causes": "CPU resource load from kernel operations handling memory management, swapping, and I/O operations under extreme resource pressure.",
+    "solutions": [
+      "CPU system time increases from 2% to over 31%, indicating significant kernel overhead from memory and I/O management.",
+      "The high number of context switches (reaching 3,131 per second) suggests intensive process scheduling due to resource contention.",
+      "Monitor kernel CPU usage with 'top' or 'htop' to confirm the system time is spent on memory management operations.",
+      "Address the root memory pressure issue to reduce kernel overhead and improve overall system performance."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with usage jumping from 33% to 73% and available memory dropping dramatically.",
+    "root_causes": "Memory resource exhaustion caused by a memory-intensive workload that consumed most available RAM.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to track memory consumption trends.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' or 'top' to find the largest memory consumers.",
+      "Review the completed job 'ft_cgC' which ran during this timeframe as it may have been the cause of high memory usage.",
+      "Consider implementing memory limits for jobs using cgroups or Slurm memory constraints to prevent future memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in anonymous memory usage from 22% to 62% indicating heavy application memory allocation.",
+    "root_causes": "Application workload allocating large amounts of heap memory or other anonymous memory regions.",
+    "solutions": [
+      "Analyze application memory allocation patterns to identify if the job is using memory efficiently.",
+      "Check for potential memory leaks in the application code that could cause excessive memory growth.",
+      "Consider optimizing the application's memory usage or splitting large jobs into smaller, more memory-efficient tasks.",
+      "Implement monitoring alerts for anonymous memory usage to catch similar issues early."
+    ]
+  }
+]

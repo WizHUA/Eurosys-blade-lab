@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure and significant swapping activity detected",
+    "root_causes": "Memory usage increased dramatically with swap activity indicating insufficient physical memory",
+    "solutions": [
+      "Investigate memory usage patterns of ft_cgC job",
+      "Consider optimizing memory allocation or increasing node memory resources",
+      "Check for memory leaks in application code"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O bottleneck developing",
+    "root_causes": "High disk write activity concurrent with memory swapping",
+    "solutions": [
+      "Monitor disk I/O latency metrics continuously",
+      "Consider moving temporary files to faster storage",
+      "Optimize job checkpointing frequency if applicable"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spikes",
+    "root_causes": "Periodic high CPU usage correlating with computational phases",
+    "solutions": [
+      "Analyze CPU usage patterns within ft_cgC job",
+      "Consider CPU pinning or core isolation",
+      "Check for thread contention issues"
+    ]
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Transient memory pressure with swap churn around 07:08:28–07:08:58",
+    "root_causes": "Anonymous memory grew rapidly (memory_active_anon_bytes ≈1.58 GB → ≈3.43 GB) and memory_committed_as_bytes jumped to ≈9.05 GB, exceeding physical RAM (8.28 GB). This triggered a burst of paging: page_faults_rate rose from ≈279/s to ≈5,700/s and page_swap_out_rate spiked up to ≈167/s (with non-zero swap-in), while swap_usage_percent was already ≈46.6%.",
+    "solutions": [
+      "Identify the largest memory consumers during that window (e.g., ps -eo pid,comm,rss,vsz --sort=-rss; pmap/smaps for top offenders).",
+      "Right-size job memory requests/limits and enforce cgroup memory controls (memory.high/memory.max) to prevent overcommit thrash.",
+      "Reduce kernel overcommit aggressiveness (e.g., set vm.overcommit_memory=2 and adjust vm.overcommit_ratio) if workloads are not overcommit-safe.",
+      "Lower vm.swappiness (e.g., 10) to favor RAM when several GB are available and avoid premature swapping.",
+      "If the workload legitimately needs more memory, schedule on a node with more RAM or reduce concurrency."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap utilization (~46.6%) despite several GB of available memory",
+    "root_causes": "Across the entire window, swap_free_bytes stayed ~1.15 GB (out of 2.0 GB), indicating ~0.85 GB swapped out, while memory_available_bytes remained ~3.7–5.6 GB. This suggests pages remain in swap even when RAM is available, consistent with aggressive or earlier swapping that was not reclaimed.",
+    "solutions": [
+      "During a maintenance window, consider swapoff -a && swapon -a to repatriate cold pages and verify that swap usage drops under normal load.",
+      "Tune vm.swappiness lower to reduce tendency to keep pages in swap when free/available memory is ample.",
+      "Set cgroup swap limits (memory.swap.max) for jobs to constrain swap usage and prefer in-RAM residency.",
+      "Monitor swap activity (vmstat 1, sar -W) and correlate with job phases to ensure swap does not recur under steady-state load."
+    ]
+  },
+  {
+    "anomaly": "Elevated TCP retransmissions and SYN retransmissions in a short window",
+    "root_causes": "tcp_retransmissions_rate rose to ≈10.9–17.45/s and tcp_syn_retrans_rate to ≈0.29/s around 07:08:28–07:08:58, with node_netstat_Tcp_RetransSegs and TCPSynRetrans counters incrementing. Network interface error/drop counters remained zero, pointing to transient path congestion or remote endpoint issues rather than local NIC errors.",
+    "solutions": [
+      "Check switch/port counters and NIC statistics (ethtool -S, switch logs) for congestion or microbursts during 07:08:28–07:08:58.",
+      "Validate MTU consistency end-to-end (ip link, switch config) and ensure no fragmentation/jumbo mismatch.",
+      "Capture a short packet trace during similar workload phases (tcpdump) and review for out-of-order/dup ACKs or RTOs.",
+      "Consider tuning TCP buffers (net.core.rmem_max/wmem_max, net.ipv4.tcp_rmem/tcp_wmem) if retransmissions correlate with bursts.",
+      "If retransmissions align with paging events, prioritize fixing memory/swap churn first to avoid sender stalls."
+    ]
+  }
+]

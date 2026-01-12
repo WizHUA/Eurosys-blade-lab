@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "Transient but severe memory pressure spike with large jump in anonymous memory and sharp drop in available memory.",
+    "root_causes": "During the job window (ft_cgC active), memory_active_anon_bytes surged from 1,654,865,920 to 4,664,414,208 and memory_available_bytes fell from 5,492,637,696 to 2,552,856,576 at 07:04:28, while memory_committed_as_bytes rose to 10,911,182,848 and page_faults_rate/page_swap_in/out rates increased, indicating a burst of anonymous allocations from the running workload.",
+    "solutions": [
+      "Right-size Slurm memory requests for the job (e.g., --mem/--mem-per-cpu) and enforce memory cgroups (ConstrainRAMSpace/ConstrainSwapSpace) to align allocations with node capacity.",
+      "Profile the job’s memory footprint (e.g., /usr/bin/time -v, smem, pmap) and reduce working-set peaks by adjusting problem size, tiling/blocking, or concurrency.",
+      "Monitor in real time with vmstat 1 and pidstat -r 1 to confirm that page_faults_rate and swap activity return to a low steady state.",
+      "If this peak is expected and sustained, consider scheduling on nodes with larger RAM or staggering concurrent memory-intensive phases."
+    ]
+  },
+  {
+    "anomaly": "High and persistent swap utilization (~46.6% of 2 GiB) despite multiple gigabytes of RAM reported available.",
+    "root_causes": "swap_free_bytes remains ~1,146,806,272 (swap_usage_percent 46.6%) across samples while memory_available_bytes is in the 2.5–5.5 GB range; Linux likely reclaimed cold pages to swap during prior pressure and kept them swapped out, causing ongoing swap-in/out at modest rates.",
+    "solutions": [
+      "Lower swappiness temporarily and persistently (e.g., sysctl -w vm.swappiness=1; persist in /etc/sysctl.d) to reduce proactive swapping of cold pages.",
+      "Identify processes with significant swap usage (smem -s swap -r, grep -H VmSwap /proc/*/status) and verify they match the workload’s expectations.",
+      "If swap use is legacy from earlier pressure, consider a controlled swapoff && swapon during a maintenance window to repatriate pages without impacting jobs.",
+      "Ensure Slurm cgroup limits prevent oversubscription that would trigger swap thrash (ConstrainSwapSpace=yes, set MemoryMax/High)."
+    ]
+  },
+  {
+    "anomaly": "Memory overcommit condition with evidence of at least one OOM kill on the node.",
+    "root_causes": "memory_committed_as_bytes reached 10,911,182,848 (> physical 8,278,052,864) and vm_oom_kills_total=1 across samples indicates the node has experienced an OOM event (time unknown) and is operating with overcommit.",
+    "solutions": [
+      "Set stricter overcommit policy (sysctl vm.overcommit_memory=2 and tune vm.overcommit_ratio) to cap aggregate commit below safe headroom.",
+      "Enforce job-level memory ceilings via Slurm (e.g., --mem/--mem-per-cpu and cgroup memory limits) to prevent system-wide OOM.",
+      "Protect critical daemons by reducing their oom_score_adj and validate dmesg/journalctl for recent OOM invocations tied to user jobs.",
+      "If workloads legitimately require >8 GiB committed, provision nodes with more RAM or reduce job concurrency on this node."
+    ]
+  },
+  {
+    "anomaly": "Inconsistent telemetry: a single-sample load_1min drop to 0.09 while CPU usage remained ~55%.",
+    "root_causes": "The 07:05:13 sample shows load_1min=0.0909 despite cpu_usage_percent=55.0, suggesting a collection/parsing glitch or transient sensor read error rather than a real workload collapse.",
+    "solutions": [
+      "Validate the metrics collector/exporter (parsing of /proc/loadavg and sampling intervals) and upgrade if known bugs exist.",
+      "Cross-check with sar/uptime on-node during the same window to confirm the anomaly is telemetry-only.",
+      "Harden alerting to ignore single-sample spikes/dips for load averages to reduce false positives."
+    ]
+  }
+]

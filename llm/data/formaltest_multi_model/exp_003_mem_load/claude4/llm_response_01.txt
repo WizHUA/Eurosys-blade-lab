@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with memory usage spiking from 33% to 55% and available memory dropping substantially.",
+    "root_causes": "Memory resource load from the running job 'ft_cgC' causing substantial consumption of system memory.",
+    "solutions": [
+      "Monitor the 'ft_cgC' job memory usage patterns using 'ps aux --sort=-%mem' to identify if it has memory leaks or inefficient allocation.",
+      "Check if the job is within its allocated memory limits using 'scontrol show job 276' to review resource constraints.",
+      "Consider implementing memory cgroups limits to prevent jobs from consuming excessive system memory.",
+      "Review application logs for the 'ft_cgC' job to identify potential memory optimization opportunities."
+    ]
+  },
+  {
+    "anomaly": "Elevated page fault activity indicating memory pressure stress on the system.",
+    "root_causes": "Memory subsystem stress causing increased page fault handling as the system manages memory allocation and swapping.",
+    "solutions": [
+      "Monitor page fault patterns using 'vmstat 1' to track major vs minor faults during job execution.",
+      "Use 'iostat -x 1' to check if increased page faults are correlating with disk I/O from swapping activity.",
+      "Consider increasing available memory or optimizing job memory usage to reduce page fault frequency.",
+      "Review swap usage trends to determine if virtual memory is being actively used."
+    ]
+  }
+]

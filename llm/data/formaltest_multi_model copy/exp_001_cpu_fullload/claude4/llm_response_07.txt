@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization dramatically increased from 30% to 83% over a 1.5 minute period, indicating sudden computational load spike.",
+    "root_causes": "CPU resource load from computationally intensive processes, likely from the ft_cgC job which started at 07:01:13 and is consuming increasing amounts of CPU time.",
+    "solutions": [
+      "Monitor the ft_cgC job's resource consumption using 'top' or 'htop' to verify it is the source of high CPU usage.",
+      "Check if the job is CPU-bound as expected or if there are runaway processes consuming excessive resources.",
+      "Consider implementing CPU limits using cgroups or Slurm resource constraints to prevent single jobs from monopolizing system resources."
+    ]
+  },
+  {
+    "anomaly": "System load average increased significantly from 1.77 to 4.88, exceeding the number of CPU cores (8) and indicating resource contention.",
+    "root_causes": "High system load caused by processes waiting for CPU time, likely due to the intensive computational workload from the running job.",
+    "solutions": [
+      "Use 'vmstat 1' to monitor system load trends and identify if processes are queued for CPU access.",
+      "Evaluate whether the ft_cgC job should be configured to use fewer CPU cores to maintain system responsiveness.",
+      "Consider job scheduling policies to prevent multiple CPU-intensive jobs from running simultaneously on the same node."
+    ]
+  },
+  {
+    "anomaly": "Memory usage increased from 34% to 33.8% with growing cache usage, indicating increased I/O activity and memory pressure.",
+    "root_causes": "Memory resource load from the computational job creating larger working sets and increased file system caching needs.",
+    "solutions": [
+      "Monitor memory allocation patterns using 'free -h' and '/proc/meminfo' to track job memory consumption.",
+      "Verify that the job's memory requirements are within allocated limits and not approaching swap usage.",
+      "Consider memory limits for the job if it continues to grow beyond expected bounds."
+    ]
+  }
+]

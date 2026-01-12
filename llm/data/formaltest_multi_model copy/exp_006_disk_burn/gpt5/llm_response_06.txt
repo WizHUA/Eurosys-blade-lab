@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Severe swap thrashing and memory pressure beginning ~07:12:28",
+    "root_causes": "At 07:12:28 the node shows a collapse in free RAM (memory_free_bytes ~127 MB) with a large file cache (memory_cached_bytes ~5.18 GB, memory_inactive_file_bytes ~4.85 GB) and explosive paging: page_swap_in_rate ~145,076/s and page_swap_out_rate ~69,125/s. Swap activity remains very high over subsequent samples (swap-in/out rates up to ~573k/193k per second), indicating the workload’s anonymous memory is being swapped to maintain an oversized page cache under heavy file I/O.",
+    "solutions": [
+      "Right-size the job’s memory request/limit (e.g., Slurm --mem/--mem-per-cpu) to match peak working set and prevent swapping.",
+      "Reduce page cache pressure for this workload: prefer streaming I/O or O_DIRECT where appropriate, and call posix_fadvise(DONTNEED)/fflush/fsync checkpoints to release cache promptly.",
+      "Tune VM parameters to curb swapping and cache growth for this node/workload (e.g., lower vm.swappiness, adjust readahead and dirty ratios) after change control.",
+      "If the workload must cache large data, provision more RAM or use node-local SSD/scratch to avoid swapping to the system disk.",
+      "Use cgroup memory+swap limits to prevent system-wide thrashing from a single job."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with rising queueing and iowait",
+    "root_causes": "Disk throughput and utilization ramp sharply: disk_read_rate_bytes_per_sec grows from ~148 MB/s (07:12:28) to ~587 MB/s (07:13:13) with disk_io_usage_percent rising from ~11.6% to ~60.2% and cpu_iowait_percent from ~0.7% to ~4.9%. Concurrently, swap-in/out bursts contribute additional random I/O, amplifying contention.",
+    "solutions": [
+      "Move heavy I/O to faster/local scratch or a higher-bandwidth parallel filesystem; ensure jobs write to $TMPDIR and stage data in/out.",
+      "Throttle or isolate I/O from this job (ionice/cgroup blkio) to protect system responsiveness.",
+      "Tune I/O path for the workload: adjust device readahead, choose an appropriate I/O scheduler (e.g., mq-deadline/none), and batch writes to reduce small, random I/O.",
+      "Reduce swapping per above; eliminating swap churn will directly lower disk queueing and iowait.",
+      "Monitor with iostat/blktrace to verify queue depth and request sizes; if sustained near device limits, consider additional disks or striping."
+    ]
+  },
+  {
+    "anomaly": "Rapid, transient filesystem usage spikes (73% → 86% → 76%) within minutes",
+    "root_causes": "Filesystem_usage_percent jumps from ~73.3% (07:11:43) to ~85.6% (07:12:58) as filesystem_avail_bytes drops by ~10 GB, then recovers (~75.8% at 07:13:13). This pattern indicates large, short-lived file creation/deletion by the job, increasing pressure on a nearly 80% full filesystem.",
+    "solutions": [
+      "Ensure the job writes large intermediates to node-local scratch and cleans up promptly; stage outputs to long-term storage at the end.",
+      "Set job-level quotas/limits or alerts to prevent sudden capacity spikes that risk filling the filesystem.",
+      "If the workflow repeatedly produces large temporaries, plan free-space headroom or stripe/spread data to reduce hotspotting.",
+      "Audit job scripts to avoid unnecessary intermediate duplication and enable incremental/streaming processing where possible."
+    ]
+  }
+]

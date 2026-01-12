@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure and swap exhaustion causing severe system degradation.",
+    "root_causes": "Memory usage climbed from 35% to over 96% with swap utilization reaching 54%, indicating the system has exhausted physical RAM and is heavily relying on swap space.",
+    "solutions": [
+      "Immediately identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top' to find the primary memory consumers.",
+      "Monitor swap activity with 'vmstat 1' to confirm active swapping is occurring.",
+      "Consider killing non-essential processes or the problematic job if it's consuming excessive memory beyond system capacity.",
+      "Review the completed job 'ft_cgC' logs to understand its memory usage pattern and prevent similar issues in future runs."
+    ]
+  },
+  {
+    "anomaly": "Sustained high I/O wait percentage indicating severe disk performance bottleneck.",
+    "root_causes": "I/O wait percentage spiked from 6.9% to over 22%, likely caused by excessive swapping activity due to memory pressure forcing the system to continuously read/write pages to swap space.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the highest disk I/O load.",
+      "Check disk utilization with 'iostat -x 1' to confirm if storage devices are saturated.",
+      "The primary solution is resolving the memory pressure issue, which should significantly reduce swap-related I/O activity.",
+      "Consider upgrading storage to faster SSDs if this workload pattern is expected to continue."
+    ]
+  },
+  {
+    "anomaly": "System load average climbing well above the number of CPU cores available.",
+    "root_causes": "Load average increased from 6.92 to 8.37 on an 8-core system, indicating more processes are waiting for resources than can be efficiently served, primarily due to memory and I/O constraints.",
+    "solutions": [
+      "Use 'ps aux' to check process states and identify how many processes are in 'D' (uninterruptible sleep) state waiting for I/O.",
+      "The load issue should resolve once memory pressure and I/O bottlenecks are addressed.",
+      "Monitor the system during future job executions to ensure resource requirements are within system capacity.",
+      "Consider implementing resource limits for jobs to prevent similar system-wide performance degradation."
+    ]
+  }
+]

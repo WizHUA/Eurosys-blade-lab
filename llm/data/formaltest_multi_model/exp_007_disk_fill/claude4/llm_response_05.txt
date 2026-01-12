@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extreme disk I/O bottleneck with consistently high utilization and massive write operations.",
+    "root_causes": "Disk I/O load caused by intensive write operations, likely from the completed job 'ft_cgC' performing large data dumps or checkpointing.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes causing the high disk write activity and confirm if any cleanup operations are still running.",
+      "Check if the completed job left large temporary files that need cleanup - examine /tmp and job-specific directories.",
+      "Monitor disk queue depth and consider I/O scheduling optimizations if this pattern persists.",
+      "Verify that the storage subsystem can handle the sustained write load without performance degradation."
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with filesystem cache being heavily utilized.",
+    "root_causes": "Memory resource load with high cache usage, potentially from the large data operations of the recently completed job.",
+    "solutions": [
+      "The filesystem cache usage is over 63%, which may indicate large file operations are consuming available memory.",
+      "Use 'sync' and 'echo 3 > /proc/sys/vm/drop_caches' to clear filesystem caches if they are no longer needed.",
+      "Monitor if memory pressure decreases as the post-job I/O operations complete.",
+      "Check for any lingering processes from the completed job that may still be holding memory."
+    ]
+  }
+]

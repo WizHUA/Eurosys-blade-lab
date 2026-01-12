@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization (83.74%) and sustained system load (7.5 on 1-minute average)",
+    "root_causes": "CPU-intensive application (ft_cgC) running with significant user-space CPU consumption (59.99%) and system overhead (4.00%)",
+    "solutions": [
+      "Verify application's CPU utilization against expected performance benchmarks",
+      "Check for potential CPU resource contention with other processes",
+      "Consider optimizing application code or adjusting CPU affinity settings"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O utilization (62.43%) with high weighted I/O time",
+    "root_causes": "Application executing significant disk write operations (32.7MB/s write rate) during computation phase",
+    "solutions": [
+      "Monitor filesystem I/O patterns using iotop",
+      "Consider using tmpfs for temporary files if appropriate",
+      "Check if disk performance matches expected throughput for the workload"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure (33.15% usage) with 3 OOM kills recorded",
+    "root_causes": "Application memory requirements approaching system capacity, evidenced by swap usage (53.79%)",
+    "solutions": [
+      "Verify application memory requirements and compare with allocated resources",
+      "Check for memory leaks in application",
+      "Consider increasing memory allocation or optimizing application memory usage"
+    ]
+  }
+]

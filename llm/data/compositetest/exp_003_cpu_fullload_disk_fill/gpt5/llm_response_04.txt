@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "Transient filesystem saturation: filesystem_usage_percent spiked to ~95.36% with filesystem_avail_bytes dropping to ~3.89 GiB between 23:20:25 and 23:20:55, then returned to ~73.36%.",
+    "root_causes": "A burst of large writes/creations from the completed job (JobID 284: ft_cgC) temporarily filled the shared filesystem. Evidence: sharp drop in filesystem_avail_bytes and concurrent non-trivial disk write rates; capacity returned to normal shortly after, consistent with large temporary files or staging/checkpoint files being created and removed or moved.",
+    "solutions": [
+      "Identify large files created/modified in that window: sudo find /path/to/fs -xdev -type f -newermt '2025-09-22 23:20:00' ! -newermt '2025-09-22 23:21:00' -size +100M -ls",
+      "Check for deleted-but-open files consuming space: sudo lsof +L1 | sort -k7 -nr | head",
+      "Direct job scratch/checkpoints to node-local or dedicated scratch (e.g., /scratch or NVMe) and stage-out at job end.",
+      "Enforce per-job/project quotas and enable automatic cleanup of transient outputs post-job.",
+      "Add monitoring/alerts at 90% FS usage and consider expanding capacity if bursts are expected."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap activity and elevated I/O wait at the start of the window: swap_usage_percent ~54% with page_swap_out_rate peaking ~31.8k/s and cpu_iowait_percent ~8.0% at 23:19:40 (declining thereafter).",
+    "root_causes": "Memory pressure or aggressive swapping during workload activity led to active paging and disk contention. Despite sizable memory_available_bytes, previously swapped anonymous pages remained in swap while the job’s I/O and cache activity caused bursty swap-in/out.",
+    "solutions": [
+      "Right-size memory requests/limits for similar jobs and verify cgroup constraints (sacct -j 284 -o ReqMem,MaxRSS,Elapsed).",
+      "Reduce swapping on compute nodes (e.g., set vm.swappiness=10–20) and ensure sufficient RAM for expected working sets.",
+      "Profile memory usage to find top consumers (smem -r -k; ps --sort=-rss -eo pid,comm,rss) and tune application to lower RSS or use streaming/batching.",
+      "Place temporary data on tmpfs or local scratch to reduce page cache pressure on the shared filesystem.",
+      "If swapping persists under normal load, consider adding RAM or tightening memory-heavy background services."
+    ]
+  }
+]

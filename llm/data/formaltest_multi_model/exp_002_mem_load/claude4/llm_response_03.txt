@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage spiking from 33% to 73% during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the ft_cgC job consuming excessive memory, leading to significant reduction in available memory from 5.4GB to 2.1GB.",
+    "solutions": [
+      "Monitor the ft_cgC job's memory consumption patterns using 'ps aux --sort=-%mem' or 'top' to identify if it has memory leaks or inefficient memory usage.",
+      "Check if the job's memory requirements exceed the node's capacity and consider job scheduling constraints or memory limits.",
+      "Review swap usage and consider increasing swap space if memory pressure persists, though this may impact performance."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in anonymous memory usage indicating active memory allocation by running processes.",
+    "root_causes": "Active memory allocation by the ft_cgC job causing anonymous memory to increase from 22% to 62% of total memory usage.",
+    "solutions": [
+      "Analyze the memory allocation patterns of the ft_cgC job to determine if it's allocating memory efficiently.",
+      "Consider implementing memory usage monitoring and alerts for jobs that exceed expected memory consumption.",
+      "Evaluate if the job requires memory optimization or if the node needs additional RAM capacity."
+    ]
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Bursty disk I/O saturation with elevated iowait during the job window, followed by normalization.",
+    "root_causes": "An I/O‑intensive phase of job 'ft_cgC' drove very high disk throughput and utilization (disk_io_usage_percent ~67.7% at 07:13:43 with ~264 MB/s reads and ~139 MB/s writes; cpu_iowait_percent ~6.16%), coinciding with heavy memory reclaim/swap activity that amplified writeback and cache eviction.",
+    "solutions": [
+      "Identify top I/O contributors during similar runs (iotop -oPa, pidstat -d 1) and correlate with job steps.",
+      "Throttle or isolate job I/O using cgroups (io.max/io.bfq or blkio.*) or run on nodes with local NVMe scratch; stage datasets to $TMPDIR.",
+      "Tune writeback to smooth bursts (e.g., vm.dirty_background_ratio=2, vm.dirty_ratio=10, vm.dirty_expire_centisecs=3000) and verify disk scheduler (mq-deadline/kyber).",
+      "Schedule I/O-heavy steps when filesystem load is low, or split workload across separate storage targets."
+    ]
+  },
+  {
+    "anomaly": "High sustained swap usage (~46.6%) with large swap activity spikes.",
+    "root_causes": "Anonymous memory pressure and kernel reclaim caused swapping bursts (page_swap_out_rate peaking to ~1.5e5/s around 07:14:13) while swap stayed ~46.6% used and vm_oom_kills_total>0, indicating prior memory stress. Later, memory_available rose (>5.6 GB) but swap remained allocated, consistent with lingering swapped pages after pressure.",
+    "solutions": [
+      "Reduce or cap memory footprint of 'ft_cgC' (Slurm --mem/--mem-per-cpu) and verify application memory use.",
+      "Lower swappiness on compute nodes (vm.swappiness=1–10) and review reclaim knobs (vm.watermark_scale_factor, vfs_cache_pressure).",
+      "During maintenance, consider gradual swapoff/swapon to repatriate cold pages if swap remains heavily used (ensure headroom and low load).",
+      "Monitor major faults and swap rates (vmstat 1, sar -W) during job to catch thrashing early."
+    ]
+  },
+  {
+    "anomaly": "Abrupt page cache collapse and cache churn (cached memory ~5.3 GB → ~0.53 GB with free memory jumping to ~5.27 GB).",
+    "root_causes": "Aggressive reclaim/writeback or explicit cache dropping during the job caused large eviction of inactive file pages, leading to I/O spikes and performance variability.",
+    "solutions": [
+      "Verify no scripts/services issue drop_caches during jobs; avoid 'echo 3 > /proc/sys/vm/drop_caches' in pipelines.",
+      "Reduce cache pressure (vfs_cache_pressure ~50–100) and ensure writeback settings avoid large flush storms.",
+      "If the workflow repeatedly scans large datasets, pre-stage to fast local storage and reuse warm cache between steps."
+    ]
+  },
+  {
+    "anomaly": "Filesystem utilization swings between ~73% and ~90% within minutes, approaching high-water mark.",
+    "root_causes": "The job created and removed large temporary files on the shared filesystem, pushing capacity close to 90%, which risks fragmentation and ENOSPC events under concurrent load.",
+    "solutions": [
+      "Direct large intermediates to node-local $TMPDIR or a high-throughput scratch filesystem; clean up promptly on step completion.",
+      "Set user/project quotas and alerts at 85–90% usage to prevent sudden exhaustion.",
+      "Coordinate scheduling of data-heavy steps to avoid overlapping with other I/O-intensive jobs targeting the same filesystem."
+    ]
+  }
+]

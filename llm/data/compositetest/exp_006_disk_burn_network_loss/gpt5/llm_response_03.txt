@@ -1,0 +1,44 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with swap thrashing during job window",
+    "root_causes": "Memory_available_bytes collapsed from ~5.6 GB to 280 MB at 23:26:10 and to 117 MB at 23:26:25, while swap_free_bytes dropped to 28,672 bytes (swap_usage_percent ~99.999%). Page swap activity surged (page_swap_in_rate ~29k–62k/s, page_swap_out_rate up to ~45k/s), and anon_memory_percent reached ~88%. This coincided with the ft_ftC job running, indicating the job drove memory pressure and triggered heavy swapping.",
+    "solutions": [
+      "Re-run the job with an accurate memory request/limit (e.g., Slurm --mem/--mem-per-cpu) or enforce cgroup memory limits for the job.",
+      "Profile the job’s memory usage (smem, /proc/<pid>/smaps, heap profiling) to reduce peak RSS and eliminate leaks.",
+      "Lower vm.swappiness and set per-job memory QoS to avoid swap storms; if unavoidable, increase RAM or attach faster swap (NVMe).",
+      "Stage large working sets to local scratch and process in chunks to keep resident memory within limits.",
+      "Alert on memory_available_bytes and swap_free_bytes thresholds to preemptively throttle or requeue jobs before thrashing."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with very high iowait and blocked processes",
+    "root_causes": "cpu_iowait_percent spiked from ~0.02–0.17 to 12.9–27.0% (peaking ~27% at 23:27:10), disk_io_usage_percent rose to ~36–66%, and disk throughput reached ~150–290 MB/s reads and ~110–180 MB/s writes. processes_blocked climbed up to 17. The timing matches swap storms and heavy file writes, indicating storage contention amplified by swapping.",
+    "solutions": [
+      "Mitigate the root memory pressure to eliminate swap I/O (see memory solutions).",
+      "Throttle or isolate job I/O (ionice/blkio cgroup) and prefer local NVMe scratch or a high-throughput parallel filesystem for temporary/output data.",
+      "Verify disk health and I/O scheduler; use mq-deadline/none for NVMe and ensure queue depths are tuned.",
+      "Stagger or batch large writes and enable application-level buffering/checkpoint tuning to reduce write bursts.",
+      "Set alerts on cpu_iowait_percent, disk_io_usage_percent, and processes_blocked to catch storage saturation early."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the job",
+    "root_causes": "filesystem_avail_bytes fell from ~22.33 GB (23:25:40) to ~13.84 GB (23:27:25), an ~8.5 GB drop in ~2 minutes, while disk_write_rate_bytes_per_sec exceeded 100–300 MB/s. This indicates the job wrote large volumes to the filesystem, driving utilization from ~73.36% to ~83.49%.",
+    "solutions": [
+      "Redirect large outputs and temporary files to designated high-capacity scratch/parallel filesystems rather than the root/system filesystem.",
+      "Enforce per-job quotas/limits and add pre-run checks for available space; abort or requeue when below a safety threshold.",
+      "Compress/aggregate outputs and reduce checkpoint frequency or size if feasible.",
+      "Schedule cleanup of temporary artifacts post-job and monitor filesystem_usage_percent for rapid growth."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmissions and timeouts",
+    "root_causes": "Short spikes were observed (e.g., node_netstat_Tcp_RetransSegs ~30/s, TCPSynRetrans ~6/s, TCPTimeouts 15/s at 23:26:40 and again at 23:27:25) while other intervals remained near zero. These events coincide with peak I/O and memory pressure, suggesting brief congestion or host-level delays impacting TCP.",
+    "solutions": [
+      "Correlate retransmission spikes with host load; prioritize resolving the swap and disk contention to reduce kernel scheduling delays.",
+      "Check NIC and switch counters (ethtool -S, switch port stats) and dmesg/syslog for driver or link errors.",
+      "Validate MTU/jumbo frame consistency and flow control settings on the path used by the job.",
+      "Enable network telemetry alerts on Tcp_RetransSegs and TCPTimeouts to flag future spikes."
+    ]
+  }
+]

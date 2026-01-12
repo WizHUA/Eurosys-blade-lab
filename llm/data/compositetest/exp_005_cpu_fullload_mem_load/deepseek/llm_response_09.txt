@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Consistently high CPU utilization (~75-83%) with significant system load imbalance",
+    "root_causes": "CPU-intensive scientific computation from completed FT_CG workload creating sustained pressure",
+    "solutions": [
+      "Profile application code for potential optimizations",
+      "Consider CPU affinity/pinning for better NUMA utilization",
+      "Review Slurm job parameters for appropriate CPU resource requests"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure spikes showing rapid allocation/deallocation patterns",
+    "root_causes": "Large memory footprint of FT_CG benchmark during execution",
+    "solutions": [
+      "Analyze memory access patterns with valgrind/memcheck",
+      "Consider optimizing MPI buffer sizes",
+      "Verify Slurm memory allocation parameters matched actual usage"
+    ]
+  },
+  {
+    "anomaly": "Intermittent disk I/O bursts despite compute-bound workload",
+    "root_causes": "Checkpointing or temporary file operations during FT_CG execution",
+    "solutions": [
+      "Evaluate SSD/scratch storage performance",
+      "Consider RAM disk for temporary files",
+      "Profile filesystem calls during benchmark execution"
+    ]
+  }
+]

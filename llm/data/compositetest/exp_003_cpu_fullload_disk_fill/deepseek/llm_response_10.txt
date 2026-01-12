@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU I/O wait percentage (7.97% at peak) causing system slowdown",
+    "root_causes": "Disk I/O bottleneck from concurrent read/write operations during the FT-CG computation",
+    "solutions": [
+      "Check disk I/O scheduler and consider switching to deadline or none for HPC workloads",
+      "Monitor disk queue depth and consider adjusting request queue size",
+      "Verify filesystem mount options (noatime,nodiratime) are optimized for HPC"
+    ]
+  },
+  {
+    "anomaly": "Spike in major page faults (24.1/s at peak) indicating memory pressure",
+    "root_causes": "Application working set exceeding available physical memory during compute phases",
+    "solutions": [
+      "Profile application memory usage to identify optimization opportunities",
+      "Consider increasing memory allocation for this job class",
+      "Check NUMA affinity settings if running multi-socket system"
+    ]
+  },
+  {
+    "anomaly": "Extended periods of high system load (7.5 load average on 8-core system)",
+    "root_causes": "CPU saturation from FT-CG's computational workload combined with I/O wait processes",
+    "solutions": [
+      "Review job placement strategy to avoid co-locating I/O intensive jobs",
+      "Consider implementing CPU pinning for this application",
+      "Verify no unnecessary system processes are competing for resources"
+    ]
+  }
+]

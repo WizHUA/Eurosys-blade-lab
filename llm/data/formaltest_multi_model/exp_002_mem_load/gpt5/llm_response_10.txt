@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "Transient severe memory pressure with overcommit during the sampling window (peaks around 07:04:28–07:04:58)",
+    "root_causes": "The node’s committed virtual memory exceeded physical RAM (memory_committed_as_bytes ≈10.9 GB vs memory_total_bytes ≈8.28 GB) while anonymous memory surged (memory_active_anon_bytes jumped to ≈4.66 GB). This caused cache reclaim (drop in memory_cached_bytes and inactive_file_bytes) and reduced headroom (memory_available_bytes fell to ~2.55 GB). The only job recorded for this window is ft_cgC, making it the likely source of the working set expansion. No new OOM kills were recorded (vm_oom_kills_total did not increase), so the kernel managed via reclaim and limited swap activity.",
+    "solutions": [
+      "Increase the Slurm memory request for ft_cgC (e.g., --mem or --mem-per-cpu) to cover its observed peak working set with safety headroom.",
+      "Enforce a cgroup memory limit for the job to prevent node-wide pressure and protect system services.",
+      "Review and tune overcommit policy (vm.overcommit_memory=2 and vm.overcommit_ratio) to avoid commits exceeding available RAM on shared nodes.",
+      "Profile the job’s memory usage (pmap/smaps, smem, heap profiling) to find peaks and potential leaks; consider MALLOC_ARENA_MAX to reduce allocator overhead in multithreaded workloads.",
+      "If recurring, schedule the job on nodes with more RAM or reduce in-job concurrency/memory footprint.",
+      "Adjust swappiness or enable zswap if appropriate to mitigate swap latency when pressure occurs."
+    ]
+  },
+  {
+    "anomaly": "Bursts of swap I/O and elevated page faults indicating memory churn",
+    "root_causes": "During the same period, page_faults_rate rose sharply (≈5.5k→7.7k faults/s) and swap activity appeared (page_swap_in_rate/page_swap_out_rate peaking around ≈8.9/≈169 pages/s), consistent with the kernel reclaiming memory under pressure from the running workload (ft_cgC). Although overall disk I/O utilization remained modest, the swap churn can add latency.",
+    "solutions": [
+      "Reduce swapping by ensuring sufficient job memory allocation and lowering vm.swappiness (e.g., 10–20) subject to site policy.",
+      "Investigate the job’s memory access patterns; reduce oversubscription and improve locality to shrink the active working set.",
+      "Use Slurm cgroup memory+swap constraints to cap swap thrash from individual jobs.",
+      "Monitor per-process faults and swap-in/out (e.g., perf stat, pidstat -r, /proc/<pid>/smaps_rollup) to pinpoint offending phases and optimize them."
+    ]
+  }
+]

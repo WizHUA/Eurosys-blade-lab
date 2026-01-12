@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with significant I/O wait time despite job completion",
+    "root_causes": "Disk I/O bottleneck persisting after computational job completion, suggesting potential filesystem or storage issues",
+    "solutions": [
+      "Check for lingering I/O operations using 'iotop' or 'dstat'",
+      "Verify filesystem health with 'fsck' on relevant storage devices",
+      "Monitor process table for any residual processes from completed job"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure lingering after job completion with high cache usage",
+    "root_causes": "Memory not being effectively reclaimed after job completion, potentially due to filesystem caching behavior",
+    "solutions": [
+      "Check and potentially adjust vm.vfs_cache_pressure sysctl parameter",
+      "Monitor kswapd activity for memory reclaim issues",
+      "Verify if transparent huge pages need tuning for workload patterns"
+    ]
+  },
+  {
+    "anomaly": "Unexpected TCP retransmissions and connection churn during normal operation",
+    "root_causes": "Network stack issues potentially affecting distributed job coordination",
+    "solutions": [
+      "Check TCP retransmit timers and congestion window settings",
+      "Verify network interface statistics for errors or drops",
+      "Consider adjusting TCP keepalive settings if connections are timing out prematurely"
+    ]
+  }
+]

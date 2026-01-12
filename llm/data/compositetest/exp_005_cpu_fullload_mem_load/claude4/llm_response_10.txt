@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure causing system instability and potential out-of-memory conditions.",
+    "root_causes": "Memory resource load exceeding available physical RAM, with memory usage climbing to over 92% and available memory dropping to critically low levels.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes consuming system resources.",
+      "Monitor swap usage as the system shows signs of heavy swapping with swap_usage_percent at 47.9%.",
+      "Consider terminating non-essential processes or restarting services that may have memory leaks.",
+      "Evaluate if the completed job 'ft_cgC' left behind memory-consuming processes that need cleanup."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O bottleneck with extremely high utilization causing system performance degradation.",
+    "root_causes": "Disk I/O load caused by combination of high memory pressure leading to swap activity and intensive disk operations.",
+    "solutions": [
+      "The disk_io_usage_percent peaked at over 70% indicating severe I/O congestion.",
+      "Use 'iotop' to identify processes causing the highest disk I/O activity.",
+      "Monitor disk write operations which show extremely high rates of over 100MB/sec sustained activity.",
+      "Address the memory pressure issue first as it is likely causing excessive swap I/O contributing to the disk bottleneck."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization with significant I/O wait time affecting overall system responsiveness.",
+    "root_causes": "CPU resource load from compute-intensive workload combined with I/O blocking due to disk bottleneck.",
+    "solutions": [
+      "CPU usage reached over 83% with notable I/O wait component indicating processes blocked on disk operations.",
+      "Use 'top' to identify processes with high CPU usage and 'D' state processes waiting on I/O.",
+      "Consider reducing concurrent I/O operations or implementing I/O scheduling optimizations.",
+      "Monitor system load which shows values above 6.0 on what appears to be a multi-core system."
+    ]
+  }
+]

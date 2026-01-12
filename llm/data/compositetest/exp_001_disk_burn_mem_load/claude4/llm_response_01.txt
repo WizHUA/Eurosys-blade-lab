@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swapping activity indicating memory exhaustion",
+    "root_causes": "Memory usage increased from 36% to 89% during job execution, with swap usage climbing to 55% and active swap operations of 391,782 pages per second",
+    "solutions": [
+      "Monitor memory usage of the completed job 'ft_cgC' to identify if it has memory leaks or inefficient memory allocation patterns",
+      "Use 'vmstat 1' to confirm ongoing swap activity and 'free -h' to check current memory state",
+      "Review job memory requirements and consider allocating more memory or optimizing the application's memory usage",
+      "Check if multiple memory-intensive processes are running simultaneously and consider job scheduling improvements"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spike to 91% with extremely high I/O wait reaching 31%",
+    "root_causes": "High CPU system time (31%) and I/O wait (5.8%) indicate the system is struggling with memory management and disk operations due to intensive swapping",
+    "solutions": [
+      "The high I/O wait is likely caused by swap operations - resolving memory pressure should reduce this",
+      "Use 'iotop' to identify processes causing high disk I/O activity",
+      "Monitor disk utilization and consider faster storage if swap operations are frequent",
+      "Implement memory monitoring alerts to prevent future memory exhaustion scenarios"
+    ]
+  },
+  {
+    "anomaly": "Massive increase in disk I/O operations with write rates reaching 537MB/sec",
+    "root_causes": "Disk write operations increased dramatically from 6MB/sec to 537MB/sec, primarily due to memory pages being written to swap space",
+    "solutions": [
+      "The extreme disk write activity correlates with memory pressure and swap operations",
+      "Consider increasing swap space if memory cannot be expanded, though this is a temporary solution",
+      "Evaluate storage performance capabilities to ensure they can handle memory pressure scenarios",
+      "Implement proactive memory monitoring to prevent reaching critical memory thresholds"
+    ]
+  }
+]

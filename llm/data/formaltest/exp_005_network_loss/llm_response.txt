@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Significant memory pressure and swap activity detected.",
+    "root_causes": "Memory resource load from application or system processes.",
+    "solutions": [
+      "Monitor 'vmstat 1' to confirm active swapping ('si'/'so' columns).",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "Review the recently completed job 'ft_cgC' for potential memory usage patterns."
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O wait time indicating storage bottleneck.",
+    "root_causes": "Disk I/O load from application or system processes.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk read/write activity.",
+      "Check for filesystem saturation or slow storage response times.",
+      "Review the job 'ft_cgC' for I/O-intensive operations during its runtime."
+    ]
+  },
+  {
+    "anomaly": "High system load and CPU utilization persisting post-job completion.",
+    "root_causes": "CPU resource load from residual processes or system tasks.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify any processes still consuming CPU resources after job end.",
+      "Check for zombie processes or orphaned tasks that may not have cleaned up properly.",
+      "Review system logs for any post-job cleanup or maintenance activities that might be running."
+    ]
+  }
+]

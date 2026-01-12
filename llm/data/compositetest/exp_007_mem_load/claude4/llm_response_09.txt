@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with near-complete memory exhaustion.",
+    "root_causes": "Memory resource load from the running job 'ft_ftC' which appears to be a memory-intensive workload consuming over 99% of available memory.",
+    "solutions": [
+      "Monitor the job 'ft_ftC' for memory leaks or inefficient memory allocation patterns using tools like 'valgrind' or 'massif'.",
+      "Consider terminating the job if it continues to consume excessive memory and threatens system stability.",
+      "Review job resource limits and consider implementing memory cgroups to prevent future memory exhaustion scenarios.",
+      "Add more physical memory to the node if this level of memory usage is expected for legitimate workloads."
+    ]
+  },
+  {
+    "anomaly": "Severe swap thrashing with extremely high swap activity.",
+    "root_causes": "System is heavily swapping due to memory exhaustion, with swap usage climbing to nearly 100% and continuous page swap operations.",
+    "solutions": [
+      "The page_swap_in_rate and page_swap_out_rate show sustained high values indicating active thrashing.",
+      "Immediate action: increase swap space or add physical memory to reduce swapping pressure.",
+      "Monitor swap usage trends and consider implementing swap limits to prevent complete swap exhaustion.",
+      "Evaluate workload memory requirements and optimize applications to use memory more efficiently."
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time and disk utilization indicating storage bottleneck.",
+    "root_causes": "Disk I/O load caused by excessive swapping activity as the system attempts to manage memory pressure through virtual memory operations.",
+    "solutions": [
+      "The cpu_iowait_percent consistently above 29% indicates processes are waiting for I/O operations to complete.",
+      "Monitor disk utilization with 'iostat' to identify if storage subsystem is the bottleneck.",
+      "Consider using faster storage (SSD) for swap partitions to reduce I/O wait times.",
+      "Resolve the primary memory pressure issue to reduce swap-related I/O load."
+    ]
+  }
+]

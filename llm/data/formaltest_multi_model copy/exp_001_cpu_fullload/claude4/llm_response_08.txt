@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU utilization increased dramatically from 30% to 83% during job execution, indicating severe resource contention.",
+    "root_causes": "High computational load from the 'ft_cgC' job causing CPU saturation and system performance degradation.",
+    "solutions": [
+      "Monitor CPU usage patterns with 'htop' or 'top' to identify specific processes consuming excessive CPU resources",
+      "Consider implementing CPU limits using cgroups or Slurm job constraints to prevent single jobs from monopolizing system resources",
+      "Evaluate if the job requires optimization or if additional compute nodes should be allocated for similar workloads"
+    ]
+  },
+  {
+    "anomaly": "System load average increased significantly from 1.77 to 4.88, indicating resource oversubscription.",
+    "root_causes": "High system load caused by intensive computational workload exceeding optimal system capacity.",
+    "solutions": [
+      "Review job scheduling policies to prevent overloading single nodes",
+      "Implement load balancing across multiple nodes for computationally intensive jobs",
+      "Monitor load averages continuously and set alerts when thresholds are exceeded"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in memory pressure and cache usage during job execution.",
+    "root_causes": "Memory-intensive operations from the running job causing increased memory allocation and cache utilization.",
+    "solutions": [
+      "Monitor memory usage patterns with 'free -h' and 'vmstat' to track memory consumption trends",
+      "Set appropriate memory limits for jobs to prevent memory exhaustion",
+      "Consider increasing available memory or optimizing job memory usage if this pattern persists"
+    ]
+  }
+]

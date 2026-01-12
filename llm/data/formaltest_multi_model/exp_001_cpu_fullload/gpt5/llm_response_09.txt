@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Significant swap usage with active swap-in/out bursts despite ample free and available RAM",
+    "root_causes": "Kernel is keeping a large portion of anonymous memory swapped (swap_usage_percent ~46.6% with swap_free_bytes ~1.15 GB) while memory_available_bytes remains ~5.48 GB. Repeated spikes in page_swap_in_rate/page_swap_out_rate (e.g., ~146–172 KB/s in and ~86–202 KB/s out between 07:02:28–07:03:13) plus non-zero page_major_faults_rate indicate the workload is touching swapped-out pages. Likely causes include aggressive swappiness and/or workload access patterns that re-activate cold anonymous pages previously swapped.",
+    "solutions": [
+      "Temporarily lower vm.swappiness (e.g., sysctl vm.swappiness=10) and observe whether page_swap_in/out spikes subside during similar runs.",
+      "Profile the job’s working set: record major faults (perf stat -e major-faults) and RSS over time; adjust task memory footprint to keep hot pages resident.",
+      "If swap must remain enabled, move it to faster storage (NVMe) or enable zswap to reduce swap I/O latency.",
+      "After the run, consider reclaiming stale swap with swapoff -a && swapon -a during a maintenance window to reset swapped-out idle pages.",
+      "Verify Slurm/cgroup memory limits (if used) are not forcing reclaim despite available system-wide memory."
+    ]
+  },
+  {
+    "anomaly": "Excessive process churn and scheduler overhead during the job window",
+    "root_causes": "process_forks_rate increases from ~3.4k/s to 7.1k/s with context_switches_rate ~1.4–1.8k/s and processes_running up to 17, indicating many short-lived processes/threads being created, which adds scheduling overhead and cache/TLB churn.",
+    "solutions": [
+      "Inspect the job ft_cgC launch pattern; replace frequent process spawning with persistent worker pools or threads where possible.",
+      "For MPI/launcher scripts, batch small tasks and reduce per-iteration exec/fork; prefer in-process loops over external commands.",
+      "Use perf or strace -f -c on a short reproduction to confirm fork/exec hotspots; cache intermediate results to avoid helper-command invocations."
+    ]
+  },
+  {
+    "anomaly": "Transient I/O pressure correlated with swap bursts",
+    "root_causes": "io_pressure_waiting_rate grows (e.g., ~0.0128 to ~0.054 at 07:03:13) while page_swap_in/out rates spike, indicating brief periods where tasks wait on storage due to swap traffic, even though disk_io_usage_percent remains low on average.",
+    "solutions": [
+      "Mitigate swap activity (see swap-related actions above) to remove the source of I/O waits.",
+      "Confirm the swap device performance and queueing (iostat -x 1; check disk_read_time_seconds_total/disk_write_time_seconds_total trends) during runs.",
+      "If persistent, allocate more memory headroom for the job or reduce concurrency so the active working set stays resident."
+    ]
+  },
+  {
+    "anomaly": "Inconsistent load_1min telemetry (sudden drop to ~0.84 while CPU usage and runnable tasks remain elevated)",
+    "root_causes": "Metrics collection/aggregation anomaly: at 07:02:43 load_1min ≈ 0.84 despite cpu_usage_percent ≈ 61.6% and processes_running = 12, which is inconsistent with surrounding samples and suggests a transient exporter or scrape artifact rather than a real load change.",
+    "solutions": [
+      "Validate the node exporter/scraper intervals and check for restarts around 07:02:43; ensure monotonic counters and averaging windows are handled correctly.",
+      "Correlate with dmesg/journalctl for exporter or agent restarts, and verify time synchronization (time_offset_seconds is stable and near zero).",
+      "If using federated monitoring, check for out-of-order samples or partial writes; enable sample rate limiting or smoothing for load averages."
+    ]
+  }
+]

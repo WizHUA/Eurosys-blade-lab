@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "System experiencing severe memory pressure with critical memory exhaustion pattern.",
+    "root_causes": "Memory usage increased dramatically from 32% to 84% within 45 seconds, indicating massive memory allocation by processes during job completion phase.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming excessive RAM.",
+      "Check for memory leaks in applications that may not be releasing memory properly after job completion.",
+      "Monitor swap usage patterns with 'vmstat 1' to confirm if system is actively swapping.",
+      "Review job cleanup procedures to ensure proper memory deallocation after task completion."
+    ]
+  },
+  {
+    "anomaly": "Critical disk I/O bottleneck with extremely high utilization and latency.",
+    "root_causes": "Disk I/O utilization spiked from 0% to 60% with massive write operations (up to 423GB/sec), likely caused by memory pressure forcing extensive swapping activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the excessive disk write activity.",
+      "Monitor swap activity with 'swapon -s' and consider adding more swap space if system consistently hits memory limits.",
+      "Check if the high I/O is related to job output writing or system swapping due to memory pressure.",
+      "Consider upgrading storage subsystem if this I/O pattern is expected for normal workloads."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space consumption increased rapidly during the monitoring period.",
+    "root_causes": "Filesystem usage jumped from 73% to 85% within minutes, indicating large file generation or data accumulation during job execution.",
+    "solutions": [
+      "Use 'du -sh /path/to/filesystem/*' to identify which directories are consuming the most space.",
+      "Check for large log files, temporary files, or job output files that may be accumulating.",
+      "Implement disk space monitoring and cleanup policies for job temporary files.",
+      "Consider configuring job-specific temporary directories with automatic cleanup."
+    ]
+  }
+]

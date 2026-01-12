@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Spike in TCP retransmissions and timeouts indicating transient network instability around 07:10:28, with elevated levels persisting afterward.",
+    "root_causes": "Network path congestion or transient connectivity issues (e.g., switch/virtual NIC bottlenecks or MTU/duplex mismatches). Evidence: tcp_retransmissions_rate rose from ~0 at 07:09:43 to ~1.9/s at 07:10:28 and remained ~1.6–2.1/s; node_netstat rates for Tcp_RetransSegs, TCPSynRetrans, and TCPTimeouts all jumped to ~7.5/s at 07:10:28. Interface error/drop rates stayed at 0, pointing to path-level conditions rather than NIC hardware errors.",
+    "solutions": [
+      "Inspect network device and switch counters for congestion/error indicators: ethtool -S <iface>, ip -s link, and switch port statistics around 07:10:28.",
+      "Verify end-to-end MTU consistency and duplex/speed settings (ip link show, ethtool <iface>; ensure 1500 MTU everywhere or consistent jumbo frames).",
+      "Capture a short packet trace to confirm loss/retrans cause: tcpdump -i <iface> -s 128 -w /tmp/mretr.pcap and correlate with application timestamps.",
+      "If using virtualization/overlay, check host vSwitch/bridge load and offload settings (GRO/LRO/TSO) for the VM interface.",
+      "Consider TCP tuning for bulk flows if appropriate: review net.ipv4.tcp_congestion_control, tcp_rmem/tcp_wmem, and enable net.ipv4.tcp_mtu_probing=1 when MTU issues are suspected."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap usage (~46.6% of 2 GiB) despite ample available RAM (5.6–6.7 GiB) during the window.",
+    "root_causes": "Pages were swapped out earlier and remained resident on swap (stale swap) or aggressive swappiness is keeping cold pages out, not current memory pressure (swap activity near zero except one brief spike; memory_usage_percent ~32%).",
+    "solutions": [
+      "Audit which processes have swapped pages: smem -rs swap or sudo grep -l 'VmSwap' /proc/*/status; evaluate if they should remain swapped.",
+      "Lower vm.swappiness (e.g., to 10) to favor RAM over swap for future behavior: sysctl vm.swappiness=10 (persist via /etc/sysctl.d).",
+      "During a maintenance window, repatriate swapped pages to RAM: swapoff -a && swapon -a (ensure enough free RAM before doing this).",
+      "Monitor swap I/O and memory pressure over time (vmstat 1, sar -S) to confirm no ongoing thrashing."
+    ]
+  },
+  {
+    "anomaly": "High TCP connection churn: tcp_active_opens_rate peaked at ~46/s (07:10:58) while tcp_current_connections stayed ~15.",
+    "root_causes": "Application pattern of frequent short-lived TCP connections and/or retries triggered by earlier packet loss/timeouts, increasing handshake overhead and risk of ephemeral port pressure.",
+    "solutions": [
+      "Review application/MPI or client libraries to enable connection pooling/keepalive or reuse persistent connections where possible.",
+      "Check TIME_WAIT and connection states: ss -ant | awk '{print $1}' | sort | uniq -c; tune net.ipv4.ip_local_port_range and consider net.ipv4.tcp_tw_reuse=1 if high TIME_WAIT is observed (validate policy impact first).",
+      "Correlate connection spikes with retransmission bursts in logs/metrics; if coupled, prioritize fixing the underlying network loss.",
+      "Validate server-side accept backlog and SYN backlog sizing (net.core.somaxconn, net.ipv4.tcp_max_syn_backlog) even though listen overflows are 0 in this window."
+    ]
+  }
+]

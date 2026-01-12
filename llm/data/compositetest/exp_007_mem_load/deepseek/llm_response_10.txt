@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap usage exceeding 99%",
+    "root_causes": "Memory exhaustion causing heavy swapping and performance degradation",
+    "solutions": [
+      "Immediately investigate memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Check for memory leaks in completed job 'ft_ftC'",
+      "Increase physical memory or optimize workload distribution"
+    ]
+  },
+  {
+    "anomaly": "Extremely high CPU utilization (94.5%) with significant I/O wait",
+    "root_causes": "CPU resource contention compounded by memory pressure induced swapping",
+    "solutions": [
+      "Analyze CPU-bound processes using 'top -c' sorted by CPU usage",
+      "Check disk I/O bottlenecks with 'iotop'",
+      "Consider adjusting Slurm job memory requirements"
+    ]
+  },
+  {
+    "anomaly": "System load average (11.88) far exceeds logical CPU count",
+    "root_causes": "Resource starvation causing process queueing",
+    "solutions": [
+      "Reduce concurrent job submissions to this node",
+      "Investigate process scheduling with 'pidstat'",
+      "Monitor kernel scheduler stats via '/proc/sched_debug'"
+    ]
+  }
+]

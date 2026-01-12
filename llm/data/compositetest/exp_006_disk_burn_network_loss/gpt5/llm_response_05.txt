@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion and swap thrashing aligned with job 285 start; swap nearly exhausted and available RAM collapsed.",
+    "root_causes": "Right after job 285 (ft_ftC) started at 23:25:54, memory_commit surged to ~13.5 GB on an 8.3 GB node while memory_available_bytes dropped as low as ~117 MB and swap_free_bytes fell to ~28 KB (≈100% used). Page swap-in/out and page_faults rates spiked, indicating active thrashing, which also drove processes_blocked up to 17.",
+    "solutions": [
+      "Enforce strict per-job memory limits in Slurm (e.g., --mem/--mem-per-cpu) and enable/enforce cgroup memory accounting so jobs cannot exceed allocated RAM.",
+      "Reduce the job’s memory footprint (repartition workload, stream/batch data, fix leaks) or lower task concurrency to fit physical RAM.",
+      "Tune the node to mitigate thrash: lower vm.swappiness and ensure adequate low-watermarks (vm.min_free_kbytes/watermark_scale_factor) after validating with change control.",
+      "If repeated, preempt/checkpoint or terminate jobs when swap usage crosses a safety threshold to protect node stability."
+    ]
+  },
+  {
+    "anomaly": "Storage I/O saturation with high CPU iowait during the swap storm (disk I/O up to hundreds of MB/s; iowait up to ~27%).",
+    "root_causes": "Swap churn and writeback from the job saturated the disk: disk_io_usage_percent rose to ~66%, disk_read/write_rate_bytes_per_sec peaked in the hundreds of MB/s, cpu_iowait_percent climbed to ~27%, and processes_blocked increased—consistent with device queueing from paging and heavy writes.",
+    "solutions": [
+      "Resolve the memory thrashing first to eliminate paging I/O (see memory solutions).",
+      "Place swap and job scratch on the fastest local device available and verify disk health/throughput (use iostat/iotop/blktrace/smartctl) to ensure the device is not a bottleneck.",
+      "Apply I/O control to noisy jobs (cgroups blkio/io.weight or io.max) so a single job cannot monopolize the disk.",
+      "Tune writeback to reduce long stalls (adjust vm.dirty_background_bytes and vm.dirty_bytes with change control and validation)."
+    ]
+  },
+  {
+    "anomaly": "Rapid local filesystem space consumption during the job (~10% capacity increase in minutes).",
+    "root_causes": "Filesystem_usage_percent climbed from ~73.36% to ~83.49% and filesystem_avail_bytes fell by ~8–9 GB during the run, indicating the job produced large intermediates/outputs on the local filesystem.",
+    "solutions": [
+      "Redirect large intermediates/output to a high-capacity scratch or parallel filesystem and set TMPDIR accordingly.",
+      "Enable automated per-job cleanup (Slurm Prolog/Epilog or site scripts) and enforce per-job disk usage limits/quotas where available.",
+      "Audit the job’s output patterns; prune or compress intermediates and avoid writing to the root filesystem.",
+      "Add monitoring/alerts on filesystem_usage_percent to prevent node outages from full disks."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Acute memory pressure with a swap-out burst and page-fault storm around 07:08:28–07:09:13.",
+    "root_causes": "While job 276 (ft_cgC) was running, the node’s working set surged: memory_usage_percent rose from ~32% to ~55%, anon_memory_percent from ~21% to ~43%, and committed_as from ~7.14 GB to ~9.05 GB. This coincided with a large spike in page_faults_rate (~113/s to ~5,711/s) and page_swap_out_rate (0 → ~14/s → ~167/s), plus a step-up in disk_write_rate_bytes_per_sec (~15 KB/s → ~171 KB/s). These together indicate the job entered a memory-hungry phase that exceeded readily available RAM, causing swap activity and heavy minor faults.",
+    "solutions": [
+      "Re-run or requeue the job with a higher Slurm memory request (e.g., increase --mem or --mem-per-cpu) so its working set fits in RAM.",
+      "Identify offenders and verify working set growth: ps -eo pid,comm,rss,vsz,maj_flt,min_flt,cmd --sort=-rss | head and smem -tw.",
+      "Live-verify pressure and swapping during runs: vmstat 1 and sar -B 1 to watch si/so and faults; correlate with the job’s phases.",
+      "If swapping must be minimized, temporarily reduce vm.swappiness (e.g., to 10–20) and consider memory.high/memory.max via cgroup v2 (Slurm cgroup plugin) to avoid thrashing.",
+      "If the algorithm/data phase inherently exceeds node RAM, schedule on a higher-memory node or split the workload to reduce peak resident memory."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap occupancy (~46.6% of 2.0 GB) during the window despite multiple GB of free/available memory.",
+    "root_causes": "swap_usage_percent remains ~46.60% with swap_free_bytes ~1.15 GB while memory_free_bytes fluctuates between ~1.82–3.71 GB and memory_available_bytes ~3.72–5.61 GB. This suggests a substantial amount of pages remain swapped out from prior pressure, with intermittent swap-out bursts during the job.",
+    "solutions": [
+      "After draining the node, clear stale swap to restore hot pages into RAM: swapoff -a && swapon -a.",
+      "Lower steady-state swapping by tuning vm.swappiness (e.g., 10–20) and ensuring jobs are scheduled with realistic memory requests (enforce via Slurm cgroups and ConstrainRAMSpace).",
+      "Audit long-lived services for unnecessary resident footprint and swapped-out pages (smem -tw; systemd-cgls) and restart culprits during maintenance windows."
+    ]
+  }
+]

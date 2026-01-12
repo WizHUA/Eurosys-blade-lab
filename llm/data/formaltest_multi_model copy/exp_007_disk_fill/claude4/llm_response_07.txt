@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe I/O wait time indicating storage performance bottleneck during job execution.",
+    "root_causes": "High I/O wait percentage (6.16% initially, decreasing to near zero) suggests the completed job 'ft_cgC' was performing intensive disk operations that saturated storage subsystem.",
+    "solutions": [
+      "Monitor disk utilization and queue depth using 'iostat -x 1' to identify storage bottlenecks during future job runs",
+      "Consider implementing I/O scheduling optimizations or using faster storage for compute-intensive jobs",
+      "Review the 'ft_cgC' job's I/O patterns to optimize data access patterns and reduce storage contention",
+      "Evaluate if additional storage bandwidth or parallel file systems would benefit this workload type"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage critically high at over 90% capacity with declining available space.",
+    "root_causes": "Filesystem utilization increased from 78% to over 90% during the monitoring window, indicating rapid consumption of disk space likely from job output or temporary files.",
+    "solutions": [
+      "Immediately clean up temporary files and job output data to free disk space",
+      "Implement automated disk space monitoring alerts when usage exceeds 85%",
+      "Review job output and logging policies to prevent excessive disk space consumption",
+      "Consider expanding filesystem capacity or implementing data retention policies for completed jobs"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure indicators show system under resource stress with swap activity.",
+    "root_causes": "Page swap activity (257K-168K pages/sec initially) and high memory usage (63-65%) indicate the system experienced memory pressure during job execution.",
+    "solutions": [
+      "Monitor memory usage patterns for future jobs to ensure adequate RAM allocation",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact",
+      "Review the memory requirements of the 'ft_cgC' job type to optimize resource allocation",
+      "Implement memory usage alerts to detect similar conditions before they impact system performance"
+    ]
+  }
+]

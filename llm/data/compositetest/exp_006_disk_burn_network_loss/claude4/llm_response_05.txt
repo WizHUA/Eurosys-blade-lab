@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Node experienced extreme memory pressure and thrashing during job execution.",
+    "root_causes": "Memory resource exhaustion with swap utilization reaching 99% and severe memory pressure causing system instability.",
+    "solutions": [
+      "Memory usage spiked from 32% to 99% during job execution, indicating the job exceeded available memory.",
+      "Swap usage increased from 47% to 90%, causing severe performance degradation due to constant swapping.",
+      "Monitor job memory requirements and adjust resource allocation to prevent memory exhaustion.",
+      "Consider implementing memory limits or cgroups to prevent jobs from consuming all available memory."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O bottleneck with utilization reaching critical levels.",
+    "root_causes": "Disk I/O load caused by excessive swapping activity and application I/O demands.",
+    "solutions": [
+      "Disk I/O utilization peaked at 66% with extremely high write rates exceeding 173MB/s due to memory swapping.",
+      "Page swap out rates reached over 280,000 pages/sec, indicating heavy memory pressure forcing disk writes.",
+      "Optimize application memory usage to reduce swap activity and associated disk I/O.",
+      "Consider upgrading storage subsystem or adding more memory to reduce swapping requirements."
+    ]
+  },
+  {
+    "anomaly": "System load and process scheduling severely impacted by resource contention.",
+    "root_causes": "CPU and memory resource contention causing high system load and blocked processes.",
+    "solutions": [
+      "System load increased from 5.38 to 10.02, indicating severe resource contention beyond normal capacity.",
+      "Number of blocked processes reached 17, showing processes waiting for I/O operations to complete.",
+      "CPU iowait time increased dramatically to 27%, indicating processes spending significant time waiting for disk operations.",
+      "Implement resource monitoring and job scheduling policies to prevent resource over-subscription."
+    ]
+  }
+]

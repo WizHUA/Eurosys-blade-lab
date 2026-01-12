@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure event with swap activation during job execution",
+    "root_causes": "Memory resource exhaustion causing the system to activate swap space and experience memory pressure",
+    "solutions": [
+      "Monitor the memory usage pattern of job 'ft_cgC' to identify if it has memory leaks or excessive allocation",
+      "Consider implementing memory limits for jobs using cgroups to prevent system-wide memory pressure",
+      "Evaluate if the node has sufficient memory for the workload or if job scheduling parameters need adjustment",
+      "Review swap configuration and consider disabling swap for HPC workloads to avoid performance degradation"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spike coinciding with I/O wait increase during memory pressure",
+    "root_causes": "System experiencing performance degradation due to memory swapping and increased I/O operations",
+    "solutions": [
+      "The I/O wait percentage increased from 0% to over 1% during the memory pressure event, indicating disk bottleneck",
+      "Monitor disk I/O patterns during job execution to identify if the application is causing excessive page faults",
+      "Consider using faster storage or optimizing application memory access patterns to reduce I/O wait",
+      "Implement monitoring alerts for I/O wait percentage exceeding acceptable thresholds"
+    ]
+  }
+]

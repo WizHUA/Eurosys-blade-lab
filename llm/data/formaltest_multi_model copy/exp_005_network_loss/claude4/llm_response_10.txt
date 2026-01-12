@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant memory usage increase during job execution with cache memory growth.",
+    "root_causes": "The completed job 'ft_cgC' caused substantial memory consumption, with memory usage climbing from 18.4% to 32.3% and cache memory increasing from 1.9GB to 1.96GB, indicating intensive memory allocation patterns typical of compute-intensive workloads.",
+    "solutions": [
+      "Monitor memory usage patterns for similar jobs to establish baseline resource requirements",
+      "Consider implementing memory limits for future jobs of this type using Slurm's --mem parameter",
+      "Review the ft_cgC application for potential memory optimization opportunities",
+      "Evaluate if the node has sufficient memory capacity for concurrent jobs of this scale"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity and filesystem utilization during job processing.",
+    "root_causes": "Disk write operations increased significantly during job execution, with write rates reaching 174KB/s and filesystem usage climbing to 73.34%, suggesting the job performs substantial data output operations.",
+    "solutions": [
+      "Monitor disk space utilization trends to prevent filesystem capacity issues",
+      "Consider implementing disk I/O limits or quotas for compute jobs to prevent interference",
+      "Evaluate if faster storage or additional disk capacity is needed for this workload type",
+      "Review job output patterns to optimize data writing efficiency"
+    ]
+  },
+  {
+    "anomaly": "TCP connection activity spikes during specific monitoring intervals.",
+    "root_causes": "TCP active opens increased from baseline levels during certain periods, with retransmission activity present, suggesting network communication patterns or potential connectivity issues during job execution phases.",
+    "solutions": [
+      "Monitor network performance during similar computational jobs to identify patterns",
+      "Check network infrastructure health if retransmission rates become consistently elevated",
+      "Consider network bandwidth requirements for jobs that involve data communication",
+      "Evaluate if network configuration optimizations are needed for compute workloads"
+    ]
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Spike in TCP retransmissions and SYN retransmits with TCP timeouts during the job window.",
+    "root_causes": "Transient network loss or congestion on the node’s link (MTU 1500, 1 Gbps) causing packet loss: node_netstat_Tcp_RetransSegs rose from ~0 to ~30/s, TCPSynRetrans to ~6/s, and TCPTimeouts to ~15/s around 07:06:43–07:06:58 while job 276 (ft_cgC) was running.",
+    "solutions": [
+      "Inspect NIC and link error counters (ip -s link, ethtool -S) and switch port statistics for drops, CRC, or resets during 07:06:40–07:07:00.",
+      "Check dmesg for NIC driver/PCIe warnings or resets that align with the retransmission spike.",
+      "Verify end-to-end MTU consistency (observed MTU 1500) and enable PMTU probing if needed (sysctl net.ipv4.tcp_mtu_probing=1).",
+      "Tune host TCP buffers if sustained high bandwidth/RTT variation is expected (e.g., net.core.rmem_max/wmem_max, tcp_rmem/tcp_wmem).",
+      "If the workload bursts traffic, consider pacing/aggregation at the application layer to reduce incast-like spikes."
+    ]
+  },
+  {
+    "anomaly": "Sustained swap usage (~46.6% of 2 GB) with non-zero swap-in activity despite several GB of memory available.",
+    "root_causes": "Inactive pages remain swapped out while memory_available_bytes stays between ~3.7–5.6 GB; light but steady swap-in and major faults observed (page_swap_in_rate ~5/s, page_major_faults_rate up to ~0.51/s). This indicates suboptimal reclaim behavior (stale swap) rather than true memory scarcity.",
+    "solutions": [
+      "Lower swappiness temporarily and observe impact (sysctl -w vm.swappiness=10); persist via /etc/sysctl.d if it helps.",
+      "During a maintenance window, clear stale swap to RAM (swapoff -a && swapon -a) to repatriate cold pages.",
+      "Check for cgroup memory limits that might induce swapping despite free RAM (inspect memory.high/memory.max for the job slice).",
+      "Profile per-process RSS vs. swap usage (smem, pmap) to identify offenders and adjust application memory behavior or job sizing."
+    ]
+  },
+  {
+    "anomaly": "Short-lived working set surge and fault burst around 07:06:28 with drop in available memory.",
+    "root_causes": "memory_available_bytes fell from ~5.5 GB to ~4.4 GB while active_anon_bytes increased by ~1.1 GB and page_faults_rate jumped to ~5617/s; committed_as also rose. This indicates rapid allocation/touch of new pages by the workload, causing cache eviction and a burst of minor/major faults.",
+    "solutions": [
+      "Amortize page faults by pre-touching large allocations at startup (e.g., MAP_POPULATE or application-level warm-up).",
+      "Use huge pages where appropriate (THP madvise or static hugepages) to reduce fault/PMD splits for large arrays.",
+      "Stage input data and reuse resident pages to minimize cache churn; verify that memory access patterns are locality-friendly.",
+      "Ensure job memory requests/reservations reflect peak working set to avoid reclaim pressure and incidental swapping."
+    ]
+  }
+]

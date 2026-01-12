@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage climbing from 32% to 87% and active swap usage increasing.",
+    "root_causes": "Memory resource exhaustion likely caused by the ft_cgC job consuming excessive memory beyond available physical RAM, forcing the system to use swap space extensively.",
+    "solutions": [
+      "Monitor the specific memory consumption of the ft_cgC job using 'ps aux --sort=-%mem' to identify if it has a memory leak or is simply memory-intensive.",
+      "Check swap activity using 'vmstat 1' to confirm active swapping is occurring due to memory pressure.",
+      "Consider terminating the job if it continues to consume excessive memory beyond expected limits.",
+      "Review job memory requirements and ensure adequate physical memory is allocated for future similar workloads."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O bottleneck with disk utilization reaching 55% and extremely high write rates up to 500GB/s.",
+    "root_causes": "Disk I/O load caused by a combination of intensive application writes from the ft_cgC job and memory swapping due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the massive disk write activity (up to 507GB/s observed).",
+      "The combination of high memory pressure and disk writes suggests extensive swapping - resolving memory issues will reduce I/O load.",
+      "Monitor disk health and performance as sustained high I/O rates may impact storage system reliability.",
+      "Consider I/O scheduling optimizations or storage system upgrades if this workload pattern is expected to continue."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization reaching 87% with increasing system load and high context switching rates.",
+    "root_causes": "CPU resource load from the computationally intensive ft_cgC job combined with increased system overhead from memory management and I/O operations.",
+    "solutions": [
+      "The ft_cgC job appears to be CPU-intensive in addition to memory and I/O intensive - monitor its CPU usage patterns.",
+      "High context switching rates (over 2100/sec) indicate potential resource contention between processes.",
+      "Consider CPU affinity settings or process priority adjustments to manage resource competition.",
+      "Evaluate if the job's resource requirements exceed the node's capacity for efficient execution."
+    ]
+  }
+]

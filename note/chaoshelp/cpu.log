@@ -1,0 +1,56 @@
+======================================================================
+$ blade create cpu fullload -h
+======================================================================
+Create chaos engineering experiments with CPU load
+
+Usage:
+  blade create cpu fullload
+
+Aliases:
+  fullload, fl, load
+
+Examples:
+
+# Create a CPU full load experiment
+blade create cpu load
+
+#Specifies two random core's full load
+blade create cpu load --cpu-percent 60 --cpu-count 2
+
+# Specifies that the core is full load with index 0, 3, and that the core's index starts at 0
+blade create cpu load --cpu-list 0,3
+
+# Specify the core full load of indexes 1-3
+blade create cpu load --cpu-list 1-3
+
+# Specified percentage load
+blade create cpu load --cpu-percent 60
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --cgroup-root string       cgroup root path, default value /sys/fs/cgroup
+      --channel string           Select the channel for execution, and you can now select SSH
+      --climb-time string        durations(s) to climb
+      --cpu-count string         Cpu count
+      --cpu-index string         cpu index, user unavailable!
+      --cpu-list string          CPUs in which to allow burning (0-3 or 1,3)
+      --cpu-percent string       percent of burn CPU (0-100)
+  -h, --help                     help for fullload
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

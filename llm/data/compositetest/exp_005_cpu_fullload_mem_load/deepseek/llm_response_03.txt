@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "High memory usage with memory_available_bytes dropping to critically low levels",
+    "root_causes": "Memory pressure from completed computational job (ft_cgC), possibly memory leaks or inefficient memory management in the application",
+    "solutions": [
+      "Check application logs for memory allocation errors",
+      "Profile memory usage of similar jobs to identify optimization opportunities",
+      "Consider increasing memory allocation for jobs with similar characteristics"
+    ]
+  },
+  {
+    "anomaly": "Sudden spikes in network activity after job completion",
+    "root_causes": "Post-processing or cleanup activities following job completion causing network traffic",
+    "solutions": [
+      "Verify if distributed file system cleanup is required",
+      "Check for unnecessary network transfers during job teardown",
+      "Optimize job finalization procedures"
+    ]
+  }
+]

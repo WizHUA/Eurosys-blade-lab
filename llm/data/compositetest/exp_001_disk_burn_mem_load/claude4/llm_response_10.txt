@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion causing system instability and performance degradation.",
+    "root_causes": "Memory usage climbed from 36% to 89% during job execution, with available memory dropping from 5.3GB to just 933MB, indicating the completed job 'ft_cgC' consumed excessive memory resources.",
+    "solutions": [
+      "Review the memory requirements and optimization of the 'ft_cgC' job to prevent future memory exhaustion.",
+      "Implement memory limits for Slurm jobs using --mem parameter to prevent single jobs from consuming all available memory.",
+      "Monitor for memory leaks in the application code that may not be releasing memory properly after completion.",
+      "Consider increasing physical memory or implementing swap space if the memory requirements are legitimate."
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait times indicating severe storage bottleneck.",
+    "root_causes": "I/O wait percentage spiked from 0.1% to over 5.8%, with disk utilization reaching 52%, likely caused by memory pressure forcing the system to swap heavily to disk.",
+    "solutions": [
+      "The high I/O wait correlates directly with memory exhaustion, suggesting swap thrashing as the primary cause.",
+      "Use 'iotop' to identify processes causing high disk I/O during similar workloads.",
+      "Consider implementing faster storage solutions (SSD) for swap space if memory pressure cannot be avoided.",
+      "Optimize the application to reduce memory footprint and minimize swap usage."
+    ]
+  },
+  {
+    "anomaly": "Significant filesystem space consumption during job execution.",
+    "root_causes": "Available filesystem space decreased from 22.3GB to 11.7GB (a reduction of ~10GB) during the job runtime, indicating substantial temporary file creation or data output.",
+    "solutions": [
+      "Review the 'ft_cgC' job's file I/O patterns to understand the large space consumption.",
+      "Implement cleanup procedures to remove temporary files after job completion.",
+      "Consider using a dedicated scratch filesystem with larger capacity for compute-intensive jobs.",
+      "Monitor disk space usage more closely and set up alerts when utilization exceeds safe thresholds."
+    ]
+  }
+]

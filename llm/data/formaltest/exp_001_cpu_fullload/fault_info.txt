@@ -1,0 +1,12 @@
+Fault Types: cpu-fullload
+Experiment IDs: fb581fa9d70b23ae
+Injection Time Range: 2025-09-20 07:02:13 - 2025-09-20 07:03:14
+Fault Commands:
+blade status fb581fa9d70b23ae
+
+Detailed Fault Information:
+1. ID: fb581fa9d70b23ae
+   Type: cpu-fullload
+   Create: 2025-09-20 07:02:13
+   End: 2025-09-20 07:03:14
+

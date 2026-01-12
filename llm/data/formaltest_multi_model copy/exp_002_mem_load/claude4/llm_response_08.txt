@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Severe memory pressure with usage jumping from 33% to 73% and significant swap activity indicating memory exhaustion.",
+    "root_causes": "Memory resource exhaustion caused by the running job 'ft_cgC' consuming excessive memory beyond available physical RAM, forcing the system to heavily utilize swap space.",
+    "solutions": [
+      "Monitor memory usage of the 'ft_cgC' job using 'ps aux --sort=-%mem' to identify if it has a memory leak or is configured with insufficient memory limits",
+      "Check swap usage with 'swapon -s' and 'vmstat 1' to confirm active swapping is occurring due to memory pressure",
+      "Consider terminating or restarting the job if memory usage continues to grow uncontrollably",
+      "Review job submission parameters to ensure appropriate memory allocation limits are set for future runs"
+    ]
+  },
+  {
+    "anomaly": "CPU usage remained consistently high throughout the monitoring period with significant system CPU time increase.",
+    "root_causes": "High computational load from the running job combined with increased kernel overhead due to memory pressure and swap activity.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify specific processes consuming high CPU resources",
+      "Monitor CPU breakdown to determine if high system time is related to memory management overhead",
+      "Consider CPU throttling or job scheduling adjustments if the workload is impacting system responsiveness"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in context switches and process activity indicating system stress.",
+    "root_causes": "System resource contention causing increased scheduling overhead as processes compete for limited memory and CPU resources.",
+    "solutions": [
+      "Monitor process states using 'ps aux' to check for processes in uninterruptible sleep (D state)",
+      "Check system load average trends to determine if the current workload is sustainable",
+      "Consider implementing resource limits using cgroups to prevent individual jobs from overwhelming system resources"
+    ]
+  }
+]

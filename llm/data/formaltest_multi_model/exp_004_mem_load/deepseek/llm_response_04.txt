@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Sudden memory usage spike and increased swapping activity",
+    "root_causes": "Memory intensive job execution causing pressure on physical RAM leading to swap usage",
+    "solutions": [
+      "Check job 276 (ft_cgC) memory requirements and optimize code/memory usage",
+      "Increase node memory allocation for similar memory-intensive jobs",
+      "Monitor for memory leaks in the application"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O wait times during memory pressure periods",
+    "root_causes": "Swap activity and memory pressure causing increased disk I/O",
+    "solutions": [
+      "Tune vm.swappiness parameter to balance between swapping and OOM killer",
+      "Increase physical RAM capacity to reduce swap dependency",
+      "Consider faster storage for swap partitions"
+    ]
+  },
+  {
+    "anomaly": "CPU usage spikes despite completed job status",
+    "root_causes": "Possible post-job cleanup or logging activities consuming CPU",
+    "solutions": [
+      "Verify if any post-processing scripts are running after job completion",
+      "Check system logs for background maintenance tasks",
+      "Monitor for runaway processes from completed jobs"
+    ]
+  }
+]

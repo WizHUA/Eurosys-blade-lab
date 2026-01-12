@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU system usage percentage (peaking at 17.78%) indicating significant kernel processing overhead",
+    "root_causes": "Kernel-level processing bottleneck from completed but still-cleaning-up FT_CG job operations",
+    "solutions": [
+      "Check for lingering processes from job 276/ft_cgC using 'ps aux | grep ft_cgC'",
+      "Verify kernel module parameter settings optimized for MPI workloads",
+      "Review system logs for kernel scheduler activity during job termination phase"
+    ]
+  },
+  {
+    "anomaly": "Sustained high I/O wait percentages (up to 4.87%) after job completion",
+    "root_causes": "Post-job filesystem cleanup operations or lingering I/O operations from completed MPI job",
+    "solutions": [
+      "Monitor 'iotop' for residual I/O activity from system processes",
+      "Check filesystem journal flushing status with 'journalctl --flush'",
+      "Verify parallel filesystem client tuning parameters"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure spikes with elevated page fault rates (peaking at 30038 faults/sec)",
+    "root_causes": "Memory management overhead during large job cleanup and potential memory fragmentation",
+    "solutions": [
+      "Check for memory fragmentation via '/proc/buddyinfo'",
+      "Monitor 'sar -B' for abnormal paging activity",
+      "Consider adjusting vm.vfs_cache_pressure parameter if caching overhead is high"
+    ]
+  }
+]

@@ -1,0 +1,115 @@
+# 实验套件配置
+experiments:
+  - name: "test"
+    description: "TEST"
+    output_dir: "data/test"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml" 
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "light_background"  # 背景负载计划
+      chaos_plan: "single_cpu_stress"    # 故障注入计划
+      duration:
+        preparation: 10    # 准备阶段时间(秒)：计划提交线程创建
+        recovery: 10      # chaos恢复期时间(秒)
+        cleanup: 10       # 清理阶段时间(秒)
+    monitoring:
+      interval: 15        # 监控间隔(秒)
+      step: "15s"        # Prometheus查询步长
+
+  - name: "cpu_stress_experiment"
+    description: "CPU负载压力测试"
+    output_dir: "data/cpu_stress_experiment"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml" 
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "light_background"  # 背景负载计划
+      chaos_plan: "single_cpu_stress"    # 故障注入计划
+      duration:
+        preparation: 10    # 准备阶段时间(秒)：计划提交线程创建
+        recovery: 10      # chaos恢复期时间(秒)
+        cleanup: 10       # 清理阶段时间(秒)
+    monitoring:
+      interval: 10        # 监控间隔(秒)
+      step: "15s"        # Prometheus查询步长
+
+  - name: "memory_pressure_test"
+    description: "内存压力测试"
+    output_dir: "data/memory_pressure_test"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml"
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "medium_background"
+      chaos_plan: "memory_pressure"
+      duration:
+        preparation: 30
+        recovery: 90
+        cleanup: 30
+    monitoring:
+      interval: 15
+      step: "15s"
+
+  - name: "composite_stress_test"
+    description: "复合故障压力测试"
+    output_dir: "data/composite_stress_test"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml"
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "heavy_background"
+      chaos_plan: "composite_stress"
+      duration:
+        preparation: 45
+        recovery: 10
+        cleanup: 45
+    monitoring:
+      interval: 10
+      step: "15s"
+  
+  - name: "formaltest"
+    description: "formaltest"
+    output_dir: "data/formaltest"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml"
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "formaltest"
+      chaos_plan: "formaltest"
+      duration:
+        preparation: 60
+        recovery: 60
+        cleanup: 60
+    monitoring:
+      interval: 15
+      step: "15s"
+
+  - name: "compositetest"
+    description: "compositetest"
+    output_dir: "data/compositetest"
+    component_configs:
+      monitor: "config/metrics.yaml"
+      workload: "config/workloads.yaml"
+      chaos: "config/chaos.yaml"
+    experiment_plan:
+      workload_plan: "formaltest"
+      chaos_plan: "composite_faults"
+      duration:
+        preparation: 60
+        recovery: 60
+        cleanup: 60
+    monitoring:
+      interval: 15
+      step: "15s"
+
+# 全局配置
+global_settings:
+  log_level: "INFO"
+  max_experiment_duration: 10000  # 最大实验时长(秒)
+  cleanup_on_error: true         # 错误时是否自动清理

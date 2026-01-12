@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage climbing from 32% to 37% and extensive page swapping activity.",
+    "root_causes": "Memory resource exhaustion causing the system to heavily rely on swap space for memory management.",
+    "solutions": [
+      "Monitor swap activity using 'vmstat 1' - page_swap_in_rate reached 495,868 and page_swap_out_rate reached 182,221 indicating critical swapping",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to find applications consuming excessive RAM",
+      "Check if the completed job 'ft_cgC' left behind memory-consuming processes or cached data that should be cleared",
+      "Consider increasing physical memory or implementing memory limits for jobs to prevent future swap storms"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization reaching over 50% with massive write operations.",
+    "root_causes": "Disk I/O bottleneck caused by intensive swap activity and application data writes.",
+    "solutions": [
+      "The disk_write_rate_bytes_per_sec peaked at 507,655,340 bytes/sec indicating severe I/O stress",
+      "Use 'iotop' to identify which processes are generating the highest disk write activity",
+      "Monitor disk queue length and latency - the high I/O is likely related to memory swapping rather than application I/O",
+      "Consider implementing I/O scheduling policies or upgrading to faster storage to handle memory pressure scenarios"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization is extremely high, reaching 87% with significant system overhead.",
+    "root_causes": "CPU resource contention from memory management overhead and I/O wait states.",
+    "solutions": [
+      "The cpu_system_percent increased dramatically to 16.47% indicating kernel overhead from memory/I/O management",
+      "Use 'top' with 'f' to add memory and swap columns to correlate CPU usage with memory pressure",
+      "The high cpu_iowait_percent (up to 3.77%) confirms that CPU cycles are being wasted waiting for I/O operations",
+      "Address the root memory pressure issue to reduce CPU overhead from swap management"
+    ]
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "High CPU I/O wait percentage indicating storage bottleneck",
+    "root_causes": "Disk subsystem struggling to keep up with application demands, reaching up to 22.49% I/O wait",
+    "solutions": [
+      "Check disk performance metrics using 'iostat -x' to identify potential hardware bottlenecks",
+      "Review application I/O patterns to optimize file access strategies",
+      "Consider migrating workload to storage with higher IOPS capability"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load averages exceeding CPU core count",
+    "root_causes": "CPU resource saturation with load averages peaking at 8.37 while having only 8 logical cores",
+    "solutions": [
+      "Analyze process list with 'top' or 'htop' to identify CPU-hungry processes",
+      "Consider adjusting Slurm job constraints to better distribute workload",
+      "Review CPU affinity settings for MPI processes"
+    ]
+  },
+  {
+    "anomaly": "Significant page fault activity indicating memory pressure",
+    "root_causes": "High page fault rates (up to 13441/s) suggesting insufficient physical memory for workload",
+    "solutions": [
+      "Monitor memory usage patterns with 'vmstat 1'",
+      "Consider reducing MPI process count per node or increasing node memory allocation",
+      "Check for memory leaks in application code"
+    ]
+  },
+  {
+    "anomaly": "Network performance degradation",
+    "root_causes": "TCP segment retransmissions indicating possible packet loss or congestion",
+    "solutions": [
+      "Check network interface statistics for errors/drops",
+      "Verify network fabric health (switches, cables)",
+      "Consider adjusting MPI communication parameters"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with 99.6% memory usage and 98.5% swap usage",
+    "root_causes": "Memory exhaustion likely from the completed ft_ftC job which may have had memory leaks or improper resource handling",
+    "solutions": [
+      "Check memory profiling for the ft_ftC job to identify memory leaks",
+      "Increase physical memory allocation or implement better memory management for similar jobs",
+      "Clear system caches and buffers after job completion to free up memory"
+    ]
+  },
+  {
+    "anomaly": "High IO wait percentage (up to 53.99%) despite moderate disk usage",
+    "root_causes": "Suboptimal disk I/O scheduling or potential filesystem contention from job activities",
+    "solutions": [
+      "Verify filesystem health and check for fragmentation",
+      "Consider using a more performant filesystem or tuned IO scheduler",
+      "Monitor disk latencies during job execution to identify bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "High system load average (11.9) with relatively low CPU utilization (94.5%)",
+    "root_causes": "Potential process scheduling issues or IO-bound processes causing wait states",
+    "solutions": [
+      "Analyze process state distribution (running vs blocked processes)",
+      "Check for IO bottlenecks that might be causing process blocking",
+      "Review system scheduler settings for proper process prioritization"
+    ]
+  }
+]

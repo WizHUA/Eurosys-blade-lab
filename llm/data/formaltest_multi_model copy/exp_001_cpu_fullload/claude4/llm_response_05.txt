@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe CPU utilization spike reaching over 83% with extremely high user CPU consumption.",
+    "root_causes": "Computationally intensive workload from the 'ft_cgC' job consuming excessive CPU resources during execution period.",
+    "solutions": [
+      "Monitor CPU usage patterns using 'top' or 'htop' to identify specific processes causing high utilization.",
+      "Consider implementing CPU resource limits using cgroups or Slurm job constraints to prevent single jobs from monopolizing system resources.",
+      "Evaluate if the job's computational requirements match the allocated resources and consider job scheduling optimization.",
+      "Review the ft_cgC application for potential optimization opportunities or parallelization improvements."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in system load averages indicating resource contention.",
+    "root_causes": "High computational load from running job causing system load to increase from 1.77 to 4.88 over the monitoring period.",
+    "solutions": [
+      "Monitor load averages using 'uptime' or system monitoring tools to track resource utilization trends.",
+      "Implement job scheduling policies to prevent system oversubscription and maintain acceptable load levels.",
+      "Consider load balancing across multiple nodes for computationally intensive jobs.",
+      "Review system capacity planning to ensure adequate resources for expected workload patterns."
+    ]
+  },
+  {
+    "anomaly": "High context switching rate indicating excessive process scheduling overhead.",
+    "root_causes": "Increased context switching from 1788 to over 1840 switches per second, likely due to intensive computational workload competing for CPU time.",
+    "solutions": [
+      "Use 'vmstat' to monitor context switching patterns and identify periods of high scheduling overhead.",
+      "Consider CPU affinity settings to reduce context switching by binding processes to specific CPU cores.",
+      "Review application threading models and consider optimizing for reduced context switching.",
+      "Monitor for I/O bound processes that might be causing excessive scheduling events."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Network performance degradation causing packet loss and connection instability",
+    "root_causes": "Network infrastructure experiencing congestion or hardware issues affecting data transmission reliability",
+    "solutions": [
+      "TCP retransmission rate spiked indicating significant packet loss during job execution",
+      "Check network infrastructure health including switches, cables, and interface statistics",
+      "Monitor network bandwidth utilization and consider QoS policies for HPC workloads"
+    ]
+  },
+  {
+    "anomaly": "Severe memory pressure leading to swap usage and potential OOM kills",
+    "root_causes": "Memory resource load exceeding available physical RAM capacity",
+    "solutions": [
+      "Monitor 'si/so' columns in vmstat to confirm active swapping",
+      "Identify memory-heavy processes using 'ps aux --sort=-%mem'",
+      "Check application logs for memory leaks or inefficient resource management"
+    ]
+  },
+  {
+    "anomaly": "High system load disproportionate to CPU utilization",
+    "root_causes": "Resource contention from multiple processes or I/O wait bottlenecks",
+    "solutions": [
+      "Analyze process states with 'top' focusing on processes in 'D' state",
+      "Check for I/O bottlenecks using iotop and disk utilization metrics",
+      "Review system logs for concurrent job scheduling issues"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Spike in memory pressure and system load after job completion",
+    "root_causes": "Memory usage remains elevated (73.67%) with 1.18GB/s swap activity despite job completion, suggesting potential memory leak or improper cleanup",
+    "solutions": [
+      "Check application logs of completed job ft_cgC for memory-related errors",
+      "Verify if child processes were properly terminated after job completion",
+      "Monitor for lingering processes using 'ps aux | grep ft_cgC'"
+    ]
+  },
+  {
+    "anomaly": "Abnormal network activity patterns post-execution",
+    "root_causes": "Network receive rate dropped to 0 while transmit rate spiked to 11319.85 MB/s during job cleanup phase",
+    "solutions": [
+      "Inspect network traffic patterns in job logs for anomalies",
+      "Check for network-intensive cleanup processes",
+      "Validate MPI finalization routines in the application"
+    ]
+  },
+  {
+    "anomaly": "System load remains elevated (4.1) despite job completion",
+    "root_causes": "High system load (4.1) persists with 14 running processes when only system processes should be active",
+    "solutions": [
+      "Investigate running processes with 'top -b -n 1'",
+      "Check for zombie processes using 'ps -A -ostat,ppid | grep -e [zZ]'", 
+      "Review system logs for abnormal process activity"
+    ]
+  }
+]

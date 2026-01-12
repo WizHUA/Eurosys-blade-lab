@@ -1,0 +1,8 @@
+{
+  "model_short_name": "claude4",
+  "model_full_name": "anthropic/claude-sonnet-4",
+  "total_runs": 10,
+  "successful_runs": 0,
+  "success_rate": "0.0%",
+  "results": []
+}

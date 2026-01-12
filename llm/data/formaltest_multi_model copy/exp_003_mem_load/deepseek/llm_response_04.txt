@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes causing increased swap usage and page faults",
+    "root_causes": "Memory-intensive application (ft_cgC) consuming large amounts of RAM and triggering swapping activity",
+    "solutions": [
+      "Monitor memory usage patterns of ft_cgC job to identify peak requirements",
+      "Consider allocating more memory per node or reducing job concurrency",
+      "Optimize application memory usage or implement checkpointing for large datasets"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure during application execution",
+    "root_causes": "Application performing intensive disk operations during computation phases",
+    "solutions": [
+      "Verify if temporary files are being written to optimal storage locations",
+      "Consider using RAM disks or faster storage for temporary files",
+      "Profile application I/O patterns to identify optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization fluctuations during job execution",
+    "root_causes": "Computationally intensive phases alternating with I/O-bound operations in the application",
+    "solutions": [
+      "Analyze application profiling data to identify computational bottlenecks",
+      "Consider adjusting CPU affinity settings for better core utilization",
+      "Evaluate if MPI/thread configuration matches available CPU resources"
+    ]
+  }
+]

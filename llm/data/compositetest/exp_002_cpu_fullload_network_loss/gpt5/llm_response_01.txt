@@ -1,0 +1,42 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with high CPU iowait during the job window",
+    "root_causes": "The completed job 'ft_cgC' coincided with storage bottlenecks: disk_io_usage_percent climbed to 87.04% and cpu_iowait_percent peaked at 22.49%, with non-zero processes_blocked and elevated io_pressure rates, indicating the node was frequently waiting on disk I/O.",
+    "solutions": [
+      "Profile I/O with iostat -x 1 and iotop to identify the processes and files driving I/O saturation.",
+      "Stage working data to local NVMe/tmpfs or redesign the workflow to reduce synchronous small writes and merges.",
+      "Limit I/O bandwidth for the job via cgroups (blkio) and lower priority with ionice -c3.",
+      "Evaluate and tune the storage stack (elevator/scheduler, queue depth, writeback settings); consider BFQ/none for SSD workloads.",
+      "Check backend storage health and contention (RAID, NFS/parallel FS servers) and schedule heavy I/O jobs off-peak."
+    ]
+  },
+  {
+    "anomaly": "Intense swapping activity despite moderate overall memory usage",
+    "root_causes": "Swap usage remained ~54% (swap_free_bytes ≈ 0.98 GiB of 2 GiB) and page_swap_in/out rates were high (up to ~145,640/210,065 pages/s), while memory_usage_percent was ~33–36%, indicating aggressive swapping of pages under I/O pressure.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., sysctl vm.swappiness=10) and review vm.vfs_cache_pressure to curb unnecessary swapping of file-backed pages.",
+      "Increase memory resources or lower the job’s memory footprint (tile/stream data, reduce concurrency).",
+      "Pin hot data in RAM or use tmpfs for transient files to avoid swap churn.",
+      "Audit memory access patterns (perf/ftrace) and ensure the job does not trigger excessive page faults."
+    ]
+  },
+  {
+    "anomaly": "Filesystem operated near capacity during the run",
+    "root_causes": "filesystem_usage_percent remained very high (94–98%) across multiple samples before dropping to ~73%, with substantial write rates (e.g., disk_write_rate_bytes_per_sec ≈ 214,873,588 B/s initially), indicating large temporary outputs or staging that risked ENOSPC events.",
+    "solutions": [
+      "Enforce per-job quotas/reservations on the scratch filesystem and alert when usage exceeds 90%.",
+      "Stage outputs to a dedicated high-capacity scratch or burst buffer, and clean intermediate files promptly.",
+      "Coordinate dataset lifecycle (pre-clean, post-clean) and avoid writing to shared home partitions.",
+      "Expand filesystem capacity or rebalance data across nodes if sustained high usage is expected."
+    ]
+  },
+  {
+    "anomaly": "Abrupt page cache eviction and memory state shift",
+    "root_causes": "At 23:19:40 memory_free_bytes jumped to ~5.32 GiB while cache_usage_percent dropped from ~61% to ~4%, and memory_cached_bytes fell from ~5.08 GiB to ~0.34 GiB, consistent with large file deletions or an explicit drop_caches invocation during/after job cleanup.",
+    "solutions": [
+      "Avoid drop_caches in production; prefer targeted eviction using posix_fadvise(DONTNEED) or gradual cleanup to minimize disruption.",
+      "Perform large deletions and cache-flushing actions after peak compute/IO periods or on isolated scratch mounts.",
+      "If automated cleanup exists, throttle it (ionice/nice) and schedule it away from concurrent I/O-heavy jobs."
+    ]
+  }
+]

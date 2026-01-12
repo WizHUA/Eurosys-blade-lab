@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization exhibits extreme spikes reaching 83% with sustained high activity during job execution.",
+    "root_causes": "Computational workload from the 'ft_cgC' job causing intensive CPU consumption with user CPU time dominating the usage pattern.",
+    "solutions": [
+      "Monitor the specific processes within the 'ft_cgC' job using 'top' or 'htop' to identify which components are most CPU-intensive.",
+      "Consider implementing CPU throttling or resource limits using cgroups to prevent future jobs from monopolizing CPU resources.",
+      "Evaluate if the job's algorithm can be optimized or parallelized more efficiently to reduce per-core CPU intensity.",
+      "Review job scheduling policies to ensure CPU-intensive jobs are distributed appropriately across available nodes."
+    ]
+  },
+  {
+    "anomaly": "System load average increases progressively from 1.77 to 4.88, indicating growing resource contention.",
+    "root_causes": "Accumulating system load due to the computational job creating more processes or threads than the system can efficiently handle.",
+    "solutions": [
+      "Use 'ps aux' and 'pstree' to examine the process hierarchy and thread count of the running job.",
+      "Monitor the number of runnable processes and ensure they don't consistently exceed the number of CPU cores.",
+      "Consider adjusting the job's parallelization parameters to match the available CPU cores more closely.",
+      "Implement load monitoring alerts to detect when system load approaches critical thresholds."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity shows irregular patterns with significant write operations increasing over time.",
+    "root_causes": "The 'ft_cgC' job generating substantial disk write activity, potentially related to checkpointing, logging, or intermediate result storage.",
+    "solutions": [
+      "Use 'iotop' to identify which processes within the job are responsible for the highest disk write activity.",
+      "Review the job's I/O patterns and consider optimizing data write strategies, such as buffering or reducing checkpoint frequency.",
+      "Ensure sufficient disk space is available and monitor filesystem usage to prevent disk full conditions.",
+      "Consider using faster storage or optimizing the job's data access patterns to reduce I/O overhead."
+    ]
+  }
+]

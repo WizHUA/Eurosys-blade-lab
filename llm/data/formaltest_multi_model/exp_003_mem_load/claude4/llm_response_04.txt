@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing node performance degradation.",
+    "root_causes": "Memory usage increased from 33% to 55% during job execution, indicating excessive memory consumption by the running job.",
+    "solutions": [
+      "Monitor the job 'ft_cgC' for memory leaks or inefficient memory usage patterns using tools like 'valgrind' or 'massif'.",
+      "Review job memory allocation parameters and consider reducing the problem size or increasing available memory.",
+      "Check if the job is using appropriate data structures and algorithms for memory efficiency.",
+      "Consider implementing memory usage limits through Slurm job constraints to prevent future memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity correlated with memory pressure.",
+    "root_causes": "Disk write operations increased dramatically from 164KB/s to 193MB/s as memory pressure mounted, indicating potential swapping or inefficient I/O patterns.",
+    "solutions": [
+      "Monitor swap usage with 'vmstat' and 'free' to confirm if increased I/O is due to memory swapping.",
+      "Analyze the job's I/O patterns using 'iotop' to identify if excessive disk operations are application-driven.",
+      "Consider optimizing the application's I/O strategy, such as buffering writes or using more efficient file access patterns.",
+      "Evaluate if the job requires SSD storage or faster I/O subsystem to handle its workload efficiently."
+    ]
+  }
+]

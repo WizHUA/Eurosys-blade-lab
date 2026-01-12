@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe memory pressure with active swapping during the job window",
+    "root_causes": "memory_usage_percent spiked from ~33% to >92% (23:24:40–23:25:10) while swap_usage_percent remained ~47.74%; page_swap_in_rate/page_swap_out_rate peaked at ~265,191/136,253 per second and anon_memory_percent rose to ~81%, indicating the working set exceeded physical RAM during ft_cgC.",
+    "solutions": [
+      "Right-size the job's memory request (Slurm --mem) or reduce problem size to fit RAM.",
+      "Apply cgroup memory limits or schedule on a higher-RAM node to prevent excessive swapping.",
+      "Lower vm.swappiness (e.g., 10–20) and ensure swap resides on fast storage.",
+      "Use vmstat/iostat/pidstat to pinpoint per-process swap I/O and investigate memory growth (smem/pmap).",
+      "Consider local NVMe scratch and adjust caching to reduce page cache churn for this workload."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation and elevated I/O wait early in the window",
+    "root_causes": "disk_io_usage_percent was 59–70% with disk_read/write_rate_bytes_per_sec up to ~272 MB/s/~139 MB/s and cpu_iowait_percent up to ~7.69%; concurrent heavy swap activity indicates a storage bottleneck driven by swapping and application I/O.",
+    "solutions": [
+      "Use iotop/blkio cgroup stats to identify top I/O contributors and throttle if needed.",
+      "Move temporary files to faster storage (NVMe/local scratch) or reduce I/O concurrency.",
+      "Tune I/O scheduler and writeback settings (e.g., vm.dirty_ratio/vm.dirty_background_ratio).",
+      "Resolve the memory pressure first to eliminate swap-induced I/O.",
+      "Verify disk/filesystem health (smartctl, dmesg) to rule out device or driver issues."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage near capacity with large write bursts, then fluctuation",
+    "root_causes": "filesystem_usage_percent was ~89.49–90.06% at 23:23:40–23:23:55 and later saw large writes (disk_write_rate_bytes_per_sec up to ~245 MB/s), then dropped to ~73%, consistent with large job output/staging and cleanup.",
+    "solutions": [
+      "Audit job outputs and remove temporary files post-run to reclaim space.",
+      "Increase filesystem capacity or adjust user quotas for this workload.",
+      "Stage large outputs to a different volume or burst buffer to avoid filling the primary filesystem."
+    ]
+  }
+]

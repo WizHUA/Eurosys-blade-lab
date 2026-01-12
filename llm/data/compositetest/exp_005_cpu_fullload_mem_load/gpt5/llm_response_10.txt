@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with elevated CPU iowait during the job window.",
+    "root_causes": "The ft_cgC job drove sustained storage activity: disk_io_usage_percent peaked near 70% and remained high early in the window, with disk read/write rates spiking to ~272 MB/s and ~139 MB/s respectively, and cpu_iowait_percent reaching ~7.7%. Concurrent large drops in memory_cached_bytes indicate aggressive page cache churn, consistent with heavy streaming I/O.",
+    "solutions": [
+      "Profile I/O with iostat -x 1, pidstat -d 1, and iotop to identify the processes issuing the highest read/write throughput and queue depths.",
+      "Run the workload on nodes with faster local/NVMe scratch or a higher-throughput parallel filesystem; if available, stripe files appropriately to distribute I/O.",
+      "Reduce synchronous writes and small I/O operations by batching I/O, increasing application buffer sizes, and avoiding frequent fsyncs where not required.",
+      "Limit I/O concurrency for this job using cgroup v2 io.max or blkio.weight to cap per-job throughput if it contends with other workloads.",
+      "Verify filesystem mount and scheduler settings (e.g., mq-deadline/none for NVMe) to better handle high-queue-depth workloads."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap activity and high swap utilization indicating memory thrashing phases.",
+    "root_causes": "Swap_usage_percent sits around ~47.9% while page_swap_in_rate/page_swap_out_rate surge (up to ~265k/s and ~136k/s respectively), and page_faults_rate is elevated. This reflects phases where the job’s memory footprint exceeded effective RAM, forcing frequent page migrations between RAM and swap.",
+    "solutions": [
+      "Increase the job’s requested memory or reduce its footprint (e.g., lower parallelism, optimize data structures) to avoid swapping.",
+      "Constrain memory with Slurm/cgroup limits to prevent system-wide thrash, and consider lowering vm.swappiness (e.g., to 10) to reduce swap pressure on anonymous memory.",
+      "Use per-process memory profiling (pmap/ps/top with %MEM) to identify largest consumers and potential leaks.",
+      "If feasible, stage intermediate data to faster storage or RAM-backed caches to lessen memory pressure from page cache churn."
+    ]
+  },
+  {
+    "anomaly": "Filesystem utilization approached critical levels and then dropped abruptly.",
+    "root_causes": "Filesystem_usage_percent rose to ~89–90% with filesystem_avail_bytes near 8–12 GB, then fell to ~73%, consistent with the job creating and later removing large temporary or output data. High occupancy during execution risks ENOSPC events.",
+    "solutions": [
+      "Verify the job’s scratch/output paths and purge temporary artifacts at completion; enforce cleanup in job epilog scripts.",
+      "Stage large intermediate files to dedicated scratch with sufficient capacity and quotas; avoid filling shared home/project filesystems.",
+      "Set monitoring/alerts for filesystem_usage_percent thresholds (e.g., warn >85%) and apply scheduler policies to prevent jobs from starting on near-full filesystems.",
+      "If sustained high usage is expected, expand filesystem capacity or redistribute workloads across filesystems with more headroom."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme filesystem utilization increasing from 79% to 90% during job execution",
+    "root_causes": "Job 'ft_cgC' is consuming large amounts of disk space, likely generating substantial temporary files or output data that is filling up the filesystem",
+    "solutions": [
+      "Monitor disk usage with 'du -sh /path/to/job/directory' to identify which files are consuming space",
+      "Check job logs and configuration to determine if temporary file cleanup is working properly",
+      "Consider implementing disk space quotas or limits for jobs to prevent filesystem exhaustion",
+      "Clean up any unnecessary temporary files and verify the job has proper cleanup procedures"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with high swap activity and declining available memory",
+    "root_causes": "Memory usage increased from 33% to over 31% with substantial swap activity (page_swap_in_rate and page_swap_out_rate), indicating the system is under memory pressure from the running job",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes from the ft_cgC job",
+      "Monitor swap usage with 'swapon -s' and 'vmstat 1' to track swapping activity",
+      "Consider increasing available memory or optimizing the job's memory usage patterns",
+      "Review job memory requirements and ensure they fit within available system resources"
+    ]
+  },
+  {
+    "anomaly": "Moderate TCP connection activity with periodic retransmissions",
+    "root_causes": "TCP retransmission activity and SYN retransmissions indicate some network communication issues, possibly related to network congestion or temporary connectivity problems during job execution",
+    "solutions": [
+      "Monitor network interface statistics with 'ethtool -S interface_name' for error counts",
+      "Check network connectivity and latency to ensure stable communication",
+      "Review application network usage patterns to identify potential optimization opportunities",
+      "Consider implementing connection retry logic or timeout adjustments if the job involves network communication"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike with active anonymous memory doubling from 1.5GB to 3.4GB",
+    "root_causes": "Memory-intensive computation phase of the FT_CG benchmark causing rapid memory allocation",
+    "solutions": [
+      "Monitor memory allocation patterns of FT_CG benchmark jobs",
+      "Consider adjusting Slurm memory limits for this benchmark class",
+      "Check if memory compression (zswap/zram) could help mitigate pressure"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with write operations peaking at 145MB/s",
+    "root_causes": "Checkpointing or result writing phase of the completed FT_CG job",
+    "solutions": [
+      "Verify if temporary files are being written to optimal storage locations",
+      "Consider implementing asynchronous checkpointing",
+      "Monitor disk health metrics for potential hardware issues"
+    ]
+  },
+  {
+    "anomaly": "Network retransmissions spiking to 30 packets during memory pressure period",
+    "root_causes": "TCP congestion likely caused by memory pressure affecting network buffers",
+    "solutions": [
+      "Monitor TCP buffer sizes during memory-intensive jobs",
+      "Consider adjusting net.ipv4.tcp_mem parameters",
+      "Verify network interface statistics for errors"
+    ]
+  }
+]

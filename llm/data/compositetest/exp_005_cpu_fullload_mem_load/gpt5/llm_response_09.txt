@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Severe memory pressure with heavy swapping during the job window",
+    "root_causes": "The running job (ft_cgC) drove memory usage above 90% (memory_usage_percent ≈92.3% at 23:24:40) with memory_available_bytes dropping as low as ~641 MB. Swap usage remained ~47.7% while page_swap_in/out rates were extremely high (e.g., swap-in ~265k/s and swap-out ~136k/s at 23:23:40), indicating active swap thrashing and contributing to elevated iowait earlier.",
+    "solutions": [
+      "Reduce the job’s memory footprint (e.g., smaller problem size or more memory-efficient settings) or request more memory via scheduler constraints so the job runs on higher-memory nodes.",
+      "Set/adjust Slurm memory limits (e.g., --mem/--mem-per-cpu) and enforce cgroup memory.high/memory.max to prevent node-wide pressure.",
+      "Tune vm.swappiness lower (e.g., 1–10) to reduce swapping under pressure and consider increasing RAM if workloads routinely exceed capacity.",
+      "Profile allocations (heap/anon) and page cache behavior to identify leak-like growth; use tools like pmap/smaps or memory profilers."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation and writeback bursts early in the window",
+    "root_causes": "Disk I/O utilization was elevated (disk_io_usage_percent ≈59–70% at 23:23:40–23:23:55) with very large read/write rates, coinciding with high swap activity and page faults. This indicates the job’s I/O plus swapping caused storage contention and earlier iowait (up to ~7.7%).",
+    "solutions": [
+      "Use iotop/blkio metrics to identify dominant I/O contributors from the job and limit them with cgroup I/O controls (e.g., io.max/blkio.throttle).",
+      "Stage working data to faster local SSD/NVMe or a less contended filesystem; avoid remote/shared paths for hot I/O.",
+      "Tune writeback to smooth bursts (e.g., vm.dirty_background_ratio and vm.dirty_ratio) and align application checkpoints/output frequency.",
+      "Mitigate swapping (see memory actions) to reduce extra I/O pressure."
+    ]
+  },
+  {
+    "anomaly": "Filesystem nearly full prior to a sudden free-space recovery, risking ENOSPC",
+    "root_causes": "Filesystem usage was high (filesystem_usage_percent ~89–90% with avail ~8–8.8 GB) and then abruptly dropped to ~73% (avail ~22.3 GB) mid-run, consistent with large temporary/output files being created and later removed by the job.",
+    "solutions": [
+      "Direct large temporaries to a dedicated per-job scratch (e.g., $SLURM_TMPDIR) and ensure automatic cleanup on exit.",
+      "Implement user/job quotas and pre-run cleanup to keep baseline free space above safe thresholds.",
+      "Monitor filesystem headroom and alert when usage exceeds a threshold (e.g., 80–85%) to prevent ENOSPC failures during runs."
+    ]
+  },
+  {
+    "anomaly": "Memory overcommit risk (committed memory exceeds RAM+swap)",
+    "root_causes": "memory_committed_as_bytes peaked around 11.99 GB while the node has ~8.28 GB RAM and ~2.15 GB swap (~10.4 GB total), indicating allocations that exceed physical+swap capacity and raising OOM risk (vm_oom_kills_total is non-zero).",
+    "solutions": [
+      "Set vm.overcommit_memory=2 and tune vm.overcommit_ratio to bound commit against available RAM+swap.",
+      "Enforce per-job memory limits with cgroups and Slurm so allocations cannot exceed requested memory.",
+      "Review application allocation patterns; cap maximum data structures and concurrency (e.g., thread count) that amplify memory use."
+    ]
+  }
+]

@@ -1,0 +1,57 @@
+======================================================================
+$ blade create mem load -h
+======================================================================
+Create chaos engineering experiments with memory load
+
+Usage:
+  blade create mem load
+
+Examples:
+
+# The execution memory footprint is 50%
+blade create mem load --mode ram --mem-percent 50
+
+# The execution memory footprint is 50%, cache model
+blade create mem load --mode cache --mem-percent 50
+
+# The execution memory footprint is 50%, usage contains buffer/cache
+blade create mem load --mode ram --mem-percent 50 --include-buffer-cache
+
+# The execution memory footprint is 50%, avoid mem-burn process being killed
+blade create mem load --mode ram --mem-percent 50 --avoid-being-killed
+
+# The execution memory footprint is 50% for 200 seconds
+blade create mem load --mode ram --mem-percent 50 --timeout 200
+
+# 200M memory is reserved
+blade create mem load --mode ram --reserve 200 --rate 100
+
+Flags:
+      --avoid-being-killed       Prevent mem-burn process from being killed by oom-killer
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --cgroup-root string       cgroup root path, default value /sys/fs/cgroup
+      --channel string           Select the channel for execution, and you can now select SSH
+  -h, --help                     help for load
+      --include-buffer-cache     Ram mode mem-percent is include buffer/cache
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --mem-percent string       percent of burn Memory (0-100), must be a positive integer
+      --mode string              burn memory mode, cache or ram.
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --rate string              burn memory rate, unit is M/S, only support for ram mode.
+      --reserve string           reserve to burn Memory, unit is MB. If the mem-percent flag exist, use mem-percent first.
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

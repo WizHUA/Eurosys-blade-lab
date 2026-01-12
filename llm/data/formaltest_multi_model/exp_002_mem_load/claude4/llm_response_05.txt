@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability with memory usage jumping from 33% to 73%.",
+    "root_causes": "Memory resource exhaustion from a memory-intensive workload or memory leak.",
+    "solutions": [
+      "Identify memory-consuming processes using 'ps aux --sort=-%mem' and 'top' to pinpoint the source of high memory usage.",
+      "Check for memory leaks in running applications by monitoring memory growth patterns over time.",
+      "Review the completed job 'ft_cgC' for any post-completion cleanup issues that may be retaining memory.",
+      "Consider increasing swap space or adding physical memory if workloads consistently require more than available RAM."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time from 1.7% to 4.2% indicating kernel overhead.",
+    "root_causes": "Kernel spending excessive time handling system calls, interrupts, or memory management due to resource pressure.",
+    "solutions": [
+      "Monitor system call activity using 'strace' or 'perf' to identify sources of kernel overhead.",
+      "Check for high interrupt rates that may be causing excessive context switching and kernel processing.",
+      "Review memory management activity as high system CPU often correlates with swap activity and page fault handling.",
+      "Examine process scheduling and context switch rates to identify if process thrashing is occurring."
+    ]
+  }
+]

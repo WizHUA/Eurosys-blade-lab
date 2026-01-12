@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Heavy swap activity despite ample free and available memory",
+    "root_causes": "Swap usage is ~46% and page swap-in/out rates spike (e.g., swap-in ~1.4K/s and swap-out ~235–270/s early) while memory_available remains ~5.4 GB and overall memory usage ~34%. This suggests aggressive paging of idle pages or cgroup memory constraints causing unnecessary swap churn during job 276 (ft_cgC).",
+    "solutions": [
+      "Inspect Slurm cgroup limits for job 276 (ft_cgC): verify memory.max/memory.high are not set below the job’s working set (e.g., cgget or systemd-cgls).",
+      "Reduce vm.swappiness on compute nodes to discourage paging of idle pages during jobs (apply via sysctl and host profile).",
+      "Identify processes incurring swap I/O and major faults (pidstat -r 1, sar -W, perf stat -e page-faults) and adjust their memory behavior (e.g., reuse buffers, avoid touching swapped-out cold pages in tight loops).",
+      "If operationally safe, reclaim stale swap by scheduling a maintenance window to swapoff && swapon the node so future runs start without legacy swapped pages."
+    ]
+  },
+  {
+    "anomaly": "Load average exceeded core count with relatively low CPU busy and minimal I/O wait at job start",
+    "root_causes": "At 07:01:43–07:01:58, load_1min ~9 with cpu_usage ~31–45% and iowait ~0.02%, while processes_running ~12–13 and forks/context-switch rates are elevated. This indicates many runnable short-lived tasks or threads creating run-queue pressure rather than sustained CPU or I/O saturation.",
+    "solutions": [
+      "Constrain concurrency to available cores: tune Slurm --ntasks/--cpus-per-task, enable --cpu-bind/--distribution, and ensure OMP_NUM_THREADS does not oversubscribe cores.",
+      "Reduce fork/exec bursts during startup (e.g., pre-spawn workers, reuse threads, or stagger initialization).",
+      "Profile run-queue and context switching (pidstat -w 1, perf sched record/report) to locate components causing bursty runnable activity."
+    ]
+  },
+  {
+    "anomaly": "Node reports a prior OOM kill event",
+    "root_causes": "vm_oom_kills_total = 1 across all samples indicates at least one historical OOM kill on this node (time not shown in the window). Combined with steady swap usage, the node previously experienced memory stress.",
+    "solutions": [
+      "Check kernel logs (dmesg or journalctl -k) to determine when and which process was OOM-killed and whether it was associated with Slurm jobs.",
+      "Validate per-job memory requests/limits and revise QoS or cgroup settings to prevent future OOM conditions.",
+      "Enable proactive monitoring/alerts on major faults, swap I/O, and cgroup memory pressure metrics to act before OOM conditions develop."
+    ]
+  }
+]

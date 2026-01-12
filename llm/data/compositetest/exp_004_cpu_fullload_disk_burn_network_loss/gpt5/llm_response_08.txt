@@ -1,0 +1,43 @@
+[
+  {
+    "anomaly": "Severe swap thrashing and disk I/O saturation during the job window (swap-in/out rates and disk_io_usage_percent surged; CPU iowait rose steadily).",
+    "root_causes": "The running job (ft_cgC) drove a large I/O working set that expanded the page cache and increased memory pressure, pushing anonymous pages to swap. The resulting swap churn combined with heavy filesystem reads/writes saturated storage and increased CPU iowait.",
+    "solutions": [
+      "Reduce the job's memory footprint or parallelism to lower anonymous memory pressure and swapping.",
+      "Tune vm.swappiness downward (e.g., sysctl vm.swappiness=10) to reduce swap aggressiveness; monitor for OOM risk.",
+      "Place swap on faster media or move the job to nodes with faster local SSD/NVMe to mitigate swap latency.",
+      "Use direct I/O or posix_fadvise(DONTNEED)/madvise to avoid polluting the page cache for large sequential I/O.",
+      "Throttle or schedule I/O using ionice or cgroups (io.max) to prevent disk saturation during peak phases."
+    ]
+  },
+  {
+    "anomaly": "File cache ballooning drove free memory near zero while available memory remained high, coinciding with sustained swapping.",
+    "root_causes": "Kernel page cache aggressively cached large file I/O (cached/inactive_file grew to several GB), competing with anonymous memory and triggering reclaim and swap churn.",
+    "solutions": [
+      "Increase vm.vfs_cache_pressure (e.g., sysctl vm.vfs_cache_pressure=200) to reclaim cache more aggressively under pressure.",
+      "Reduce readahead for the workload or storage device to limit unnecessary caching of sequential I/O.",
+      "Use O_DIRECT or posix_fadvise(DONTNEED) in the application for large streaming I/O to minimize page cache growth.",
+      "After the job, clear caches safely (echo 3 > /proc/sys/vm/drop_caches) to return memory to the free pool.",
+      "Mount with noatime where appropriate to reduce metadata caching pressure."
+    ]
+  },
+  {
+    "anomaly": "Transient network instability with TCP retransmissions and timeouts at 23:22:25.",
+    "root_causes": "Short-lived congestion or link/path issues caused segment retransmissions and SYN retries during the job.",
+    "solutions": [
+      "Inspect NIC and driver stats (ethtool -S, dmesg) and switch logs around 23:22:25 for errors or resets.",
+      "Verify MTU consistency end-to-end and check cabling/ports; replace suspect cables.",
+      "Ensure NIC offloads and IRQ affinity are configured correctly; update NIC/virt drivers if applicable.",
+      "Isolate or rate-limit competing traffic during MPI runs; consider QoS for the job’s network flows."
+    ]
+  },
+  {
+    "anomaly": "Rapid rise in filesystem usage to ~87% with sustained high write rates.",
+    "root_causes": "The job generated large outputs that quickly consumed available filesystem capacity.",
+    "solutions": [
+      "Redirect job outputs to larger local scratch or high-capacity storage; enforce quotas to prevent capacity exhaustion.",
+      "Compress or stream outputs to long-term storage to reduce on-node footprint.",
+      "Set up alerts for filesystem usage thresholds and perform post-job cleanup of temporary files."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system to enter critical swap state with 90%+ swap utilization.",
+    "root_causes": "Memory resource exhaustion from job 'ft_ftC' consuming excessive RAM, forcing the system to heavily use swap space which degrades performance significantly.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_ftC' job to determine if it has memory leaks or inefficient memory allocation.",
+      "Consider increasing physical RAM on the node or implementing memory limits for jobs to prevent system-wide memory exhaustion.",
+      "Review job memory requirements and optimize the application's memory usage patterns.",
+      "Implement swap monitoring alerts to catch memory pressure issues before they become critical."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization reaching 66% with intensive read/write operations.",
+    "root_causes": "Combination of heavy swapping due to memory pressure and intensive disk operations from the running job, creating a storage bottleneck.",
+    "solutions": [
+      "The disk I/O rates show over 320MB/s read and 144MB/s write, indicating severe storage stress.",
+      "Optimize the job's I/O patterns to reduce disk pressure, such as using more efficient file access methods or buffering.",
+      "Consider using faster storage (NVMe SSDs) for swap and temporary files to handle high I/O loads.",
+      "Implement I/O monitoring and throttling to prevent single jobs from saturating storage resources."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization exhibits erratic behavior with high iowait percentages reaching 27%.",
+    "root_causes": "CPU cores are frequently waiting for disk I/O operations to complete due to the storage bottleneck and heavy swapping activity.",
+    "solutions": [
+      "The high iowait percentage indicates CPUs are blocked waiting for storage operations to complete.",
+      "Address the underlying memory and storage issues to reduce iowait times and improve CPU efficiency.",
+      "Monitor CPU pressure metrics and consider workload scheduling optimizations to avoid resource conflicts.",
+      "Implement proper job resource allocation to prevent jobs from overwhelming system resources."
+    ]
+  }
+]

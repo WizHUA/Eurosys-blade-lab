@@ -1,0 +1,12 @@
+[
+  {
+    "anomaly": "Significant memory pressure indicated by dramatic drop in available memory during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the running job 'ft_cgC' consuming excessive amounts of system memory.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to identify if it has memory leaks or inefficient memory allocation.",
+      "Review job resource requirements and consider setting memory limits using Slurm's --mem parameter to prevent system memory exhaustion.",
+      "Check if the job can be optimized to use less memory or if additional memory is needed for the node.",
+      "Monitor swap usage as memory pressure may lead to performance degradation due to swapping."
+    ]
+  }
+]

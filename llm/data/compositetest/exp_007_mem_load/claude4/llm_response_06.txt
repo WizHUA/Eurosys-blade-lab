@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high I/O wait time, indicating severe storage bottleneck affecting system performance.",
+    "root_causes": "Storage subsystem unable to keep up with I/O demand, likely from the completed ft_ftC job causing persistent disk congestion.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating high I/O load and their read/write patterns.",
+      "Check disk health with 'smartctl -a /dev/sdX' to identify potential hardware issues.",
+      "Monitor filesystem performance and consider I/O scheduling optimization or storage upgrade if bottleneck persists.",
+      "Review the ft_ftC job's I/O patterns to optimize future runs and reduce storage impact."
+    ]
+  },
+  {
+    "anomaly": "System is experiencing severe memory pressure with over 99% memory utilization and significant swap usage.",
+    "root_causes": "Memory demand exceeding available physical RAM, forcing heavy reliance on swap space which contributes to I/O bottleneck.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to find applications consuming excessive RAM.",
+      "Monitor swap activity with 'vmstat 1' to confirm extent of memory pressure and swapping behavior.",
+      "Consider increasing swap space or adding physical memory if workload demands consistently exceed available RAM.",
+      "Review memory allocation patterns of recently completed jobs to prevent future memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "High system load averaging over 10, significantly exceeding the 8-core capacity of the system.",
+    "root_causes": "Combination of I/O bottleneck and memory pressure creating a backlog of processes waiting for resources.",
+    "solutions": [
+      "Use 'top' or 'htop' to analyze process states and identify tasks in uninterruptible sleep (D state) indicating I/O blocking.",
+      "Check for processes blocked on memory or I/O operations that may be contributing to the excessive load average.",
+      "Monitor system recovery after the ft_ftC job completion to determine if load normalizes naturally.",
+      "Implement resource limits or job scheduling policies to prevent individual jobs from overwhelming system resources."
+    ]
+  }
+]

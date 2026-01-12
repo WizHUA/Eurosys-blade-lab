@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Critical memory exhaustion with near-100% swap usage and sustained swap thrashing during job 285 (ft_ftC).",
+    "root_causes": "The job’s working set exceeded physical RAM, driving memory_available_bytes down to tens of MB while swap_free_bytes repeatedly approached zero. Page-in/out and swap-in/out rates spiked to very high values, and memory_committed_as_bytes (~13.6 GB) far exceeded physical memory (~8.3 GB), indicating oversubscription and causing heavy paging.",
+    "solutions": [
+      "Enforce per-job memory limits via Slurm (e.g., --mem or MemPerCPU) and cgroup memory controllers to prevent node-wide exhaustion.",
+      "Profile the job’s memory footprint (e.g., /usr/bin/time -v, heap profiling) and reduce peak usage or partition workloads to fit available memory.",
+      "Enable compressed swap (zswap) or zram, or relocate swap to faster NVMe to reduce disk thrash; as a policy option, consider setting memory.swap.max=0 for job cgroups to avoid swap-heavy behavior.",
+      "Tune VM settings to reduce overcommit-driven pressure (e.g., vm.overcommit_memory=2 and an appropriate vm.overcommit_ratio) for this node/class of jobs.",
+      "Schedule memory-intensive jobs on high-memory nodes or increase RAM if such workloads are routine."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O saturation and very high CPU iowait caused by paging activity.",
+    "root_causes": "Disk I/O usage stayed high (≈60–87%) with large read/write throughput and IOPS while cpu_iowait_percent remained elevated (≈30–54%). Processes_blocked increased (up to double digits). This pattern matches swap/paging storms from memory pressure rather than primary application I/O.",
+    "solutions": [
+      "Resolve the upstream memory pressure (see above); reducing paging will directly lower disk queueing and iowait.",
+      "Place swap on faster storage or enable zswap to reduce read/write amplification from paging.",
+      "Apply per-job I/O throttling/priority using blkio/io.max (cgroups v2) to protect system responsiveness under pressure.",
+      "Verify disk health and queueing (smartctl -a, iostat -x) and ensure an appropriate I/O scheduler for the device (e.g., mq-deadline/none for NVMe).",
+      "Separate job data I/O from swap (dedicated devices) when feasible to avoid interference."
+    ]
+  },
+  {
+    "anomaly": "System load far above CPU capacity with many threads blocked on I/O.",
+    "root_causes": "load_1min peaked around 11–12 on an 8-core node while user/system CPU was modest relative to iowait; processes_blocked increased. Elevated PSI (pressure) and blocked tasks indicate the load is dominated by I/O wait from paging rather than computebound work.",
+    "solutions": [
+      "After mitigating memory and I/O pressure, load averages should normalize; validate by monitoring cpu_iowait_percent and disk_io_usage_percent.",
+      "Use PSI-based alerts (memory/io pressure rates) to preemptively throttle or reschedule jobs before the node enters sustained I/O wait.",
+      "Adjust Slurm scheduling/partitions to avoid colocating memory-intensive jobs on low-memory nodes and require explicit --mem requests.",
+      "Pre-stage working data to local fast storage and tune application I/O patterns (batching, larger sequential reads/writes) to reduce contention."
+    ]
+  }
+]

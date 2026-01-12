@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O utilization with severe write latency degradation.",
+    "root_causes": "Storage subsystem experiencing severe performance bottleneck, likely due to heavy write operations from the completed job 'ft_cgC' causing sustained disk saturation.",
+    "solutions": [
+      "The disk_io_usage_percent peaked at 67.7% and remains elevated, indicating persistent storage bottleneck.",
+      "Use 'iotop' to identify processes still performing heavy I/O operations after job completion.",
+      "Check for pending write operations or filesystem sync activities that may be causing continued high disk utilization.",
+      "Consider investigating storage hardware health and performance characteristics to address the underlying bottleneck."
+    ]
+  },
+  {
+    "anomaly": "Sustained high memory pressure causing active swapping behavior.",
+    "root_causes": "Memory resource exhaustion forcing the system to actively swap pages, indicated by consistent page swap-in/swap-out activity throughout the monitoring period.",
+    "solutions": [
+      "The page_swap_in_rate and page_swap_out_rate show persistent swapping activity ranging from 117K to 257K pages, indicating severe memory pressure.",
+      "Monitor memory usage patterns using 'vmstat 1' to confirm ongoing swap activity.",
+      "Identify memory-intensive processes or potential memory leaks that may be consuming excessive RAM.",
+      "Consider adding more physical memory or optimizing application memory usage to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with over 90% utilization.",
+    "root_causes": "Storage capacity approaching exhaustion, which can impact system performance and application functionality.",
+    "solutions": [
+      "Filesystem usage increased from 78.97% to 90.34% during the monitoring period, indicating rapid space consumption.",
+      "Use 'df -h' and 'du -sh /*' to identify large files or directories consuming disk space.",
+      "Clean up temporary files, logs, or completed job output files that may no longer be needed.",
+      "Consider expanding storage capacity or implementing automated cleanup policies for temporary data."
+    ]
+  }
+]

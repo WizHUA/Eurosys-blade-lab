@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion causing system instability and performance degradation.",
+    "root_causes": "Memory usage escalated from 36% to 89% during job execution, with swap usage increasing from 44% to 55%, indicating the system exceeded available physical memory capacity.",
+    "solutions": [
+      "Monitor memory consumption patterns of the 'ft_cgC' job type to determine if this is expected behavior or a memory leak.",
+      "Consider implementing memory limits for jobs using cgroups to prevent system-wide memory exhaustion.",
+      "Evaluate increasing physical memory or optimizing the job's memory usage patterns.",
+      "Implement proactive monitoring to detect and potentially kill jobs before they exhaust system memory."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation with utilization reaching over 50% and massive throughput spikes.",
+    "root_causes": "Disk I/O bottleneck caused by combination of application I/O demands and memory pressure forcing extensive swapping activity.",
+    "solutions": [
+      "Disk write rates spiked to over 400MB/s with IOPS exceeding 1000, indicating severe I/O stress.",
+      "Use 'iotop' to identify specific processes generating the excessive disk activity.",
+      "Consider faster storage solutions (NVMe SSDs) or additional swap space on faster devices.",
+      "Optimize application I/O patterns to reduce disk pressure and prevent memory-induced swapping."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization saturated at over 90% with extremely high system CPU usage.",
+    "root_causes": "CPU resources overwhelmed by combination of application workload and system overhead from memory management and I/O operations.",
+    "solutions": [
+      "System CPU usage reached 31% indicating significant kernel overhead, likely from memory management and I/O operations.",
+      "Profile the 'ft_cgC' job to understand its computational requirements and optimize if possible.",
+      "Consider job scheduling policies to prevent resource contention with other system processes.",
+      "Monitor CPU pressure metrics to implement better resource allocation strategies."
+    ]
+  }
+]

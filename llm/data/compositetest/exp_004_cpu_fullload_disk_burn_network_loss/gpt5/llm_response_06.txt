@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Escalating disk I/O saturation with rising iowait and blocked tasks during the job window.",
+    "root_causes": "The running job 'ft_cgC' drove sustained high storage throughput and queueing: disk_io_usage_percent rose from ~0.46% (23:21:40) to 54.91% (23:23:25); disk_read_rate_bytes_per_sec increased from ~1.68e8 to ~5.08e8 and disk_write_rate_bytes_per_sec peaked >1.86e8; cpu_iowait_percent climbed from ~0.03% to 3.77%; processes_blocked appeared (0→1→2); io_pressure_waiting_rate and io_pressure_stalled_rate rose steadily. These indicate the filesystem/device became the bottleneck under the job's I/O load.",
+    "solutions": [
+      "Redirect heavy I/O to a high-throughput scratch or parallel filesystem; avoid writing to the system/root filesystem.",
+      "Throttle per-job I/O using Slurm/cgroup I/O controllers (e.g., blkio/io.max) to prevent device saturation.",
+      "Profile I/O patterns with iostat -x 1, pidstat -d 1, and iotop to identify hot processes/files and reduce small/random I/O.",
+      "Batch and buffer writes (larger sequential chunks) or reduce checkpoint frequency to lower IOPS pressure.",
+      "Verify storage path and health (smartctl, dmesg for disk/controller messages) and ensure sufficient queue depth on the target device."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space consumed rapidly during the run (usage ~73.36% → 87.05%; avail ~22.33 GiB → ~10.85 GiB).",
+    "root_causes": "The job produced large output and/or intermediate files while sustaining high write rates (disk_write_rate_bytes_per_sec rising to ~1.51e8–1.86e8) alongside high read rates, quickly reducing filesystem_avail_bytes.",
+    "solutions": [
+      "Purge unnecessary intermediate files during the run; enable per-job cleanup (Slurm Epilog) of temporary directories.",
+      "Write large outputs to a higher-capacity target (project/scratch space) and stage results post-run.",
+      "Enforce per-job storage quotas/limits and alerting to prevent space exhaustion.",
+      "If capacity is routinely insufficient for this workload, expand the filesystem or allocate node-local scratch for spill.",
+      "Audit the job’s output paths to ensure it is not writing to unintended locations (e.g., $HOME or system partitions)."
+    ]
+  },
+  {
+    "anomaly": "Free memory collapsed while page cache ballooned (cache_usage_percent ~4.85% → ~60.03%), but available memory remained high.",
+    "root_causes": "Heavy file I/O populated the page cache (memory_cached_bytes grew from ~4.01e8 to ~4.76e9–5.00e9) causing memory_free_bytes to drop as low as ~2.31e8, while memory_available_bytes stayed ~5.15e9–5.59e9 and swap usage/change remained largely stable. This reflects aggressive caching rather than true memory exhaustion, yet it correlates with rising I/O pressure.",
+    "solutions": [
+      "If cache growth interferes with co-located workloads, isolate the job (dedicated nodes) or use cgroup memory.high to limit cache footprint.",
+      "Tune writeback and caching for this workload (e.g., vm.dirty_bytes/vm.dirty_background_bytes) to smooth bursts and reduce long dirty-page flushes.",
+      "Consider streaming/append patterns and fewer, larger sequential I/O operations to reduce cache churn.",
+      "After the job, reclaim cache if needed (echo 3 > /proc/sys/vm/drop_caches) during a maintenance window.",
+      "Schedule similar I/O-heavy jobs to avoid overlap, given the observed memory and I/O pressure trends."
+    ]
+  }
+]

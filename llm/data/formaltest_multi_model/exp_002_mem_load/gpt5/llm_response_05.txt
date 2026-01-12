@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Acute memory pressure with a sudden spike in anonymous memory and sustained swap-out bursts around 07:04:13–07:05:00.",
+    "root_causes": "During the job window, memory_active_anon jumped to ~4.66 GB and memory_committed_as rose to ~10.9 GB, exceeding physical RAM (8.28 GB). This coincided with memory_usage_percent rising from ~33.6% to ~73.7%, memory_free_bytes dropping to ~0.28–0.57 GB, and page_swap_out_rate spiking to ~160–169 pages/s, indicating heavy allocation by running processes and kernel reclaim pushing pages to swap.",
+    "solutions": [
+      "Enforce per-job memory limits (e.g., Slurm --mem/--mem-per-cpu with cgroup memory.max) to prevent overcommit during peaks.",
+      "Profile the job’s memory usage (smaps/pmap, heap profiling) and reduce peak footprint (e.g., smaller batch sizes, tiled/blocked data structures, release buffers promptly).",
+      "Tune memory and reclaim policy if swapping recurs: lower vm.swappiness (e.g., 10–20), consider zswap/zram for gentler swap behavior, and set vm.overcommit_memory=2 with a sane vm.overcommit_ratio.",
+      "If workloads routinely need more headroom, add RAM to the node or adjust job placement to spread memory-intensive ranks."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap utilization (~46.6% of 2 GB) with swapped pages not reclaimed after the peak.",
+    "root_causes": "swap_free_bytes remains ~1.146 GB (≈53% used) across samples while swap I/O subsides later, indicating many pages remain resident in swap after earlier pressure, which can degrade latency-sensitive performance.",
+    "solutions": [
+      "During a maintenance window, consider swapoff -a && swapon -a to repatriate cold pages if sufficient RAM is available.",
+      "Audit workloads that leave long-lived memory cold (e.g., daemons or background services) and restart or optimize them to encourage in-RAM residency.",
+      "Set monitoring alerts on sustained swap usage and page_swap_out_rate to catch and mitigate future pressure earlier."
+    ]
+  },
+  {
+    "anomaly": "Evidence of a prior out-of-memory (OOM) event on the node.",
+    "root_causes": "vm_oom_kills_total=1 indicates at least one OOM kill has occurred since boot (time not determined from the provided window), consistent with observed overcommit and swap activity risks.",
+    "solutions": [
+      "Review kernel logs (dmesg, /var/log/kern.log) for OOM killer details to identify the offending process and memory context.",
+      "Harden memory safeguards: enforce Slurm memory limits, enable cgroup memory.high/memory.max, and set vm.overcommit_memory=2 with an appropriate vm.overcommit_ratio.",
+      "If OOMs coincide with specific jobs, coordinate with users to cap memory usage or refactor to reduce peak allocation."
+    ]
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Severe storage I/O saturation with elevated CPU iowait during the job window",
+    "root_causes": "The running job (ft_cgC) drove sustained read-heavy disk activity (disk_read_rate_bytes_per_sec peaking ~690 MB/s) with disk_io_usage_percent up to 87% and cpu_iowait_percent up to 22%, causing I/O queues and blocked processes (processes_blocked up to 3).",
+    "solutions": [
+      "Identify top I/O contributors with iotop or pidstat -d and correlate to ft_cgC processes.",
+      "Reduce concurrent readers/writers in the job (batch I/O, throttle with ionice or cgroup io.max/blkio limits).",
+      "Stage data to faster local storage or distribute I/O across more disks; verify I/O scheduler and adjust readahead (blockdev --getra/--setra) based on access patterns.",
+      "Monitor disk latency and queue depth (iostat -x, blktrace) and migrate workload or upgrade storage if saturation persists."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap activity with sustained high swap usage",
+    "root_causes": "Swap usage remains ~54% throughout the window with large swap-in/out spikes at the start (page_swap_in_rate ~145k/s, page_swap_out_rate ~210k/s), increasing disk load and latency while the job runs.",
+    "solutions": [
+      "Lower the job’s memory footprint (reduce in-process concurrency or working set size) and re-run while monitoring vmstat 1.",
+      "Temporarily reduce vm.swappiness (e.g., 10–20) to prefer RAM over swap and prevent page thrashing.",
+      "If applicable, pin hot pages (mlock/numactl) and avoid oversubscribing memory on the node.",
+      "If swapping persists, schedule fewer simultaneous memory-heavy jobs on this node or add RAM."
+    ]
+  },
+  {
+    "anomaly": "Filesystem nearly full during most of the window, risking degraded I/O performance",
+    "root_causes": "Filesystem usage stayed very high (filesystem_usage_percent ~94–98%, avail only ~2.4–4.9 GB out of ~78 GB) while heavy I/O was occurring, which can amplify latency and fragmentation.",
+    "solutions": [
+      "Free space to keep utilization below ~85% during jobs (purge temp files, relocate large outputs to scratch or another filesystem).",
+      "Increase filesystem capacity allocated to this node/job or adjust quotas.",
+      "Add job prolog/epilog cleanup to automatically reclaim temporary data."
+    ]
+  },
+  {
+    "anomaly": "Abrupt collapse of page cache with a surge in free memory near the end of the window",
+    "root_causes": "Cache usage dropped from ~61% to ~4% (memory_cached_bytes fell to ~340 MB) while memory_free_bytes jumped to ~5.3 GB, consistent with a cache purge or workload phase change, which can cause performance jitter as caches rewarm.",
+    "solutions": [
+      "Verify whether drop_caches or cgroup memory reclaim occurred (audit system logs and job scripts).",
+      "Avoid dropping caches during active I/O phases; if necessary, schedule cache purges outside job windows.",
+      "Tune cache/flush behavior cautiously (e.g., vm.dirty_* and vm.vfs_cache_pressure) and track cache hit rates to stabilize performance."
+    ]
+  }
+]

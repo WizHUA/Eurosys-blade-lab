@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Filesystem nearly full during job runtime (usage 94–98% with very low available space), then sudden space recovery.",
+    "root_causes": "The running job (ft_cgC) likely created large outputs or temporary files on the local filesystem, pushing filesystem_usage_percent to 94–98% (filesystem_avail_bytes dropped as low as 1,573,330,944–6,450,204,672 bytes) before a cleanup/deletion event reduced usage to ~73% and increased available space.",
+    "solutions": [
+      "Redirect large outputs and temporary data for ft_cgC to a high-capacity scratch or parallel filesystem instead of the node’s root filesystem.",
+      "Enforce per-job disk quotas and pre-run free-space checks; fail or defer jobs if filesystem_avail_bytes falls below a safe threshold (e.g., >10–20% free).",
+      "Enable job prolog/epilog cleanup to purge stale temp files and ensure timely removal upon job completion.",
+      "Investigate which paths grew the most using: du -xhd1 / and lsof +L1 to catch deleted-but-open files.",
+      "Set monitoring alerts on filesystem_usage_percent > 85% to proactively protect node stability."
+    ]
+  },
+  {
+    "anomaly": "Sustained storage saturation with high disk I/O utilization and CPU iowait spikes.",
+    "root_causes": "Intensive read/write activity from the job caused disk_io_usage_percent to remain very high (≈54–87%) with cpu_iowait_percent peaking at ~22.5%, and large throughput (disk_write_rate_bytes_per_sec up to ~214,873,588 B/s; disk_read_rate_bytes_per_sec up to ~149,136,582 B/s), indicating the node’s storage was a bottleneck.",
+    "solutions": [
+      "Throttle or schedule I/O-heavy phases (e.g., checkpointing) to reduce burstiness; consider cgroups (io.max/blkio.throttle.*) per job.",
+      "If available, stage I/O to faster local SSD/NVMe scratch; otherwise spread writes over more targets (application-level striping) to lower single-device contention.",
+      "Tune I/O pipeline: increase write buffer sizes, batch small I/Os, and ensure sequential access patterns when possible.",
+      "Validate with iostat -x 1 and pidstat -d 1 which processes are dominating I/O; reduce unnecessary synchronous fsyncs.",
+      "Review filesystem configuration and mount options; ensure no accidental logging/debug settings are amplifying I/O."
+    ]
+  },
+  {
+    "anomaly": "Heavy and persistent swap usage with bursts of swap activity despite moderate overall memory usage.",
+    "root_causes": "swap_usage_percent stayed ~53–54% (swap_free_bytes ≈ 0.98–0.99 GiB of 2.0 GiB) with large swap in/out bursts (page_swap_in_rate up to ~145,640/s and page_swap_out_rate up to ~210,065/s earlier), increasing disk pressure and latency even though memory_usage_percent was only ~22–36%. This indicates the working set and page cache behavior are driving swapping under I/O load.",
+    "solutions": [
+      "Reduce the job’s memory footprint (smaller in-memory buffers, streams/chunks) and request adequate --mem in the scheduler to avoid swapping.",
+      "Lower vm.swappiness (e.g., to 10) on compute nodes to prefer keeping anonymous memory resident over swapping under I/O pressure.",
+      "If swapping is undesirable for compute nodes, consider disabling swap or moving swap to a faster device; alternatively increase RAM if feasible.",
+      "Track major faults and swap activity during runs (vmstat 1, sar -B) and correlate with application phases to target hotspots.",
+      "Ensure the job’s I/O strategy (read-ahead/write-behind) does not excessively evict hot pages; tune readahead and buffer sizes accordingly."
+    ]
+  }
+]

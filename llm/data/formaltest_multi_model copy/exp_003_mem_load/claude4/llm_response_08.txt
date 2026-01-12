@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 33% to 55% during job execution, with available memory dropping from 5.4GB to 3.7GB, indicating excessive memory consumption by the running workload.",
+    "solutions": [
+      "Monitor the 'ft_cgC' job's memory usage patterns to identify if it has memory leaks or inefficient allocation",
+      "Use 'ps aux --sort=-%mem' to identify specific processes consuming excessive memory",
+      "Check if the job requires more memory allocation than currently available",
+      "Consider implementing memory limits using cgroups to prevent future memory exhaustion"
+    ]
+  },
+  {
+    "anomaly": "Significant CPU utilization increase with elevated system load during job execution.",
+    "root_causes": "CPU usage increased from 48% to 52% with load average rising from 4.08 to 4.11, indicating computational intensity of the running job combined with potential resource contention.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify which processes are contributing to the high CPU load",
+      "Monitor CPU pressure metrics to determine if the system is experiencing CPU contention",
+      "Consider CPU affinity settings to optimize job performance and reduce system interference",
+      "Evaluate if the current CPU allocation is sufficient for the workload requirements"
+    ]
+  }
+]

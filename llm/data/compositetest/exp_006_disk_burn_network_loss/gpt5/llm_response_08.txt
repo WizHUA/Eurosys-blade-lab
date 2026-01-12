@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion and swap thrashing during job 285 window",
+    "root_causes": "While job 285 (ft_ftC) was running, memory_available_bytes plunged to 280–117 MB and swap_usage_percent spiked to 99.9987% (swap_free_bytes ≈ 28 KB at 23:26:25). page_major_faults_rate surged from ~2/s to >1100/s, and memory/IO pressure rates rose markedly. This indicates the job’s working set exceeded RAM, triggering intense reclaim and swapping.",
+    "solutions": [
+      "Enforce per-job memory limits via Slurm (e.g., request/limit with --mem and enable cgroup memory+swap controls); reject or kill tasks that exceed limits to prevent node-wide thrashing.",
+      "Tune swap behavior on compute nodes (e.g., lower vm.swappiness or set memory.swap.max=0 in cgroups for strict no-swap workloads) to avoid prolonged swap storms.",
+      "Work with the job owner to reduce memory footprint (profile RSS with /usr/bin/time -v, pmap/smaps, jemalloc/tcmalloc stats, adjust algorithm/data partitioning) or move the job to a higher-memory node/partition.",
+      "Add RAM to this node or route such jobs to nodes with sufficient memory capacity if these workloads are expected."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O contention with very high iowait and throughput spikes",
+    "root_causes": "During the same interval, cpu_iowait_percent rose sharply (up to ~27% at 23:27:10), disk_io_usage_percent climbed (e.g., ~36–66%), and disk read/write rates spiked (e.g., ~150 MB/s read and ~116 MB/s write around 23:26:40). processes_blocked increased (up to 17). This aligns with heavy swap-in/out and large file I/O from the job saturating storage.",
+    "solutions": [
+      "Identify the top I/O consumers (iotop, pidstat -d) and confirm the job’s read/write pattern; if swapping is the root driver, address the memory issue first.",
+      "Direct temporary and checkpoint files to high-performance local/parallel scratch, and batch or rate-limit large writes to reduce burst pressure on the filesystem.",
+      "Tune I/O and writeback (e.g., vm.dirty_{background_ratio,ratio} appropriately for the storage), and verify the I/O scheduler settings are appropriate for the device.",
+      "If this is recurring, provision faster local storage (NVMe/RAID) for scratch or move heavy-I/O phases to suitable storage tiers."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the run",
+    "root_causes": "filesystem_avail_bytes fell from ~22.33 GB to ~13.84 GB (usage from ~73.36% to ~83.49%) within ~2 minutes while disk write rates were elevated, indicating the job wrote a large volume of data in a short time.",
+    "solutions": [
+      "Verify the job’s output and temporary paths; redirect large outputs and intermediates to designated scratch with sufficient free space.",
+      "Set Slurm per-job storage requests/limits or quotas and alert when filesystem usage crosses thresholds.",
+      "Coordinate data staging/cleanup (prolog/epilog) to ensure timely removal of intermediates and prevent rapid fill events."
+    ]
+  },
+  {
+    "anomaly": "Intermittent TCP retransmission spikes during the job",
+    "root_causes": "node_netstat_Tcp_RetransSegs and TcpExt_TCPSynRetrans rates were near zero for most samples but spiked to ~30/s and ~6/s respectively at 23:26:40 and again at 23:27:25, indicating momentary packet loss or congestion.",
+    "solutions": [
+      "Inspect NIC and switch counters for errors/drops (ethtool -S, switch logs) and check dmesg for link resets or driver issues.",
+      "Verify MTU consistency end-to-end and adjust NIC ring buffers if receive overruns/drops are observed.",
+      "Correlate retransmission bursts with job phases; if co-occurring with I/O spikes, consider isolating network-intensive phases or shaping traffic."
+    ]
+  }
+]

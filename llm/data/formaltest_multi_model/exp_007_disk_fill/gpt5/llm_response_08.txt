@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Abrupt and large page cache eviction around 07:14:13 (memory_cached_bytes dropped from ~5.33 GiB to ~0.53 GiB; cache_usage_percent fell from ~64% to ~6%).",
+    "root_causes": "Behavior is consistent with an explicit cache drop (e.g., vm.drop_caches) or an aggressive reclaim event triggered by workload I/O patterns, causing most of the file cache to be discarded.",
+    "solutions": ["Audit for any scripts or automation invoking cache drops (e.g., writing to /proc/sys/vm/drop_caches) during job runs and disable or reschedule them.", "If cache reclaim is unintended, reduce vm.vfs_cache_pressure and verify no periodic 'sync; echo 3 > /proc/sys/vm/drop_caches' runs are scheduled.", "Coordinate large sequential I/O phases to avoid unnecessary cache pollution or use O_DIRECT where appropriate to prevent cache blowouts."]
+  },
+  {
+    "anomaly": "Intense swap churn despite ample free memory (e.g., at 07:13:43 memory_available_bytes ≈ 5.49 GiB while page_swap_in_rate ≈ 2.58e5/s and page_swap_out_rate ≈ 1.36e5/s; swap usage steady at ~46.6%).",
+    "root_causes": "The kernel is actively paging while plenty of RAM is available, indicating overly aggressive swappiness or lingering swapped pages from prior pressure leading to swap thrashing without reducing swap occupancy.",
+    "solutions": ["Lower vm.swappiness (e.g., to 10) to discourage paging when RAM is available.", "During a maintenance window, run swapoff -a && swapon -a to repatriate cold pages from swap and reset swap residency.", "Identify processes with significant swap usage using 'smem -s swap' or 'top' and investigate their memory behavior; optimize to keep hot working sets in RAM."]
+  },
+  {
+    "anomaly": "Burst of heavy disk I/O and device saturation (disk_io_usage_percent peaked ~67.7% with ~264 MB/s reads and ~139 MB/s writes at 07:13:43; gradually subsided thereafter).",
+    "root_causes": "Workload-driven storage contention from large sequential reads/writes during the job window, increasing I/O queueing and service times.",
+    "solutions": ["Stage high-throughput I/O to faster local/scratch storage or spread across more devices to increase parallelism.", "Throttle or batch large I/O bursts (e.g., via ionice/cgroup blkio) to reduce contention with other system activity.", "Verify I/O scheduler and queue depths are tuned for the workload; consider increasing read-ahead for sequential reads."]
+  },
+  {
+    "anomaly": "Filesystem nearing capacity during the window (filesystem_usage_percent up to ~90.34%, with free space falling to ~8–12 GiB on a ~78 GiB filesystem).",
+    "root_causes": "High occupancy reduces allocator flexibility and can amplify latency under heavy I/O, especially with large file create/delete activity.",
+    "solutions": ["Clean up temporary and stale files from the volume or move data to a roomier filesystem.", "Set alerts/quotas to keep usage below ~85% to avoid fragmentation and allocation slowdowns.", "If persistent, expand the filesystem or redirect job scratch/data to a higher-capacity target."]
+  }
+]

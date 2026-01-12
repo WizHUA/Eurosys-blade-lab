@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing performance degradation and potential system instability.",
+    "root_causes": "Memory usage spiked to 73.7% with available memory dropping from 5.5GB to 2.2GB, indicating excessive memory consumption by running processes.",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming excessive RAM.",
+      "Monitor swap usage patterns with 'vmstat 1' to detect if the system is experiencing memory pressure.",
+      "Check if the completed job 'ft_cgC' left behind memory-consuming processes or temporary files.",
+      "Consider increasing available memory or implementing memory limits for future jobs to prevent system-wide impact."
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU system time indicating kernel-level processing overhead.",
+    "root_causes": "CPU system time increased significantly during memory pressure period, suggesting kernel is spending excessive time managing memory and I/O operations.",
+    "solutions": [
+      "Monitor context switch rates and interrupts to identify if excessive kernel activity is causing performance bottlenecks.",
+      "Check system logs for any kernel warnings or errors related to memory management.",
+      "Use 'iotop' to determine if high system CPU is related to I/O wait from memory swapping or disk operations.",
+      "Consider tuning kernel memory management parameters if this pattern persists across multiple jobs."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe disk I/O bottleneck with extremely high write activity and substantial queue buildup.",
+    "root_causes": "High-intensity disk write operations from the completed 'ft_cgC' job creating storage subsystem congestion.",
+    "solutions": [
+      "Monitor disk write rates which peaked at 214MB/s, significantly above normal levels for this workload type.",
+      "Check storage subsystem health including disk controllers, RAID configuration, and filesystem performance.",
+      "Consider implementing I/O throttling or scheduling policies to prevent single jobs from saturating storage resources.",
+      "Evaluate if the storage infrastructure can handle the write-intensive requirements of computational fluid dynamics jobs."
+    ]
+  },
+  {
+    "anomaly": "Filesystem utilization increased dramatically from 79% to 90% during job execution.",
+    "root_causes": "Large amounts of data being written to disk by the computational job, consuming significant storage space.",
+    "solutions": [
+      "Available filesystem space dropped from 17GB to 8GB in a short time window, indicating rapid space consumption.",
+      "Implement automated cleanup policies for temporary job files and intermediate results.",
+      "Monitor job output requirements and ensure adequate storage allocation before job submission.",
+      "Consider implementing storage quotas per job or user to prevent filesystem exhaustion."
+    ]
+  },
+  {
+    "anomaly": "High CPU usage sustained at 76% with elevated system load throughout the monitoring period.",
+    "root_causes": "Computationally intensive operations from the running computational fluid dynamics job.",
+    "solutions": [
+      "System load averaging 5.0+ on an 8-core system indicates moderate resource contention.",
+      "Monitor job resource allocation to ensure it aligns with available CPU capacity.",
+      "Consider CPU affinity settings to optimize performance for compute-intensive workloads.",
+      "Evaluate if the job requirements match the allocated compute resources."
+    ]
+  }
+]

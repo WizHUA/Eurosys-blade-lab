@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe transient memory pressure and near exhaustion between 23:24:40 and 23:25:10 (memory_usage_percent ~92–93%, memory_available_bytes ~0.6 GB, anon_memory_percent ~81%).",
+    "root_causes": "The running job 'ft_cgC' drove a large spike in anonymous memory while swap was already ~48% utilized, pushing the node close to RAM limits and reducing available memory.",
+    "solutions": [
+      "Enforce Slurm cgroup memory limits (memory.high/memory.max) for the job to cap resident memory and prevent node-wide pressure.",
+      "Profile the job’s peak allocations (smaps/smapssize, /proc/<pid>/status, perf) and reduce memory footprint via algorithmic or batching changes.",
+      "Lower vm.swappiness (e.g., to 10) and monitor page_swap_in_rate/page_swap_out_rate to reduce swap churn during pressure.",
+      "Schedule memory-hungry phases on nodes with larger RAM or split the workload to reduce concurrent memory demand.",
+      "Enable early OOM notifications and alerts so operators can intervene before the node becomes unstable."
+    ]
+  },
+  {
+    "anomaly": "Intense swapping and disk I/O contention earlier in the window (page_swap_in_rate up to ~265k/s, page_swap_out_rate ~136k/s; disk_io_usage_percent ~59–70%; read/write rates >100 MB/s).",
+    "root_causes": "Working set exceeded available RAM causing swap churn; paging activity and application I/O saturated the storage subsystem and increased iowait.",
+    "solutions": [
+      "Use iotop/blkio tools to identify the processes dominating I/O and apply blkio cgroup limits to throttle if necessary.",
+      "Reduce memory pressure to eliminate swapping (apply job memory limits, optimize allocations) to remove pager-induced disk load.",
+      "Tune writeback parameters (vm.dirty_ratio, vm.dirty_background_ratio) to smooth large write bursts and reduce I/O spikes.",
+      "Verify and tune device scheduler/queue depth (mq-deadline/kyber) appropriate to the underlying storage, and ensure job scratch uses the fastest available disk."
+    ]
+  },
+  {
+    "anomaly": "Network throughput near or above reported NIC capacity during job execution (network_receive_rate_bytes_per_sec peaked ~272 MB/s while network_speed_bytes reports 125 MB/s), with softnet queue pressure events.",
+    "root_causes": "Network-intensive MPI traffic from 'ft_cgC' saturated the interface(s) and increased kernel network processing load, contributing to transient network stack pressure.",
+    "solutions": [
+      "Inspect NIC and switch port statistics (ethtool -S, ip -s link) for errors/drops during the interval and remediate cabling or port issues if present.",
+      "Tune MPI communication patterns (e.g., adjust collective algorithms or message aggregation) and pin ranks to reduce bursty cross-node traffic.",
+      "Enable or adjust RPS/RFS and interrupt coalescing to distribute packet processing across CPUs and reduce per-core softnet pressure.",
+      "If sustained high bandwidth is required, schedule such workloads on nodes with higher-bandwidth fabrics or stagger communication-heavy phases."
+    ]
+  }
+]

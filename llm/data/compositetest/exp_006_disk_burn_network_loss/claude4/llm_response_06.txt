@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure leading to heavy swapping and system instability.",
+    "root_causes": "The system experienced severe memory exhaustion during job execution, with memory usage climbing from 32% to 99% and swap usage increasing from 47% to 90%. The job 'ft_ftC' appears to have consumed excessive memory resources beyond system capacity.",
+    "solutions": [
+      "Immediately investigate the memory requirements of the 'ft_ftC' job and implement memory limits using cgroups or Slurm memory constraints",
+      "Monitor swap usage with 'swapon -s' and consider adding more swap space as a temporary measure",
+      "Review job submission parameters and ensure adequate memory allocation requests to prevent oversubscription",
+      "Implement memory monitoring alerts to detect similar situations before they cause system instability"
+    ]
+  },
+  {
+    "anomaly": "Severe I/O bottleneck with disk utilization reaching critical levels.",
+    "root_causes": "Disk I/O utilization spiked from 0.3% to 66% during the memory pressure event, primarily caused by intensive swapping activity as the system struggled to manage memory shortage.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing excessive I/O and correlate with memory usage patterns",
+      "Consider upgrading to faster storage (NVMe SSDs) for swap partitions to handle memory pressure events more efficiently",
+      "Implement I/O scheduling optimizations and consider using faster filesystems for temporary storage",
+      "Monitor disk queue depths and latency metrics to detect I/O bottlenecks before they impact system performance"
+    ]
+  },
+  {
+    "anomaly": "High system load and CPU pressure indicating resource contention.",
+    "root_causes": "System load increased from 5.38 to 10.02 while CPU usage patterns shifted dramatically, with high context switching rates (6300+ per second) indicating significant resource contention and thrashing due to memory pressure.",
+    "solutions": [
+      "Analyze process scheduling with 'ps aux' and 'top' to identify processes in uninterruptible sleep states",
+      "Implement CPU and memory resource limits for batch jobs to prevent system-wide resource exhaustion",
+      "Consider job preemption policies to maintain system stability during resource contention",
+      "Review system scheduling parameters and consider tuning kernel parameters for better handling of memory pressure scenarios"
+    ]
+  }
+]

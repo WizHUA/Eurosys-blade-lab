@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with significant system load despite job completion",
+    "root_causes": "CPU resources remain heavily utilized even after the ft_cgC job completed, suggesting potential process cleanup or lingering background tasks",
+    "solutions": [
+      "Check for orphaned processes related to the completed ft_cgC job using 'ps aux | grep ft_cgC'",
+      "Monitor system processes with 'top' or 'htop' to identify unexpected CPU consumers",
+      "Verify job completion status and check for any post-processing tasks in the job script"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure persists after job completion",
+    "root_causes": "Memory usage remains elevated with significant cached memory, possibly due to incomplete cleanup after the computational job",
+    "solutions": [
+      "Check memory usage breakdown with 'free -h' and 'cat /proc/meminfo'",
+      "Clear page cache if appropriate with 'echo 3 > /proc/sys/vm/drop_caches'",
+      "Investigate potential memory leaks in the completed application"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure continues post-job",
+    "root_causes": "Disk write operations remain active despite job completion, possibly due to log writing or result file finalization",
+    "solutions": [
+      "Monitor disk activity with 'iotop' to identify ongoing I/O operations",
+      "Check for background filesystem operations with 'lsof +D /path/to/job/working/directory'",
+      "Verify if any post-job data movement or cleanup processes are running"
+    ]
+  }
+]

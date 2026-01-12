@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with system memory usage spiking to 87% and severe swap activity occurring.",
+    "root_causes": "Memory resource exhaustion caused by the completed job 'ft_cgC' which appears to have consumed excessive memory during its 10-minute runtime, leading to heavy swapping activity.",
+    "solutions": [
+      "Monitor memory usage patterns for similar 'ft_cgC' jobs and consider setting memory limits using Slurm's --mem parameter",
+      "Use 'ps aux --sort=-%mem' to identify any remaining memory-intensive processes that may not have been properly cleaned up after job completion",
+      "Review the job's memory requirements and potentially request nodes with more RAM or optimize the application's memory usage",
+      "Consider implementing memory monitoring alerts to detect similar situations before they cause system degradation"
+    ]
+  },
+  {
+    "anomaly": "Severe I/O wait time indicating storage subsystem is overwhelmed, reaching up to 3.8% CPU time spent waiting for I/O operations.",
+    "root_causes": "High disk I/O pressure likely caused by intensive swapping activity due to memory exhaustion, combined with potential application I/O from the completed job.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity and verify if swap usage is the primary contributor",
+      "Monitor disk utilization reaching over 50% and consider I/O scheduling optimizations",
+      "The massive increase in disk write activity (from 64KB/s to 186MB/s) suggests swap thrashing - resolving memory pressure will alleviate I/O pressure",
+      "Consider implementing I/O limits for jobs or upgrading storage subsystem if this pattern persists"
+    ]
+  },
+  {
+    "anomaly": "System load average climbing significantly above normal levels for the available CPU cores.",
+    "root_causes": "High system load caused by processes waiting for I/O operations to complete, primarily due to memory pressure forcing swap activity.",
+    "solutions": [
+      "The load average increasing from 4.7 to 7.3 on what appears to be an 8-core system indicates resource contention",
+      "Use 'top' or 'htop' to identify processes in 'D' (uninterruptible sleep) state that are waiting for I/O",
+      "Addressing the root memory and I/O issues should normalize the load average",
+      "Consider job scheduling policies to prevent resource over-subscription"
+    ]
+  }
+]

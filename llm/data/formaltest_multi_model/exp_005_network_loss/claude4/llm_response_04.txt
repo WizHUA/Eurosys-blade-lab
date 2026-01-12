@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with sustained high page swap activity.",
+    "root_causes": "Memory resource load from applications or system processes exceeding available physical RAM, forcing the system to use swap space.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to identify the extent of swapping activity.",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes consuming RAM.",
+      "Check if the completed job 'ft_cgC' left behind any orphaned processes or memory leaks using 'pgrep' and 'ps'.",
+      "Consider increasing physical memory or optimizing application memory usage to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity with write operations significantly outpacing reads.",
+    "root_causes": "Disk I/O load primarily from write operations, likely related to swap activity and system logging or data persistence.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the heavy write activity.",
+      "Monitor swap usage trends with 'swapon -s' and consider optimizing swap configuration.",
+      "Check system logs in '/var/log/' for excessive logging that might contribute to write load.",
+      "Evaluate if the disk subsystem can handle the current I/O demands or if storage optimization is needed."
+    ]
+  }
+]

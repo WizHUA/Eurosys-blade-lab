@@ -1,0 +1,37 @@
+[
+  {
+    "anomaly": "Extremely high CPU usage (72.8%) and system load (load_1m: 6.06) at the start of the monitoring window, indicating severe CPU saturation.",
+    "root_causes": "CPU resource load from computationally intensive processes, likely the 'ft_cgC' job which was running during this period.",
+    "solutions": [
+      "Use 'top' or 'htop' sorted by CPU usage to identify the specific processes causing saturation.",
+      "Review the job 'ft_cgC' as it was active during the high CPU usage period.",
+      "Consider adjusting job scheduling or resource limits to prevent CPU overcommitment."
+    ]
+  },
+  {
+    "anomaly": "Significant disk I/O activity with high disk I/O time (disk_io_time_seconds_total: 4335.536) and utilization (disk_io_usage_percent: 61.5%), indicating a storage bottleneck.",
+    "root_causes": "Disk I/O load from application read/write operations or system swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk I/O.",
+      "Check if the high I/O is related to application data access or system swapping due to memory pressure.",
+      "Consider optimizing I/O patterns or using faster storage if available."
+    ]
+  },
+  {
+    "anomaly": "High memory usage (memory_usage_percent: 33.7%) with significant cached memory (memory_cached_bytes: 5.3GB), though available memory is sufficient.",
+    "root_causes": "Memory resource load from active processes and filesystem caching.",
+    "solutions": [
+      "Monitor memory trends to ensure sufficient available memory for future jobs.",
+      "Review the memory footprint of the 'ft_cgC' job to understand its requirements.",
+      "Consider tuning filesystem cache settings if necessary."
+    ]
+  },
+  {
+    "anomaly": "Network activity shows moderate receive/transmit rates (network_receive_rate_bytes_per_sec: 17.45, network_transmit_rate_bytes_per_sec: 10.05) with no errors, indicating normal network operations.",
+    "root_causes": "Network resource load from job communication or data transfer.",
+    "solutions": [
+      "Monitor network usage to ensure it does not become a bottleneck.",
+      "Review job networking requirements if performance issues are suspected."
+    ]
+  }
+]

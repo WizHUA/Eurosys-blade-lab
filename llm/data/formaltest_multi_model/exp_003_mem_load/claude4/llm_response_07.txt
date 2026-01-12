@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with usage spiking from 33% to 55% and sustained swapping activity.",
+    "root_causes": "Memory resource load from the running 'ft_cgC' job consuming substantial system memory.",
+    "solutions": [
+      "Monitor the 'ft_cgC' job memory consumption patterns using 'ps aux --sort=-%mem' to identify if it has memory leaks.",
+      "The consistent page_swap_out_rate (160-188 pages/sec) indicates active swapping that degrades performance.",
+      "Consider increasing available memory or optimizing the application's memory usage patterns.",
+      "Use 'vmstat 1' to monitor swap activity in real-time and correlate with job phases."
+    ]
+  },
+  {
+    "anomaly": "Elevated system load averaging 4.0+ on an 8-core system with moderate CPU utilization.",
+    "root_causes": "System resource contention likely caused by memory pressure forcing processes into wait states.",
+    "solutions": [
+      "The load_1min consistently above 4.0 suggests processes are waiting for resources despite CPU availability.",
+      "Check for processes in 'D' (uninterruptible sleep) state using 'ps aux' which often indicates I/O or memory pressure.",
+      "Monitor I/O wait time which shows minimal values, confirming memory pressure rather than disk bottleneck as primary cause.",
+      "Consider job scheduling adjustments to prevent memory-intensive jobs from overwhelming system resources."
+    ]
+  }
+]

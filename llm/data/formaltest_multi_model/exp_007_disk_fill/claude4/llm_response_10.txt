@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with critically low available memory and active swapping.",
+    "root_causes": "Memory resource exhaustion indicated by only 270MB free memory out of 8GB total, causing active swap usage.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify the largest consumers.",
+      "The 'page_swap_in_rate' and 'page_swap_out_rate' metrics show active swapping occurring, confirming memory pressure.",
+      "Consider reducing memory allocation for running applications or adding more physical RAM to the system.",
+      "Use 'vmstat 1' to monitor ongoing swap activity and 'free -h' to track memory recovery."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization causing system performance degradation.",
+    "root_causes": "Disk I/O subsystem overwhelmed with utilization reaching 67% and high write activity due to memory swapping.",
+    "solutions": [
+      "The 'disk_io_usage_percent' at 67% indicates severe I/O bottleneck affecting system responsiveness.",
+      "Use 'iotop' to identify processes generating the highest disk I/O load.",
+      "The correlation between high swap activity and disk I/O suggests memory pressure is causing excessive disk writes.",
+      "Consider upgrading to faster storage (SSD) or optimizing application I/O patterns to reduce disk load."
+    ]
+  },
+  {
+    "anomaly": "High CPU iowait time indicating processes blocked waiting for I/O operations.",
+    "root_causes": "CPU spending significant time waiting for disk operations to complete due to storage bottleneck.",
+    "solutions": [
+      "The 'cpu_iowait_percent' shows processes are frequently blocked waiting for I/O completion.",
+      "Monitor system load and process states using 'top' to identify processes in 'D' (uninterruptible sleep) state.",
+      "Resolving the underlying disk I/O and memory pressure issues should reduce CPU iowait time.",
+      "Consider implementing I/O scheduling optimizations or upgrading storage performance."
+    ]
+  }
+]

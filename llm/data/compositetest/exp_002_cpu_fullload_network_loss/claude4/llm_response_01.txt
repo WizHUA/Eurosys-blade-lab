@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load causing CPU cores to wait extensively for storage operations to complete.",
+    "solutions": [
+      "The cpu_iowait_percent reaches 22.5% which is critically high for system performance.",
+      "Use 'iotop' to identify which processes are generating the most disk I/O activity.",
+      "Check disk utilization with 'iostat -x 1' to confirm storage subsystem saturation.",
+      "Consider migrating I/O intensive workloads to faster storage or implementing I/O throttling."
+    ]
+  },
+  {
+    "anomaly": "Heavy memory swapping activity causing performance degradation.",
+    "root_causes": "Memory pressure forcing the system to swap memory pages to disk at high rates.",
+    "solutions": [
+      "Swap usage at 54% with page_swap_out_rate reaching over 210,000 pages/sec indicates severe memory pressure.",
+      "Monitor memory usage with 'free -h' and identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "The high page_swap_in_rate and page_swap_out_rate confirm active swapping is occurring.",
+      "Consider adding more RAM or optimizing application memory usage to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with only 4.9GB remaining out of 83GB total.",
+    "root_causes": "Disk space exhaustion with filesystem usage at 94-98% capacity.",
+    "solutions": [
+      "Filesystem usage increased from 94.1% to 98.1% during the monitoring period, indicating rapid space consumption.",
+      "Use 'df -h' to confirm available space and 'du -sh /*' to identify large directories consuming space.",
+      "Clean up temporary files, logs, and unnecessary data to free up disk space immediately.",
+      "Implement disk space monitoring alerts and consider expanding storage capacity."
+    ]
+  }
+]

@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Transient swap storm and I/O pressure spike during the job window (~07:08:28–07:09:13).",
+    "root_causes": "The job increased its anonymous working set sharply (memory_active_anon_bytes jumped from ~1.58 GB to ~3.43 GB; memory_usage_percent from ~32% to ~55%), pushing committed memory (memory_committed_as_bytes ~9.05 GB) beyond physical RAM (~8.28 GB). This triggered bursty swapping (page_swap_out_rate up to ~167/s; page_swap_in_rate up to ~3.7/s), high page fault rates (~5.7k/s), and a spike in I/O pressure (io_pressure_waiting_rate ~30/s), even though CPU iowait remained low.",
+    "solutions": [
+      "Right-size the job's memory request/limit in Slurm (e.g., increase --mem or set cgroup memory constraints) so the working set fits RAM and prevents node-wide swapping.",
+      "Profile the job's memory usage to find the growth phase (use /usr/bin/time -v, smem -sw, pmap) and reduce peak footprint (batching, tiling, reduced concurrency).",
+      "Tune kernel swapping behavior on compute nodes: set vm.swappiness to a low value (e.g., 10) and validate vm.watermark_scale_factor/min_free_kbytes to reduce premature swapping.",
+      "Place swap on the fastest available storage and verify I/O scheduler settings; monitor /proc/pressure/io to confirm pressure clears after the phase.",
+      "If spikes persist, consider increasing node RAM or splitting the workload to avoid exceeding physical memory."
+    ]
+  },
+  {
+    "anomaly": "High baseline swap utilization (~46.6%) while multiple gigabytes of RAM remain available.",
+    "root_causes": "swap_free_bytes and swap_usage_percent are steady (~1.15 GB free, ~46.6% used) across samples despite memory_available_bytes being 3.7–5.6 GB. This indicates aggressive or sticky swapping (inactive pages left in swap and/or reclaimed) rather than genuine RAM scarcity, leading to periodic swap churn when pages are touched again.",
+    "solutions": [
+      "Audit per-process swap usage (smem -sw, /proc/<pid>/smaps) and reclaim stale swapped pages during maintenance (swapoff -a && swapon -a) to reset the baseline.",
+      "Lower vm.swappiness and verify reclaim settings to discourage swapping when ample RAM is available.",
+      "Enforce memory isolation per job via cgroups (Slurm cgroup.conf) to prevent one workload from pushing long-lived pages of others into swap.",
+      "Track swap activity with sar -W/vmstat and alert if swap_out or swap_in rates rise while memory_available_bytes > 3 GB."
+    ]
+  },
+  {
+    "anomaly": "Virtual memory overcommit: committed memory exceeds physical RAM during the run.",
+    "root_causes": "memory_committed_as_bytes peaks around 9.05 GB while memory_total_bytes is ~8.28 GB, implying reliance on Linux overcommit policy. Combined with the observed swap activity and I/O pressure, this increases risk of latency spikes or OOM under load changes.",
+    "solutions": [
+      "Review vm.overcommit_memory and vm.overcommit_ratio; consider stricter overcommit on compute nodes to avoid runtime swapping.",
+      "Set explicit per-job memory limits in Slurm (--mem/--mem-per-cpu) to keep committed memory within node capacity.",
+      "Refactor the application phase that expands memory usage (e.g., reduce in-memory buffers, enable streaming/tiling) to stay under physical RAM.",
+      "Add observability and alerts on memory_committed_as_bytes relative to memory_total_bytes to catch overcommit events early."
+    ]
+  }
+]

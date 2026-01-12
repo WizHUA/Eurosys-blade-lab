@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extreme network retransmission rates (peaking at 60.18 segments/sec) causing network congestion",
+    "root_causes": "Network hardware issues or configuration problems leading to severe packet loss during MPI operations",
+    "solutions": [
+      "Inspect network interface cards, switches and cables for hardware faults",
+      "Monitor network buffers and queues for saturation during high traffic periods",
+      "Consider adjusting network MTU size or TCP window scaling parameters"
+    ]
+  },
+  {
+    "anomaly": "Severe CPU system time increase (peaking at 17.78% of total CPU)",
+    "root_causes": "Kernel processing overhead from handling excessive network retransmissions and interrupts",
+    "solutions": [
+      "Profile kernel network stack processing with 'perf' to identify bottlenecks",
+      "Consider enabling TCP offloading on network interfaces if supported",
+      "Monitor softirq distribution across cores to balance network processing load"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure spikes causing increased swap activity",
+    "root_causes": "Memory contention from network buffering combined with computational workload demands",
+    "solutions": [
+      "Increase available memory or reduce per-node MPI task count",
+      "Tune MPI buffer sizes and network-related memory allocations",
+      "Monitor and potentially increase system swappiness parameters"
+    ]
+  }
+]

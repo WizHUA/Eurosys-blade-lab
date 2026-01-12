@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spikes to over 54% and remains elevated, indicating significant memory pressure.",
+    "root_causes": "Memory resource load from application processes.",
+    "solutions": [
+      "Monitor memory usage trends with 'free -h' and 'vmstat 1' to confirm sustained high usage.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "Check if the completed job 'ft_cgC' had high memory requirements that might have left the system in a state of high cache usage."
+    ]
+  },
+  {
+    "anomaly": "High system load average (load_1min consistently above 4.0) despite moderate CPU usage.",
+    "root_causes": "System resource load from processes waiting for I/O or other resources.",
+    "solutions": [
+      "Use 'top' or 'htop' to check the number of processes in 'D' state (uninterruptible sleep), which could indicate I/O wait.",
+      "Review system logs for any errors related to disk or network I/O that might be causing delays.",
+      "The high load could be residual from the recently completed job 'ft_cgC'; monitor to see if it decreases over time."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity shows significant write operations, with disk_write_rate_bytes_per_sec reaching over 186852 bytes/sec.",
+    "root_causes": "Disk I/O load from application or system processes.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk write activity.",
+      "Check if there are any background processes or logs writing excessively to disk.",
+      "The completed job 'ft_cgC' might have involved heavy disk I/O; verify if post-job cleanup or data writing is still ongoing."
+    ]
+  }
+]

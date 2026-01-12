@@ -1,0 +1,155 @@
+{
+  "batch_analysis_time": "2025-09-20T13:51:01.707821",
+  "model_used": "deepseek/deepseek-chat-v3.1:free",
+  "total_experiments": 29,
+  "successful_analyses": 29,
+  "failed_analyses": 0,
+  "success_rate": "100.0%",
+  "results": [
+    {
+      "experiment_name": "exp_001_cpu_fullload",
+      "timestamp": "2025-09-20T13:37:01.947496",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_001_cpu_fullload"
+    },
+    {
+      "experiment_name": "exp_002_mem_load",
+      "timestamp": "2025-09-20T13:37:37.600364",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_002_mem_load"
+    },
+    {
+      "experiment_name": "exp_003_mem_load",
+      "timestamp": "2025-09-20T13:38:09.335809",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_003_mem_load"
+    },
+    {
+      "experiment_name": "exp_004_mem_load",
+      "timestamp": "2025-09-20T13:38:45.702946",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_004_mem_load"
+    },
+    {
+      "experiment_name": "exp_005_network_loss",
+      "timestamp": "2025-09-20T13:39:08.436004",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_005_network_loss"
+    },
+    {
+      "experiment_name": "exp_006_disk_burn",
+      "timestamp": "2025-09-20T13:39:49.727272",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_006_disk_burn"
+    },
+    {
+      "experiment_name": "exp_007_disk_fill",
+      "timestamp": "2025-09-20T13:40:20.296825",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_007_disk_fill"
+    },
+    {
+      "experiment_name": "exp_008_cpu_fullload_mem_load",
+      "timestamp": "2025-09-20T13:40:44.115190",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_008_cpu_fullload_mem_load"
+    },
+    {
+      "experiment_name": "exp_009_cpu_fullload_mem_load",
+      "timestamp": "2025-09-20T13:41:11.639494",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_009_cpu_fullload_mem_load"
+    },
+    {
+      "experiment_name": "exp_010_cpu_fullload_mem_load",
+      "timestamp": "2025-09-20T13:41:28.954424",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_010_cpu_fullload_mem_load"
+    },
+    {
+      "experiment_name": "exp_011_cpu_fullload_network_loss",
+      "timestamp": "2025-09-20T13:41:52.183306",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_011_cpu_fullload_network_loss"
+    },
+    {
+      "experiment_name": "exp_012_cpu_fullload_disk_burn",
+      "timestamp": "2025-09-20T13:42:12.507706",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_012_cpu_fullload_disk_burn"
+    },
+    {
+      "experiment_name": "exp_013_cpu_fullload_disk_fill",
+      "timestamp": "2025-09-20T13:42:48.401787",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_013_cpu_fullload_disk_fill"
+    },
+    {
+      "experiment_name": "exp_014_mem_load",
+      "timestamp": "2025-09-20T13:43:19.983226",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_014_mem_load"
+    },
+    {
+      "experiment_name": "exp_015_mem_load",
+      "timestamp": "2025-09-20T13:43:46.919134",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_015_mem_load"
+    },
+    {
+      "experiment_name": "exp_016_mem_load_network_loss",
+      "timestamp": "2025-09-20T13:44:17.637502",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_016_mem_load_network_loss"
+    },
+    {
+      "experiment_name": "exp_017_disk_burn_mem_load",
+      "timestamp": "2025-09-20T13:44:46.142335",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_017_disk_burn_mem_load"
+    },
+    {
+      "experiment_name": "exp_018_disk_fill_mem_load",
+      "timestamp": "2025-09-20T13:45:16.228302",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_018_disk_fill_mem_load"
+    },
+    {
+      "experiment_name": "exp_019_mem_load",
+      "timestamp": "2025-09-20T13:45:36.136594",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_019_mem_load"
+    },
+    {
+      "experiment_name": "exp_020_mem_load_network_loss",
+      "timestamp": "2025-09-20T13:46:03.787664",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_020_mem_load_network_loss"
+    },
+    {
+      "experiment_name": "exp_021_disk_burn_mem_load",
+      "timestamp": "2025-09-20T13:46:39.883607",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_021_disk_burn_mem_load"
+    },
+    {
+      "experiment_name": "exp_022_disk_fill_mem_load",
+      "timestamp": "2025-09-20T13:47:18.478447",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_022_disk_fill_mem_load"
+    },
+    {
+      "experiment_name": "exp_023_mem_load_network_loss",
+      "timestamp": "2025-09-20T13:47:55.699250",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_023_mem_load_network_loss"
+    },
+    {
+      "experiment_name": "exp_024_disk_burn_mem_load",
+      "timestamp": "2025-09-20T13:48:29.878158",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_024_disk_burn_mem_load"
+    },
+    {
+      "experiment_name": "exp_025_disk_fill_mem_load",
+      "timestamp": "2025-09-20T13:48:57.260830",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_025_disk_fill_mem_load"
+    },
+    {
+      "experiment_name": "exp_026_network_loss",
+      "timestamp": "2025-09-20T13:49:26.094554",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_026_network_loss"
+    },
+    {
+      "experiment_name": "exp_027_disk_burn",
+      "timestamp": "2025-09-20T13:49:56.575699",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_027_disk_burn"
+    },
+    {
+      "experiment_name": "exp_028_disk_fill_network_loss",
+      "timestamp": "2025-09-20T13:50:36.102083",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_028_disk_fill_network_loss"
+    },
+    {
+      "experiment_name": "exp_029_disk_burn_disk_fill",
+      "timestamp": "2025-09-20T13:51:01.707102",
+      "result_dir": "/opt/exp/llm/data/formaltest/exp_029_disk_burn_disk_fill"
+    }
+  ]
+}

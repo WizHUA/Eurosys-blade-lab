@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Catastrophic memory pressure with near-total swap saturation and sustained thrashing",
+    "root_causes": "During the window, memory_usage_percent is ~99.2–99.7% while memory_available_bytes falls to 26–71 MB. swap_free_bytes collapses from 31 MB to as low as 8 KB (swap_usage_percent ≥99.95%). Page activity is extreme (page_faults_rate up to 140k/s, page_swap_in_rate up to 107k/s, page_swap_out_rate up to 53k/s). memory_committed_as_bytes is ~13.4–13.7 GB on an 8 GB node, indicating overcommit and allocations far beyond physical RAM. The only active job, ft_ftC, is likely exceeding memory limits and driving system-wide swapping.",
+    "solutions": [
+      "Enforce per-job memory limits via Slurm (e.g., --mem/--mem-per-cpu) and enable cgroup memory enforcement; terminate or requeue jobs that exceed limits.",
+      "Reduce application memory footprint (e.g., smaller working sets, batching) or schedule the job on nodes with higher RAM.",
+      "Set vm.overcommit_memory=2 and tune vm.overcommit_ratio to prevent reservation beyond available RAM+swap.",
+      "As a short-term mitigation, expand swap on fast storage (NVMe/SSD) and lower vm.swappiness to reduce anonymous-page swapping; monitor and revert if thrashing persists.",
+      "Continuously alert when memory_available_bytes falls below a threshold (e.g., <500 MB) to proactively protect node stability."
+    ]
+  },
+  {
+    "anomaly": "Severe storage I/O saturation and CPU iowait dominated load",
+    "root_causes": "cpu_iowait_percent is extremely high (≈30–54%), disk_io_usage_percent remains elevated (≈62–87%), and read throughput spikes (disk_read_rate_bytes_per_sec up to ≈141 MB/s). Swap traffic is heavy (swap in/out rates tens of thousands per second), and processes_blocked rises up to 13. This pattern is consistent with paging-driven I/O contention caused by memory exhaustion.",
+    "solutions": [
+      "Resolve memory thrashing (see above) to eliminate paging as the primary I/O source.",
+      "Move swap to a faster device (NVMe/SSD) and verify disk health and latency with iostat/smartctl; tune I/O scheduler and read-ahead to reduce stalls.",
+      "Throttle I/O of the offending job using cgroup blkio (e.g., blkio.weight/io.max) to protect system responsiveness.",
+      "Reduce concurrent I/O from the application (limit threads/processes) and prefer sequential access patterns when possible."
+    ]
+  },
+  {
+    "anomaly": "High resource pressure (PSI) indicating system-wide stalls under load",
+    "root_causes": "Pressure metrics show sustained waiting/stall rates (e.g., memory_pressure_waiting_rate ~0.32–0.35, memory_pressure_stalled_rate ~0.30–0.35, io_pressure_waiting_rate ~0.41–0.66). Load_1min climbs to 11.9 with many blocked processes, reflecting global contention from memory and I/O pressure while the ft_ftC job is active.",
+    "solutions": [
+      "Introduce PSI-based safeguards (alerts/actions) to preemptively throttle or requeue jobs when memory/io pressure exceeds thresholds.",
+      "Use Slurm cgroup plugins to cap memory and I/O, preventing single jobs from inducing system-wide stalls.",
+      "Right-size job placement (spread or pack) to nodes with adequate RAM and fast local storage, and avoid colocating memory-heavy jobs on constrained nodes."
+    ]
+  }
+]

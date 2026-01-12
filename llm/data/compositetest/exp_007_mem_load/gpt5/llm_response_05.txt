@@ -1,0 +1,35 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with near-total swap usage and active swap thrashing",
+    "root_causes": "The node’s working set exceeds physical RAM: memory_available_bytes drops to tens of MB while memory_usage_percent ~99–100%, swap_free_bytes falls as low as 8192 bytes, and memory_committed_as_bytes (~13.6 GiB) far exceeds physical memory (~7.7 GiB). High page_swap_in/out rates confirm continuous paging. This coincides with the running job (ft_ftC) during the window.",
+    "solutions": [
+      "Immediately cap the job’s memory via Slurm (e.g., --mem/--mem-per-cpu) or cgroup memory limits to keep its footprint within node RAM.",
+      "Reduce the job’s memory usage (smaller problem sizes, chunking, streaming I/O) or move it to a higher-memory node/partition.",
+      "Temporarily pause/stop the job to allow swap to drain; avoid running with swap nearly exhausted.",
+      "Enforce system-wide overcommit controls (vm.overcommit_memory=2 and appropriate vm.overcommit_ratio) to prevent committed memory from exceeding RAM.",
+      "Lower vm.swappiness to reduce aggressive swapping and prefer killing offenders under cgroup control rather than system-wide thrashing.",
+      "Monitor with vmstat/iostat/free; profile per-process RSS with ps/top to find the largest consumers."
+    ]
+  },
+  {
+    "anomaly": "Sustained disk I/O saturation with extreme CPU iowait",
+    "root_causes": "Disk is heavily utilized (disk_io_usage_percent ~70–87%) while cpu_iowait_percent is very high (peaking >50%). High swap-in/out and rising disk read/write rates indicate the disks are serving paging plus application I/O, causing many processes_blocked and degraded throughput.",
+    "solutions": [
+      "Relieve memory pressure first (see above) to stop swap-driven I/O; this will directly reduce iowait.",
+      "Throttle or isolate I/O for the job using cgroups io.max/blkio or Slurm’s task/cgroup plugin to prevent full-disk saturation.",
+      "Place swap on the fastest available device (NVMe) and ensure proper swap priority; consider increasing swap only on fast media as a short-term mitigation.",
+      "Use iotop/pidstat -d to identify top I/O contributors; optimize the job’s I/O pattern (batching, larger sequential reads/writes, fewer random accesses).",
+      "Verify storage health (dmesg, SMART) to rule out device issues contributing to latency."
+    ]
+  },
+  {
+    "anomaly": "Recent OOM events recorded with ongoing high risk of further OOM",
+    "root_causes": "vm_oom_kills_total=5 indicates prior out-of-memory kills. With memory_usage_percent ~99% and swap nearly exhausted during this window, the node remains at high risk of additional OOM terminations while the workload runs.",
+    "solutions": [
+      "Review system and kernel logs (dmesg, journalctl -k) to identify which processes were OOM-killed and why.",
+      "Enforce per-job memory limits in Slurm and enable cgroup memory enforcement so offending tasks are contained rather than causing node-wide instability.",
+      "Tune overcommit (vm.overcommit_memory/ratio) and set sensible per-user/job limits to prevent recurrence.",
+      "Right-size the job’s memory request or migrate it to nodes with sufficient RAM to avoid OOM conditions."
+    ]
+  }
+]

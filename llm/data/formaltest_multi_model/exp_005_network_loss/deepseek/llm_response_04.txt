@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Significant TCP retransmission spike during MPI job execution",
+    "root_causes": "Network congestion or packet loss due to heavy MPI communication patterns",
+    "solutions": [
+      "Check network switch statistics for congestion indicators",
+      "Tune MPI job parameters to reduce burst traffic",
+      "Consider using RDMA-capable network adapters if available"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure spikes coinciding with MPI communication bursts",
+    "root_causes": "MPI job allocation patterns causing temporary memory contention",
+    "solutions": [
+      "Profile application memory usage patterns",
+      "Consider adjusting MPI buffer sizes",
+      "Monitor NUMA locality for potential optimizations"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O during computation phases",
+    "root_causes": "Possible checkpointing or logging activity from MPI job",
+    "solutions": [
+      "Verify if application is performing unnecessary disk I/O",
+      "Consider using RAM disk for temporary files",
+      "Check Lustre/parallel filesystem performance metrics"
+    ]
+  }
+]

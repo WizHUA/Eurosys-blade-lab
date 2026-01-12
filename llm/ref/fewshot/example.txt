@@ -1,0 +1,27 @@
+Input Data:
+We are diagnosing abnormal behavior in an HPC cluster.
+The following JSON object contains two types of real-time monitoring data:
+{
+  "system_metrics": "timestamp,cpu_usage_percent,load_1m,memory_usage_percent,disk_io_time_percent,...\n
+                                   2025-08-15 15:10:33,92.0,6.72,68.0,77.78,...\n
+                                   2025-08-15 15:10:48,92.0,7.97,80.0,77.06,...\n
+                                   ...",
+  "job_status": "JobID|JobName|NodeList|Submit|Start|End|State|ExitCode|Elapsed\n
+                 278|TestJob|Node1|2025-08-15T15:05:00|2025-08-15T15:05:01|2025-08-15T15:20:01|COMPLETED|0:0|00:15:00"
+}
+Please analyze this data and generate a diagnostic report following the rules and format specified in the System Prompt.
+
+Expected Output:
+[
+  ...,
+  {
+    "anomaly": "Node is under extreme memory pressure, with memory usage climbing to 80%.",
+    "root_causes": "The high memory usage is likely caused by the job 'TestJob' (ID 278), which was active during the anomaly period.",
+    "solutions": [
+      "Confirm active swapping by monitoring 'si'/'so' columns in 'vmstat 1'.",
+      "Examine the job script for 'TestJob' (ID 278) for potential memory leaks or inefficient memory usage.",
+      "Identify memory-heavy processes using 'ps aux --sort=-%mem' to confirm they belong to the suspected job."
+    ]
+  },
+  ...
+]

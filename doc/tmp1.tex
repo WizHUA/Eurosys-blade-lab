@@ -1,0 +1,27 @@
+\begin{table}[ht]
+\centering
+\footnotesize
+\caption{Top-1 / Top-2 / Top-3 Accuracy (\%) by LLM}
+\label{tab:acc_llms_singlecol_nocat}
+\setlength{\tabcolsep}{2pt}  % ← 缩小列间距
+\renewcommand{\arraystretch}{1.05}  % ← 控制行距
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Type} & \textbf{ChatGPT} & \textbf{Claude} & \textbf{DeepSeek} \\
+\midrule
+H1 & 20.0  / 20.0  / 40.0  & 100.0 / 100.0 / 100.0 & 100.0 / 100.0 / 100.0 \\
+H2 & 100.0 / 100.0 / 100.0 & 100.0 / 100.0 / 100.0 & 100.0 / 100.0 / 100.0 \\
+H3 & 90.0  / 100.0 / 100.0 & 20.0  / 70.0  / 100.0 & 30.0  / 50.0  / 70.0  \\
+H4 & 20.0  / 40.0  / 70.0  & 60.0  / 80.0  / 100.0 & 30.0  / 30.0  / 90.0  \\
+S1 & 40.0  / 90.0  / 90.0  & 30.0  / 80.0  / 90.0  & 30.0  / 80.0  / 100.0 \\
+S2 & 60.0  / 70.0  / 100.0 & 70.0  / 80.0  / 100.0 & 60.0  / 80.0  / 100.0 \\
+N1 & 50.0  / 70.0  / 70.0  & 30.0  / 60.0  / 60.0  & 50.0  / 60.0  / 80.0  \\
+N2 & 60.0  / 80.0  / 80.0  & 30.0  / 50.0  / 70.0  & 50.0  / 70.0  / 100.0 \\
+E1 & 40.0  / 70.0  / 70.0  & 50.0  / 70.0  / 90.0  & 40.0  / 80.0  / 100.0 \\
+\textbf{Average} 
+& \textbf{53.3 / 71.1 / 80.0} 
+& \textbf{54.4 / 76.7 / 90.0} 
+& \textbf{54.4 / 72.2 / 95.6} \\
+\bottomrule
+\end{tabular}
+\end{table}

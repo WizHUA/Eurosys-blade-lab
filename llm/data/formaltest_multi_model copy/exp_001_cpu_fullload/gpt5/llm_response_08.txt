@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Transient spike in TCP retransmissions and timeouts during the run",
+    "root_causes": "Short-lived network instability or congestion is indicated by a jump in TCP retransmissions and timeouts around 07:02:43 (tcp_retransmissions_rate ≈ 0.29/s, tcp_timeouts_rate ≈ 0.09/s; node_netstat shows bursts in Tcp_RetransSegs and TCPSynRetrans) while errors and drops remain 0 and traffic is otherwise low.",
+    "solutions": [
+      "Inspect NIC and driver counters for the interval: ethtool -S <iface> and ip -s link; check dmesg for NETDEV WATCHDOG or NIC resets.",
+      "Review switch port logs and error counters for the node’s interface during that minute; verify no microbursts or port errors.",
+      "Validate end-to-end MTU consistency (e.g., 1500) and, if errors are observed, test disabling problematic offloads (ethtool -K <iface> tso gro gso lro off).",
+      "If running under virtualization, check vSwitch/hypervisor for oversubscription or throttling at the same time.",
+      "For future runs, capture tcpdump and netstat -s deltas to correlate retransmission spikes with application phases."
+    ]
+  },
+  {
+    "anomaly": "Persistent high swap usage (~46.6%) with ongoing swap activity despite ample free memory",
+    "root_causes": "Swap is in active use (page_swap_in_rate up to ~168/s and page_swap_out_rate up to ~197/s) while memory_free_bytes ≈ 3.3 GiB and memory_available_bytes ≈ 5.48 GiB, suggesting aggressive reclamation of cold pages or swappiness-driven behavior that can introduce latency via major faults.",
+    "solutions": [
+      "Lower swappiness for compute nodes and persist it: sysctl vm.swappiness=1 (configure in /etc/sysctl.d/) to reduce background swapping.",
+      "During maintenance, refresh swap to repatriate cold pages: swapoff -a && swapon -a (only if sufficient RAM and safe to do so).",
+      "Identify processes incurring swap I/O: vmstat 1, pidstat -r 1, and smem -s swap; tune per-application memory usage or cgroup limits.",
+      "Verify memory policies that can force reclaim: check systemd/Slurm cgroup memory.max and sysctl vm.overcommit_memory and vm.overcommit_ratio."
+    ]
+  },
+  {
+    "anomaly": "Historical OOM kill recorded on the node (vm_oom_kills_total=1)",
+    "root_causes": "At least one process was previously terminated by the OOM killer; although not increasing during this window, it indicates past memory pressure that could recur under load.",
+    "solutions": [
+      "Audit kernel logs for the OOM event details: journalctl -k -b | grep -i 'out of memory' to identify the offending process and memory state.",
+      "Set appropriate per-job memory limits and cgroup accounting in Slurm; alert on low memory_available_bytes and rising major faults.",
+      "Ensure swap and RAM sizing align with workload peaks; consider reducing swappiness and enabling early warnings before OOM conditions."
+    ]
+  }
+]

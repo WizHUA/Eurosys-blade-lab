@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Sudden memory pressure spike with paging during the job window (≈07:08:28–07:09:28).",
+    "root_causes": "Anonymous memory working set expanded rapidly while job 276 (ft_cgC) was active: memory_usage_percent rose from ~32% to ~55%, memory_free_bytes dropped to ~1.8 GB, memory_active_anon_bytes jumped from ~1.58 GB to ~3.43 GB, page_faults_rate increased (>5.7k/s), and page_swap_out_rate spiked (up to ~167 pages/s).",
+    "solutions": [
+      "Right-size job memory requests in the scheduler (e.g., increase --mem for ft_cgC) to avoid reclaim and paging.",
+      "Profile the job’s memory (smem, pmap/smaps, heap profiling) to reduce peak RSS or stagger allocations.",
+      "Pin and localize memory/threads if applicable (numactl/taskset) to reduce unnecessary page faults.",
+      "Monitor in real time with vmstat 1 and sar -B/-W during reruns to confirm reduced paging."
+    ]
+  },
+  {
+    "anomaly": "Persistent swap utilization around 46–47% throughout the entire window despite available RAM.",
+    "root_causes": "swap_free_bytes ≈1.146 GB out of 2.147 GB remained constant while memory_available_bytes stayed ≥3.7 GB for most samples, indicating pages remained swapped out from earlier pressure and the kernel continued occasional swap activity (page_swap_out_rate up to ~160 pages/s).",
+    "solutions": [
+      "Lower swappiness on compute nodes (e.g., sysctl vm.swappiness=1..10) to prefer RAM and minimize steady-state swap usage.",
+      "During maintenance, clear stale swap: swapoff -a && swapon -a (ensure sufficient free RAM first).",
+      "Enforce per-job memory limits via cgroups/Slurm so memory pressure doesn’t leak into system-wide swap.",
+      "If workloads legitimately need more headroom, increase node RAM or reduce concurrency per node."
+    ]
+  },
+  {
+    "anomaly": "An OOM kill was recorded on this node during the current boot.",
+    "root_causes": "vm_oom_kills_total=1 across all samples indicates at least one prior out-of-memory event (not necessarily in this short window), consistent with historical memory pressure.",
+    "solutions": [
+      "Inspect kernel logs for the victim and timestamp: dmesg -T | grep -i \"out of memory\\|oom-killer\".",
+      "Audit recent jobs’ memory usage and ensure Slurm enforces realistic --mem requests to prevent system-wide OOM.",
+      "Consider reserving more headroom on compute nodes (reduce oversubscription) and alert on rising swap/page fault rates to intervene before OOM."
+    ]
+  }
+]

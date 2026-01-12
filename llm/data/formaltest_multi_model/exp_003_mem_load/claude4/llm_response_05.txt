@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Severe memory pressure with dramatic decrease in available memory during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job consuming excessive memory, leading to significant reduction in free memory from 3.6GB to 1.8GB.",
+    "solutions": [
+      "Monitor the 'ft_cgC' job's memory consumption pattern to identify if it has a memory leak or inefficient memory allocation.",
+      "Check if the job is exceeding its memory allocation limits and consider increasing memory limits or optimizing the application.",
+      "Review job configuration to ensure proper memory management and consider implementing memory usage monitoring during execution."
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time indicating storage bottleneck during intensive workload.",
+    "root_causes": "Disk I/O congestion from the computational job creating significant storage access patterns that exceed system capacity.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes causing high I/O load and their read/write patterns.",
+      "Consider implementing I/O scheduling optimizations or moving temporary files to faster storage if available.",
+      "Monitor disk utilization patterns to determine if the workload requires storage infrastructure improvements."
+    ]
+  }
+]

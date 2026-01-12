@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with sustained system load spikes",
+    "root_causes": "CPU intensive computation from FT_CG application",
+    "solutions": [
+      "Check CPU core affinity settings for the application",
+      "Analyze application's thread utilization patterns",
+      "Consider optimizing the MPI implementation for better core utilization"
+    ]
+  },
+  {
+    "anomaly": "Periodic disk I/O pressure despite job completion",
+    "root_causes": "Application cleanup or post-processing activities",
+    "solutions": [
+      "Verify if application has proper I/O buffering",
+      "Check for background filesystem operations",
+      "Monitor for rogue processes doing post-job cleanup"
+    ]
+  },
+  {
+    "anomaly": "TCP connection instability with retransmissions",
+    "root_causes": "Network congestion during MPI communications",
+    "solutions": [
+      "Verify network infrastructure health and configuration",
+      "Check MTU settings and packet fragmentation",
+      "Review MPI implementation's network buffer settings"
+    ]
+  }
+]

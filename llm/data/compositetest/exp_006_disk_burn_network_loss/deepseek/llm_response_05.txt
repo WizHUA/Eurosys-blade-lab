@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike with significant swap usage and page faults",
+    "root_causes": "Job ft_ftC caused memory exhaustion leading to heavy swapping and paging activity",
+    "solutions": [
+      "Review job memory requirements and adjust Slurm job allocations",
+      "Check for memory leaks in the application code",
+      "Increase swap space or add more physical memory to the node"
+    ]
+  },
+  {
+    "anomaly": "High system load with elevated CPU utilization",
+    "root_causes": "CPU-intensive operations from job ft_ftC combined with memory pressure",
+    "solutions": [
+      "Optimize the application to reduce CPU load",
+      "Ensure proper CPU core allocation in Slurm job submissions",
+      "Check for runaway processes or failed cleanup of job resources"
+    ]
+  },
+  {
+    "anomaly": "Abnormal increase in disk I/O operations",
+    "root_causes": "Memory pressure caused increased swapping activity to disk",
+    "solutions": [
+      "Monitor disk health and check for potential SSD wear issues",
+      "Consider moving swap to faster storage devices",
+      "Review I/O patterns in the application for optimization opportunities"
+    ]
+  }
+]

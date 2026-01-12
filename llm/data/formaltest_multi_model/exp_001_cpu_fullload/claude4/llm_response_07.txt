@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Progressive CPU utilization increase from 30% to 83% during job execution.",
+    "root_causes": "Computational workload intensification as the ft_cgC job progresses through more resource-intensive phases.",
+    "solutions": [
+      "Monitor job progress to determine if this is expected behavior for the computational algorithm being executed.",
+      "Use 'top' or 'htop' to verify that the CPU usage is primarily attributed to the ft_cgC job processes.",
+      "Consider implementing CPU throttling or job scheduling policies if this pattern affects other system operations."
+    ]
+  },
+  {
+    "anomaly": "System load steadily increasing from 1.77 to 4.88, exceeding optimal levels for an 8-core system.",
+    "root_causes": "High computational demand from the running job creating process queue buildup.",
+    "solutions": [
+      "Check if the job is creating more processes than expected using 'ps aux | grep ft_cgC'.",
+      "Monitor process states with 'ps axo state,pid,comm' to identify processes in uninterruptible sleep (D state).",
+      "Evaluate if the job configuration needs adjustment to better match system capabilities."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity with write rates jumping from 240KB/s to 177MB/s.",
+    "root_causes": "Job entering a data-intensive phase requiring substantial disk write operations.",
+    "solutions": [
+      "Monitor disk utilization with 'iostat -x 1' to ensure the storage subsystem can handle the load.",
+      "Check available disk space to ensure the job has sufficient storage for its operations.",
+      "Consider using faster storage or optimizing I/O patterns if this becomes a bottleneck."
+    ]
+  }
+]

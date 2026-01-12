@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage increased dramatically from 33.8% to 54.9% during job execution, with anonymous memory consumption growing significantly, indicating the 'ft_cgC' job consumed excessive memory resources.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' memory usage patterns to understand peak requirements for future scheduling",
+      "Implement memory limits using cgroups or Slurm memory constraints for similar computational jobs",
+      "Consider increasing available memory or optimizing the application's memory allocation patterns",
+      "Review system logs during the 07:01-07:28 timeframe to identify specific memory allocation events"
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with usage at 73% and declining available space.",
+    "root_causes": "Available filesystem space decreased from 22.3GB to 22.3GB during monitoring period, with consistent high usage indicating potential disk space exhaustion from job output or temporary files.",
+    "solutions": [
+      "Clean up temporary files and job output from the completed 'ft_cgC' job",
+      "Implement automated cleanup policies for completed jobs to prevent filesystem exhaustion",
+      "Monitor disk usage patterns during job execution to identify space-intensive operations",
+      "Consider expanding filesystem capacity or implementing quotas to prevent single jobs from consuming excessive space"
+    ]
+  }
+]

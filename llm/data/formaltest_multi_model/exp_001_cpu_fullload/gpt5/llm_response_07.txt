@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Transient spike in TCP retransmissions and timeouts",
+    "root_causes": "Short-lived network instability or congestion during the job window. Evidence: at 07:02:43 node_netstat counters show Tcp_RetransSegs ≈ 30/s, TCPSynRetrans ≈ 6/s, and TCPTimeouts ≈ 15/s while link-level errors and drops remain 0, indicating end-to-end issues (congestion, transient path loss, or remote endpoint slowness) rather than NIC errors.",
+    "solutions": [
+      "Inspect NIC and driver health on the node: ethtool -S <iface>, ip -s link, and dmesg | grep -i -E 'net|eth|watchdog' for resets.",
+      "Check switch/port logs and counters (CRC, FCS, input errors, discards) on the connected switch port(s) for the same time window.",
+      "Run targeted network tests between this node and peers (iperf3, ping with -M do to validate MTU) to detect loss/jitter; verify cluster-wide MTU consistency (1500 here) and offload settings (TSO/GSO/GRO).",
+      "If the issue correlates with specific paths/endpoints, consider QoS or traffic shaping for bursty flows; otherwise update NIC firmware/driver and retest."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap usage despite ample free/available memory",
+    "root_causes": "Swap usage stays around 46.6% (swap_free ≈ 1.146 GiB of 2.0 GiB) across samples while memory_available remains ≈ 5.4–5.5 GiB and memory_usage_percent ≈ 33–34%, with low but non-zero swap-in/out rates. This suggests aggressive reclaim (high vm.swappiness) or long-lived idle anonymous pages being kept in swap, not acute memory pressure.",
+    "solutions": [
+      "Review and tune swappiness: sysctl vm.swappiness (consider lowering toward 10–20 for HPC nodes) and confirm vm.vfs_cache_pressure.",
+      "Identify processes holding swapped pages: smem -rs swap or grep VmSwap in /proc/*/status; consider restarting long-lived services with large swapped sets off-hours.",
+      "If appropriate, clear stale swap: swapoff -a && swapon -a during a maintenance window to repatriate idle pages to RAM.",
+      "Set per-job/container memory and swap policies (cgroups: memory.swap.max, memory.high) to prevent HPC jobs from incurring swap latency."
+    ]
+  },
+  {
+    "anomaly": "Sustained very high major page fault rate without matching I/O load",
+    "root_causes": "page_major_faults_rate remains high (≈170k–275k faults/s) while disk I/O time and iowait are low and disk_read/write rates are modest. This pattern is consistent with frequent page-ins served largely from page cache or memory-mapped file activity causing CPU overhead rather than storage bottlenecks.",
+    "solutions": [
+      "Validate the fault profile and source: perf stat -e major-faults, faults, and vmstat/pgmajfault deltas during the workload.",
+      "Reduce mmap churn or improve locality (e.g., reuse mappings, batch I/O) in the application; pre-warm working sets if feasible (vmtouch or sequential read prefetch).",
+      "Increase read-ahead for the dataset/block device if access is sequential (blockdev --getra/--setra) and ensure filesystem cache is sized appropriately.",
+      "Correlate page fault bursts with job phases to confirm impact; if not performance-critical, document as expected behavior of the workload."
+    ]
+  }
+]

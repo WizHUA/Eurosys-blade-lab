@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing significant swap activity and system instability.",
+    "root_causes": "Memory resource exhaustion with the system actively swapping memory pages to disk, indicating insufficient physical RAM for current workload demands.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to confirm the extent of swap utilization.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' or 'top'.",
+      "The memory_free_bytes dropped from 3.7GB to 1.8GB while swap usage remained constant, indicating active memory pressure.",
+      "Consider adding more physical RAM or optimizing application memory usage patterns."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity correlating with memory pressure events.",
+    "root_causes": "Disk I/O load caused by memory swapping activity and potential application I/O operations during the memory pressure period.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity.",
+      "The disk_write_rate_bytes_per_sec spiked significantly during memory pressure periods, confirming swap-related I/O.",
+      "Resolving the memory pressure issue should reduce the excessive disk I/O caused by swapping.",
+      "Monitor disk utilization with 'iostat -x 1' to track I/O patterns."
+    ]
+  }
+]

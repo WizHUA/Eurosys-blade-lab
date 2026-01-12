@@ -1,0 +1,97 @@
+{
+  "model_short_name": "gpt5",
+  "model_full_name": "openai/gpt-5",
+  "total_runs": 10,
+  "successful_runs": 8,
+  "success_rate": "80.0%",
+  "results": [
+    {
+      "run_id": 1,
+      "success": false,
+      "error": "Expecting value: line 1 column 1 (char 0)",
+      "response_file": "llm_response_01.txt",
+      "error_file": "llm_response_01_error.txt",
+      "timestamp": "2025-09-21T22:26:26.432750"
+    },
+    {
+      "run_id": 2,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_02.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:28:10.019433"
+    },
+    {
+      "run_id": 3,
+      "success": false,
+      "error": "Expecting value: line 1 column 1 (char 0)",
+      "response_file": "llm_response_03.txt",
+      "error_file": "llm_response_03_error.txt",
+      "timestamp": "2025-09-21T22:28:23.757663"
+    },
+    {
+      "run_id": 4,
+      "success": true,
+      "anomaly_count": 2,
+      "response_file": "llm_response_04.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:29:27.971862"
+    },
+    {
+      "run_id": 5,
+      "success": true,
+      "anomaly_count": 2,
+      "response_file": "llm_response_05.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:30:46.686256"
+    },
+    {
+      "run_id": 6,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_06.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:31:47.104750"
+    },
+    {
+      "run_id": 7,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_07.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:33:22.375686"
+    },
+    {
+      "run_id": 8,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_08.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:34:41.652100"
+    },
+    {
+      "run_id": 9,
+      "success": true,
+      "anomaly_count": 4,
+      "response_file": "llm_response_09.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:35:58.361419"
+    },
+    {
+      "run_id": 10,
+      "success": true,
+      "anomaly_count": 2,
+      "response_file": "llm_response_10.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-21T22:36:48.174254"
+    }
+  ]
+}

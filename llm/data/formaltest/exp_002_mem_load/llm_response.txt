@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory usage spikes from 33% to over 73% during the monitoring window, indicating a significant memory allocation event.",
+    "root_causes": "Memory resource load from a large-scale application or process.",
+    "solutions": [
+      "Check the memory usage pattern of the recently completed job 'ft_cgC' to see if it aligns with the observed spike.",
+      "Use 'ps aux --sort=-%mem' to identify any processes that might be holding onto large amounts of memory.",
+      "Monitor 'vmstat 1' to check for ongoing swapping activity ('si'/'so' columns) which could indicate memory pressure."
+    ]
+  },
+  {
+    "anomaly": "High system load average (load_1min consistently above 4.0) persists despite the job completing.",
+    "root_causes": "CPU resource load from background processes or system tasks.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes contributing to the high load average.",
+      "Check for any runaway processes or daemons that might have been spawned by the completed job.",
+      "Review system logs around the job completion time for any errors or unusual activity."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in page faults and swap activity observed during the memory usage spike.",
+    "root_causes": "Memory pressure leading to increased paging and potential swapping.",
+    "solutions": [
+      "Confirm active swapping by monitoring 'si'/'so' columns in 'vmstat 1'.",
+      "The increase in 'page_swap_out_rate' is a strong indicator of memory pressure forcing pages to disk.",
+      "If swapping is confirmed, consider tuning application memory usage or adding more physical RAM to the node."
+    ]
+  }
+]

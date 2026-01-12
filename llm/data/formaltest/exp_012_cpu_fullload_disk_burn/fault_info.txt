@@ -1,0 +1,18 @@
+Fault Types: cpu-fullload, disk-burn
+Experiment IDs: 0483e4b3c3d69774, 77034854f492c6d2
+Injection Time Range: 2025-09-20 07:24:13 - 2025-09-20 07:25:14
+Fault Commands:
+blade status 0483e4b3c3d69774
+blade status 77034854f492c6d2
+
+Detailed Fault Information:
+1. ID: 0483e4b3c3d69774
+   Type: cpu-fullload
+   Create: 2025-09-20 07:24:13
+   End: 2025-09-20 07:25:14
+
+2. ID: 77034854f492c6d2
+   Type: disk-burn
+   Create: 2025-09-20 07:24:13
+   End: 2025-09-20 07:25:14
+

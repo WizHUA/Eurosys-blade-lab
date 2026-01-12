@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with dramatic increase in memory usage from 32% to 84% and active swapping.",
+    "root_causes": "Memory resource exhaustion likely caused by a memory-intensive workload or memory leak, with the system forced to use swap space extensively.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and 'vmstat 1' to confirm swap activity levels.",
+      "Use 'ps aux --sort=-%mem' to identify the processes consuming the most memory.",
+      "Check for memory leaks in running applications, particularly those associated with the completed job 'ft_cgC'.",
+      "Consider increasing available memory or implementing memory limits for jobs to prevent system-wide impact."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O saturation with utilization reaching 60% and massive increase in I/O operations.",
+    "root_causes": "Disk I/O bottleneck caused by intensive read/write operations, likely from memory swapping and application I/O demands.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load.",
+      "The dramatic increase in disk operations from ~2 IOPS to over 800 IOPS indicates severe I/O stress.",
+      "Consider upgrading to faster storage (SSD) or implementing I/O scheduling policies to prioritize critical operations.",
+      "Address the underlying memory pressure issue to reduce swap-related I/O."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage increased from 73% to 85%, approaching capacity limits.",
+    "root_causes": "Rapid filesystem consumption likely due to application data writes, temporary files, or log generation.",
+    "solutions": [
+      "Use 'du -sh /*' to identify which directories are consuming the most space.",
+      "Check for large temporary files or logs that can be safely removed.",
+      "Monitor the rate of filesystem growth to predict when capacity will be exhausted.",
+      "Consider implementing log rotation policies and cleanup procedures for temporary files."
+    ]
+  }
+]

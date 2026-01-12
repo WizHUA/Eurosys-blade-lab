@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Rapid surge and sustained high filesystem usage (≈95.36% used; avail dropped to ~3.89 GB from ~22.3 GB).",
+    "root_causes": "Heavy write activity during the window (disk_write_rate_bytes_per_sec peaked ~32,706,838 B/s; disk_io_usage_percent up to ~62%) while job 284 (ft_cgC) was running, likely writing large outputs/logs to the root filesystem.",
+    "solutions": [
+      "Identify large recent files and growth hotspots: sudo find / -xdev -type f -mmin -20 -printf '%s %p\\n' | sort -nr | head -50 and sudo du -xhd1 / | sort -hr | head -50.",
+      "Inspect job 284 output directories and logs; redirect future outputs to high-capacity scratch or parallel FS (e.g., set SLURM_TMPDIR or write to /scratch or the shared parallel filesystem).",
+      "Remove or archive unneeded artifacts; enable log rotation and per-job/output quotas to prevent fill-ups.",
+      "If space is urgently needed, move large files off-node or extend the backing volume; add monitoring/alerts for filesystem_avail_bytes and usage_percent thresholds."
+    ]
+  },
+  {
+    "anomaly": "High swap utilization (≈47–54% used) with active swap I/O early in the window despite ample free memory.",
+    "root_causes": "Processes moved cold pages to swap and generated swap traffic (page_swap_out_rate up to ~31.8k/s and page_swap_in/out activity while memory_usage_percent ≈33% and memory_available_bytes ≈5.5 GB), indicating suboptimal swappiness and/or earlier memory pressure during job 284 (ft_cgC).",
+    "solutions": [
+      "Profile per-process swap use (sudo smem -s swap -r or grep VmSwap /proc/*/status) and correlate with the job’s tasks.",
+      "Tune swappiness to reduce aggressive swapping (e.g., sysctl vm.swappiness=10) and persist via /etc/sysctl.d.",
+      "During a maintenance window, consider swapoff -a && swapon -a to repatriate swapped pages if performance is impacted.",
+      "Ensure future jobs request adequate memory and avoid writing large intermediates to memory-backed tmpfs that can trigger swap."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation bursts (disk_io_usage_percent up to ~62% with write throughput peaking ~32.7 MB/s and total IOPS ~74), risking elevated latency.",
+    "root_causes": "Write-heavy workload from job 284 (ft_cgC) coinciding with swap traffic, driving elevated device busy time.",
+    "solutions": [
+      "Identify top I/O contributors (sudo iotop -oPa, pidstat -d 1) and confirm the job’s write pattern and targets.",
+      "Place large sequential outputs and checkpoints on faster storage (node-local NVMe or parallel FS) and avoid the root filesystem.",
+      "Apply I/O throttling/weighting for non-critical tasks via cgroups (io.max/blkio) and consider staggering or batching writes.",
+      "Review writeback tuning (vm.dirty_background_ratio/bytes and vm.dirty_ratio/bytes) cautiously to smooth bursts."
+    ]
+  }
+]

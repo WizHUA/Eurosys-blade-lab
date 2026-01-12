@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU usage spikes to 94% with high system load during job execution",
+    "root_causes": "The ft_cgC job caused significant CPU utilization with load averages reaching 4.88 (1min) on an 8-core system",
+    "solutions": [
+      "Review job resource requirements and adjust CPU allocation",
+      "Check for potential inefficiencies in the ft_cgC application code",
+      "Consider spreading workload across more nodes if possible"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with swap usage reaching 46.6%",
+    "root_causes": "Job memory requirements exceeded available physical RAM, forcing heavy swap usage",
+    "solutions": [
+      "Increase physical memory allocation for compute nodes",
+      "Optimize application memory usage or implement memory management",
+      "Consider using larger memory nodes for similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with 21% disk utilization during peak",
+    "root_causes": "Job generated significant disk writes (384GB total) during execution",
+    "solutions": [
+      "Evaluate if temporary files can use faster storage (NVMe/SSD)",
+      "Implement I/O buffering or caching strategies in the application",
+      "Consider using parallel filesystems for better I/O throughput"
+    ]
+  }
+]

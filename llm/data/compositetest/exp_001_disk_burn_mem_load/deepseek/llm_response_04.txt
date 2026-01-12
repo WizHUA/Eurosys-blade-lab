@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spiked to 88.7% with significant swap usage",
+    "root_causes": "Application memory demand exceeded physical RAM capacity during ft_cgC job execution",
+    "solutions": [
+      "Monitor application memory requirements and compare against node configuration",
+      "Consider optimizing application memory usage or increasing node memory allocation",
+      "Review memory fragmentation and NUMA configurations for potential improvements"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O wait time reached 5.88% during peak activity",
+    "root_causes": "Simultaneous read/write operations from job processes stressing storage subsystem",
+    "solutions": [
+      "Check filesystem performance bottlenecks with iostat during job execution",
+      "Consider using tmpfs or ramdisk for temporary files if I/O is the limiting factor",
+      "Review job's I/O patterns for potential optimization opportunities"
+    ]
+  },
+  {
+    "anomaly": "System load average peaked at 7.12 on 8-core system",
+    "root_causes": "CPU resource contention from compute-intensive workload during job execution",
+    "solutions": [
+      "Verify proper core binding/multithreading in application configuration",
+      "Check for thermal throttling or frequency scaling that may reduce CPU performance",
+      "Consider adjusting Slurm job parameters to better match node capabilities"
+    ]
+  }
+]

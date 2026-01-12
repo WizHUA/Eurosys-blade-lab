@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Significant memory pressure and usage increase from 33% to 55% during job execution.",
+    "root_causes": "The 'ft_cgC' job is consuming substantial memory resources, causing active anonymous memory to increase from 1.6GB to 3.4GB and overall memory availability to drop significantly.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to determine if this is expected behavior or indicates a memory leak",
+      "Consider implementing memory limits using cgroups or Slurm job constraints to prevent excessive memory consumption",
+      "Evaluate if the node has sufficient memory resources for the workload requirements",
+      "Review application memory allocation patterns and consider optimization if memory usage is inefficient"
+    ]
+  },
+  {
+    "anomaly": "Network transmission activity completely stopped during the middle of job execution.",
+    "root_causes": "Network transmit rate dropped to zero at 07:06:43 and remained at zero, suggesting either application behavior change or potential network connectivity issues.",
+    "solutions": [
+      "Verify network interface status and connectivity using 'ip link show' and 'ping' tests",
+      "Check application logs to determine if the job naturally transitioned to a computation-only phase",
+      "Monitor network interface statistics for any error counters or dropped packets",
+      "Investigate if the job requires network communication and verify all network services are functioning properly"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage increased from 73.34% to 73.34% with slight variations in available space.",
+    "root_causes": "The job appears to be performing I/O operations with temporary file creation and cleanup, causing minor fluctuations in available disk space.",
+    "solutions": [
+      "Monitor disk I/O patterns to ensure the job is not causing excessive write operations",
+      "Check if temporary files are being properly cleaned up after job completion",
+      "Verify sufficient disk space is available for job completion and temporary file storage",
+      "Consider implementing disk usage monitoring alerts if filesystem usage approaches critical levels"
+    ]
+  }
+]

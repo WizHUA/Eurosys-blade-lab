@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with system memory usage climbing to critical levels and extensive swapping activity.",
+    "root_causes": "Memory resource load from applications exceeding available physical RAM, forcing the system to heavily utilize swap space.",
+    "solutions": [
+      "Monitor memory-intensive processes using 'ps aux --sort=-%mem' to identify the primary consumers.",
+      "The swap usage remains constant at 46.6% while memory availability drops drastically, indicating active swapping.",
+      "Consider killing or restarting memory-heavy processes if they appear to have memory leaks.",
+      "Add more physical RAM to the system if this represents normal workload memory requirements."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O activity with sustained high utilization and massive write operations.",
+    "root_causes": "Disk I/O load caused by intensive swap activity due to memory pressure and potentially large data processing operations.",
+    "solutions": [
+      "Disk utilization reaches 60% with write rates exceeding 400MB/s, indicating severe I/O bottleneck.",
+      "Use 'iotop' to identify specific processes generating the heavy disk activity.",
+      "Prioritize resolving memory issues to reduce swap-related I/O load.",
+      "Consider using faster storage (SSD) or adding more memory to reduce disk pressure."
+    ]
+  },
+  {
+    "anomaly": "CPU system time significantly elevated, reaching over 17% during peak periods.",
+    "root_causes": "CPU resource load from kernel operations, likely related to memory management and I/O handling under severe resource pressure.",
+    "solutions": [
+      "High system CPU usage correlates with memory pressure and swap activity, indicating kernel overhead.",
+      "Monitor system calls and kernel activity using 'perf top' or 'top' with detailed process information.",
+      "The elevated system time is likely a symptom of the memory and I/O issues rather than a primary problem.",
+      "Focus on resolving memory and I/O bottlenecks to reduce kernel overhead."
+    ]
+  }
+]

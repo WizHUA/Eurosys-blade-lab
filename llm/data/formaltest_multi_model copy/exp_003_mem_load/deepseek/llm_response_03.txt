@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure leading to potential swapping activity",
+    "root_causes": "Memory usage spike to 54% with significant anonymous memory (3.4GB) and reduced available memory",
+    "solutions": [
+      "Check memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Analyze memory usage patterns of recently completed 'ft_cgC' job",
+      "Consider adjusting job memory allocations or implementing memory cleanup routines"
+    ]
+  },
+  {
+    "anomaly": "Periodic disk I/O spikes with potential performance impact",
+    "root_causes": "Intermittent high disk write rates up to 193MB/s despite low I/O wait times",
+    "solutions": [
+      "Monitor disk I/O patterns with 'iotop' to identify processes responsible for spikes",
+      "Verify if temporary file operations during job completion caused the I/O bursts",
+      "Consider optimizing filesystem caching or implementing I/O throttling"
+    ]
+  },
+  {
+    "anomaly": "Network retransmissions and connection resets observed",
+    "root_causes": "TCP retransmissions (30/sec) and 24 connection resets during job execution",
+    "solutions": [
+      "Check network interface statistics for errors or congestion",
+      "Review MPI network configuration for 'ft_cgC' job",
+      "Verify switch and network hardware health"
+    ]
+  }
+]

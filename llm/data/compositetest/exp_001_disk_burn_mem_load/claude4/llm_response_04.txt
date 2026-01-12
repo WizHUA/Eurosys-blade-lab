@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure causing system instability and potential out-of-memory conditions.",
+    "root_causes": "Memory usage spiked from 36% to 89% during job execution, with available memory dropping from 5.3GB to 933MB, indicating a memory-intensive workload exceeding system capacity.",
+    "solutions": [
+      "Monitor memory usage of the 'ft_cgC' job type and consider implementing memory limits or requesting nodes with higher memory capacity.",
+      "Use 'free -h' and 'ps aux --sort=-%mem' to identify specific processes consuming excessive memory.",
+      "Consider implementing swap space monitoring and alerts to prevent future memory exhaustion scenarios.",
+      "Review job submission parameters to ensure memory requirements match available resources."
+    ]
+  },
+  {
+    "anomaly": "Severe I/O bottleneck with disk utilization reaching critical levels and high I/O wait times.",
+    "root_causes": "Disk I/O utilization increased from 0.7% to 52% with corresponding spike in I/O wait from 0.1% to 5.9%, indicating intense disk activity likely caused by memory pressure and swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and determine if it's related to swapping or application I/O patterns.",
+      "Monitor disk queue depth and latency metrics to assess storage subsystem performance.",
+      "Consider optimizing the application's I/O patterns or using faster storage for memory-intensive workloads.",
+      "Implement I/O scheduling policies to prioritize critical system processes during high I/O periods."
+    ]
+  },
+  {
+    "anomaly": "High CPU system time indicating kernel overhead and resource contention.",
+    "root_causes": "CPU system time increased from 2% to 31% while user time remained relatively stable, suggesting significant kernel overhead likely due to memory management and I/O operations.",
+    "solutions": [
+      "Monitor kernel processes and system calls using 'perf' or 'strace' to identify the source of high system CPU usage.",
+      "Review system logs for any kernel warnings or errors related to memory or I/O subsystems.",
+      "Consider tuning kernel parameters related to memory management and I/O scheduling for better performance under load.",
+      "Evaluate whether the workload characteristics are suitable for the current system configuration."
+    ]
+  }
+]

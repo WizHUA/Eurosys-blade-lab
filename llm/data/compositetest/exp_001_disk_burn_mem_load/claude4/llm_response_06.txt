@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage reaching 88% and swap utilization exceeding 55%.",
+    "root_causes": "Memory resource exhaustion from the 'ft_cgC' job causing heavy swapping activity.",
+    "solutions": [
+      "Monitor swap in/out rates which peak at 391,783 and 172,434 pages per second indicating severe memory thrashing.",
+      "The job completed at 23:25:53, but memory pressure persisted through the monitoring window.",
+      "Consider implementing memory limits for future jobs to prevent system-wide memory exhaustion.",
+      "Evaluate if the node has sufficient memory for the workload requirements of similar jobs."
+    ]
+  },
+  {
+    "anomaly": "High CPU I/O wait time reaching 31% indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load caused by extensive memory swapping and application I/O operations.",
+    "solutions": [
+      "Disk I/O usage reaches 52% with extremely high read/write rates of 401GB/sec and 176GB/sec respectively.",
+      "The primary cause is memory swapping; resolving memory pressure will significantly reduce I/O wait.",
+      "Monitor disk health and consider faster storage solutions if high I/O workloads are common.",
+      "Use 'iotop' to identify specific processes causing the I/O bottleneck during job execution."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage increased dramatically from 73% to 86% during job execution.",
+    "root_causes": "Rapid filesystem space consumption by the running job, potentially creating large temporary files.",
+    "solutions": [
+      "Available filesystem space dropped from 22GB to 11GB in under 10 minutes.",
+      "Implement disk usage monitoring and alerts to prevent filesystem exhaustion.",
+      "Configure job cleanup policies to remove temporary files after job completion.",
+      "Consider implementing disk quotas or storage limits for compute jobs."
+    ]
+  }
+]

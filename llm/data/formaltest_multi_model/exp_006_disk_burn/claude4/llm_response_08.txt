@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with swap space completely consumed and excessive swapping activity.",
+    "root_causes": "Memory resource load exceeding available physical RAM, causing the system to rely heavily on swap space which has been depleted.",
+    "solutions": [
+      "The swap usage increased from 46.6% to 46.6% but swap activity (page_swap_in_rate and page_swap_out_rate) is extremely high, indicating constant swapping.",
+      "Free memory dropped dramatically from 3.7GB to 168MB at 07:12:58, showing severe memory pressure.",
+      "Use 'free -h' and 'vmstat 1' to monitor real-time memory and swap usage patterns.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and consider terminating non-essential processes."
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization reaching critical levels with massive throughput spikes.",
+    "root_causes": "Disk I/O load caused primarily by memory swapping activity and possibly application I/O operations.",
+    "solutions": [
+      "Disk I/O usage spiked to over 60% with write rates exceeding 400MB/s, indicating severe storage bottleneck.",
+      "The high disk write activity correlates directly with swap-out operations due to memory pressure.",
+      "Use 'iotop' to identify specific processes causing heavy disk I/O activity.",
+      "Resolving the memory pressure issue is critical to reducing the excessive disk I/O load from swapping."
+    ]
+  },
+  {
+    "anomaly": "CPU system time consumption increased significantly indicating kernel overhead from resource management.",
+    "root_causes": "CPU resource load from kernel operations managing memory pressure, swapping, and I/O operations.",
+    "solutions": [
+      "CPU system time increased from 0.9% to 17.8%, showing significant kernel overhead likely from memory management.",
+      "The high context switch rate (up to 1918/sec) indicates system stress and resource contention.",
+      "Monitor CPU usage patterns with 'top' to confirm if kernel overhead is impacting application performance.",
+      "Address the underlying memory and I/O issues to reduce kernel overhead and improve overall system performance."
+    ]
+  }
+]

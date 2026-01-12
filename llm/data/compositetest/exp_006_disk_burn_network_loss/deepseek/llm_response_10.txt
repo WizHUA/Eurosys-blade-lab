@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swap exhaustion leading to OOM kills",
+    "root_causes": "Memory usage spiked to 99% with swap usage reaching 90.67%, causing multiple out-of-memory kills (3 OOM kills observed)",
+    "solutions": [
+      "Investigate memory leaks in recently completed job ft_ftC (ID 285) which ran during the memory pressure period",
+      "Check for memory-intensive processes in job 285.batch that exited with non-zero code 15",
+      "Consider adjusting Slurm memory limits or implementing cgroups to prevent system-wide memory exhaustion"
+    ]
+  },
+  {
+    "anomaly": "Abnormal disk I/O saturation with high write activity",
+    "root_causes": "Disk write rate spiked to 180MB/s (690064 bytes/sec) during memory pressure events, suggesting heavy swapping activity",
+    "solutions": [
+      "Analyze disk I/O patterns during job execution using iotop or iostat",
+      "Check filesystem health on /dev devices with high IO wait (over 26%)",
+      "Consider implementing I/O throttling for memory-intensive jobs"
+    ]
+  },
+  {
+    "anomaly": "Unusual TCP retransmission spikes during job execution",
+    "root_causes": "TCP retransmissions reached 1.19 segments/sec during job processing, indicating possible network congestion",
+    "solutions": [
+      "Verify network driver settings and update if necessary",
+      "Check switch port statistics for packet errors",
+      "Consider adjusting MPI job parameters for better network utilization"
+    ]
+  }
+]

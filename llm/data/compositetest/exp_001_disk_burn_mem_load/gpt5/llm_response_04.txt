@@ -1,0 +1,51 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swap storm during job execution",
+    "root_causes": "While job 284 (ft_cgC) was running, memory_available_bytes fell sharply from ~5.28 GB (23:16:10) to ~0.93 GB (23:17:10); swap_free_bytes dropped from ~1.19 GB to ~0.95 GB with swap_usage_percent rising from ~44.6% to ~55.6%. Page swap rates spiked (page_swap_in_rate ~339,056/s, page_swap_out_rate ~139,079/s) with major faults increasing, indicating the working set exceeded RAM and triggered heavy swapping.",
+    "solutions": [
+      "Reduce the job's memory footprint (smaller working sets/tiles/batch sizes) or refactor to stream data.",
+      "Set appropriate Slurm memory limits (e.g., --mem/--mem-per-cpu) and schedule on nodes with sufficient RAM for the peak footprint.",
+      "Profile memory (smem, pmap, /usr/bin/time -v) to locate high-usage processes/allocations.",
+      "Tune swapping policy per site standards (e.g., lower vm.swappiness) and ensure adequate fast local scratch for spill if unavoidable."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation and high I/O pressure concurrent with swapping",
+    "root_causes": "disk_io_usage_percent rose from ~0.77% to ~52.2% with disk_read_rate_bytes_per_sec peaking ~401 MB/s and disk_write_rate_bytes_per_sec ~177 MB/s (23:17:25). io_pressure_waiting_rate and processes_blocked (>0) increased. This is consistent with swap thrashing and heavy job I/O.",
+    "solutions": [
+      "First eliminate the swap storm (see memory fixes) to remove swap-induced I/O.",
+      "Use iostat/iotop to identify top I/O contributors; reduce concurrent writers and checkpoint frequency.",
+      "Write large intermediates to fast local NVMe/TMPDIR and stage results off-node after compute.",
+      "If persistent, place workload on nodes/storage with higher IOPS or distribute I/O across devices."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the window",
+    "root_causes": "filesystem_avail_bytes dropped from ~22.34 GB to ~11.76 GB and filesystem_usage_percent rose from ~73.35% to ~85.97% within minutes, indicating large output/intermediate files created by the job.",
+    "solutions": [
+      "Audit recent writes (du -shx --time-sort on job directories; lsof for open files) and clean temporary artifacts.",
+      "Redirect temporary data to per-node scratch (SLURM_TMPDIR) and implement job cleanup steps.",
+      "Apply user/project quotas and alerting to prevent sudden space exhaustion.",
+      "Coordinate data staging to parallel/storage tiers instead of the system filesystem."
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization with rising I/O wait and system load",
+    "root_causes": "cpu_usage_percent climbed from ~26% to ~91% and cpu_iowait_percent rose to ~5.9%; load_1min increased from ~2.4 to ~7.3 with processes_blocked appearing. The CPU is busy but also frequently stalled on I/O, amplified by swapping.",
+    "solutions": [
+      "Address memory pressure and I/O bottlenecks to reduce iowait.",
+      "Limit thread count or bind threads (taskset/OMP settings) to reduce contention and cache thrash.",
+      "If compute-bound phases persist, scale out to more cores/nodes rather than oversubscribing a single node.",
+      "Use perf/stat/flamegraphs to spot hot paths causing excessive kernel/system CPU."
+    ]
+  },
+  {
+    "anomaly": "Increasing TCP retransmissions during the period",
+    "root_causes": "tcp_retransmissions_rate increased from ~0.0017 to ~0.1146 with tcp_syn_retrans_rate rising as well, suggesting intermittent network retransmits, though overall network throughput was low.",
+    "solutions": [
+      "Check NIC and switch port statistics (ethtool -S, switch counters) for errors or congestion; verify cables.",
+      "Confirm MTU and offload settings are consistent cluster-wide; test with iperf between peers.",
+      "Correlate retransmit spikes with disk/memory pressure to exclude host overload effects."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with swap space nearly depleted and extremely high memory usage reaching 99%.",
+    "root_causes": "Memory resource exhaustion from application memory leaks or insufficient memory allocation for the workload, causing extensive swapping activity.",
+    "solutions": [
+      "Identify memory-consuming processes using 'ps aux --sort=-%mem' and 'top' to locate potential memory leaks.",
+      "Monitor swap activity with 'vmstat 1' to confirm active swapping is causing performance degradation.",
+      "Consider terminating or restarting memory-intensive processes if they show abnormal memory growth patterns.",
+      "Evaluate if the node has sufficient memory capacity for the current workload and consider memory upgrades."
+    ]
+  },
+  {
+    "anomaly": "Critical disk I/O bottleneck with utilization exceeding 60% and extremely high I/O wait times reaching 27%.",
+    "root_causes": "Disk I/O load caused by intensive swapping activity due to memory pressure, creating a cascading performance impact.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity and correlate with memory usage patterns.",
+      "The primary solution is to resolve memory pressure which will reduce swap-induced I/O load.",
+      "Monitor disk queue lengths and latency using 'iostat -x 1' to assess the severity of the storage bottleneck.",
+      "Consider temporary I/O priority adjustments using 'ionice' for critical processes if immediate relief is needed."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in system load and context switching rate indicating resource contention.",
+    "root_causes": "System resource contention caused by multiple processes competing for limited memory and I/O resources.",
+    "solutions": [
+      "Monitor process states using 'ps axo stat,pid,comm' to identify processes in uninterruptible sleep (D state).",
+      "The high context switch rate (over 6000/sec) indicates excessive process scheduling overhead due to resource waits.",
+      "Address the underlying memory and I/O issues to reduce system load and improve overall responsiveness.",
+      "Consider load balancing by moving some workloads to other nodes if the resource constraints cannot be immediately resolved."
+    ]
+  }
+]

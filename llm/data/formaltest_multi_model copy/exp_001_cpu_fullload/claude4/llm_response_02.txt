@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization is extremely high, reaching over 83% with sustained load above 4.0 on an 8-core system.",
+    "root_causes": "The completed job 'ft_cgC' which ran for 27 minutes appears to have been computationally intensive, causing sustained high CPU usage throughout its execution period.",
+    "solutions": [
+      "Monitor the system for any lingering processes from the completed job using 'ps aux' and 'top'",
+      "Check if the job properly cleaned up all spawned processes and threads",
+      "Review job resource allocation to ensure it matches the computational requirements",
+      "Consider implementing CPU limits or cgroups for future similar jobs to prevent system saturation"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in context switches and interrupts indicating system stress.",
+    "root_causes": "High computational load from the running job is causing frequent task switching and interrupt handling, leading to system overhead.",
+    "solutions": [
+      "The context switch rate increased from 1788 to over 1841 per second, indicating resource contention",
+      "Interrupt rate peaked at over 7148 per second, suggesting high I/O or network activity",
+      "Monitor process scheduling behavior using 'vmstat 1' to identify if specific processes are causing excessive context switching",
+      "Consider process affinity settings to reduce unnecessary context switches"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure is building with increasing page fault rates and swap activity.",
+    "root_causes": "The intensive computational job is consuming significant memory resources, leading to increased paging activity.",
+    "solutions": [
+      "Page fault rate increased from 7785 to over 6287 faults per second",
+      "Monitor memory usage patterns with 'free -m' and 'vmstat 1' to identify memory bottlenecks",
+      "Check if the job's memory requirements exceed allocated resources",
+      "Consider increasing memory allocation for similar jobs or implementing memory limits to prevent system-wide impact"
+    ]
+  }
+]

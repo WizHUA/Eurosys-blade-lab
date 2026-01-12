@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Excessive disk I/O activity with sustained high write rates and disk utilization.",
+    "root_causes": "Heavy disk write operations from a compute-intensive job causing storage bottleneck.",
+    "solutions": [
+      "Monitor disk I/O patterns using 'iotop' to identify the specific processes causing high write activity.",
+      "Check if the 'ft_cgC' job is writing large amounts of data and consider optimizing its I/O patterns or using faster storage.",
+      "Review filesystem performance and consider moving temporary files to faster storage devices if available.",
+      "Implement I/O scheduling policies to prevent single jobs from monopolizing disk resources."
+    ]
+  },
+  {
+    "anomaly": "High network traffic volume with significant packet transmission rates.",
+    "root_causes": "Network-intensive operations from running computational job requiring data transfer.",
+    "solutions": [
+      "Monitor network bandwidth utilization to ensure it doesn't exceed available capacity.",
+      "Check if the job's network communication patterns are optimal and not causing unnecessary overhead.",
+      "Review network infrastructure capacity to handle sustained high-volume data transfers.",
+      "Consider implementing traffic shaping or QoS policies if network congestion becomes problematic."
+    ]
+  }
+]

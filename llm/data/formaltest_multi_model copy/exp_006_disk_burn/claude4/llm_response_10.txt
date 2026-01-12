@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "System is experiencing severe memory pressure leading to extensive swapping activity.",
+    "root_causes": "Available memory has dropped critically low while swap usage remains high, causing the system to constantly page memory to disk.",
+    "solutions": [
+      "Monitor memory usage with 'free -h' and identify memory-consuming processes using 'ps aux --sort=-%mem'",
+      "The 'page_swap_in_rate' and 'page_swap_out_rate' metrics show intense swapping activity that correlates with performance degradation",
+      "Consider increasing physical memory or optimizing application memory usage to reduce swap dependency",
+      "Use 'vmstat 1' to monitor real-time swapping behavior and identify peak usage patterns"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization has increased dramatically to over 76% with high I/O wait times.",
+    "root_causes": "System load has increased significantly while I/O wait percentage climbed from 0% to nearly 4%, indicating disk bottleneck from memory swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity",
+      "The correlation between increased CPU usage and I/O wait suggests the system is spending significant time waiting for disk operations",
+      "Consider implementing I/O scheduling optimizations or upgrading storage subsystem",
+      "Monitor disk utilization with 'iostat -x 1' to confirm storage performance bottleneck"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage has increased dramatically from 73% to over 85% during the monitoring period.",
+    "root_causes": "Available filesystem space has decreased significantly, potentially due to increased swap file usage, temporary files, or log growth.",
+    "solutions": [
+      "Use 'du -sh /*' to identify which directories are consuming the most space",
+      "Check for large log files or temporary files that can be safely removed",
+      "Monitor swap file size and consider relocating swap to a separate partition if space is critical",
+      "Implement log rotation policies to prevent uncontrolled disk space consumption"
+    ]
+  }
+]

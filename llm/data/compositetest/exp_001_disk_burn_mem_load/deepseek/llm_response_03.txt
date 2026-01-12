@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swap exhaustion during job execution",
+    "root_causes": "Memory usage spiked to 88.7% with swap usage reaching 55.6%, indicating insufficient memory for the workload",
+    "solutions": [
+      "Increase memory allocation for compute nodes running similar workloads",
+      "Optimize application memory usage through code profiling",
+      "Consider implementing memory limits or cgroups for jobs"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time (31.25%) indicating kernel overhead",
+    "root_causes": "Excessive context switches (3131/s) and system calls during memory-intensive operations",
+    "solutions": [
+      "Profile application system call usage with strace",
+      "Check for excessive process creation/forking",
+      "Review kernel parameters for optimization"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with 43.2% utilization during peak",
+    "root_causes": "High page swap activity (391MB/s) due to memory pressure",
+    "solutions": [
+      "Add faster swap devices or reduce swap dependency",
+      "Check filesystem cache efficiency",
+      "Consider using tmpfs for temporary files"
+    ]
+  }
+]

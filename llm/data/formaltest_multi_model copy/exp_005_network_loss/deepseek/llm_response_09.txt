@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Network performance degradation with increased TCP retransmissions and connection timeouts",
+    "root_causes": "Network congestion or hardware issues affecting MPI job communication reliability",
+    "solutions": [
+      "Check network infrastructure health including switches and interface statistics",
+      "Monitor network bandwidth utilization during MPI job execution",
+      "Evaluate MPI job's communication pattern for potential optimization"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increasing during job execution with active swapping",
+    "root_causes": "Application memory requirements exceeding available physical RAM",
+    "solutions": [
+      "Monitor memory usage patterns of completed job 'ft_cgC' for optimization opportunities",
+      "Consider increasing node memory allocation for similar future jobs",
+      "Check for memory leaks in application code"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure during job execution",
+    "root_causes": "High disk write activity from job output or temporary files",
+    "solutions": [
+      "Review job's disk I/O patterns and optimize file operations",
+      "Consider using faster storage or RAM disk for temporary files",
+      "Check filesystem performance and health"
+    ]
+  }
+]

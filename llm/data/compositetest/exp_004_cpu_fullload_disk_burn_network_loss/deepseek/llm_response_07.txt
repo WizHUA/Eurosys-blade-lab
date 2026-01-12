@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with significant swap usage and high disk I/O",
+    "root_causes": "Memory-intensive application causing excessive paging and swap activity",
+    "solutions": [
+      "Investigate memory usage patterns of completed job ft_cgC to identify memory leaks or inefficient allocations",
+      "Increase physical memory allocation or optimize application memory usage",
+      "Monitor swap usage during job execution to determine appropriate memory requirements"
+    ]
+  },
+  {
+    "anomaly": "Extremely high CPU system usage (up to 16.47%)",
+    "root_causes": "Kernel overhead from handling memory pressure and disk I/O operations",
+    "solutions": [
+      "Analyze system call activity during job execution using perf or strace",
+      "Check for excessive context switches or interrupt handling",
+      "Optimize I/O patterns to reduce system overhead"
+    ]
+  },
+  {
+    "anomaly": "Massive disk I/O operations (up to 507MB/s read, 186MB/s write)",
+    "root_causes": "Memory pressure forcing excessive paging and swap operations",
+    "solutions": [
+      "Verify if temporary files or working sets can be reduced",
+      "Consider using faster storage or RAM disks for temporary files",
+      "Profile application I/O patterns to identify optimization opportunities"
+    ]
+  }
+]

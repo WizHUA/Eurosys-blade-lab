@@ -1,0 +1,23 @@
+[
+  {
+    "anomaly": "Active swapping despite ample free and available memory",
+    "root_causes": "During 07:10:28–07:11:28 the node shows sustained swap activity (page_swap_in_rate ≈ 17/s and page_swap_out_rate ≈ 165–170/s, later ≈ 19–21/s) while memory_free_bytes ≈ 3.7 GB and memory_available_bytes ≈ 5.6 GB remain high; swap_free_bytes and swap_cached_bytes are largely steady. This pattern indicates aggressive swap/reclaim behavior (e.g., high vm.swappiness or memory/cgroup policy) rather than true RAM exhaustion during job 276 (ft_cgC).",
+    "solutions": [
+      "Lower swappiness to reduce background swapping: sysctl -w vm.swappiness=10 (and persist via /etc/sysctl.d/99-swap.conf).",
+      "Verify cgroup/Slurm memory policies for the job (memory.high/memory.max and swap limits); relax constraints if they cause reclaim while RAM is available.",
+      "Monitor si/so with vmstat 1 and /proc/pressure/memory during workload to confirm swap churn reduction after tuning.",
+      "If swap is not desired for this workload, consider limiting or disabling it for the job/container (e.g., memory.swap.max=0), then re-test.",
+      "As a last resort post-job, drop cold cache only if appropriate: echo 3 > /proc/sys/vm/drop_caches (understood impact)."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmissions and timeouts during the job",
+    "root_causes": "TCP retransmissions increased (tcp_retransmissions_rate from ~0.05/s up to ~0.49/s at 07:10:58; node_netstat_Tcp_RetransSegs peaked ~7.5/s at 07:10:28) and tcp_timeouts_rate registered non-zero (~0.018/s at 07:10:58–07:11:13), while NIC error/drop counters in the feed remained zero. This suggests brief network congestion or path instability affecting traffic during job 276.",
+    "solutions": [
+      "Inspect host NIC and switch port counters for errors/drops: ethtool -S <iface>, ip -s link, and switch logs around 07:10:28–07:11:13.",
+      "Check for transient bandwidth spikes and contention on the fabric; apply QoS or rate limits if co-located traffic overlaps with compute jobs.",
+      "Validate consistent MTU settings end-to-end to avoid fragmentation-related retransmits.",
+      "Capture a short packet trace when reproducing (tcpdump) and correlate retransmissions/timeouts with application phases to guide tuning (e.g., TCP rmem/wmem)."
+    ]
+  }
+]

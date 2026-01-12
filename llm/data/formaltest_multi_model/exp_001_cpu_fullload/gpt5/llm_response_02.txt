@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Transient network instability with spikes in TCP retransmissions and timeouts during the job runtime.",
+    "root_causes": "At 07:02:43 there is a sharp spike in node_netstat TCP counters (Tcp_RetransSegs ≈30/s, TCPSynRetrans ≈6/s, TCPTimeouts ≈15/s), with another smaller retrans spike at 07:03:28 (≈1.5/s). Network error/drop rates remain 0, indicating likely upstream congestion, intermittent switch/NIC issues, or MTU/duplex mismatch rather than NIC-level RX/TX errors.",
+    "solutions": [
+      "Inspect NIC and driver stats: ethtool -S <iface> and dmesg for link flaps, resets, or ring buffer errors around 07:02:43–07:03:28.",
+      "Check switch port counters and logs tied to this node’s interface for CRC/FCS errors, discards, or congestion events; verify cabling.",
+      "Validate interface configuration: ensure MTU consistency end-to-end (1500 or jumbo), correct duplex/speed, and appropriate flow-control settings.",
+      "If the workload is sensitive to latency, consider enabling ECN or tuning TCP congestion control (e.g., BBR/CUBIC) and verifying RTO/minRTO parameters."
+    ]
+  },
+  {
+    "anomaly": "High swap utilization (~46.6% of 2 GB) with bursts of swap activity despite ample free/available memory.",
+    "root_causes": "swap_free_bytes remains ~1.146 GB (swap_usage_percent ≈46.61%) while memory_available_bytes ≈5.4 GB; early in the window page_swap_in_rate ≈1390/s and page_swap_out_rate ≈235–269/s (07:01:43–07:01:58). This suggests aggressive reclaim/legacy swapped pages being faulted back in, likely due to kernel swappiness and prior memory pressure rather than current shortage.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., to 10) and consider tuning vm.watermark_scale_factor to reduce unnecessary swapping under light pressure.",
+      "During a maintenance window, clear stale swap: swapoff -a && swapon -a to repopulate RAM and minimize swap-backed pages.",
+      "For latency-sensitive jobs, limit or disable swapping via cgroup (e.g., memory.swap.max=0) and ensure requested memory matches actual peak usage.",
+      "Monitor page faults (major/minor) and swap-in/out rates with sar/vmstat to confirm improvement after tuning."
+    ]
+  },
+  {
+    "anomaly": "CPU oversubscription/queueing during job ramp-up (more runnable tasks than cores).",
+    "root_causes": "cpu_usage_percent rises from ~31% to ~83% over ~90 seconds while processes_running reaches 17 on an 8-core system and schedstat_waiting_rate climbs (≈0.0168 → ≈0.074), indicating increasing run-queue contention. load_1min remains elevated (up to ~9.29 earlier in the window), consistent with oversubscription.",
+    "solutions": [
+      "Align thread/process parallelism with available cores: set SLURM --cpus-per-task appropriately and cap threads (e.g., OMP_NUM_THREADS=8, taskset/numactl pinning).",
+      "Audit the job (ft_cgC) for uncontrolled thread spawning or nested parallelism; disable nesting (e.g., OMP_NESTED=FALSE) if not intended.",
+      "Track run-queue and pressure metrics (PSI) to verify reduced waiting after parallelism tuning."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high memory usage (>99%) with severe swapping activity",
+    "root_causes": "Memory exhaustion likely caused by the ft_ftC job exceeding allocated resources, leading to heavy page swapping and OOM kills",
+    "solutions": [
+      "Check memory profile of ft_ftC job to identify memory leaks or incorrect resource requests",
+      "Increase job memory allocation or reduce workload memory requirements",
+      "Monitor for OOM kills in system logs (/var/log/kern.log)"
+    ]
+  },
+  {
+    "anomaly": "Persistently high disk I/O wait times (>50% of CPU time)",
+    "root_causes": "Severe swapping activity caused by memory pressure is creating disk I/O bottleneck",
+    "solutions": [
+      "Optimize job to reduce memory footprint and minimize swapping",
+      "Consider using faster storage for swap partition",
+      "Monitor disk I/O latency with iostat -x 1"
+    ]
+  },
+  {
+    "anomaly": "High system load (11-12) despite moderate CPU utilization (75-95%)",
+    "root_causes": "Processes blocked waiting for I/O resources due to memory and disk contention",
+    "solutions": [
+      "Investigate I/O-bound processes with iotop",
+      "Check for excessive context switching from process scheduling",
+      "Balance workload distribution across nodes"
+    ]
+  }
+]

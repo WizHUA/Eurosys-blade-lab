@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Sustained high CPU utilization above 70% with significant I/O wait time during job execution.",
+    "root_causes": "The completed job 'ft_cgC' was computationally intensive with substantial I/O operations, causing CPU saturation and I/O bottlenecks throughout its 27-minute runtime.",
+    "solutions": [
+      "Monitor job resource requirements before submission to ensure appropriate resource allocation",
+      "Consider using job scheduling policies to limit concurrent I/O-intensive jobs",
+      "Evaluate storage subsystem performance and consider faster storage solutions for I/O-heavy workloads",
+      "Implement CPU and I/O throttling for resource-intensive jobs to prevent system saturation"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with high cache usage and swap activity during job execution.",
+    "root_causes": "Memory usage exceeded optimal levels with cache reaching 63-64% of total memory and active swapping occurring, indicating insufficient RAM for the workload demands.",
+    "solutions": [
+      "Increase available memory allocation for similar jobs to prevent swapping",
+      "Monitor memory usage patterns and adjust job memory limits accordingly",
+      "Consider memory-aware job scheduling to prevent memory contention",
+      "Implement memory profiling for the 'ft_cgC' application to optimize memory usage patterns"
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage increased significantly from 78% to 90% during job execution.",
+    "root_causes": "The job generated substantial output data or temporary files, consuming approximately 12% of available filesystem space during its execution.",
+    "solutions": [
+      "Implement disk space monitoring and alerts for job output directories",
+      "Configure automatic cleanup of temporary files after job completion",
+      "Consider using separate scratch filesystems for temporary job data",
+      "Establish disk space quotas and monitoring for long-running computational jobs"
+    ]
+  }
+]

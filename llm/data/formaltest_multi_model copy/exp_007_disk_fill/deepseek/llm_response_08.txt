@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High memory pressure with significant swap usage",
+    "root_causes": "Memory intensive application causing swap utilization and degrading performance",
+    "solutions": [
+      "Investigate memory usage patterns of completed ft_cgC job",
+      "Check for memory leaks in application code",
+      "Consider increasing physical memory or optimizing application memory requirements"
+    ]
+  },
+  {
+    "anomaly": "Sustained disk I/O pressure with high IO wait times",
+    "root_causes": "Disk-intensive operations from completed job causing sustained I/O load",
+    "solutions": [
+      "Review disk usage patterns of the ft_cgC job",
+      "Consider using faster storage or SSDs for I/O intensive workloads",
+      "Optimize application I/O patterns (sequential vs random access)"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load average despite CPU utilization under 50%",
+    "root_causes": "I/O wait and process contention causing queueing despite available CPU capacity",
+    "solutions": [
+      "Analyze process states for blocked processes",
+      "Investigate potential storage bottlenecks",
+      "Review process scheduling priority and CPU affinity settings"
+    ]
+  }
+]

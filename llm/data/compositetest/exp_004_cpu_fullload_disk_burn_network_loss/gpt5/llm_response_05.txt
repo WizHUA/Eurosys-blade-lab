@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe swap thrashing concurrent with rapidly growing page cache",
+    "root_causes": "During 23:22:25–23:23:25 the job ft_cgC entered an I/O-heavy phase where the kernel retained a very large page cache (cached grew to ~5.0 GB) while anonymous memory was actively swapped in and out (page_swap_in_rate up to ~496k pages/s and page_swap_out_rate up to ~182k pages/s). Swap usage stayed ~48% while swap churn spiked, and memory_available remained >5 GB, indicating aggressive caching/swappiness and a working set exceeding available anonymous RAM, causing swap thrash.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., 10–20) and increase vm.vfs_cache_pressure so reclaim prefers dropping cache over swapping anon pages.",
+      "Constrain the job’s memory with cgroups (memory.high/memory.max) to prevent system-wide swap pressure.",
+      "Reduce page cache pollution in the application I/O path: use O_DIRECT or posix_fadvise(DONTNEED)/madvise(MADV_DONTNEED), and tune block device readahead.",
+      "Place swap on the fastest local device (e.g., NVMe) separate from data, then retest.",
+      "If feasible, add RAM or reduce the job’s concurrency/working set size."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with rising I/O wait and pressure",
+    "root_causes": "Storage throughput climbed sharply (disk_read_rate_bytes_per_sec peaked ~508 MB/s; writes ~186 MB/s) with disk_io_usage_percent rising to ~55%, io_pressure_waiting_rate increasing from ~0.008 to ~0.082, cpu_iowait up to ~3.77%, and processes_blocked > 0—consistent with the storage subsystem bottlenecking under heavy job I/O and swap activity.",
+    "solutions": [
+      "Identify top I/O consumers (iotop, pidstat -d) during the job’s peak phases.",
+      "Throttle the job’s I/O via cgroups (io.max/io.weight) to protect system responsiveness.",
+      "Redirect scratch/output to faster local SSD/NVMe or a high-performance parallel filesystem.",
+      "Tune writeback (vm.dirty_background_ratio, vm.dirty_ratio) to smooth bursts; ensure device scheduler/queue depth are appropriate.",
+      "Separate swap and data onto different physical devices to reduce contention."
+    ]
+  },
+  {
+    "anomaly": "Filesystem filling rapidly to >85%, risking space exhaustion and performance degradation",
+    "root_causes": "Filesystem usage increased from ~73% to ~87% within minutes while sustained writes exceeded 100–180 MB/s, indicating the job generated large outputs or temporary files on the same filesystem that the system relies on.",
+    "solutions": [
+      "Enforce per-user/job quotas and direct job tmp/scratch to a capacity-appropriate filesystem, not the root/system filesystem.",
+      "Clean up large temporary files and logs from job 284 (ft_cgC); move outputs to dedicated scratch or parallel storage.",
+      "Set alerts at 80–85% usage and plan to expand the filesystem or provision additional scratch capacity to avoid future incidents."
+    ]
+  }
+]

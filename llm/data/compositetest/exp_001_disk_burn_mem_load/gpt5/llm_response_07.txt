@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe memory pressure with heavy swap thrashing during job runtime.",
+    "root_causes": "While job 284 (ft_cgC) was running, memory_available_bytes dropped sharply (to 933,273,600 at 23:17:10) and swap activity spiked massively (page_swap_in_rate/page_swap_out_rate rose from ~1.9k/6.2k to 339,055.8/139,078.7 per second, then to 391,782.6/172,433.6 by 23:17:25). Anonymous memory share jumped (anon_memory_percent up to ~76%), and processes_blocked appeared, indicating the job exceeded effective RAM and triggered sustained paging.",
+    "solutions": [
+      "Re-run or schedule ft_cgC with accurate Slurm memory limits (e.g., --mem) and enable/enforce cgroup memory limits to prevent node-wide thrashing.",
+      "Reduce the job’s memory footprint or problem size, or split the workload across more nodes to increase aggregate RAM.",
+      "Investigate for memory growth/leaks in ft_cgC using smem/pidstat/pmap and application logs.",
+      "Lower vm.swappiness on compute nodes (if policy permits) to reduce aggressiveness of swapping.",
+      "Prefer memory-efficient data structures or on-disk streaming for large datasets to limit resident memory."
+    ]
+  },
+  {
+    "anomaly": "Escalating disk I/O saturation and rising CPU iowait correlated with swap traffic.",
+    "root_causes": "Disk read/write rates and utilization surged (disk_read_rate_bytes_per_sec grew from ~1.9e6 to 4.01e8; disk_io_usage_percent climbed from ~0.77% to 52.22%), and cpu_iowait_percent rose from ~0.12% to 5.88%. This pattern matches swap-induced I/O amplification from the memory pressure triggered by ft_cgC.",
+    "solutions": [
+      "Eliminate the swap storm (see memory fixes above); reducing paging will directly lower storage contention.",
+      "Place large temporary files on fast local scratch and batch writes (avoid frequent small writes).",
+      "Use iostat/iotop to verify the top contributors and throttle I/O concurrency within the job if possible.",
+      "Tune I/O stack for the workload (e.g., appropriate scheduler and readahead) and ensure the node uses SSD/NVMe for swap/scratch where available."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption approaching high utilization.",
+    "root_causes": "Filesystem usage increased quickly from ~73.35% to ~85.97% (filesystem_avail_bytes fell from ~22.34 GiB to ~11.76 GiB) during the job window, indicating substantial output or temporary data generation by ft_cgC.",
+    "solutions": [
+      "Redirect large outputs and temporaries to node-local /scratch and stage results out at job end.",
+      "Set and enforce per-job/output quotas in Slurm to prevent sudden capacity exhaustion.",
+      "Clean up temporary files after job completion and monitor filesystem usage with alerts near 90%.",
+      "If sustained, expand filesystem capacity or schedule such jobs on nodes/filesystems with more headroom."
+    ]
+  }
+]

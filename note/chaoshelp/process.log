@@ -1,0 +1,107 @@
+======================================================================
+$ blade create process kill -h
+======================================================================
+Kill process by process id or process name
+
+Usage:
+  blade create process kill
+
+Aliases:
+  kill, k
+
+Examples:
+
+# Kill the process that contains the SimpleHTTPServer keyword
+blade create process kill --process SimpleHTTPServer
+
+# Kill the Java process
+blade create process kill --process-cmd java
+
+# Specifies the semaphore and local port to kill the process
+blade c process kill --local-port 8080 --signal 15
+
+# Return success even if the process not found
+blade c process kill --process demo --ignore-not-found
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --count string             Limit count, 0 means unlimited
+      --exclude-process string   Exclude process
+  -h, --help                     help for kill
+      --ignore-not-found         Ignore process that cannot be found
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --local-port string        Local service ports. Separate multiple ports with commas (,) or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --pid string               pid
+      --process string           Process name
+      --process-cmd string       Process name in command
+      --signal string            Killing process signal, such as 9,15
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+
+======================================================================
+$ blade create process stop -h
+======================================================================
+process fake death by process id or process name
+
+Usage:
+  blade create process stop
+
+Aliases:
+  stop, f
+
+Examples:
+
+# Pause the process that contains the "SimpleHTTPServer" keyword
+blade create process stop --process SimpleHTTPServer
+
+# Pause the Java process
+blade create process stop --process-cmd java
+
+# Return success even if the process not found
+blade create process stop --process demo --ignore-not-found
+
+Flags:
+      --blade-release string     Blade release package，use this flag when the channel is ssh
+      --channel string           Select the channel for execution, and you can now select SSH
+      --count string             Limit count, 0 means unlimited
+      --exclude-process string   Exclude process
+  -h, --help                     help for stop
+      --ignore-not-found         Ignore process that cannot be found
+      --install-path string      install path default /opt/chaosblade，use this flag when the channel is ssh
+      --local-port string        Local service ports. Separate multiple ports with commas (,) or connector representing ranges, for example: 80,8000-8080
+      --override-blade-release   Override blade release，use this flag when the channel is ssh
+      --pid string               pid
+      --process string           Process name
+      --process-cmd string       Process name in command
+      --signal string            Killing process signal, such as 9,15
+      --ssh-host string          Use this flag when the channel is ssh
+      --ssh-key string           Use this flag when the channel is ssh
+      --ssh-key-passphrase       Use this flag when the channel is ssh
+      --ssh-port string          Use this flag when the channel is ssh
+      --ssh-user string          Use this flag when the channel is ssh
+      --timeout string           set timeout for experiment
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+
+

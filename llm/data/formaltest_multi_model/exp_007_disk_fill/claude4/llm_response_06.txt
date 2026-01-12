@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "System experiencing severe memory pressure with filesystem usage at 90% and memory available dropping significantly.",
+    "root_causes": "Memory resource exhaustion combined with disk space shortage, likely caused by memory-intensive operations and insufficient cleanup of temporary files or logs.",
+    "solutions": [
+      "Use 'df -h' and 'du -sh /*' to identify large files consuming disk space and clean up unnecessary data",
+      "Monitor memory usage with 'free -h' and identify memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Check for large log files or temporary files that can be safely removed to free up disk space",
+      "Consider expanding filesystem capacity or implementing log rotation policies to prevent future disk space issues"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time and disk utilization indicating storage bottleneck.",
+    "root_causes": "Disk I/O subsystem under stress due to combination of high memory pressure causing swapping and filesystem near capacity.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating high disk I/O and optimize their disk access patterns",
+      "Monitor swap usage with 'swapon -s' and consider adding more swap space or physical memory",
+      "Check disk health with 'smartctl -a /dev/sda' to ensure no hardware issues are contributing to slow I/O",
+      "Implement I/O scheduling optimizations or consider migrating high I/O workloads to faster storage"
+    ]
+  }
+]

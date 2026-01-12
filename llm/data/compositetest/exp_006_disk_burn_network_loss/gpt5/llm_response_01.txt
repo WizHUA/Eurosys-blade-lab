@@ -1,0 +1,34 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with OOM kills and swap thrashing during the job window.",
+    "root_causes": "The workload's memory demand exceeded physical RAM and available cache, causing swap_free_bytes to drop as low as 28,672 (≈0% free), memory_committed_as_bytes to exceed RAM (up to ≈13 GB vs 8 GB), and vm_oom_kills_total to increase (3→5). This led to extremely high page swap in/out rates and sustained cpu_iowait_percent spikes (up to ≈27%), indicating the node was thrashing.",
+    "solutions": [
+      "Increase the Slurm memory request/reservation for this job or schedule it on nodes with more RAM.",
+      "Enable and enforce cgroup memory limits for jobs to prevent system-wide OOM (e.g., memory.limit_in_bytes) and ensure early termination when limits are exceeded.",
+      "Optimize the application’s memory footprint (streaming/chunking data, reduce in-memory buffers) to keep working set within physical RAM.",
+      "Tune kernel memory settings: set vm.overcommit_memory=2 and adjust vm.overcommit_ratio to reduce overcommit, and lower vm.swappiness to discourage aggressive swapping.",
+      "Add node RAM or split the workload across multiple tasks/nodes to reduce per-node memory pressure."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation and high I/O wait, driven by heavy swapping and large write activity.",
+    "root_causes": "During the same interval, disk_read/write rates surged (e.g., read ≈291 MB/s and write ≈180 MB/s), disk_io usage and times escalated, processes_blocked spiked (up to 17), and cpu_iowait_percent reached ≈27%. This is consistent with swap-driven I/O and job-generated large writes overwhelming the storage subsystem.",
+    "solutions": [
+      "Resolve the memory exhaustion first to eliminate swap-driven I/O.",
+      "Place swap on faster NVMe/SSD or reduce/disable swap for this job to avoid thrashing.",
+      "Use iostat/iotop to identify the processes driving I/O; consider blkio cgroup throttling for noisy jobs.",
+      "Direct large temporary scratch/output to high-throughput local SSDs or parallel filesystems and avoid writing large intermediates to the system root filesystem.",
+      "Review and optimize the job’s I/O patterns (batching, compression, fewer checkpoints) to reduce write amplification."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem consumption during the job, increasing usage from ≈73% to ≈83% in minutes.",
+    "root_causes": "Sustained high write rates and swap activity correlated with a fast rise in filesystem_usage_percent, indicating large temporary/output files being produced and/or excessive swap/cache pressure expanding disk usage.",
+    "solutions": [
+      "Verify and clean large temporary or intermediate files created by the job; direct scratch data to dedicated /scratch with ample capacity.",
+      "Enforce user/project quotas and set alerting thresholds to catch rapid filesystem growth.",
+      "Schedule I/O-heavy jobs on nodes with sufficient local storage and ensure output paths are on high-capacity filesystems.",
+      "Implement post-job cleanup hooks to remove transient files and reclaim space promptly."
+    ]
+  }
+]

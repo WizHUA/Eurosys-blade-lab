@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure with memory usage climbing to 55% and significant memory allocation patterns indicating potential memory leak.",
+    "root_causes": "Memory resource stress showing progressive increase in anonymous memory usage from 22% to 43% over the monitoring period, with committed memory exceeding physical memory capacity.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' for memory leak patterns using memory profiling tools like valgrind or AddressSanitizer in future runs.",
+      "Check system logs for out-of-memory events during the job execution period.",
+      "Implement memory usage limits for future jobs using cgroups or Slurm memory constraints.",
+      "Consider increasing swap space or physical memory if this workload pattern is expected to continue."
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU utilization near 50% with elevated system load during job execution.",
+    "root_causes": "CPU resource load from computationally intensive workload with load averages consistently above 4.0 for an 8-core system, indicating resource contention.",
+    "solutions": [
+      "Review the 'ft_cgC' job requirements to ensure proper CPU allocation and scheduling.",
+      "Consider implementing CPU throttling or nice values for similar compute-intensive jobs to maintain system responsiveness.",
+      "Monitor for CPU thermal throttling if this utilization pattern continues for extended periods.",
+      "Evaluate if the job can be optimized for better CPU efficiency or parallelization."
+    ]
+  }
+]

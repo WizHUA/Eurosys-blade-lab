@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure and resource exhaustion during job completion period.",
+    "root_causes": "Memory resource load caused by memory leak or improper cleanup during job termination phase.",
+    "solutions": [
+      "Monitor memory usage patterns during job cleanup phases to identify memory leaks in application or cleanup scripts.",
+      "The dramatic drop in available memory from 5.6GB to 3.7GB between 07:08:28 and 07:08:43 indicates a significant memory allocation event.",
+      "Review the 'ft_cgC' job implementation for proper memory deallocation and cleanup procedures.",
+      "Consider implementing memory limits and monitoring for jobs to prevent system-wide memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O activity correlating with memory pressure.",
+    "root_causes": "Disk I/O load likely caused by swapping activity due to memory pressure.",
+    "solutions": [
+      "The increase in disk write activity from ~7KB/s to ~164KB/s during the memory pressure period indicates swapping.",
+      "Monitor swap usage and consider increasing physical memory or optimizing application memory usage.",
+      "Use 'iotop' and 'vmstat' to confirm swapping activity and identify processes causing excessive memory usage.",
+      "Implement application-level memory management improvements to reduce swap pressure."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spikes with significant swap usage and OOM kills",
+    "root_causes": "Memory-intensive job (ft_cgC) causing memory exhaustion and triggering OOM kills",
+    "solutions": [
+      "Increase memory allocation for memory-intensive jobs",
+      "Optimize job's memory usage patterns",
+      "Consider adding more physical memory to nodes"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time percentage (peaking at 31.25%)",
+    "root_causes": "Kernel handling memory management overhead due to memory pressure",
+    "solutions": [
+      "Monitor kernel processes during job execution",
+      "Check for memory fragmentation issues",
+      "Review system configuration for memory management"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with high write rates during job execution",
+    "root_causes": "Job causing heavy disk writes potentially due to swapping or temporary files",
+    "solutions": [
+      "Check job's disk I/O patterns",
+      "Consider using faster storage for temporary files",
+      "Optimize job's disk usage"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O rates with over 1.4 million bytes/sec disk read rate spike.",
+    "root_causes": "Intensive disk I/O operations from computational job causing storage bottleneck.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are responsible for the intensive disk read activity.",
+      "Monitor if the 'ft_cgC' job is performing large file operations or inefficient I/O patterns.",
+      "Consider optimizing the application's I/O patterns or using faster storage if this represents normal workload behavior.",
+      "Check if the job is reading large datasets inefficiently, potentially with small block sizes."
+    ]
+  },
+  {
+    "anomaly": "Sustained high network traffic with receive rates up to 431 bytes/sec and transmit rates up to 421 bytes/sec.",
+    "root_causes": "Network-intensive operations from the running computational job.",
+    "solutions": [
+      "Monitor network utilization to ensure it's within acceptable limits for the application requirements.",
+      "Verify that the 'ft_cgC' job's network communication patterns are expected for this type of workload.",
+      "Check for any network congestion issues if this traffic level is impacting other services.",
+      "Consider network optimization if the communication patterns can be improved."
+    ]
+  }
+]

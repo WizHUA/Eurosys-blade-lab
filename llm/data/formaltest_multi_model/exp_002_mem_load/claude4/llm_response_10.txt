@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure and potential out-of-memory condition on the node.",
+    "root_causes": "Memory resource exhaustion with usage jumping from 33% to 73% and available memory dropping from 5.5GB to 2.2GB during job execution.",
+    "solutions": [
+      "Monitor memory usage of the 'ft_cgC' job and similar workloads to understand their memory requirements.",
+      "Check system logs for any OOM killer activity or memory allocation failures during the time period.",
+      "Consider increasing memory limits for compute nodes or implementing memory quotas for jobs to prevent resource exhaustion.",
+      "Review the job's memory allocation patterns to identify potential memory leaks or inefficient usage."
+    ]
+  },
+  {
+    "anomaly": "Dramatic increase in anonymous memory allocation indicating potential memory leak or inefficient memory usage.",
+    "root_causes": "Anonymous memory percentage increased from 22% to 62% during job execution, suggesting excessive heap allocation or memory fragmentation.",
+    "solutions": [
+      "Profile the 'ft_cgC' application for memory allocation patterns using tools like 'valgrind' or 'heaptrack'.",
+      "Check if the application properly releases allocated memory or has memory leak issues.",
+      "Monitor memory allocation trends over longer periods to determine if this is a recurring pattern.",
+      "Consider implementing memory monitoring within the application to track allocation behavior."
+    ]
+  }
+]

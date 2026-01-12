@@ -1,0 +1,18 @@
+Fault Types: network-loss, disk-fill
+Experiment IDs: 6f4fe5d621457c25, e4de4388929fba51
+Injection Time Range: 2025-09-20 07:54:18 - 2025-09-20 07:55:31
+Fault Commands:
+blade status 6f4fe5d621457c25
+blade status e4de4388929fba51
+
+Detailed Fault Information:
+1. ID: 6f4fe5d621457c25
+   Type: network-loss
+   Create: 2025-09-20 07:54:18
+   End: 2025-09-20 07:55:30
+
+2. ID: e4de4388929fba51
+   Type: disk-fill
+   Create: 2025-09-20 07:54:20
+   End: 2025-09-20 07:55:31
+

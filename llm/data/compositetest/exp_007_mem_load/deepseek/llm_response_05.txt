@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage consistently above 99%",
+    "root_causes": "Memory resource exhaustion due to high anonymous memory usage, severe swapping activity, and minimal free memory availability",
+    "solutions": [
+      "Investigate memory usage patterns of completed job 285 (ft_ftC) which ran during this period",
+      "Check for memory leaks in application code or libraries used by the job",
+      "Consider reducing memory allocation requests or optimizing memory usage in applications",
+      "Monitor and potentially expand physical memory capacity if workloads regularly require more resources"
+    ]
+  },
+  {
+    "anomaly": "Critical swap usage with less than 0.5% swap space free",
+    "root_causes": "Extreme memory pressure forcing heavy utilization of swap space as overflow",
+    "solutions": [
+      "Monitor swap usage trends during job execution to size swap space appropriately",
+      "Consider disabling swap entirely if jobs are memory-bound to fail fast rather than degrade performance",
+      "Ensure NUMA memory balancing is properly configured for optimal memory allocation"
+    ]
+  },
+  {
+    "anomaly": "High CPU I/O wait percentage (frequently >50%)",
+    "root_causes": "Disk I/O bottlenecks likely caused by excessive swapping activity and filesystem operations",
+    "solutions": [
+      "Analyze disk I/O patterns during high iowait periods using iotop",
+      "Optimize filesystem access patterns in application code",
+      "Consider moving temporary files to RAM disk if possible",
+      "Evaluate faster storage solutions if I/O bottlenecks persist after memory issues are resolved"
+    ]
+  }
+]

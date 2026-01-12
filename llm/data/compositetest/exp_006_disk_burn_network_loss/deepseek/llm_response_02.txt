@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space exhaustion",
+    "root_causes": "Memory usage spiked to 98.58% with swap usage reaching 99.99%, indicating extreme memory pressure and heavy swapping activity",
+    "solutions": [
+      "Investigate memory leaks in the 'ft_ftC' application that just completed",
+      "Check for memory-intensive processes using 'ps aux --sort=-%mem'",
+      "Increase physical memory allocation or optimize application memory usage"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time percentage (26.98%)",
+    "root_causes": "Excessive system CPU usage suggests kernel-level processing overhead, possibly from memory management during swapping",
+    "solutions": [
+      "Analyze kernel activity using 'perf top' to identify system call bottlenecks",
+      "Check for excessive context switches (6308.70/s) which may indicate process thrashing",
+      "Optimize application to reduce system call frequency"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with high IO wait time (26.98%)",
+    "root_causes": "Intense swapping activity caused by memory pressure led to disk I/O bottleneck",
+    "solutions": [
+      "Monitor disk I/O patterns using 'iotop' during job execution",
+      "Consider using faster storage (NVMe) for swap space",
+      "Adjust swappiness parameter to control swap aggressiveness"
+    ]
+  }
+]

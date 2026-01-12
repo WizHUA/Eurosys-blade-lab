@@ -1,0 +1,18 @@
+Fault Types: network-loss, mem-load
+Experiment IDs: d9f564a9c11047bc, b6e24bd2bd82e4ee
+Injection Time Range: 2025-09-20 07:46:14 - 2025-09-20 07:47:16
+Fault Commands:
+blade status d9f564a9c11047bc
+blade status b6e24bd2bd82e4ee
+
+Detailed Fault Information:
+1. ID: d9f564a9c11047bc
+   Type: network-loss
+   Create: 2025-09-20 07:46:14
+   End: 2025-09-20 07:47:16
+
+2. ID: b6e24bd2bd82e4ee
+   Type: mem-load
+   Create: 2025-09-20 07:46:14
+   End: 2025-09-20 07:47:16
+

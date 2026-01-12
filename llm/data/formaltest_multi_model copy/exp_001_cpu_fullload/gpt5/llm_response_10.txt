@@ -1,0 +1,24 @@
+[
+  {
+    "anomaly": "OOM kill occurred during the job window with heavy swap churn despite ample free memory",
+    "root_causes": "vm_oom_kills_total=1 while memory_available_bytes remained ~5.4–5.5 GiB and memory_usage_percent ~34–35%, alongside high swap activity (page_swap_in_rate ≈1390/s and swap_usage_percent ≈46.6%). This pattern most likely indicates the job (ft_cgC) exceeded a per-job/cgroup memory limit, triggering the OOM killer even though system-wide RAM was available; aggressive swapping further suggests suboptimal swappiness/reclaim settings.",
+    "solutions": [
+      "Inspect kernel logs for the OOM event and cgroup attribution: dmesg -T | egrep -i 'Out of memory|Killed process' around 07:01:40–07:02:00 to identify the killed process and invoking cgroup.",
+      "Verify Slurm job 276 memory limits vs. actual usage (e.g., scontrol show job 276) and raise the job's requested memory (--mem/--mem-per-cpu) or adjust cgroup memory.max if appropriate.",
+      "If policy permits, lower swap exposure for jobs (e.g., set memory.swap.max or Slurm cgroup memory+swap policy) to avoid OOM from unintended reclaim.",
+      "Tune system reclaim aggressiveness on compute nodes: reduce vm.swappiness (e.g., to 1–10) and persist via sysctl; confirm changes during a maintenance window.",
+      "If stale pages remain swapped, perform a controlled swap refresh during node drain: swapoff -a && swapon -a to repatriate cold pages."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap usage (~46% of 2 GiB) and intermittent swap bursts while system memory is lightly utilized",
+    "root_causes": "Swap is being used and churned (page_swap_in/out spikes and swap_cached_bytes ~298 MiB) even though memory_available_bytes stays >5 GiB. This indicates unnecessary swapping due to aggressive swappiness or reclaim of long‑lived inactive pages; it can also arise from per-cgroup memory reclaim behavior during the completed job.",
+    "solutions": [
+      "Confirm ongoing swap I/O with vmstat 1 or sar -W and correlate with page_swap_in_rate/out spikes seen at 07:01:43–07:01:58.",
+      "Reduce vm.swappiness to minimize background swapping on compute nodes (e.g., sysctl -w vm.swappiness=1..10 and persist in /etc/sysctl.d).",
+      "Consider disabling or strictly limiting swap for compute workloads if policy allows (e.g., memory.swap.max=0 for job cgroups) to keep pages in RAM.",
+      "During a maintenance window, clear stale swap usage by running swapoff -a && swapon -a on the node after draining jobs.",
+      "Review Slurm/cgroup memory settings that may force reclaim; ensure job memory requests match actual needs to reduce reclaim pressure."
+    ]
+  }
+]

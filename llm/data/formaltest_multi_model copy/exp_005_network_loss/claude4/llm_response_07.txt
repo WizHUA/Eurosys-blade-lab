@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "High CPU utilization with significant I/O wait time indicating system bottleneck.",
+    "root_causes": "The system is experiencing sustained high CPU usage (47-51%) with notable I/O wait periods, suggesting the completed job 'ft_cgC' has left the system in a resource-constrained state with ongoing disk operations.",
+    "solutions": [
+      "Monitor active processes with 'top' or 'htop' to identify any lingering processes from the completed job",
+      "Check for any stuck I/O operations using 'iotop' to identify processes causing disk bottlenecks",
+      "Verify that all job cleanup processes have completed properly and no zombie processes remain",
+      "Consider rebooting the node if cleanup processes are unable to complete normally"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high anonymous memory usage and active swapping.",
+    "root_causes": "Memory usage remains elevated at 32% with significant anonymous memory allocation (20.97-20.98%) and evidence of swap activity, indicating incomplete memory cleanup after job completion.",
+    "solutions": [
+      "Use 'free -h' and 'vmstat 1' to monitor ongoing memory usage patterns and swap activity",
+      "Identify processes with high memory consumption using 'ps aux --sort=-%mem'",
+      "Check for memory leaks in any remaining processes from the completed job",
+      "Force garbage collection or consider a controlled restart of services if memory is not being properly released"
+    ]
+  },
+  {
+    "anomaly": "Elevated network retransmission activity suggesting network instability.",
+    "root_causes": "TCP retransmission segments show periodic spikes (up to 7.5 retransmissions per second at 07:10:28) indicating network congestion or packet loss during and after job execution.",
+    "solutions": [
+      "Monitor network interface statistics for errors and drops using 'ip -s link show'",
+      "Check network connectivity and latency to other nodes in the cluster",
+      "Verify network hardware health including cables, switches, and network interface cards",
+      "Review network configuration for MTU mismatches or buffer size issues that could cause packet loss"
+    ]
+  }
+]

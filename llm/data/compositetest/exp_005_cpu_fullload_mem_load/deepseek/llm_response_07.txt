@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with significant I/O wait time",
+    "root_causes": "CPU-intensive job (ft_cgC) completing execution with elevated disk I/O operations",
+    "solutions": [
+      "Review job resource allocation to ensure adequate CPU cores were requested",
+      "Check filesystem performance metrics during job execution",
+      "Analyze storage subsystem for potential bottlenecks"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations during job execution",
+    "root_causes": "Memory usage spikes correlated with compute-intensive phases of completed ft_cgC job",
+    "solutions": [
+      "Verify if job had proper memory reservation parameters",
+      "Check for memory leaks in application code",
+      "Monitor swap usage patterns during similar future runs"
+    ]
+  },
+  {
+    "anomaly": "Increased context switches during peak load periods",
+    "root_causes": "Process scheduling overhead during parallel execution phases of completed job",
+    "solutions": [
+      "Review job's thread/core affinity settings",
+      "Check CPU scheduler configuration",
+      "Analyze per-process context switch metrics"
+    ]
+  }
+]

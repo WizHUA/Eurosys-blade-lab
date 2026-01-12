@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Gradual increase in CPU utilization from 30% to 83% during job execution with high user CPU time.",
+    "root_causes": "The 'ft_cgC' job is progressively consuming more CPU resources, likely due to computational workload ramping up or inefficient algorithm scaling.",
+    "solutions": [
+      "Monitor the job 'ft_cgC' specifically using 'top -p <pid>' to identify if it's the source of high CPU usage.",
+      "Check if the job has appropriate CPU limits set via cgroups or Slurm resource constraints.",
+      "Review the job's algorithm implementation for potential inefficiencies or resource leaks that cause escalating CPU usage over time."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity with write rates climbing from 240KB/s to 177MB/s.",
+    "root_causes": "The running job is generating substantial disk write operations, possibly due to frequent checkpointing, logging, or data output operations.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity.",
+      "Check if the job's output directory has sufficient space and optimal I/O performance characteristics.",
+      "Consider optimizing the job's I/O patterns by buffering writes or using faster storage for temporary files."
+    ]
+  },
+  {
+    "anomaly": "Progressive increase in system load from 1.77 to 4.88, approaching the system's core count limit.",
+    "root_causes": "The system is experiencing increasing resource contention as the job scales up its computational and I/O operations.",
+    "solutions": [
+      "Monitor the number of processes in various states using 'ps aux' to identify if processes are being blocked.",
+      "Check for I/O wait states that might be contributing to the high load average.",
+      "Consider job scheduling adjustments to prevent resource over-subscription during peak computational phases."
+    ]
+  }
+]

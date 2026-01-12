@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Memory pressure and swap usage spikes during computational workload",
+    "root_causes": "Job ft_cgC causing memory consumption spikes leading to increased swap usage and memory pressure",
+    "solutions": [
+      "Monitor memory consumption patterns of ft_cgC job to identify memory-intensive phases",
+      "Consider optimizing job parameters to reduce memory footprint",
+      "Increase physical memory allocation or adjust Slurm job constraints for memory-intensive workloads",
+      "Analyze memory usage patterns to determine if memory leaks are present in the application"
+    ]
+  },
+  {
+    "anomaly": "Elevated TCP retransmissions and timeouts during job execution",
+    "root_causes": "Network communication issues during MPI-intensive phases of ft_cgC job",
+    "solutions": [
+      "Check network infrastructure for congestion or hardware issues",
+      "Monitor network bandwidth utilization during MPI communication phases",
+      "Consider adjusting MPI implementation parameters for network reliability",
+      "Verify network interface statistics for errors or dropped packets"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure during specific job phases",
+    "root_causes": "Temporary spikes in disk activity caused by checkpointing or data staging operations",
+    "solutions": [
+      "Analyze I/O patterns to identify if data staging can be optimized",
+      "Consider using faster storage or parallel filesystems for temporary data",
+      "Check if disk caching strategies can be implemented to reduce I/O pressure",
+      "Verify if I/O can be more evenly distributed across the execution timeline"
+    ]
+  }
+]

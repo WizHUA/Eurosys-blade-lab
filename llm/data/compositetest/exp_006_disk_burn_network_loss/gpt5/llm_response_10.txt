@@ -1,0 +1,23 @@
+[
+  {
+    "anomaly": "Catastrophic memory exhaustion with swap depletion and OOM kills during the job window",
+    "root_causes": "The running job (ft_ftC) overcommitted memory: memory_usage_percent spiked to 96–99%, memory_available_bytes fell to 117 MB (2025-09-22 23:26:25), swap_free_bytes dropped to 28 KB (99.9987% used), and vm_oom_kills_total increased to 3 (23:26:10), triggering a swap storm and the OOM killer.",
+    "solutions": [
+      "Enforce Slurm memory limits (e.g., --mem) and cgroup memory.high/memory.max so jobs cannot exceed node RAM.",
+      "Reduce the job’s working set (smaller batches/chunking, free unused buffers) and profile memory to identify peak usage.",
+      "Run the job on a high-memory node/partition or increase node RAM if the workload inherently requires more memory.",
+      "Tune OS to reduce swap thrashing (e.g., lower vm.swappiness, set vm.overcommit_memory/overcommit_ratio to prevent excessive overcommit).",
+      "Review kernel logs (dmesg) and job logs around 23:26:10 to confirm OOM victims and adjust the application accordingly."
+    ]
+  },
+  {
+    "anomaly": "Severe disk I/O thrashing with high CPU iowait and blocked processes",
+    "root_causes": "Storage saturation coincided with memory pressure and swapping: disk_io_usage_percent rose up to 66.29%, disk_read/write rates reached 150–320 MB/s, total IOPS exceeded 3000, CPU_iowait_percent peaked at 17–27%, and processes_blocked increased to 17, indicating swap-driven I/O contention.",
+    "solutions": [
+      "Eliminate swap activity by resolving the memory exhaustion (limit job memory, move to high-memory nodes).",
+      "Stage job I/O to faster local storage (e.g., SSD/NVMe) and reduce I/O concurrency (limit threads, serialize large writes).",
+      "Use iostat -x 1 and iotop to identify processes causing heavy I/O and throttle them (e.g., cgroup blkio limits, ionice).",
+      "Verify storage health and configuration (queue depth, I/O scheduler) and ensure adequate bandwidth for the workload."
+    ]
+  }
+]

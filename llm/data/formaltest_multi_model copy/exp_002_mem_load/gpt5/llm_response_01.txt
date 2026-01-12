@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Transient severe memory pressure and overcommit with swap churn between 07:04:28–07:05:00",
+    "root_causes": "During the running Slurm job (ft_cgC), anonymous memory surged (memory_active_anon_bytes ≈ 4.66e9 at 07:04:28) and committed memory exceeded physical RAM (memory_committed_as_bytes ≈ 1.09e10 > 8.28e9), driving memory_free_bytes down to ≈5.71e8 and memory_available_bytes to ≈2.55e9. This coincided with high page fault rates (≈6.8k–7.7k/s), non-zero swap-in/out (page_swap_in_rate ≈ 7–9/s; page_swap_out_rate ≈ 164–169/s), and spikes in memory pressure waiting/stalled rates, indicating the node was memory-bound rather than CPU- or I/O-bound.",
+    "solutions": [
+      "Cap per-job memory via Slurm (--mem/--mem-per-cpu) and enforce cgroup memory.high and memory.max so allocations remain within node headroom.",
+      "Profile the job’s memory use (smaps, pmap, /proc/<pid>/status VMSwap, heap sampling) to identify allocation spikes and reduce peak footprint.",
+      "Review kernel overcommit policy (vm.overcommit_memory=2 and tuned vm.overcommit_ratio) to avoid committing far beyond physical RAM.",
+      "Maintain swap but prevent thrash: keep vm.swappiness modest (e.g., 10–20) and ensure sufficient free RAM headroom for background services.",
+      "Avoid colocating other memory-hungry jobs on this node during this phase (use Slurm exclusivity or higher per-node mem reservations)."
+    ]
+  },
+  {
+    "anomaly": "High steady baseline swap usage (~1.0 GiB used) even after memory pressure subsides",
+    "root_causes": "swap_free_bytes remains ~1.146e9 out of 2.147e9 across the window (≈46.6% swap used) while swap activity later falls near zero, indicating long-lived processes with pages resident in swap (idle or background services) rather than transient spikes.",
+    "solutions": [
+      "Identify processes with swapped pages (check VMSwap in /proc/*/status or use smem) and restart or relocate culprits if feasible.",
+      "Lower vm.swappiness (e.g., 10) to reduce aggressiveness of swapping idle pages on this node.",
+      "If policy allows, clear stale swap between job waves (swapoff -a && swapon -a during maintenance or node drain) or simply reboot to reset swap residency.",
+      "Set Slurm Prolog/Epilog checks to alert on persistent swap >30–40% so nodes can be cleaned before next allocations."
+    ]
+  },
+  {
+    "anomaly": "Node has recorded at least one OOM kill (vm_oom_kills_total=1; time unknown)",
+    "root_causes": "The kernel previously terminated a process due to memory exhaustion on this node (counter=1). Combined with observed overcommit spikes, this indicates real risk of recurrence under memory-intensive workloads.",
+    "solutions": [
+      "Audit kernel logs (dmesg/journalctl -k) to find the OOM timestamp, victim, and responsible cgroup/job; correlate with Slurm job history.",
+      "Enable strict Slurm/cgroup memory enforcement so the job is killed within its cgroup rather than system services (oom.group=1 where applicable).",
+      "Right-size job memory requests and reservations based on measured peaks; consider node-level memory headroom policy for MPI ranks.",
+      "Add monitoring/alerts on committed_as > physical RAM and rising page_faults/s to preemptively throttle or drain the node."
+    ]
+  }
+]

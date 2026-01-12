@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "CPU utilization spikes to over 70% with a sharp increase in system load, indicating a sudden computational workload.",
+    "root_causes": "CPU resource load from a computationally intensive process.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify the specific processes responsible for the high CPU usage.",
+      "Check system logs for any scheduled tasks or jobs that started around the anomaly time.",
+      "Review the completed job 'ft_cgC' as it was running during this period and may have contributed to the load."
+    ]
+  },
+  {
+    "anomaly": "Memory usage surges dramatically, with a significant drop in free memory and a sharp increase in cached memory.",
+    "root_causes": "Memory resource load from an application or process.",
+    "solutions": [
+      "Use 'free -h' and 'vmstat 1' to monitor memory usage and swapping activity.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "The increase in 'memory_cached_bytes' suggests a large file or dataset was read into memory."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity increases significantly, with high read and write rates and elevated I/O wait time.",
+    "root_causes": "Disk I/O load from file operations or swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk I/O.",
+      "Check if the increased I/O is related to the memory pressure and potential swapping.",
+      "Monitor 'disk_io_time_seconds_total' for sustained high values indicating a bottleneck."
+    ]
+  },
+  {
+    "anomaly": "Network activity shows a temporary spike in receive and transmit rates, though errors remain zero.",
+    "root_causes": "Network resource load from data transfer.",
+    "solutions": [
+      "Use 'nethogs' or 'iftop' to identify processes using network bandwidth.",
+      "Check if the spike correlates with any known data transfer tasks or job activities.",
+      "Monitor for sustained high usage which could indicate a network-intensive application."
+    ]
+  }
+]

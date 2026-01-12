@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with system memory usage climbing from 32% to 37% and cache usage spiking to over 60%.",
+    "root_causes": "Memory resource exhaustion due to intensive file system operations and aggressive page caching during the ft_cgC job execution.",
+    "solutions": [
+      "Monitor memory allocation patterns using 'vmstat 1' and identify if the job is creating excessive file system cache pressure.",
+      "Consider reducing the working set size of the ft_cgC job or implementing memory limits using cgroups.",
+      "Clear filesystem caches if safe to do so using 'echo 3 > /proc/sys/vm/drop_caches' after job completion.",
+      "Increase available swap space or optimize the job's memory access patterns to reduce cache thrashing."
+    ]
+  },
+  {
+    "anomaly": "Massive disk I/O bottleneck with write operations reaching over 500MB/s and I/O utilization exceeding 50%.",
+    "root_causes": "Disk I/O load from intensive write operations during the ft_cgC job, likely involving large data file generation or checkpoint writing.",
+    "solutions": [
+      "Use 'iotop' to confirm the ft_cgC job is the primary source of the write-heavy I/O pattern.",
+      "Consider implementing I/O throttling or scheduling the job during off-peak hours to reduce system impact.",
+      "Evaluate if the job can use faster storage (SSD) or implement asynchronous I/O to improve performance.",
+      "Monitor disk queue depth and consider increasing I/O scheduler optimization for write-heavy workloads."
+    ]
+  },
+  {
+    "anomaly": "CPU system time consumption increased dramatically from 1.2% to over 16%, indicating kernel overhead.",
+    "root_causes": "CPU resource load in kernel space due to intensive system calls related to memory management and I/O operations.",
+    "solutions": [
+      "Profile the application using 'perf' to identify specific system calls causing high kernel CPU usage.",
+      "Optimize the ft_cgC job to reduce system call frequency, particularly for file I/O and memory allocation operations.",
+      "Consider tuning kernel parameters related to I/O scheduling and memory management for compute-intensive workloads.",
+      "Monitor context switches and interrupts to ensure the high system CPU time is not due to excessive task switching."
+    ]
+  }
+]

@@ -1,0 +1,39 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with high iowait and queueing",
+    "root_causes": "During 23:17:55–23:19:40, disk_io_usage_percent stays elevated (60–87%) and cpu_iowait_percent spikes up to ~22.5%, with non-zero processes_blocked and very high read/write throughput; this indicates the running job (ft_cgC) is issuing heavy I/O and the node is stalling on storage.",
+    "solutions": [
+      "Use iotop or perf to identify the processes and files driving I/O; confirm write patterns and hotspots.",
+      "Throttle job I/O (ionice, cgroup blkio) or stage to faster local scratch/NVMe if available.",
+      "Distribute output across storage or batch writes to reduce sustained pressure.",
+      "Check disk health and scheduler queues (iostat -x 1) for abnormally high await/avgqu-sz while the job runs."
+    ]
+  },
+  {
+    "anomaly": "Active swapping and memory pressure causing swap I/O",
+    "root_causes": "Swap usage remains ~54% (swap_free ~0.98–0.99 GB of 2.0 GB) with large page_swap_in/out rates (up to ~181k swap-out/s and ~145k swap-in/s early), indicating memory demand exceeding RAM and frequent paging.",
+    "solutions": [
+      "Reduce the job's memory footprint (algorithm/config changes) or request more memory via scheduler limits.",
+      "Lower concurrency/threads to fit working set into RAM and avoid swapping.",
+      "Tune vm.swappiness conservatively and ensure per-job memory limits are enforced by cgroups to prevent node-wide swap thrash."
+    ]
+  },
+  {
+    "anomaly": "Filesystem near-capacity followed by abrupt free space change",
+    "root_causes": "Filesystem usage percent is critically high (94–98%) with available space as low as ~1.6–4.9 GB, then suddenly drops to ~73% with ~22 GB available at 23:19:40, consistent with large file creation followed by deletion or cleanup during the job.",
+    "solutions": [
+      "Move large temporary outputs to dedicated scratch with sufficient capacity and automatic cleanup.",
+      "Enforce per-job quotas and monitor filesystem usage to prevent near-full conditions.",
+      "Schedule cleanup (e.g., remove intermediates) after I/O bursts rather than mid-run to avoid cache churn."
+    ]
+  },
+  {
+    "anomaly": "Abrupt page cache eviction event",
+    "root_causes": "memory_cached_bytes collapses from ~5.1 GB to ~0.34 GB at 23:19:40 while memory_free_bytes jumps to ~5.3 GB, indicating large cache eviction likely due to mass file deletion or aggressive reclaim, which can amplify subsequent I/O and iowait.",
+    "solutions": [
+      "Avoid bulk deletions or cache-dropping during active phases; defer cleanup to job end or low-load windows.",
+      "Review application workflow to minimize cache-thrashing (e.g., reuse buffers, stream I/O).",
+      "Verify no external drop_caches operations are triggered on busy nodes; adjust vfs_cache_pressure if administratively set too high."
+    ]
+  }
+]

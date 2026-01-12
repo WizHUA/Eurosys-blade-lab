@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with system transitioning from normal to critical memory state.",
+    "root_causes": "Memory resource exhaustion caused by intensive workload from job 'ft_cgC' consuming excessive amounts of RAM.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to identify if it has memory leaks or inefficient memory allocation.",
+      "Consider increasing available memory or implementing memory limits for compute jobs to prevent system-wide impact.",
+      "Check if the job requires more memory than allocated and adjust resource allocation accordingly.",
+      "Implement memory monitoring alerts to catch such scenarios before they become critical."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O pressure with utilization reaching over 50% and massive write operations.",
+    "root_causes": "Disk I/O load caused by combination of heavy swapping due to memory pressure and intensive disk writes from the compute job.",
+    "solutions": [
+      "The disk write rate escalated dramatically to over 400MB/s indicating either data output from the job or swap activity.",
+      "Use 'iotop' to identify specific processes causing the high I/O load and determine if it's job-related or swap-related.",
+      "Consider faster storage solutions or I/O scheduling optimization for compute-intensive workloads.",
+      "Resolve the memory pressure issue to reduce swap-related I/O activity."
+    ]
+  },
+  {
+    "anomaly": "CPU usage climbed to over 90% with high system overhead and increasing blocked processes.",
+    "root_causes": "CPU resource load from compute-intensive job combined with system overhead from memory management and I/O operations.",
+    "solutions": [
+      "The presence of blocked processes (reaching 2) indicates I/O waiting, confirming the storage bottleneck.",
+      "Monitor CPU usage breakdown to determine if the high system percentage is due to memory management or I/O wait.",
+      "Consider CPU throttling or job scheduling policies to prevent single jobs from monopolizing system resources.",
+      "Optimize the compute job's resource usage patterns or consider running it on nodes with better resource allocation."
+    ]
+  }
+]

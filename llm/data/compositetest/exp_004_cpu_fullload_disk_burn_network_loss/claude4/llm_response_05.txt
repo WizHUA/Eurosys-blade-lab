@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time indicating severe storage bottleneck during job completion phase.",
+    "root_causes": "Disk I/O load caused by intensive write operations as the job 'ft_cgC' completes and flushes results to storage.",
+    "solutions": [
+      "Monitor disk utilization with 'iostat -x 1' to identify which storage devices are saturated.",
+      "Use 'iotop' to identify specific processes causing the high I/O load during job completion.",
+      "Consider implementing faster storage solutions or distributed I/O to handle large result datasets.",
+      "Review job output patterns to optimize data writing strategies and reduce I/O peaks during completion."
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with filesystem cache dominating memory usage during job execution.",
+    "root_causes": "Memory resource load from large filesystem cache usage as the job processes substantial amounts of data.",
+    "solutions": [
+      "The filesystem cache usage reached over 60% of total memory, indicating heavy file I/O operations.",
+      "Monitor memory pressure indicators and consider tuning vm.dirty_ratio and vm.dirty_background_ratio parameters.",
+      "Review the job's data access patterns to optimize memory usage and reduce cache pressure.",
+      "Consider increasing available memory or implementing more efficient data processing algorithms."
+    ]
+  },
+  {
+    "anomaly": "Elevated context switching and interrupt rates indicating system overhead during intensive computation.",
+    "root_causes": "CPU scheduling overhead from high computational load and frequent system calls during the 'ft_cgC' job execution.",
+    "solutions": [
+      "Context switch rate peaked above 2100 switches per second, indicating potential CPU scheduling inefficiency.",
+      "Review CPU affinity settings for the job to reduce unnecessary context switching.",
+      "Monitor interrupt distribution across CPU cores with 'cat /proc/interrupts' to identify potential imbalances.",
+      "Consider job scheduling optimizations to reduce system overhead during intensive computation phases."
+    ]
+  }
+]

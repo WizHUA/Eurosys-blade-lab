@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Node is experiencing severe memory pressure and swapping activity during job execution.",
+    "root_causes": "Memory resource exhaustion with swap usage at 54% and high page swap-in/swap-out rates indicating active memory swapping.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' to confirm swapping activity shown by swap_in_rate and swap_out_rate values.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to determine which applications are consuming excessive RAM.",
+      "Consider increasing available memory or optimizing application memory usage as the node has dropped to only 226MB free memory.",
+      "Review the completed job 'ft_cgC' memory requirements and consider memory limits or node allocation changes for similar workloads."
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time indicating storage performance bottleneck during intensive workload.",
+    "root_causes": "Disk I/O congestion with consistently high I/O wait percentages (up to 22%) and elevated disk utilization reaching 87%.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load causing the bottleneck.",
+      "Monitor disk queue depth and latency using 'iostat -x 1' to assess storage subsystem performance.",
+      "The high write rates (up to 214MB/s) combined with memory pressure suggest swapping is contributing significantly to I/O load.",
+      "Consider storage optimization or workload scheduling to reduce concurrent I/O-intensive operations."
+    ]
+  },
+  {
+    "anomaly": "Filesystem usage has reached critically high levels during job execution.",
+    "root_causes": "Storage space depletion with filesystem usage climbing from 94% to over 98%, indicating near-capacity conditions.",
+    "solutions": [
+      "Immediately check available disk space using 'df -h' and identify large files or directories consuming space.",
+      "Clean up temporary files, logs, or job output files that may be accumulating during intensive workloads.",
+      "Monitor job output and temporary file creation patterns to prevent future space exhaustion.",
+      "Consider implementing disk space monitoring alerts when usage exceeds 90% to prevent job failures."
+    ]
+  }
+]

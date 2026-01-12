@@ -1,0 +1,23 @@
+[
+  {
+    "anomaly": "Transient memory overcommit with swapping burst around 07:04:28",
+    "root_causes": "While job 276 (ft_cgC) was running, memory_committed_as_bytes jumped from ~7.52 GB to ~10.91 GB at 07:04:28, exceeding physical RAM (8.28 GB). In the same interval, memory_available_bytes fell sharply (5.49 GB -> 2.55 GB), memory_usage_percent rose (33.6% -> 69.2%), and swap activity appeared (page_swap_in_rate ~8.87/s, page_swap_out_rate ~164.07/s). This indicates the workload temporarily overcommitted memory, causing paging.",
+    "solutions": [
+      "Enforce per-job memory limits in Slurm (e.g., --mem/--mem-per-cpu) and enable memory cgroup enforcement to prevent node-wide overcommit.",
+      "Review the job (276 ft_cgC) memory footprint: capture RSS/VSZ over time (ps, top, smem, pmap) to identify spikes or leaks.",
+      "Tune kernel overcommit policy if appropriate (e.g., vm.overcommit_memory=2 and a suitable vm.overcommit_ratio) to reduce risk of overcommit-induced swapping.",
+      "If unavoidable, provision additional swap or adjust vm.swappiness to balance swap behavior, and consider adding RAM on nodes frequently hitting overcommit.",
+      "Add monitoring alerts for memory_committed_as_bytes > memory_total_bytes and non-zero page_swap_{in,out}_rate to catch future incidents early."
+    ]
+  },
+  {
+    "anomaly": "Brief increase in TCP retransmissions and SYN retransmissions (07:04:28–07:05:13)",
+    "root_causes": "tcp_retransmissions_rate rose from ~0 to ~0.33/s with tcp_syn_retrans_rate > 0 during 07:04:28–07:04:58, then tapered (~0.25/s at 07:05:13). Network throughput remained low, suggesting transient packet loss or link hiccup rather than saturation.",
+    "solutions": [
+      "Inspect NIC and driver counters (ethtool -S, dmesg) and switch port logs around 07:04:28–07:05:13 for errors, resets, or flaps.",
+      "Verify cabling and link stability (speed/duplex autoneg results) and ensure firmware/driver versions are current.",
+      "Enable/validate ECN, appropriate MTU, and QoS policies if applicable to reduce loss on bursty traffic.",
+      "Add observability: alert on tcp_retransmissions_rate and tcp_syn_retrans_rate deviations from baseline to catch intermittent network faults."
+    ]
+  }
+]

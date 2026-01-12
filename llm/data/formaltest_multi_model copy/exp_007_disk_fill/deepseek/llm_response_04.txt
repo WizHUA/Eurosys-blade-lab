@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Sudden spike in TCP retransmissions despite completed MPI job",
+    "root_causes": "Network congestion or residual connection cleanup processes after MPI job completion",
+    "solutions": [
+      "Check for network interface errors (drops/errors) that persisted after job completion",
+      "Analyze whether job cleanup procedures properly terminated all network connections",
+      "Monitor TCP buffer sizes (net.ipv4.tcp_mem) for potential exhaustion during cleanup"
+    ]
+  },
+  {
+    "anomaly": "Unexpected memory pressure fluctuations post-job completion",
+    "root_causes": "Memory leak in application or incomplete cleanup of MPI shared memory segments",
+    "solutions": [
+      "Check for orphaned shared memory segments (ipcs -a)",
+      "Verify application correctly released all allocated memory before exit",
+      "Monitor memory pressure trends to detect if issue persists beyond job runtime"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O during post-job period",
+    "root_causes": "Application cleanup or logging activities continuing after job completion",
+    "solutions": [
+      "Check for large temporary files not properly cleaned by the application",
+      "Review system logs for post-job activity patterns",
+      "Verify job epilogue scripts are not unexpectedly intensive"
+    ]
+  }
+]

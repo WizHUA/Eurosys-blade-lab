@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion with swap saturation and OOM kills during job 285 (ft_ftC).",
+    "root_causes": "The node experienced a sharp drop in memory_available_bytes (to ~117 MB) and swap_free_bytes (down to ~28 KB), swap_usage_percent peaked (~100%), and vm_oom_kills_total increased (from 3 to 5). Anon and committed memory surged (memory_active_anon_bytes >5 GB; memory_committed_as_bytes >13 GB), indicating the running job oversubscribed memory, triggering heavy swapping and out-of-memory events.",
+    "solutions": [
+      "Enforce accurate Slurm memory requests (e.g., --mem) and enable cgroup memory enforcement to cap job memory.",
+      "Inspect kernel logs (dmesg) for OOM killer entries around 23:26–23:27 and identify offending processes from job 285.",
+      "Reduce the job’s memory footprint (problem size, batching, algorithm tuning) or schedule it on higher-memory nodes.",
+      "Tune memory overcommit (e.g., set vm.overcommit_memory=2 and adjust vm.overcommit_ratio) to prevent excessive committed_as growth.",
+      "As a temporary mitigation, add or relocate swap to a faster device to reduce stall severity, but prioritize fixing memory sizing."
+    ]
+  },
+  {
+    "anomaly": "Extreme disk I/O thrashing with high CPU iowait and blocked processes.",
+    "root_causes": "Heavy swapping caused sustained disk_read/write_rate spikes (read ~150–320 MB/s, write ~115–180 MB/s), disk_io_usage_percent rose to 54–66%, cpu_iowait_percent jumped to 13–27%, and processes_blocked peaked at 17. This pattern is consistent with swap thrash and paging pressure during the job’s memory spike.",
+    "solutions": [
+      "Resolve the memory pressure (see above) to stop swap-induced I/O thrash.",
+      "Use iostat/iotop to confirm top I/O contributors and correlate with job 285 processes.",
+      "Apply cgroup blkio limits to throttle pathological I/O, and ensure job scratch paths are on performant local storage.",
+      "Reduce vm.swappiness to limit aggressive swapping once memory sizing is corrected."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmission spike around 23:26:40.",
+    "root_causes": "node_netstat_Tcp_RetransSegs and TcpExt_TCPSynRetrans showed non-zero spikes while overall network throughput remained low, suggesting brief network instability or connection churn concurrent with heavy system pressure.",
+    "solutions": [
+      "Check NIC and switch port statistics (ethtool -S, switch logs) for errors or drops during 23:26–23:27.",
+      "Verify consistent MTU and driver/firmware status; reseat or replace cabling if errors are observed.",
+      "Monitor TCP counters over time; if retrans spikes recur, isolate noisy neighbors or enable QoS to prevent collateral impact."
+    ]
+  }
+]

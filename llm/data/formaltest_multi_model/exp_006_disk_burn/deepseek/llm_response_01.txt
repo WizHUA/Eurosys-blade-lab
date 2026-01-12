@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU system time percentage spiked to 17.78% indicating kernel overhead",
+    "root_causes": "Increased kernel mode CPU usage suggests system call overhead or interrupt handling issues during job execution",
+    "solutions": [
+      "Investigate system calls using 'strace -c -p <pid>' on active processes",
+      "Check interrupt distribution with 'cat /proc/interrupts' for imbalance",
+      "Monitor kernel worker threads with 'ps -eo pid,comm,psr,pcpu | grep kworker'"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure causing significant cache usage (74.84%) and IO wait increase",
+    "root_causes": "Memory-intensive workload pushing system into heavy caching and IO wait states",
+    "solutions": [
+      "Analyze memory allocation patterns of completed ft_cgC job using 'slurm job statistics'",
+      "Review memory usage telemetry during job execution peaks",
+      "Consider optimizing job memory allocation or implementing data partitioning"
+    ]
+  },
+  {
+    "anomaly": "Disk IO throughput surged to 587MB/s write rates during job execution",
+    "root_causes": "High disk IO activity from checkpointing or temporary file operations",
+    "solutions": [
+      "Verify filesystem cache performance with 'free -m' and 'sar -r'",
+      "Check for unflushed disk writes using '/proc/meminfo dirty/writeback metrics'",
+      "Consider using tmpfs or ramdisk for temporary files in future runs"
+    ]
+  }
+]

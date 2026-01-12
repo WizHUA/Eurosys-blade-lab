@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time, indicating a severe storage bottleneck.",
+    "root_causes": "Disk I/O load, likely caused by intensive read/write operations.",
+    "solutions": [
+      "The 'cpu_iowait_percent' metric reaches 31.14%, indicating processes are spending significant time waiting for disk I/O.",
+      "Use 'iotop' to identify which processes are responsible for the intense disk read/write activity.",
+      "Check if the recently completed job 'ft_ftC' was performing heavy I/O operations that may have contributed to the bottleneck."
+    ]
+  },
+  {
+    "anomaly": "Node is under extreme memory pressure, with swap space nearly exhausted.",
+    "root_causes": "Memory resource load exceeding available physical RAM.",
+    "solutions": [
+      "The 'swap_free_bytes' metric drops to as low as 294,912 bytes (0.28 MB), indicating swap space is nearly exhausted.",
+      "Identify memory-heavy processes using 'ps aux --sort=-%mem'.",
+      "The 'memory_available_bytes' shows very low values, confirming severe memory pressure."
+    ]
+  },
+  {
+    "anomaly": "High system load with significant number of blocked processes.",
+    "root_causes": "System resource contention, particularly from I/O wait and memory pressure.",
+    "root_causes": "System resource contention, particularly from I/O wait and memory pressure.",
+    "solutions": [
+      "The 'processes_blocked' metric reaches 8, indicating processes are unable to proceed due to resource constraints.",
+      "The system load (load_1min up to 8.98) is extremely high for the system resources.",
+      "Addressing the primary I/O and memory issues should help reduce the number of blocked processes."
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with usage climbing from 33% to 73% during job execution.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job consuming excessive RAM, leading to increased memory pressure and reduced available memory.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to identify potential memory leaks or inefficient memory allocation",
+      "Consider implementing memory limits for jobs using cgroups or Slurm resource constraints",
+      "Increase physical memory on the node if this workload pattern is expected to continue",
+      "Review the job's memory requirements and optimize memory usage in the application code"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait time and increased disk activity during memory pressure period.",
+    "root_causes": "System experiencing I/O bottleneck likely caused by memory pressure forcing the system to use swap space or increased paging activity.",
+    "solutions": [
+      "Monitor swap usage and paging activity using 'vmstat' to confirm if swapping is occurring",
+      "Consider adding faster storage (SSD) for swap if memory pressure cannot be avoided",
+      "Optimize the job's I/O patterns to reduce disk access frequency",
+      "Implement I/O scheduling policies to prioritize critical system processes during high memory usage"
+    ]
+  },
+  {
+    "anomaly": "Elevated CPU system time percentage during the latter part of job execution.",
+    "root_causes": "Increased kernel overhead likely due to memory management activities, page fault handling, and I/O operations during memory pressure.",
+    "solutions": [
+      "Use 'perf' or similar profiling tools to identify specific kernel functions consuming CPU time",
+      "Monitor page fault rates and major faults to understand memory management overhead",
+      "Consider tuning kernel memory management parameters if this becomes a recurring issue",
+      "Review job scheduling to avoid running memory-intensive jobs simultaneously"
+    ]
+  }
+]

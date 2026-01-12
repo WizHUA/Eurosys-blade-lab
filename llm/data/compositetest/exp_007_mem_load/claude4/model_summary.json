@@ -1,0 +1,99 @@
+{
+  "model_short_name": "claude4",
+  "model_full_name": "anthropic/claude-sonnet-4",
+  "total_runs": 10,
+  "successful_runs": 10,
+  "success_rate": "100.0%",
+  "results": [
+    {
+      "run_id": 1,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_01.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T00:59:57.291192"
+    },
+    {
+      "run_id": 2,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_02.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:00:12.182046"
+    },
+    {
+      "run_id": 3,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_03.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:00:31.040466"
+    },
+    {
+      "run_id": 4,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_04.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:00:50.011523"
+    },
+    {
+      "run_id": 5,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_05.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:01:06.524232"
+    },
+    {
+      "run_id": 6,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_06.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:01:23.551955"
+    },
+    {
+      "run_id": 7,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_07.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:01:40.409769"
+    },
+    {
+      "run_id": 8,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_08.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:01:58.071066"
+    },
+    {
+      "run_id": 9,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_09.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:02:14.749617"
+    },
+    {
+      "run_id": 10,
+      "success": true,
+      "anomaly_count": 3,
+      "response_file": "llm_response_10.txt",
+      "cleaned_file": null,
+      "was_cleaned": false,
+      "timestamp": "2025-09-23T01:02:32.759141"
+    }
+  ]
+}

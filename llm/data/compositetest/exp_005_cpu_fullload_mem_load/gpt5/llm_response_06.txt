@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Acute memory pressure with heavy swapping and cache eviction during the job window.",
+    "root_causes": "The running job 'ft_cgC' drove anonymous memory usage above 6 GB, dropping memory_available_bytes to ~0.61 GB (23:24:40–23:25:10). This triggered very high swap in/out activity and page faults, along with a sharp reduction of page cache, indicating memory overcommit and active reclaim.",
+    "solutions": [
+      "Increase the Slurm memory request for this job (--mem/--mem-per-cpu) to cover observed peaks, or enforce per-job memory cgroup limits to prevent node-wide swapping.",
+      "Lower swapping pressure (e.g., tune vm.swappiness) and ensure sufficient free RAM headroom before dispatching similar jobs.",
+      "Instrument the job's memory usage over time (e.g., cgroup memory.current, /proc/<pid>/smaps_rollup) to confirm peaks and optimize the application’s memory footprint.",
+      "Avoid co-scheduling other memory-intensive workloads on the same node during this job, or allocate the node exclusively while diagnosing.",
+      "If this pattern recurs across nodes, consider increasing node RAM capacity or splitting the workload to reduce peak memory."
+    ]
+  },
+  {
+    "anomaly": "High disk I/O saturation correlated with swapping, followed by sharp decline once memory pressure eased.",
+    "root_causes": "During peak memory pressure, disk_io_usage_percent spiked (≈59–70%) with high read/write throughput (up to ~272 MB/s read and ~139 MB/s write) and large swap traffic; as swapping subsided, disk I/O load fell to low levels.",
+    "solutions": [
+      "Primary: resolve the memory pressure to reduce swap I/O (see memory-related actions).",
+      "Use iostat/iotop/pidstat -d to identify offending processes and I/O patterns during the job’s intensive phase.",
+      "Direct temporary files to fast local scratch and ensure adequate free space to reduce contention on the main filesystem.",
+      "Tune I/O stack where appropriate (e.g., readahead size, scheduler) after confirming access patterns."
+    ]
+  },
+  {
+    "anomaly": "Filesystem capacity briefly near critical levels at the start of the window.",
+    "root_causes": "filesystem_usage_percent was ~89–90% (only ~8.8 GB free) early in the interval and later dropped to ~73%, consistent with the job creating and then removing sizable data.",
+    "solutions": [
+      "Maintain operational headroom (e.g., >10–20% free) by cleaning stale data or expanding capacity to avoid performance degradation when near full.",
+      "Add pre- and post-job cleanup steps to remove temporary data promptly.",
+      "Set monitoring and alerts on filesystem usage to act before crossing critical thresholds.",
+      "Where possible, stage large temporary outputs to a high-capacity scratch area separate from the main filesystem."
+    ]
+  }
+]

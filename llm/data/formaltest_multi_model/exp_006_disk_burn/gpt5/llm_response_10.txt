@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Severe and sustained disk I/O saturation with rising CPU system/iowait and task I/O pressure",
+    "root_causes": "During the running job (276: ft_cgC), disk throughput jumped from ~0.6 MB/s to 300–590 MB/s reads and 120–200 MB/s writes, disk_io_usage_percent rose from ~0.06% to ~60%, io_pressure waiting/stalled rates increased, and cpu_system% and cpu_iowait% climbed (system up to ~18%, iowait up to ~4.9%). Occasional blocked processes appeared, indicating the single node disk is the bottleneck.",
+    "solutions": [
+      "Throttle the job’s I/O using cgroups (cgroup v2 io.max or legacy blkio.throttle.*) to cap throughput/IOPS during heavy phases.",
+      "If available, place scratch/data on faster storage (e.g., local NVMe or a higher-bandwidth filesystem) or stage I/O to burst buffers.",
+      "Batch and align I/O: use larger sequential writes/reads, reduce the number of concurrent writers, and avoid small random I/O.",
+      "Tune per-job readahead (blockdev --setra) and consider O_DIRECT only if the workload benefits from bypassing page cache.",
+      "Monitor the device with iostat and check disk health (e.g., smartctl) to rule out underlying media issues."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space swings with utilization peaking around 85–86% during the job window",
+    "root_causes": "High write bursts from the running job increased filesystem_usage_percent from ~73% to ~86% within minutes, then fluctuated as data was flushed/rotated, indicating heavy temporary or checkpoint I/O.",
+    "solutions": [
+      "Verify the job’s output and temporary directories; purge or rotate intermediate files more aggressively.",
+      "Enforce per-job/project quotas and clean up scratch after completion to prevent sudden capacity exhaustion.",
+      "If space pressure persists, provision additional capacity for the target filesystem or redirect large outputs to a volume with more headroom."
+    ]
+  },
+  {
+    "anomaly": "Apparent low free memory (free dropped to ~128–296 MB) without real memory pressure",
+    "root_causes": "Kernel page cache growth from intensive file I/O drove free memory down while memory_available remained high (~5.3–6.5 GB) and swap activity stayed minimal, indicating caching rather than exhaustion.",
+    "solutions": [
+      "No immediate action required: page cache will be reclaimed as needed; track memory_available rather than memory_free for alerts.",
+      "If cache competes with workloads, consider moderating dirty writeback (vm.dirty_*), or drop_caches between batch phases (echo 3 > /proc/sys/vm/drop_caches) during maintenance windows.",
+      "Prefer sequential I/O patterns to make cache behavior more efficient and predictable."
+    ]
+  },
+  {
+    "anomaly": "Persistently high swap utilization (~46% of 2 GB) despite ample available RAM",
+    "root_causes": "Swap usage remains steady while memory_available is multi‑GB and swap in/out rates are near zero, suggesting long‑lived cold pages were swapped earlier and never reclaimed (swappiness or past activity), not current pressure.",
+    "solutions": [
+      "Lower vm.swappiness to reduce future paging of cold memory for latency‑sensitive workloads.",
+      "Reclaim unused swap during a maintenance window (swapoff -a && swapon) to repatriate cold pages.",
+      "Audit long‑running background services that may have swapped pages and ensure job cgroup memory/swap settings match policy (e.g., memory.swap.max for critical jobs)."
+    ]
+  }
+]

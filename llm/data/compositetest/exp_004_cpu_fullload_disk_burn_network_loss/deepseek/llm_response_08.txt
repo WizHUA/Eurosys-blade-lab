@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap usage exceeding 50%",
+    "root_causes": "Memory-intensive job (ft_cgC) causing heavy paging and swap activity",
+    "solutions": [
+      "Increase available physical memory allocation for memory-intensive jobs",
+      "Optimize application memory usage patterns",
+      "Monitor and limit swap usage for critical jobs"
+    ]
+  },
+  {
+    "anomaly": "Sustained high disk I/O utilization (peaking at 50%+ IOPS)",
+    "root_causes": "Page swapping activity due to memory pressure and application I/O patterns",
+    "solutions": [
+      "Analyze and optimize the job's I/O patterns",
+      "Consider using faster storage for swap/paging operations",
+      "Adjust kernel swappiness parameters"
+    ]
+  },
+  {
+    "anomaly": "CPU system time spiking to 16.47% (unusually high for system processes)",
+    "root_causes": "Kernel overhead from managing high memory pressure and swap operations",
+    "solutions": [
+      "Monitor kernel thread activity (kswapd, pdflush)",
+      "Review system call profiles for optimization opportunities",
+      "Consider upgrading to a kernel with better memory management features"
+    ]
+  }
+]

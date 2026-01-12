@@ -1,0 +1,116 @@
+{
+  "experiment_name": "exp_003_mem_load",
+  "timestamp": "2025-09-22T15:39:59.289627",
+  "models_tested": [
+    "claude4"
+  ],
+  "runs_per_model": 10,
+  "fewshot_files_used": [
+    "shot1.txt",
+    "shot2.txt",
+    "shot3.txt",
+    "shot4.txt",
+    "shot5.txt"
+  ],
+  "results": {
+    "claude4": {
+      "model_short_name": "claude4",
+      "model_full_name": "anthropic/claude-sonnet-4",
+      "total_runs": 10,
+      "successful_runs": 10,
+      "success_rate": "100.0%",
+      "results": [
+        {
+          "run_id": 1,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_01.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:38:02.683095"
+        },
+        {
+          "run_id": 2,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_02.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:38:16.863529"
+        },
+        {
+          "run_id": 3,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_03.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:38:30.124096"
+        },
+        {
+          "run_id": 4,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_04.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:38:42.802292"
+        },
+        {
+          "run_id": 5,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_05.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:38:55.025631"
+        },
+        {
+          "run_id": 6,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_06.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:39:08.720055"
+        },
+        {
+          "run_id": 7,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_07.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:39:23.149222"
+        },
+        {
+          "run_id": 8,
+          "success": true,
+          "anomaly_count": 1,
+          "response_file": "llm_response_08.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:39:32.749967"
+        },
+        {
+          "run_id": 9,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_09.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:39:46.102597"
+        },
+        {
+          "run_id": 10,
+          "success": true,
+          "anomaly_count": 2,
+          "response_file": "llm_response_10.txt",
+          "cleaned_file": null,
+          "was_cleaned": false,
+          "timestamp": "2025-09-22T15:39:59.287351"
+        }
+      ]
+    }
+  }
+}

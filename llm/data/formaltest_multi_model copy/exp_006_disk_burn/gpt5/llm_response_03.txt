@@ -1,0 +1,36 @@
+[
+  {
+    "anomaly": "Severe swap storm and disk I/O saturation starting around 07:12:28 during job 276 (ft_cgC).",
+    "root_causes": "Memory pressure and aggressive page cache growth triggered heavy reclaim and swapping: memory_free_bytes fell to ~128 MB while memory_inactive_file_bytes and memory_cached_bytes surged (>4.8–6.2 GB). This caused page_swap_in_rate to spike (~145k pages/s) and page_swap_out_rate (~69k pages/s), driving disk_read/write rates to 300–587 MB/s and 130–198 MB/s and pushing disk_io_usage_percent to ~60%.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., sysctl vm.swappiness=10) to reduce swapping under cache pressure.",
+      "Constrain job memory via Slurm (e.g., --mem/--mem-per-cpu) or cgroups (memory.max/memory.high) to keep anonymous memory within RAM.",
+      "Use direct I/O or advise the kernel to drop cache for streaming phases (O_DIRECT or posix_fadvise(..., DONTNEED)).",
+      "Move job scratch/data to faster local/NVMe storage or a less contended filesystem; ensure sufficient swap is on fast media.",
+      "Tune writeback to avoid large dirty spikes (sysctl vm.dirty_background_ratio=5 vm.dirty_ratio=20).",
+      "Profile the working set; reduce in-memory footprint (smaller batch sizes, tiling, checkpointing) to avoid reclaim thrash."
+    ]
+  },
+  {
+    "anomaly": "Excessive kernel/system CPU and I/O wait due to reclaim, page faults, and writeback.",
+    "root_causes": "cpu_system_percent rose from ~0.9% to ~17.8% and cpu_iowait_percent to ~4.9% as context_switches_rate and interrupts_rate climbed, coinciding with high page_faults_rate and large disk I/O. The kernel spent substantial time in reclaim, swap, and block I/O paths.",
+    "solutions": [
+      "Identify hot paths with perf (perf top/record) during workload to confirm reclaim/page fault dominance.",
+      "Reduce page fault pressure by using larger, sequential I/O and reusing buffers; consider disabling THP if it exacerbates faults for this workload.",
+      "Pin critical files into memory or use mmap with MADV_WILLNEED/DONTNEED appropriately to manage residency.",
+      "Separate metadata and data I/O or isolate the job on nodes with local SSDs to cut I/O wait.",
+      "Limit concurrent I/O depth from the application (tune thread count, I/O queue depth) to prevent kernel contention."
+    ]
+  },
+  {
+    "anomaly": "Very low free memory with runaway file cache and dirty pages, creating reclaim pressure.",
+    "root_causes": "memory_free_bytes dropped to ~127–296 MB while memory_cached_bytes and memory_inactive_file_bytes ballooned (>5–6 GB) and memory_dirty_bytes spiked (up to ~72 MB), indicating heavy caching and writeback that squeezed free memory and triggered reclaim.",
+    "solutions": [
+      "Throttle cache growth for streaming workloads: use O_DIRECT or posix_fadvise(DONTNEED) after sequential reads/writes.",
+      "Tune readahead down for non-reusable data (blockdev --setra) to avoid overfilling cache.",
+      "If appropriate, periodically drop cold cache (echo 1 > /proc/sys/vm/drop_caches) between phases of batch jobs.",
+      "Increase node RAM or request a higher memory allocation in Slurm for this job profile.",
+      "For shared filesystems, stage data to local scratch and write back in controlled batches to limit dirty pages."
+    ]
+  }
+]

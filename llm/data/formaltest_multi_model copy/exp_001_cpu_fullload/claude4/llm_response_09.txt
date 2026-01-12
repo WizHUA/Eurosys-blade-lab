@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "CPU utilization escalated dramatically from 30% to 83% during job execution with extremely high user CPU consumption.",
+    "root_causes": "Computationally intensive workload from the 'ft_cgC' job consuming excessive CPU resources and causing system performance degradation.",
+    "solutions": [
+      "Monitor the specific processes spawned by the 'ft_cgC' job using 'top' or 'htop' to identify CPU-intensive operations.",
+      "Consider implementing CPU resource limits using cgroups or Slurm job constraints to prevent single jobs from monopolizing system resources.",
+      "Review the job's algorithm efficiency and consider optimizing computational workloads to reduce CPU intensity.",
+      "Evaluate if the workload can be distributed across multiple nodes to reduce per-node CPU load."
+    ]
+  },
+  {
+    "anomaly": "System load average increased significantly from 1.77 to 4.88, indicating severe resource contention.",
+    "root_causes": "High computational demand from the running job creating process queue buildup and resource contention on the 8-core system.",
+    "solutions": [
+      "The load average exceeding the number of CPU cores (8) indicates the system is oversubscribed.",
+      "Implement job scheduling policies to prevent overloading individual nodes.",
+      "Monitor process states using 'vmstat' to identify if processes are waiting for CPU or I/O resources.",
+      "Consider node-level resource reservations to maintain system responsiveness during intensive workloads."
+    ]
+  },
+  {
+    "anomaly": "Memory usage increased progressively with growing cache utilization and page fault activity.",
+    "root_causes": "Memory-intensive operations from the computational job leading to increased memory pressure and cache activity.",
+    "solutions": [
+      "Monitor memory allocation patterns of the 'ft_cgC' job to identify potential memory leaks or inefficient usage.",
+      "The increase in page faults (from 7785 to 6287 per second) suggests active memory management - monitor for potential swapping.",
+      "Implement memory limits for jobs to prevent system memory exhaustion.",
+      "Consider optimizing the job's memory access patterns to improve cache efficiency."
+    ]
+  }
+]

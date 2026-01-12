@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "Intense swap activity and IO thrashing despite substantial available memory.",
+    "root_causes": "During 07:13:43–07:13:58, page swapping was extremely high (page_swap_in_rate peaked >2.5e5/s and page_swap_out_rate >1.6e5/s) while memory_available_bytes remained ~5.5 GB and swap usage stayed ~46.6%. This pattern indicates aggressive memory reclamation or mis-tuned swappiness leading to swap churn rather than true RAM exhaustion. vm_oom_kills_total=1 also shows a recent kernel OOM event, consistent with prior memory pressure.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., to 1–10) and verify vm.vfs_cache_pressure to prevent unnecessary swapping under light pressure.",
+      "Audit kernel logs (dmesg, /var/log/kern.log) for OOM and kswapd activity around 07:13–07:14; correlate with job ft_cgC.",
+      "Inspect top memory consumers (ps/top) and cgroup memory limits for the job to ensure they are not forcing reclaim while free memory exists.",
+      "If feasible on compute nodes, disable swap or move to zram/zswap to reduce disk thrash.",
+      "Monitor page_faults_rate, page_swap_in/out_rate, and disk_io_usage_percent to confirm swap churn subsides after tuning."
+    ]
+  },
+  {
+    "anomaly": "Abrupt collapse of page cache and large write flush around 07:14:13.",
+    "root_causes": "memory_cached_bytes dropped from ~5.25 GB to ~0.53 GB and memory_free_bytes jumped from ~271 MB to ~5.27 GB at 07:14:13, while disk_write_rate spiked (~1.55e8 B/s) and disk_read_rate collapsed (~1.6e3 B/s). This is characteristic of a cache drop/large reclaim event (e.g., vm.drop_caches or aggressive reclaim), which can cause performance jitter for running jobs.",
+    "solutions": [
+      "Check if vm.drop_caches was triggered (auditd, shell history, automation) and avoid running it during active jobs.",
+      "Tune vm.vfs_cache_pressure and dirty_* ratios (vm.dirty_ratio/vm.dirty_background_ratio) to smooth writeback and prevent sudden cache eviction.",
+      "Coordinate periodic cleanup or cache management outside job windows; communicate with users if cleanup scripts run on compute nodes.",
+      "Verify application I/O patterns; if they force frequent fsync/sync, consider batching or using faster scratch."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space intermittently high (peaked at ~90.34% used, ~8.10 GB free) between 07:14:28–07:15:13.",
+    "root_causes": "Rapid swings in filesystem_avail_bytes (e.g., from ~22.35 GB to ~8.10 GB and back) indicate transient bursts of output or staging that push the filesystem near fullness, which can degrade metadata and write performance.",
+    "solutions": [
+      "Purge temporary files and old job artifacts; enforce per-job quotas on shared filesystems.",
+      "Redirect large scratch I/O to node-local storage if available; ensure jobs clean up on exit.",
+      "Set alerts for filesystem_usage_percent >85% to act before performance degrades."
+    ]
+  },
+  {
+    "anomaly": "Minor TCP instability observed (small spikes in retransmissions/timeouts around 07:14:43).",
+    "root_causes": "tcp_timeouts_rate briefly non-zero and tcp_retransmissions_rate ~0.03–0.16/s with node_netstat Tcp_RetransSegs increments indicate light packet loss or transient congestion; not severe but could add latency to tightly-coupled workloads.",
+    "solutions": [
+      "Verify interface and switch error counters; check for duplex/speed mismatches.",
+      "Capture NIC stats during jobs and correlate retransmissions with application phases.",
+      "If persistent, enable ECN or adjust queueing/QoS for bursty flows."
+    ]
+  }
+]

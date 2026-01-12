@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure causing system to use almost all available memory and swap space.",
+    "root_causes": "Memory resource exhaustion with usage at 99.6% and swap utilization at 99.99%, indicating severe memory shortage during job execution.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top'",
+      "Check if the completed job 'ft_ftC' had memory leaks or excessive memory allocation",
+      "Monitor swap activity with 'vmstat 1' to confirm active swapping",
+      "Consider increasing available memory or implementing memory limits for jobs"
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O subsystem overwhelmed with I/O wait reaching 53% of CPU time, likely caused by excessive swapping due to memory pressure.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O",
+      "Check disk utilization with 'iostat -x 1' to confirm storage bottleneck",
+      "The high swap activity (140GB+ swap in/out) is likely the primary cause of I/O pressure",
+      "Resolving memory pressure will significantly reduce I/O wait times"
+    ]
+  },
+  {
+    "anomaly": "System under severe resource pressure with blocked processes and high context switching.",
+    "root_causes": "Resource contention causing up to 13 blocked processes and context switch rates exceeding 12,000 per second.",
+    "solutions": [
+      "Monitor process states with 'ps aux' to identify blocked processes",
+      "The high number of blocked processes (up to 13) indicates resource contention",
+      "Context switch rate of 12,000+ per second suggests system thrashing",
+      "Address memory and I/O pressure to reduce resource contention"
+    ]
+  }
+]

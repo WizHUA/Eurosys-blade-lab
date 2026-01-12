@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization with significant system load",
+    "root_causes": "CPU resource load from computational processes, evidenced by high user CPU time and system load averages",
+    "solutions": [
+      "Analyze process-level CPU usage with 'top' or 'pidstat' to identify specific offenders",
+      "Check for CPU-bound processes in the job's application code that may be inefficient",
+      "Consider adjusting CPU affinity settings for better core utilization"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with active swapping",
+    "root_causes": "Memory resource load causing page swapping despite available cache",
+    "solutions": [
+      "Monitor 'si/so' columns in 'vmstat 1' to quantify swap activity",
+      "Review memory allocation patterns in the completed ft_cgC job",
+      "Consider increasing memory allocation or optimizing application memory usage"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure with high weighted time",
+    "root_causes": "Storage subsystem load from application I/O patterns",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk I/O",
+      "Check filesystem performance metrics for potential bottlenecks",
+      "Consider implementing I/O throttling if multiple jobs are competing for disk resources"
+    ]
+  }
+]

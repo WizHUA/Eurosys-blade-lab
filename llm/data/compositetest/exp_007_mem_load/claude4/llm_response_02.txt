@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage performance bottleneck.",
+    "root_causes": "Storage subsystem cannot keep up with I/O demands from the ft_ftC job, causing processes to wait extensively for disk operations.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes generating the highest I/O load and their access patterns.",
+      "Check storage array health, including disk utilization, queue depths, and any failed or degraded drives.",
+      "Consider moving I/O intensive workloads to faster storage tiers or implementing I/O scheduling optimizations.",
+      "Monitor filesystem performance and consider tuning mount options for better I/O performance."
+    ]
+  },
+  {
+    "anomaly": "Memory usage is critically high at 99% with active swapping occurring.",
+    "root_causes": "The ft_ftC job is consuming nearly all available physical memory, forcing the system to use swap space extensively.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'smem' tools.",
+      "The swap usage increasing from 98.5% to 99.98% indicates severe memory pressure requiring immediate attention.",
+      "Consider adding more physical memory to the node or implementing memory limits for jobs.",
+      "Review job memory requirements and ensure proper resource allocation in Slurm job submissions."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in blocked processes indicating resource contention.",
+    "root_causes": "Multiple processes are blocked waiting for resources, primarily I/O operations, creating a bottleneck.",
+    "solutions": [
+      "The processes_blocked count increased from 5 to 13, suggesting growing resource contention.",
+      "Use 'ps aux' to identify processes in 'D' (uninterruptible sleep) state that are waiting for I/O.",
+      "Consider implementing process priority adjustments or resource quotas to prevent resource starvation.",
+      "Monitor system load trends to identify if this is a recurring pattern with similar workloads."
+    ]
+  }
+]

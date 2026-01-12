@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Significant memory pressure observed with memory usage reaching 54% and swap usage at 46%",
+    "root_causes": "Memory-intensive computation from FT (Fourier Transform) workload causing high memory allocation and swap usage",
+    "solutions": [
+      "Monitor memory allocation patterns of the FT workload using tools like valgrind or memprof",
+      "Consider increasing memory allocation for the node or reducing problem size for memory-bound computations",
+      "Optimize memory usage in the application code to reduce swap utilization"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O activity with disk utilization reaching 77% during computation",
+    "root_causes": "FT computation generating substantial disk I/O from checkpointing or temporary files",
+    "solutions": [
+      "Verify if application can utilize RAM disks or tmpfs for temporary files",
+      "Check if disk I/O patterns can be optimized (larger block sizes, sequential access)",
+      "Consider using faster storage (SSD/NVMe) if available for temporary files"
+    ]
+  },
+  {
+    "anomaly": "CPU usage spikes to 95% with system load exceeding core count",
+    "root_causes": "Computationally intensive phases of FT algorithm causing CPU contention",
+    "solutions": [
+      "Evaluate parallelization efficiency of the FT implementation",
+      "Consider adjusting CPU affinity to reduce context switching overhead",
+      "Check for proper thread/core binding in MPI implementation"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High I/O wait percentage (peaking at 22.49%) and sustained high system load (8.37 at peak) despite moderate CPU usage",
+    "root_causes": "Disk I/O bottleneck likely caused by high disk writes during the ft_cgC job execution. The job completed during this monitoring period but left residual I/O pressure",
+    "solutions": [
+      "Check for competing I/O-intensive processes that may have run concurrently with ft_cgC",
+      "Review the job's I/O patterns to optimize file access strategies",
+      "Consider utilizing faster storage or implementing I/O caching"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high anonymous memory usage (peaking at 23.89% of total memory) and swap activity",
+    "root_causes": "Memory-intensive computations during the ft_cgC job execution, evidenced by high memory_committed_as_bytes values",
+    "solutions": [
+      "Profile the ft_cgC job's memory requirements",
+      "Consider optimizing memory usage in the application code",
+      "Allocate more memory resources for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "Inconsistent network performance with TCP retransmission rate spikes",
+    "root_causes": "Potential network congestion during job execution, though no active network-intensive job was running during these measurements",
+    "solutions": [
+      "Monitor network quality during future job executions",
+      "Investigate network infrastructure health and configuration",
+      "Consider adjusting TCP stack parameters for HPC workloads"
+    ]
+  }
+]

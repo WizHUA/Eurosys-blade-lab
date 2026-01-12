@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion causing system instability and performance degradation.",
+    "root_causes": "Memory resource load exceeding available physical RAM, leading to heavy swapping and memory pressure.",
+    "solutions": [
+      "Memory usage spiked from 33% to 73% during job execution, indicating excessive memory consumption by the ft_cgC job.",
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes and validate if job memory requirements exceed node capacity.",
+      "Review job submission parameters to ensure memory allocation requests are appropriate for the workload.",
+      "Consider implementing memory limits or cgroups to prevent jobs from consuming excessive system memory."
+    ]
+  },
+  {
+    "anomaly": "High system CPU time and context switching indicating kernel stress.",
+    "root_causes": "Kernel overhead from memory management operations and process scheduling under resource pressure.",
+    "solutions": [
+      "System CPU time increased significantly to over 4% during memory pressure events, indicating kernel stress.",
+      "Context switch rate peaked at over 1800/sec, suggesting excessive process scheduling overhead.",
+      "Monitor kernel logs for memory allocation failures or OOM killer activity using 'dmesg' and '/var/log/kern.log'.",
+      "Consider tuning kernel memory management parameters or reducing concurrent process load on the node."
+    ]
+  }
+]

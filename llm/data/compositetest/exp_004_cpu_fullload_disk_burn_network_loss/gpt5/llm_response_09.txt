@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "Severe memory pressure with sustained swap thrashing and near-zero free RAM during job runtime.",
+    "root_causes": "The running workload consumed more resident memory than physical RAM, triggering heavy swapping and page reclaim. Evidence: memory_free_bytes fell to ~200 MB, swap_usage_percent ~47.8% with massive page_swap_in_rate/page_swap_out_rate spikes (up to ~495,869/s in, ~186,329/s out), and cpu_iowait_percent rising to ~3.77%.",
+    "solutions": [
+      "Reduce the job's memory footprint (optimize data structures, chunk inputs, lower per-task memory).",
+      "Limit parallelism for the job (e.g., fewer ranks/threads) or request an appropriate --mem value in Slurm.",
+      "Set stricter cgroup memory limits for jobs to prevent node-wide thrashing and consider terminating jobs that exceed limits.",
+      "Tune vm.swappiness lower on compute nodes or disable swap for latency-sensitive nodes; if swap must be used, place it on fast local SSD.",
+      "Schedule memory-hungry workloads on nodes with more RAM or increase node memory capacity."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O saturation with rising queue depth and elevated CPU iowait.",
+    "root_causes": "Swap storms and heavy file I/O from the workload drove disk bandwidth and service time high. Evidence: disk_io_usage_percent climbed from <1% to ~55%, disk_read_rate_bytes_per_sec peaked >500 MB/s with write >180 MB/s, disk_io_now up to 30, and cpu_iowait_percent increased to ~3.8%.",
+    "solutions": [
+      "Address the upstream memory thrashing (see memory solutions) to cut swap traffic.",
+      "Move job scratch and intermediates to fast local SSDs; avoid writing large intermediates to slower/shared filesystems.",
+      "Profile I/O with iostat/iotop and optimize access patterns (larger sequential I/O, reduce random small I/O).",
+      "Evaluate I/O scheduler and filesystem mount options suitable for high-throughput workloads."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption during the window (usage ~73.36% to ~87.05%).",
+    "root_causes": "The job produced significant output or temporary data, rapidly increasing filesystem usage (filesystem_free_bytes dropped notably during the run).",
+    "solutions": [
+      "Direct temporary files and checkpoints to node-local scratch and clean them at job end.",
+      "Purge unneeded outputs, logs, and caches; enforce per-job quotas to prevent unexpected fill-ups.",
+      "Monitor filesystem usage trends and alert when growth exceeds thresholds to avoid out-of-space failures."
+    ]
+  },
+  {
+    "anomaly": "Transient TCP retransmission spike with SYN retransmits and timeouts around 23:22:25.",
+    "root_causes": "Host-side stalls under heavy I/O and memory pressure likely delayed TCP ACKs, causing brief retransmissions and SYN retries (node_netstat_Tcp_RetransSegs ~30/s, TCPSynRetrans ~6/s, TCPTimeouts ~15).",
+    "solutions": [
+      "Relieve the node’s swap/I/O contention (see above) to reduce network stack latency.",
+      "Check NIC and driver statistics (ethtool -S, dmesg) and switch port logs for errors during the spike.",
+      "Enable network monitoring for retransmit rate and latency; if persistent, consider QoS or isolating noisy I/O jobs from latency-sensitive traffic."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Memory pressure during job completion with increasing memory usage and buffer allocation",
+    "root_causes": "Memory resource load from job cleanup processes and buffer management during the ft_cgC job completion phase",
+    "solutions": [
+      "Monitor memory usage patterns during job completion phases to identify if this is a recurring issue",
+      "Check if the ft_cgC job has proper memory cleanup procedures in its exit routines",
+      "Review system logs for any memory-intensive cleanup processes that may be running after job completion",
+      "Consider implementing memory monitoring alerts for job completion phases"
+    ]
+  },
+  {
+    "anomaly": "Moderate disk I/O activity with inconsistent write patterns during job completion",
+    "root_causes": "Disk I/O load from job output writing and cleanup operations as the ft_cgC job completes",
+    "solutions": [
+      "Use 'iotop' to identify specific processes generating the disk write activity",
+      "Check if the completed job is writing large output files or performing cleanup operations",
+      "Monitor filesystem space to ensure adequate capacity for job output files",
+      "Review job scripts to optimize I/O patterns during completion phases"
+    ]
+  }
+]

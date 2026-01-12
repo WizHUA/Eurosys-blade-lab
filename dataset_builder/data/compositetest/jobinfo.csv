@@ -1,0 +1,5 @@
+JobID|JobName|NodeList|Submit|Start|End|State|ExitCode|Elapsed
+284|ft_cgC|wizhua-virtual-machine|2025-09-22T23:15:10|2025-09-22T23:15:10|2025-09-22T23:25:53|COMPLETED|0:0|00:10:43
+284.batch|batch|wizhua-virtual-machine|2025-09-22T23:15:10|2025-09-22T23:15:10|2025-09-22T23:25:53|COMPLETED|0:0|00:10:43
+285|ft_ftC|wizhua-virtual-machine|2025-09-22T23:15:10|2025-09-22T23:25:54|2025-09-22T23:32:14|COMPLETED|0:0|00:06:20
+285.batch|batch|wizhua-virtual-machine|2025-09-22T23:25:54|2025-09-22T23:25:54|2025-09-22T23:32:19|COMPLETED|0:15|00:06:25

@@ -1,0 +1,37 @@
+[
+  {
+    "anomaly": "Memory usage spikes from 31% to over 97%, indicating severe memory exhaustion.",
+    "root_causes": "Memory resource load from a memory-intensive application.",
+    "solutions": [
+      "Check the memory consumption of the recently completed job 'ft_ftC' which ran during this period.",
+      "Use 'free -h' and 'vmstat 1' to monitor swap usage and identify if the system is heavily swapping.",
+      "Review the job script for 'ft_ftC' to ensure it has appropriate memory limits and is not leaking memory."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O activity surges dramatically, with write rates exceeding 8 GB/s.",
+    "root_causes": "Disk I/O load from application activity, potentially exacerbated by memory pressure causing swapping.",
+    "solutions": [
+      "Use 'iotop' to identify processes with high disk write activity.",
+      "Check if the high I/O is due to swapping by correlating with 'si'/'so' columns in 'vmstat'.",
+      "Consider moving the job's working directory to a higher-performance filesystem if applicable."
+    ]
+  },
+  {
+    "anomaly": "CPU system usage increases significantly, reaching over 9%, indicating kernel overhead.",
+    "root_causes": "Increased kernel activity due to handling memory management and I/O operations.",
+    "solutions": [
+      "High system CPU usage is often a symptom of other issues (like memory or I/O pressure).",
+      "Focus on resolving the primary memory and I/O bottlenecks, which should reduce kernel overhead."
+    ]
+  },
+  {
+    "anomaly": "Swap space is nearly exhausted, with usage rising from 46% to over 99%.",
+    "root_causes": "Memory resource load forcing the system to use swap extensively.",
+    "solutions": [
+      "The sharp increase in 'page_swap_in_rate' and 'page_swap_out_rate' confirms intense swapping activity.",
+      "Monitor 'swappiness' value and consider tuning it if necessary for future jobs.",
+      "Add more physical RAM to the node if such memory-intensive jobs are common."
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system performance degradation during job execution.",
+    "root_causes": "The completed job 'ft_cgC' consumed excessive memory resources, reducing available memory from 5.6GB to 3.7GB and causing active anonymous memory to spike to over 3.4GB, indicating heavy memory allocation without proper cleanup.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job type to identify memory leaks or inefficient allocation patterns",
+      "Implement memory limits using cgroups or Slurm memory constraints to prevent jobs from consuming excessive system memory",
+      "Review the application code for memory management issues, particularly around large data structure allocations",
+      "Consider increasing system memory or optimizing the job's memory usage patterns"
+    ]
+  },
+  {
+    "anomaly": "Sustained high disk I/O activity with significant write operations during job execution.",
+    "root_causes": "Disk write operations increased dramatically during the job execution period, with write rates reaching over 170KB/s and I/O utilization spiking, likely due to memory pressure forcing swap activity and application data writes.",
+    "solutions": [
+      "Use 'iotop' to identify specific processes causing high disk I/O during similar job executions",
+      "Monitor swap usage more closely as memory pressure may be causing excessive swapping",
+      "Consider optimizing the application's I/O patterns or using faster storage for temporary files",
+      "Implement I/O throttling or scheduling policies to prevent jobs from overwhelming storage subsystem"
+    ]
+  }
+]

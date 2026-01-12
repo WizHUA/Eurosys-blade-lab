@@ -1,0 +1,17 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space exhaustion and OOM kills",
+    "root_causes": "Memory demand exceeded physical RAM capacity, triggering OOM killer and heavy swapping",
+    "solutions": [
+      "Investigate memory usage patterns of completed job ft_cgC for potential leaks",
+      "Increase physical RAM or optimize job memory requirements",
+      "Adjust swappiness parameter to control swapping behavior"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization",
+    "root_causes": "Intensive storage activity from swapping and job I/O operations",
+    "solutions": [
+      "Monitor disk I/O latency during job execution",
+      "Consider using faster storage or RAM disk for temporary files",
+      "Implement I/O throttling for memory-intensive jobs

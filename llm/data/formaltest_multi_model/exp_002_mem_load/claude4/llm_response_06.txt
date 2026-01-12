@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 33% to 73% during job execution, indicating excessive memory consumption by the 'ft_cgC' computational job.",
+    "solutions": [
+      "Monitor the memory usage patterns of the 'ft_cgC' job type to determine if this is expected behavior or a memory leak.",
+      "Consider implementing memory limits using cgroups or Slurm memory constraints to prevent future memory exhaustion.",
+      "Evaluate if the node has sufficient memory for this type of workload or if job scheduling needs adjustment.",
+      "Check application logs for any memory allocation errors or inefficient memory usage patterns."
+    ]
+  },
+  {
+    "anomaly": "Significant increase in system CPU overhead during memory pressure period.",
+    "root_causes": "CPU system time increased from 1.7% to over 4% as the kernel handles memory management, page swapping, and resource contention.",
+    "solutions": [
+      "The elevated system CPU usage correlates directly with the memory pressure timeline, confirming memory-related kernel overhead.",
+      "Monitor page fault rates and swapping activity to quantify the impact of memory pressure on system performance.",
+      "Consider tuning kernel memory management parameters if this workload pattern is expected to continue.",
+      "Implement memory monitoring alerts to catch similar issues before they impact system performance."
+    ]
+  }
+]

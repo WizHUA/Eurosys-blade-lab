@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure with rapid increase in active anonymous memory usage during job execution",
+    "root_causes": "The FT_CG job caused a spike in memory utilization from 33% to 73% during its execution, with active anonymous memory growing by 3.3GB",
+    "solutions": [
+      "Verify FT_CG job memory requirements match allocated resources",
+      "Check for memory leaks in the application code",
+      "Increase memory allocation for similar future jobs"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O operations during the same time frame as memory pressure peak",
+    "root_causes": "Increased memory usage likely triggered swapping/paging activities to disk",
+    "solutions": [
+      "Monitor disk I/O patterns during extended job runs",
+      "Consider using tmpfs for temporary files if swap activity is excessive",
+      "Evaluate SSD storage if HDDs are currently in use"
+    ]
+  },
+  {
+    "anomaly": "Context switch rate peaked during memory-intensive phase of job",
+    "root_causes": "Memory contention likely caused additional scheduler activity",
+    "solutions": [
+      "Analyze process scheduler statistics during high memory pressure periods",
+      "Consider NUMA-aware job placement if running on NUMA architecture",
+      "Review thread/core affinity settings for the application"
+    ]
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Severe memory pressure leading to excessive disk I/O and system thrashing.",
+    "root_causes": "Memory exhaustion causing the system to heavily rely on swap space, with available memory dropping from 5.4GB to just 0.6GB and disk I/O spiking to 271GB/s read rates.",
+    "solutions": [
+      "Immediately check for memory leaks in the 'ft_cgC' job using 'ps aux --sort=-%mem' and application logs",
+      "Monitor swap usage with 'vmstat 1' and 'free -h' to confirm extent of memory pressure",
+      "Consider killing runaway processes if memory usage continues to grow uncontrollably",
+      "Review job resource allocation to ensure adequate memory limits are set for future runs"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization reaching 70% with massive read throughput.",
+    "root_causes": "Disk I/O bottleneck caused by heavy swapping activity due to memory exhaustion, with read rates peaking at 271GB/s.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing the high disk activity",
+      "The primary solution is resolving the memory pressure issue which is driving the excessive swap I/O",
+      "Consider temporarily reducing I/O priority of non-critical processes using 'ionice'",
+      "Monitor disk health and performance metrics to ensure storage subsystem can handle the load"
+    ]
+  },
+  {
+    "anomaly": "High CPU utilization reaching 83% with elevated system load.",
+    "root_causes": "CPU resource contention likely caused by the combination of application processing and system overhead from memory management.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify CPU-intensive processes and their relationship to the memory issues",
+      "Monitor CPU wait states to determine if high utilization is due to I/O wait or actual computation",
+      "Consider CPU throttling for non-critical processes if system responsiveness is impacted"
+    ]
+  }
+]

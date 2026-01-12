@@ -1,0 +1,42 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with rising CPU iowait and blocked processes",
+    "root_causes": "During the window when job ft_cgC was running, disk throughput surged sharply (disk_read_rate_bytes_per_sec peaking around 4.62e8 B/s and disk_write_rate_bytes_per_sec around 1.87e8 B/s), disk_io_usage_percent climbed from ~0% to >60%, cpu_iowait_percent rose from ~0% to ~4.9%, and processes_blocked became non-zero. This indicates the storage device is saturated and the CPU is frequently waiting on I/O.",
+    "solutions": [
+      "Identify offending I/O processes: iostat -x 1, pidstat -d 1, and iotop -oPa to attribute per-process/device utilization.",
+      "Throttle or schedule I/O for the job using cgroups (e.g., io.max or blkio.weight) to cap write/read rates and reduce queue depth.",
+      "Redirect heavy I/O to a faster local scratch device and/or reduce application I/O concurrency; batch and align writes to larger chunks.",
+      "Tune the block layer for the specific device: adjust read-ahead (e.g., blockdev --setra <dev> 128-256) and queue depth (/sys/block/<dev>/queue/nr_requests), verify scheduler is appropriate.",
+      "Check device health and errors with smartctl -a and dmesg for any storage-related kernel messages."
+    ]
+  },
+  {
+    "anomaly": "Acute swap activity spikes (swap thrashing) despite relatively steady swap usage",
+    "root_causes": "page_swap_in_rate and page_swap_out_rate jumped dramatically (up to ~1.45e5 and ~6.9e4 pages/s) while swap_usage_percent remained ~46.6%, alongside a surge in page_faults_rate. memory_free_bytes briefly collapsed (to ~1.28e8) and then recovered. This pattern indicates transient swap thrashing driven by aggressive page cache activity and/or a working set exceeding RAM during heavy I/O.",
+    "solutions": [
+      "Reduce swapping pressure: temporarily set vm.swappiness=10 (sysctl -w vm.swappiness=10) and ensure job cgroup memory limits are not forcing reclaim.",
+      "Increase job memory request/limit in the scheduler or reduce the application's memory footprint to keep hot pages resident.",
+      "Avoid cache-induced reclaim for streaming I/O: use O_DIRECT or posix_fadvise(DONTNEED) where appropriate; reduce read-ahead (blockdev --setra).",
+      "Monitor with vmstat 1 and sar -B 1 to confirm swap-in/out rates subside after changes."
+    ]
+  },
+  {
+    "anomaly": "Runaway page cache growth causing free memory collapse and high cache utilization",
+    "root_causes": "memory_cached_bytes expanded rapidly (into multi-GB, reaching ~6.2e9) and cache_usage_percent spiked (into the 60–75% range), while memory_free_bytes plunged transiently before recovering. This is consistent with large sequential I/O filling the page cache during the job’s activity.",
+    "solutions": [
+      "Bypass or trim the page cache for streaming workloads: use O_DIRECT or posix_fadvise(DONTNEED) in the application and/or periodically drop caches (sync; echo 3 > /proc/sys/vm/drop_caches) between jobs.",
+      "Increase vm.vfs_cache_pressure (e.g., sysctl -w vm.vfs_cache_pressure=200) so the kernel reclaims cache more aggressively under pressure.",
+      "Reduce read-ahead to limit cache growth (blockdev --setra <dev> 64–128) and ensure large temporary I/O targets a dedicated scratch filesystem."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption, approaching high utilization",
+    "root_causes": "filesystem_usage_percent climbed quickly (from ~73.34% to ~85.61%) in tandem with high disk write rates, indicating the running job wrote large volumes in a short time and is consuming capacity quickly.",
+    "solutions": [
+      "Audit the job’s output paths and purge unnecessary intermediate files; ensure outputs are directed to a high-capacity scratch filesystem.",
+      "Enable and enforce per-job quotas and alerting thresholds (e.g., warn at 90%) to prevent ENOSPC interruptions.",
+      "Investigate large or orphaned files (lsof +L1) and rotate/compress logs to reclaim space.",
+      "If sustained capacity pressure is expected, expand the target filesystem or relocate write-heavy workloads."
+    ]
+  }
+]

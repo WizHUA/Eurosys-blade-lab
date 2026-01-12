@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "System experiencing extreme CPU utilization spikes reaching 76.7% with severe I/O wait times up to 4.87%.",
+    "root_causes": "The completed job 'ft_cgC' which ran for 27 minutes appears to have caused sustained high computational load with significant disk I/O operations, creating system performance bottlenecks.",
+    "solutions": [
+      "Monitor active processes using 'top' or 'htop' to identify any remaining high CPU consumers from the completed job",
+      "Check for any orphaned processes or cleanup operations still running after job completion using 'ps aux --sort=-%cpu'",
+      "Review disk I/O patterns with 'iotop' to identify processes causing the elevated I/O wait times",
+      "Consider implementing CPU and I/O resource limits for future jobs of this type to prevent system saturation"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure escalating with available memory dropping from 5.6GB to 5.4GB and cache memory fluctuating significantly.",
+    "root_causes": "Memory allocation patterns show increasing pressure with cache memory varying dramatically from 1.9GB to 4.0GB, indicating aggressive memory management and potential memory leaks or inefficient cleanup after job completion.",
+    "solutions": [
+      "Use 'free -h' and 'vmstat 1' to monitor real-time memory allocation patterns",
+      "Check for memory leaks from the completed job using 'ps aux --sort=-%mem'",
+      "Monitor page fault rates which show elevated activity (30K+ faults/sec) indicating memory pressure",
+      "Implement memory monitoring for future runs of the 'ft_cgC' job type to establish baseline memory requirements"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O performance degradation with utilization climbing from 0.06% to over 60% and massive throughput spikes.",
+    "root_causes": "Disk write operations spiked dramatically from 177KB/s to over 423MB/s with corresponding increases in write IOPS from 2.18 to 604, indicating the job generated intensive disk activity that may still be impacting system performance.",
+    "solutions": [
+      "Use 'iotop -ao' to identify which processes are generating the highest disk I/O load",
+      "Check filesystem usage which increased to 85.6%, approaching capacity limits that could impact performance",
+      "Monitor disk queue depth and latency to ensure storage subsystem can handle the I/O patterns",
+      "Consider implementing I/O throttling or scheduling policies for computationally intensive jobs like 'ft_cgC'"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and exhaustion leading to system instability.",
+    "root_causes": "Memory consumption increased dramatically from 33% to 55% usage during job execution, with available memory dropping from 5.5GB to 3.7GB, indicating memory-intensive workload exceeding system capacity.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' for memory leaks or inefficient memory allocation patterns",
+      "Use 'ps aux --sort=-%mem' to identify any remaining memory-heavy processes after job completion",
+      "Consider implementing memory limits for future jobs using cgroups or Slurm memory constraints",
+      "Review job memory requirements and allocate nodes with sufficient RAM for similar workloads"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in system load and process activity during job execution.",
+    "root_causes": "System load increased from 4.08 to 4.11 with process fork rate spiking to 1.09/sec, indicating high computational activity and process creation overhead from the running job.",
+    "solutions": [
+      "Analyze the job's parallelization strategy to reduce excessive process forking",
+      "Monitor context switch rates which increased substantially during the job execution",
+      "Consider optimizing the application to use threading instead of process forking where appropriate",
+      "Implement job scheduling policies to prevent resource contention during peak usage periods"
+    ]
+  },
+  {
+    "anomaly": "Elevated disk I/O activity with potential performance impact.",
+    "root_causes": "Disk write activity increased significantly with write rates reaching 193KB/sec and I/O utilization fluctuating, suggesting the job involves substantial data output operations.",
+    "solutions": [
+      "Monitor disk performance metrics to ensure I/O subsystem can handle the workload demands",
+      "Consider using faster storage or optimizing I/O patterns for data-intensive jobs",
+      "Implement I/O scheduling policies to prevent disk bottlenecks during concurrent job execution",
+      "Review application I/O patterns to identify opportunities for batching or buffering optimizations"
+    ]
+  }
+]

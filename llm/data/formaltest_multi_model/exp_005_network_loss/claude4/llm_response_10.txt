@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Significant memory pressure with high page swap activity during job completion period.",
+    "root_causes": "Memory resource load from the completed 'ft_cgC' job causing system to actively swap pages to disk.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' to confirm ongoing swap activity and page fault rates.",
+      "Check if the completed job left behind any memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "Consider increasing available memory or optimizing job memory requirements to prevent future swap thrashing.",
+      "Review job resource allocation to ensure adequate memory is reserved for computational workloads."
+    ]
+  },
+  {
+    "anomaly": "Elevated system load with high context switching rate indicating resource contention.",
+    "root_causes": "CPU resource load from multiple processes competing for system resources during job transition period.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes causing high context switch rates and CPU contention.",
+      "Monitor system during job startup and completion phases to identify resource allocation bottlenecks.",
+      "Consider implementing CPU affinity or cgroups to better isolate job processes from system services.",
+      "Review scheduler settings and job queuing policies to prevent resource conflicts during job transitions."
+    ]
+  }
+]

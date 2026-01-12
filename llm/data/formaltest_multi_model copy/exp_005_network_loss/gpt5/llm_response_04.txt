@@ -1,0 +1,41 @@
+[
+  {
+    "anomaly": "TCP listen queue saturation with drops and overflows (node_netstat_TcpExt_ListenDrops=30 and ListenOverflows=6 observed at 07:11:13)",
+    "root_causes": "A burst of inbound connection attempts exceeded the server's listen backlog (application backlog/somaxconn/tcp_max_syn_backlog), causing the kernel to drop incoming SYNs while the job window was active.",
+    "solutions": [
+      "Increase net.core.somaxconn and net.ipv4.tcp_max_syn_backlog via sysctl and align the application's listen backlog.",
+      "Identify which service is listening and receiving the burst using 'ss -ltnp' and monitor connection rates with 'sar -n TCP,ETCP 1'.",
+      "Enable/verify TCP syncookies (net.ipv4.tcp_syncookies=1) to better withstand short connection bursts.",
+      "Reduce connection churn by using connection pooling or persistent connections on clients hitting this node."
+    ]
+  },
+  {
+    "anomaly": "High sustained swap usage (~46–47% of 2 GiB) with intermittent swap I/O bursts (page_swap_out_rate≈166.6/s and swap_in_rate≈17.3/s at 07:10:28) and a page-fault spike (~5390/s at 07:09:58)",
+    "root_causes": "Transient memory pressure and reclaim activity during the job window, with working set changes inducing swapping despite memory_available remaining ~5.6 GiB.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., to 10–20) to reduce background swapping and latency spikes.",
+      "Profile the job's memory footprint and set appropriate per-job memory limits/reservations to keep its working set in RAM.",
+      "Monitor in real time with 'vmstat 1' and 'perf mem' (or equivalent) to confirm swap-in/out during the workload phases.",
+      "If swapping persists, reduce dataset/page cache pressure or add RAM to the node."
+    ]
+  },
+  {
+    "anomaly": "Elevated TCP retransmissions and SYN retransmissions during the window (tcp_retransmissions_rate up to ~0.49/s; tcp_syn_retrans_rate up to ~0.16/s) without NIC-level errors or drops",
+    "root_causes": "Transient packet loss or congestion on the network path while the job was active; interface error and drop counters remain at 0, suggesting upstream congestion or path variability.",
+    "solutions": [
+      "Inspect switch and NIC counters for errors/drops (e.g., 'ethtool -S', switch logs/telemetry) around the timestamps.",
+      "Validate end-to-end MTU consistency and offload settings (TSO/LRO/GRO).",
+      "Benchmark path health using iperf3/owping between peers to quantify loss and jitter.",
+      "If recurrent, consider enabling ECN or evaluating congestion control (e.g., CUBIC vs BBR) appropriate for the fabric."
+    ]
+  },
+  {
+    "anomaly": "Telemetry anomaly: file descriptor maximum reported as ~9.22e18, yielding a near-zero filefd_usage_percent",
+    "root_causes": "Monitoring agent/exporter likely mis-parsed the file descriptor limit (overflow or incorrect source), producing an unrealistic filefd_maximum value.",
+    "solutions": [
+      "Update/fix the monitoring collector to read /proc/sys/fs/file-max correctly and apply sanity bounds.",
+      "Cross-check with 'cat /proc/sys/fs/file-max' and 'sysctl fs.file-max' to verify the true limit.",
+      "Add validation in the telemetry pipeline to prevent propagation of implausible kernel limit values."
+    ]
+  }
+]

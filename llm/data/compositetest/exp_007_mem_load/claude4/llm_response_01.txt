@@ -1,0 +1,31 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with near-complete memory exhaustion and heavy swapping activity.",
+    "root_causes": "Memory resource exhaustion with 99.6% memory usage and 99.99% swap utilization, indicating the system has run out of available physical memory and is heavily relying on disk-based swap.",
+    "solutions": [
+      "Monitor active processes using 'ps aux --sort=-%mem' to identify memory-intensive applications consuming available RAM.",
+      "Check swap usage patterns with 'vmstat 1' and 'swapon -s' to confirm the extent of memory pressure.",
+      "Consider adding more physical memory or optimizing application memory usage to reduce reliance on swap space.",
+      "Review the completed job 'ft_ftC' which may have left memory-intensive processes or allocated memory that wasn't properly released."
+    ]
+  },
+  {
+    "anomaly": "Severe I/O wait time indicating storage performance bottleneck.",
+    "root_causes": "High I/O wait percentage (ranging from 29% to 53%) caused by intensive disk operations, likely from memory swapping and application I/O demands.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity and determine if it's related to swapping or application workload.",
+      "Monitor disk utilization with 'iostat -x 1' to assess storage subsystem performance and identify bottlenecks.",
+      "Address the primary memory pressure issue to reduce swap-related I/O operations.",
+      "Consider storage optimization or upgrading to faster storage devices if application I/O patterns are the primary cause."
+    ]
+  },
+  {
+    "anomaly": "System load significantly higher than available CPU cores with blocked processes.",
+    "root_causes": "Load average (11.88) exceeds the 8-core system capacity with multiple blocked processes (ranging from 3 to 13), indicating resource contention and processes waiting for I/O operations.",
+    "solutions": [
+      "Analyze process states using 'top' or 'htop' to identify processes in 'D' (uninterruptible sleep) state that are contributing to the high load.",
+      "Check for processes blocked on I/O operations that may be related to the storage bottleneck.",
+      "Monitor system performance after addressing memory and I/O issues, as blocked processes may resolve once underlying resource constraints are eliminated."
+    ]
+  }
+]

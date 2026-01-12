@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Transient filesystem saturation: filesystem usage jumped from ~73.35% to ~95.36% between 23:20:10 and 23:20:25, then returned to ~73.36% by 23:21:25.",
+    "root_causes": "A large temporary write or file creation during the running job (ft_cgC) rapidly consumed space, then was removed or moved shortly after; disk write activity and inode counts remained normal, indicating a short‑lived data surge rather than a persistent leak.",
+    "solutions": [
+      "Inspect the job's working directory around 23:20:25 for large temporary files (e.g., checkpoints, scratch outputs) that were created and deleted.",
+      "Enforce per-job scratch directories and quotas; redirect large intermediates to a high-capacity scratch filesystem.",
+      "Add monitoring/alerts on filesystem_usage_percent thresholds (e.g., 90%) to capture culprit processes and paths in real time (use inotify/auditd or periodic du)."
+    ]
+  },
+  {
+    "anomaly": "Heavy swap usage with bursts of swap activity early in the window (swap_usage_percent ~53.8% at 23:19:40; page_swap_out_rate peaked at ~31,840/s) despite moderate memory usage (~33%).",
+    "root_causes": "The node had significant pages resident in swap from prior pressure or job behavior causing pageouts; subsequent samples show swap usage decreasing to ~47.8% and swap activity dropping, suggesting reclaimed pages and reduced pressure.",
+    "solutions": [
+      "Confirm if swappiness is aggressive for this workload; consider tuning vm.swappiness and vm.watermarks for HPC nodes.",
+      "Audit the job’s memory allocation pattern and use of large, sparse, or idle mappings that encourage swapping; if applicable, pin critical processes’ memory (mlock) or use NUMA-aware placement.",
+      "Add per-node alerting when swap_usage_percent increases alongside page_swap_in/out spikes to catch future regressions."
+    ]
+  },
+  {
+    "anomaly": "Sustained high system load (load_1min ~5.5–7.5) with CPU utilization 56–83% during the job.",
+    "root_causes": "Compute-bound workload from the running job (ft_cgC) keeping CPUs busy; load values are elevated but consistent with an active multi-threaded job on this node.",
+    "solutions": [
+      "Validate the job’s CPU affinity and threading (ensure it matches available cores to avoid oversubscription).",
+      "If the node is shared, enforce CPU limits via cgroups to prevent contention; otherwise, mark as expected for this job profile.",
+      "Record this load/cpu profile as a performance baseline to detect future deviations."
+    ]
+  }
+]

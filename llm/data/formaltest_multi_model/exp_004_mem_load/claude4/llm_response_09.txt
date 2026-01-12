@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "Significant increase in memory utilization from 32% to 55% during job execution period.",
+    "root_causes": "Memory resource pressure from the completed 'ft_cgC' job which ran for 27 minutes and appears to have allocated substantial memory resources.",
+    "solutions": [
+      "Monitor job memory usage patterns using 'sacct -j 276 --format=JobID,MaxRSS,MaxVMSize' to understand peak memory consumption.",
+      "Review the ft_cgC application's memory allocation patterns and consider if memory usage can be optimized.",
+      "Consider implementing memory limits for similar jobs using Slurm's --mem parameter to prevent excessive memory consumption."
+    ]
+  },
+  {
+    "anomaly": "Sustained disk write activity with moderate I/O utilization during job execution.",
+    "root_causes": "Disk I/O load from the computational job writing results or temporary data to storage.",
+    "solutions": [
+      "Monitor disk write patterns using 'iotop' to identify specific processes generating I/O load.",
+      "Consider using faster storage or optimizing I/O patterns if the application performance is I/O bound.",
+      "Evaluate if temporary data can be written to a faster local storage device to reduce I/O contention."
+    ]
+  }
+]

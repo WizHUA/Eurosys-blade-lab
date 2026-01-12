@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage during job execution with significant system load",
+    "root_causes": "The ft_cgC job was computationally intensive, causing sustained CPU utilization near 50% and spikes to 72% during execution",
+    "solutions": [
+      "Check job resource requests to ensure proper CPU allocation",
+      "Profile application for potential optimization opportunities",
+      "Review scheduler configuration to prevent node oversubscription"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure and active swapping during job execution",
+    "root_causes": "The job consumed significant memory resources, triggering swapping activity as evidenced by non-zero page_swap_in/out rates",
+    "solutions": [
+      "Increase memory allocation for similar jobs",
+      "Verify application memory usage patterns",
+      "Consider node with more memory for memory-intensive workloads"
+    ]
+  },
+  {
+    "anomaly": "Network bandwidth spikes during computation",
+    "root_causes": "Network intensive operations during job execution caused periodic bandwidth spikes to 46MB/s receive and 16MB/s transmit",
+    "solutions": [
+      "Monitor network saturation during job execution",
+      "Consider network-aware scheduling for MPI jobs",
+      "Evaluate if InfiniBand or higher bandwidth networking would benefit this workload"
+    ]
+  }
+]

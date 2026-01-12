@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with system running out of available memory and heavy swap activity.",
+    "root_causes": "Memory usage increased from 33% to 73% during job execution, with available memory dropping from 5.4GB to 2.1GB, indicating memory-intensive workload exceeding physical RAM capacity.",
+    "solutions": [
+      "Monitor the completed job 'ft_cgC' memory usage patterns to understand peak memory requirements",
+      "Increase physical memory on the node or implement memory limits for similar jobs",
+      "Consider job scheduling policies that account for memory requirements to prevent oversubscription",
+      "Review swap configuration as current 2GB swap may be insufficient for memory-intensive workloads"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization remains consistently high throughout the monitoring period with elevated system load.",
+    "root_causes": "CPU usage sustained between 48-72% with load averages reaching 4.17, indicating compute-intensive operations likely from the running job.",
+    "solutions": [
+      "Verify that high CPU usage is expected for the 'ft_cgC' job type and duration",
+      "Monitor CPU temperature and throttling to ensure sustained high usage doesn't cause hardware issues",
+      "Consider CPU affinity settings to optimize core utilization for compute-intensive jobs",
+      "Evaluate if job requires CPU resource limits to prevent interference with system processes"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity during peak memory pressure period.",
+    "root_causes": "Disk write activity increased substantially during memory pressure periods, likely due to swap operations and memory paging to storage.",
+    "solutions": [
+      "Monitor disk I/O patterns to identify if this is swap-related or application I/O",
+      "Consider faster storage (SSD) for swap partitions to improve performance during memory pressure",
+      "Implement I/O monitoring and throttling for memory-intensive jobs",
+      "Evaluate filesystem performance and consider optimizations for high I/O workloads"
+    ]
+  }
+]

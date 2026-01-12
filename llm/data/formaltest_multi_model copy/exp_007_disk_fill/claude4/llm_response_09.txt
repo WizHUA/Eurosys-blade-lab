@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Severe disk I/O bottleneck with extremely high write activity and significant filesystem space consumption.",
+    "root_causes": "The completed job 'ft_cgC' appears to have generated massive amounts of data, causing intense disk write operations (up to 214MB/sec) and consuming approximately 10GB of filesystem space during its 27-minute runtime.",
+    "solutions": [
+      "Monitor disk I/O patterns using 'iotop' to identify which processes are causing high write activity",
+      "Review the 'ft_cgC' job's output data management - consider implementing data compression or streaming output to reduce filesystem impact",
+      "Implement disk I/O quotas or throttling for compute jobs to prevent individual jobs from saturating storage resources",
+      "Consider using faster storage (NVMe/SSD) for temporary job data or implement a tiered storage strategy"
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU utilization with gradually decreasing system load indicating job completion phase.",
+    "root_causes": "CPU usage remains elevated (47-76%) with system load decreasing from 5.52 to 4.35, suggesting the compute-intensive 'ft_cgC' job is in its final processing phase before completion.",
+    "solutions": [
+      "Monitor job completion patterns to understand typical resource usage during finalization phases",
+      "Implement job monitoring to track resource consumption trends and optimize scheduling",
+      "Consider implementing CPU usage limits for jobs that exhibit prolonged high utilization patterns"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with significant anonymous memory allocation and swap usage.",
+    "root_causes": "Anonymous memory usage is consistently around 20-21% of total memory with active swap usage (46% of swap space used), indicating memory-intensive operations from the running job.",
+    "solutions": [
+      "Monitor memory usage patterns for the 'ft_cgC' job type to establish appropriate memory resource limits",
+      "Consider increasing available memory or implementing memory limits to prevent excessive swap usage",
+      "Review job memory requirements and optimize memory allocation strategies"
+    ]
+  }
+]

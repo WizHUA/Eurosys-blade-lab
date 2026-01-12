@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure and potential memory thrashing with extreme disk I/O activity.",
+    "root_causes": "System experiencing memory exhaustion leading to heavy swapping and disk I/O bottleneck.",
+    "solutions": [
+      "Monitor swap activity using 'vmstat 1' - the high page_swap_in_rate and page_swap_out_rate indicate active swapping.",
+      "Check memory-intensive processes with 'ps aux --sort=-%mem' to identify memory consumers.",
+      "The disk I/O rate spikes from 177KB/s to 461MB/s indicating severe storage bottleneck from swapping.",
+      "Consider adding more RAM or optimizing application memory usage to reduce swap dependency."
+    ]
+  },
+  {
+    "anomaly": "Critical storage space depletion with filesystem usage climbing from 73% to 85%.",
+    "root_causes": "Rapid filesystem consumption likely due to intensive I/O operations and temporary file creation.",
+    "solutions": [
+      "Use 'df -h' and 'du -sh /*' to identify which directories are consuming space rapidly.",
+      "Clean up temporary files and logs that may be accumulating during the heavy I/O operations.",
+      "Monitor the job 'ft_cgC' which may be generating large output files or temporary data.",
+      "Consider expanding storage capacity or implementing automatic cleanup policies."
+    ]
+  },
+  {
+    "anomaly": "TCP memory allocation drops significantly from 2.4MB to 1.3MB indicating network resource pressure.",
+    "root_causes": "System resource pressure affecting network buffer allocation and potentially network performance.",
+    "solutions": [
+      "Monitor network performance with 'ss -i' to check for buffer limitations.",
+      "The reduction in TCP memory suggests the system is prioritizing other memory needs over network buffers.",
+      "Consider tuning TCP buffer sizes in /proc/sys/net/ipv4/ if network performance is critical.",
+      "Investigate if the memory pressure is causing network timeouts or connection issues."
+    ]
+  }
+]

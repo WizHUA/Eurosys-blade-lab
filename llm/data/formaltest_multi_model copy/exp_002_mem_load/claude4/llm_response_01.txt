@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure event with dramatic increase in memory usage from 33% to 73%.",
+    "root_causes": "Memory resource exhaustion caused by the 'ft_cgC' job execution, leading to significant reduction in available memory and cache displacement.",
+    "solutions": [
+      "Monitor memory usage patterns of the 'ft_cgC' job to determine if it has a memory leak or unexpected memory growth",
+      "Check if the job requires more memory allocation than initially configured",
+      "Review job memory limits and consider increasing memory allocation if the usage pattern is expected",
+      "Implement memory monitoring alerts to catch similar events earlier in future job executions"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time and I/O wait during the memory pressure event.",
+    "root_causes": "System overhead from memory management operations, including potential swapping activity and increased kernel-level processing to handle memory pressure.",
+    "solutions": [
+      "Monitor swap usage to confirm if swapping is contributing to the increased I/O wait time",
+      "Consider optimizing the job's memory access patterns to reduce system overhead",
+      "Evaluate if additional physical memory would help reduce system-level CPU usage during intensive jobs",
+      "Review system-level memory management settings and kernel parameters for optimization"
+    ]
+  }
+]

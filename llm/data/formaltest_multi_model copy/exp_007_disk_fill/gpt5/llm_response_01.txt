@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Abrupt, system-wide page cache drop around 07:14:13 (memory_cached_bytes fell ~5.33 GiB -> ~0.53 GiB; cache_usage_percent 63.46% -> 6.46%) without concurrent memory pressure (memory_available_bytes ~5.66 GiB, memory_usage_percent ~31.6%).",
+    "root_causes": "An explicit cache flush (e.g., sync; echo 3 > /proc/sys/vm/drop_caches) or an aggressive cache-reclaim action triggered by a script (cron/prolog/epilog) during the job runtime; not driven by RAM shortage.",
+    "solutions": [
+      "Audit for any use of 'echo 3 > /proc/sys/vm/drop_caches' or similar in system cron, rc.local, and Slurm prolog/epilog/job scripts (job 276 ft_cgC ran during this window).",
+      "Disable cache dropping during active workloads; if needed, schedule it during maintenance windows.",
+      "Tune vm.vfs_cache_pressure and vm.dirty_* thresholds conservatively to avoid aggressive cache reclaim.",
+      "Add monitoring/alerts on memory_cached_bytes and cache_usage_percent to catch future cache flush events."
+    ]
+  },
+  {
+    "anomaly": "Heavy storage I/O with elevated disk utilization and CPU iowait early in the window (disk_io_usage_percent ~67.7%→60.8%, cpu_iowait_percent ~6.16%→5.22%, disk read/write rates up to ~264 MB/s read and ~172 MB/s write).",
+    "root_causes": "The running workload (ft_cgC) generated sustained I/O, saturating the local disk; the cache drop event likely exacerbated synchronous I/O and increased wait times.",
+    "solutions": [
+      "Use iostat/iotop and per-process I/O accounting to confirm the top contributors and their I/O patterns.",
+      "Redirect large transient I/O to a higher-throughput storage (parallel FS/local NVMe) or rate-limit via cgroups blkio.",
+      "Review I/O scheduler (elevator/BFQ) and queue depths for the device to reduce latency under heavy write load.",
+      "Stagger or isolate heavy I/O jobs to avoid contention on the same disk."
+    ]
+  },
+  {
+    "anomaly": "Significant swap occupancy (~46.6% of 2 GiB in use; swap_free_bytes ~1.15 GiB) with measurable swap activity (swap-in ~258 KB/s, swap-out ~136 KB/s at 07:13:43) despite ample free/available RAM (>5 GiB).",
+    "root_causes": "Swappiness/memory policy causing inactive pages to remain in swap or be swapped despite available RAM; residual swapped pages from prior pressure not reclaimed.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., to 10) and verify memory.reclaim behavior if using cgroups.",
+      "Consider swapoff -a && swapon to repatriate inactive pages during a maintenance window.",
+      "Monitor vmstat si/so and page_major_faults_rate to ensure swapping remains minimal during jobs."
+    ]
+  },
+  {
+    "anomaly": "Brief TCP listen queue pressure around 07:14:43 (tcp_listen_overflows_rate ~0.36/s; listen_drops non-zero; syncookies activity), even though network throughput was low.",
+    "root_causes": "Short burst of incoming connections exceeding a service’s backlog or suboptimal backlog/kernel tuning on the listener.",
+    "solutions": [
+      "Identify the listening service experiencing drops (ss -ltnp; inspect application logs) and increase its backlog.",
+      "Tune net.core.somaxconn and net.ipv4.tcp_max_syn_backlog to accommodate bursts.",
+      "Keep SYN cookies enabled and assess for misbehaving clients or local connection storms."
+    ]
+  }
+]

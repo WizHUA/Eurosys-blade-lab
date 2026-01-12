@@ -1,0 +1,33 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with escalating I/O wait during the monitoring window",
+    "root_causes": "Storage is the bottleneck: disk_io_usage_percent climbed from ~0.06% to 60.18%, cpu_iowait_percent rose from ~0% to 4.87%, io_pressure_waiting_rate increased from 0.51 to 0.81, and disk throughput spiked (disk_read_rate_bytes_per_sec up to ~4.6e8, disk_write_rate_bytes_per_sec up to ~1.9e8) with disk_io_now peaking at 26. This pattern coincides with the active batch job (ft_cgC) and indicates the workload is issuing sustained heavy I/O that the device cannot service fast enough.",
+    "solutions": [
+      "Identify top I/O contributors: iotop -oPa, pidstat -d 1 -p <pid>, and grep -E '^r|^w' /proc/<pid>/io",
+      "Throttle offending job I/O using cgroups (cgroup v2: io.max; cgroup v1: blkio.throttle.read_bps_device/blkio.throttle.write_bps_device) to protect node responsiveness",
+      "Stage data and scratch to node-local SSD where possible; avoid writing large bursts to shared filesystems",
+      "Optimize access patterns (batch writes, larger sequential I/O, adjust read-ahead via blockdev --setra for sequential workloads)",
+      "Verify block device health and queueing (smartctl -a, dmesg | grep -iE 'blk|nvme|scsi', check scheduler/queue depth) and remediate if errors are found"
+    ]
+  },
+  {
+    "anomaly": "Heavy swap churn and memory pressure with rising PSI and page fault rates",
+    "root_causes": "Memory pressure is evident: page_swap_in_rate/page_swap_out_rate surged from near-zero to hundreds of thousands per second (e.g., ~573k in / ~193k out at 07:13:13), page_faults_rate exceeded 30k/s, memory_pressure_waiting_rate and memory_pressure_stalled_rate rose to ~0.076 and ~0.058, memory_free_bytes dipped as low as ~128–296 MiB while cache_usage_percent spiked (up to ~75%). Swap usage remained ~46.6% with significant swap_cached_bytes, indicating aggressive reclaim and cache churn driven by the job’s working set.",
+    "solutions": [
+      "Reduce swapping on compute nodes by lowering vm.swappiness (e.g., to 10–20) after validation",
+      "Enforce appropriate memory requests/limits for the job via Slurm/cgroups (memory.max) and right-size per-node parallelism",
+      "If the workload is memory-bound, increase node RAM or reduce dataset size/parallel threads per node",
+      "Monitor PSI live (cat /proc/pressure/memory) and per-process faults (ps/perf) to pinpoint offenders and tune memory access patterns",
+      "Avoid cache flushes during the run; consider dropping page cache only post-job if appropriate (echo 3 > /proc/sys/vm/drop_caches)"
+    ]
+  },
+  {
+    "anomaly": "Transient filesystem capacity spike to 85.6% with very high write rates",
+    "root_causes": "filesystem_usage_percent peaked at 85.61% (07:12:58) while disk_write_rate_bytes_per_sec rose to ~1.9e8, suggesting large bursts of output that temporarily reduced free space; this aligns with the active batch job’s I/O bursts.",
+    "solutions": [
+      "Direct large temporary outputs to node-local scratch and ensure timely cleanup at job end",
+      "Set alerts at ≥85% filesystem utilization and implement automated cleanup policies for scratch areas",
+      "Reduce output volume via batching/compression and review checkpoint/log frequency to eliminate unnecessary writes"
+    ]
+  }
+]

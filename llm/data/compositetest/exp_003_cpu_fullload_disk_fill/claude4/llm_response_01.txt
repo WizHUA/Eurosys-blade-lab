@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe disk I/O bottleneck with extremely high utilization and latency.",
+    "root_causes": "Disk I/O subsystem is heavily saturated, likely due to intensive read/write operations from the completed job or system maintenance tasks.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing the high disk I/O activity.",
+      "Check if the recently completed job 'ft_cgC' left behind any background processes or temporary files causing continued I/O.",
+      "Monitor disk queue depth and consider upgrading to faster storage (SSD) if this is a recurring issue.",
+      "Verify filesystem health with 'fsck' during maintenance window if I/O patterns suggest potential corruption."
+    ]
+  },
+  {
+    "anomaly": "Filesystem space critically low with only 5% remaining capacity.",
+    "root_causes": "Filesystem usage has reached 95%, indicating potential disk space exhaustion from job outputs, logs, or temporary files.",
+    "solutions": [
+      "Immediately identify large files and directories using 'du -sh /* | sort -hr' to find space consumers.",
+      "Clean up temporary files in /tmp, /var/tmp, and job-specific temporary directories.",
+      "Check and rotate system logs if they are consuming excessive space.",
+      "Verify if the completed job 'ft_cgC' generated large output files that need to be moved or compressed."
+    ]
+  }
+]

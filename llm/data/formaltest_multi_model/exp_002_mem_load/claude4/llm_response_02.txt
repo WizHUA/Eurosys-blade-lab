@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory exhaustion causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked to over 73% with available memory dropping dramatically from 5.5GB to 2.2GB, indicating a memory leak or excessive allocation by the completed job.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' and 'free -h' to identify if memory is being properly freed after job completion.",
+      "Check for memory leaks in the 'ft_cgC' application code or any background processes that may have been spawned.",
+      "Use 'ps aux --sort=-%mem' to identify processes consuming large amounts of memory.",
+      "Consider implementing memory limits using cgroups or Slurm job constraints to prevent future memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Excessive page fault activity indicating memory pressure and thrashing.",
+    "root_causes": "Page fault rate peaked at over 7700 faults per second during memory pressure, significantly higher than normal baseline levels.",
+    "solutions": [
+      "Use 'sar -B 1' to monitor paging activity and identify if the system is experiencing excessive swapping.",
+      "Review application memory access patterns to optimize for better locality and reduce page faults.",
+      "Consider increasing available physical memory or optimizing application memory usage to reduce pressure.",
+      "Monitor '/proc/vmstat' for detailed memory statistics to understand paging behavior."
+    ]
+  },
+  {
+    "anomaly": "High system load with significant CPU system time consumption.",
+    "root_causes": "System load reached 4.1-4.2 with CPU system time consuming up to 4.2% of cycles, indicating kernel overhead from memory management and I/O operations.",
+    "solutions": [
+      "Use 'top' to identify processes causing high system CPU usage and kernel activity.",
+      "Monitor kernel logs with 'dmesg' for any memory-related warnings or errors.",
+      "Check I/O subsystem performance using 'iostat -x 1' as high system time often correlates with I/O wait.",
+      "Consider tuning kernel memory management parameters if the pattern persists."
+    ]
+  }
+]

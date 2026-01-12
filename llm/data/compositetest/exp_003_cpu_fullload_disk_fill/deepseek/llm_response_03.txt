@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with significant I/O wait time",
+    "root_causes": "The system shows sustained CPU usage around 60-80% with 5-7% I/O wait, indicating potential disk bottlenecks during the FT_CGC job execution",
+    "solutions": [
+      "Check disk I/O performance metrics during job execution to identify potential storage bottlenecks",
+      "Review the FT_CGC job's I/O patterns and consider optimizing its file access strategy",
+      "Monitor disk queue lengths and consider adding faster storage if I/O wait becomes a consistent bottleneck"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high swap usage",
+    "root_causes": "System shows 47-53% swap usage with significant page swap activity during job execution",
+    "solutions": [
+      "Analyze memory requirements of the FT_CGC job and consider increasing physical memory allocation",
+      "Monitor memory usage patterns to identify potential memory leaks or inefficient memory usage",
+      "Consider adjusting swappiness parameter if excessive swapping is impacting performance"
+    ]
+  },
+  {
+    "anomaly": "Network retransmissions during job execution",
+    "root_causes": "TCP retransmissions observed during the job's execution period, indicating potential network instability",
+    "solutions": [
+      "Check network infrastructure health including switches and interface statistics",
+      "Monitor network bandwidth utilization during job execution",
+      "Verify MPI configuration and network settings for the HPC cluster"
+    ]
+  }
+]

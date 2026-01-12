@@ -1,0 +1,38 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait percentage indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O load from intensive storage operations.",
+    "solutions": [
+      "Investigate disk I/O patterns using 'iotop' to identify processes causing high I/O wait.",
+      "Check for storage subsystem issues (e.g., slow disks, network filesystem problems).",
+      "Monitor disk latency metrics to identify potential hardware degradation."
+    ]
+  },
+  {
+    "anomaly": "Critical memory pressure with swap space nearly exhausted.",
+    "root_causes": "Memory resource load exceeding physical RAM capacity.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem'.",
+      "The swap usage reaches 99% indicating severe memory pressure.",
+      "Consider adding more physical memory or optimizing application memory usage."
+    ]
+  },
+  {
+    "anomaly": "High system load with elevated number of blocked processes.",
+    "root_causes": "System resource contention from multiple processes waiting for I/O.",
+    "solutions": [
+      "Monitor process states using 'ps aux' to identify processes in 'D' (uninterruptible sleep) state.",
+      "The high number of blocked processes (up to 10) correlates with the I/O wait issue.",
+      "Address the underlying storage bottleneck to reduce process blocking."
+    ]
+  },
+  {
+    "anomaly": "Significant network activity spikes during the monitoring period.",
+    "root_causes": "Network resource load from data transfer operations.",
+    "solutions": [
+      "Monitor network traffic patterns using 'nethogs' or 'iftop'.",
+      "Check for large data transfers that might be contributing to system load.",
+      "Verify network configuration and bandwidth availability."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Sharp increase in disk I/O activity causing high disk utilization",
+    "root_causes": "The FT CG benchmark (ft_cgC) job is generating extensive disk writes during its execution, as evidenced by disk_write_bytes_per_sec peaking at over 500MB/s",
+    "solutions": [
+      "Monitor application I/O patterns using 'iotop' to identify specific processes causing disk writes",
+      "Consider adjusting job parameters to use more memory for caching if possible",
+      "Evaluate moving temporary files to faster storage or RAM disk"
+    ]
+  },
+  {
+    "anomaly": "Severe memory pressure leading to increased swapping activity",
+    "root_causes": "Memory usage spikes to 87% with extensive page swapping (page_swap_out_rate up to 226243 pages/sec) during job execution",
+    "solutions": [
+      "Investigate memory allocation patterns in the FT CG application",
+      "Request more memory resources for future runs of this workload",
+      "Consider adjusting slurm memory limits to prevent swapping"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time suggesting kernel overhead",
+    "root_causes": "CPU system percentage spikes to 16.48% during peak job execution, indicating significant kernel processing overhead likely related to I/O handling",
+    "solutions": [
+      "Profile application syscall usage with 'strace' or 'perf'",
+      "Consider tuning kernel parameters for better I/O handling",
+      "Evaluate if filesystem choices could be optimized for this workload"
+    ]
+  }
+]

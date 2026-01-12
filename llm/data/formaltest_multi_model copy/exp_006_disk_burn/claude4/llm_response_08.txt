@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme disk I/O saturation causing system performance degradation",
+    "root_causes": "Massive disk write activity generating over 400GB/sec throughput with 800+ IOPS, indicating either a memory dump operation or intensive data processing during the ft_cgC job execution",
+    "solutions": [
+      "Monitor 'iotop' to identify the specific processes generating the extreme disk write load",
+      "Check if the ft_cgC job is performing expected large-scale data output or if there's an unexpected memory dump",
+      "Consider implementing I/O throttling or cgroups limits to prevent single jobs from saturating disk subsystem",
+      "Verify disk subsystem health and capacity to handle sustained high throughput workloads"
+    ]
+  },
+  {
+    "anomaly": "Severe memory pressure leading to massive swap activity and potential thrashing",
+    "root_causes": "Memory usage climbed to 86% with over 500GB/sec of swap-in activity, indicating the system is heavily swapping and unable to maintain working sets in physical memory",
+    "solutions": [
+      "Use 'ps aux --sort=-%mem' to identify memory-intensive processes during the ft_cgC job execution",
+      "Monitor swap usage patterns with 'vmstat 1' to confirm the extent of memory pressure",
+      "Consider job memory limits or node memory upgrades if computational workloads consistently exceed available RAM",
+      "Implement memory monitoring alerts to detect similar conditions before they cause system thrashing"
+    ]
+  },
+  {
+    "anomaly": "CPU utilization spiked to over 76% with high system overhead",
+    "root_causes": "Combination of computational load from the ft_cgC job and system overhead from handling intensive I/O operations and memory management",
+    "solutions": [
+      "Analyze CPU utilization breakdown to determine if high system time is due to I/O wait or kernel overhead",
+      "Use 'top' or 'htop' to identify specific CPU-intensive processes during job execution",
+      "Consider CPU scheduling policies or job resource limits to prevent single jobs from monopolizing system resources",
+      "Monitor correlation between CPU spikes and I/O activity to optimize job resource allocation"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage (75-95%) with sustained system load despite job completion",
+    "root_causes": "Potential zombie processes from completed FT_CG job still consuming resources or CPU throttling issues",
+    "solutions": [
+      "Check for orphaned processes with 'ps -ef | grep defunct' and clean up if found",
+      "Verify CPU throttling status with 'cpupower frequency-info'",
+      "Analyze CPU frequency scaling with 'cat /proc/cpuinfo | grep MHz'"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with only 270MB free despite job completion",
+    "root_causes": "Possible memory leak in application or kernel not reclaiming memory effectively",
+    "solutions": [
+      "Check slab memory usage with 'slabtop' to identify potential memory leaks",
+      "Trigger manual memory reclaim with 'echo 3 > /proc/sys/vm/drop_caches'",
+      "Monitor memory release patterns with 'sar -r 1'"
+    ]
+  },
+  {
+    "anomaly": "Unusually high disk I/O operations (7k+ reads/s) post-job completion",
+    "root_causes": "Possible filesystem cleanup operations or logging processes consuming disk bandwidth",
+    "solutions": [
+      "Check active disk operations with 'iotop -o'",
+      "Inspect system logs for background writing with 'journalctl --since \"15 minutes ago\"'",
+      "Verify filesystem integrity with 'fsck' if needed"
+    ]
+  }
+]

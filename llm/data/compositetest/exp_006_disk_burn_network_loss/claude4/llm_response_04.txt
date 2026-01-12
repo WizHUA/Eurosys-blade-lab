@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space nearly exhausted and excessive swapping activity.",
+    "root_causes": "Memory resource exhaustion caused by the running job consuming available RAM and forcing the system to heavily utilize swap space.",
+    "solutions": [
+      "Monitor swap usage with 'swapon -s' and 'vmstat 1' to confirm active swapping patterns.",
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes.",
+      "Consider terminating or migrating memory-heavy workloads if swap usage exceeds 90%.",
+      "Review job memory requirements and adjust resource allocation to prevent future swap exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Extremely high I/O wait time indicating severe storage bottleneck.",
+    "root_causes": "Disk I/O subsystem overwhelmed by intensive read/write operations, likely exacerbated by memory swapping activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O activity.",
+      "Check disk utilization with 'iostat -x 1' to confirm sustained high I/O load.",
+      "Consider upgrading storage subsystem or implementing I/O throttling for jobs.",
+      "Address memory pressure to reduce swap-related I/O operations."
+    ]
+  },
+  {
+    "anomaly": "High number of blocked processes indicating resource contention.",
+    "root_causes": "Multiple processes waiting for I/O operations to complete, creating a bottleneck in system responsiveness.",
+    "solutions": [
+      "Use 'ps aux | grep \" D \"' to identify processes in uninterruptible sleep state.",
+      "Monitor process states with 'vmstat 1' to track blocked process trends.",
+      "Investigate if storage hardware is functioning properly and not experiencing failures.",
+      "Consider implementing process prioritization or resource limits to prevent system-wide blocking."
+    ]
+  }
+]

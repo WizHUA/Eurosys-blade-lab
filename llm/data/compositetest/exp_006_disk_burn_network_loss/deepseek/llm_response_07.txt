@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Sudden memory pressure spike causing severe swapping activity",
+    "root_causes": "Memory usage spiked from 62% to 98% within minutes with significant anonymous memory allocation (from 1.6GB to 5.8GB), triggering heavy swapping that consumed almost all swap space",
+    "solutions": [
+      "Investigate the batch job that was running during the spike (FT_FTC) for memory leaks",
+      "Check application logs for out-of-memory errors or unusual memory allocation patterns",
+      "Consider increasing physical memory allocation for similar future jobs",
+      "Review swap configuration and monitor swap usage more closely"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time (over 26%) during memory pressure period",
+    "root_causes": "Increased system CPU usage was likely handling page faults and swap operations during the memory pressure event",
+    "solutions": [
+      "Monitor page fault rates (major/minor) during job execution",
+      "Profile system call activity during high CPU system periods",
+      "Consider tuning swappiness parameter for better handling of memory pressure"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O wait spikes correlated with swap activity",
+    "root_causes": "High disk I/O wait (up to 26.98%) occurred when swap usage peaked, indicating swap-induced storage bottleneck",
+    "solutions": [
+      "Monitor disk latency metrics during memory-intensive jobs",
+      "Consider using faster storage for swap if continued swapping is unavoidable",
+      "Review application memory working set size to right-size memory requests"
+    ]
+  }
+]

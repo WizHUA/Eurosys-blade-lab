@@ -1,0 +1,40 @@
+[
+  {
+    "anomaly": "Sudden spike in anonymous memory and committed virtual memory far beyond physical RAM, with high sustained swap usage (~46.6%).",
+    "root_causes": "The running job (ft_cgC) or its subprocesses rapidly allocated large anonymous memory around 07:04:28 (memory_active_anon_bytes jumped from ~1.7 GiB to ~4.7 GiB; memory_committed_as_bytes to ~10.9 GiB > 8 GiB RAM) while swap remained heavily utilized (~1 GiB used). This indicates aggressive memory allocation/overcommit and potential fragmentation, not matched by reclaim or swap-in/out activity.",
+    "solutions": [
+      "Inspect the job’s memory behavior around 07:04:28 with smem/pmap to identify large anonymous allocations and potential leaks.",
+      "Set or tighten Slurm memory limits (e.g., --mem/--mem-per-cpu) for ft_cgC workloads to prevent system-wide overcommit.",
+      "Enable/adjust cgroup v2 memory.high/memory.max for batch slices to cap burst allocations.",
+      "Review kernel overcommit settings (vm.overcommit_memory=2 with a suitable vm.overcommit_ratio) to avoid commit exceeding RAM+swap.",
+      "Tune reclaim: consider increasing vm.watermark_scale_factor or lowering vm.swappiness to reduce swap residency if latency-sensitive.",
+      "Profile allocation sites in the application (e.g., MALLOC_TRIM_THRESHOLD_, jemalloc stats) and fix excessive/fragmented allocations."
+    ]
+  },
+  {
+    "anomaly": "Page-fault storm coinciding with the memory surge (page_faults_rate peaked >7.7k/s) without corresponding major faults or swap I/O.",
+    "root_causes": "Rapid first-touch of newly allocated anonymous pages by the job caused many minor page faults; major faults and swap-in/out stayed very low, confirming CPU-side first-touch rather than reclaim from disk.",
+    "solutions": [
+      "Adopt NUMA-aware first-touch initialization (e.g., parallel memset) to distribute faults across cores/sockets.",
+      "If initialization is unavoidable, stagger or throttle allocation/initialization phases to avoid bursts.",
+      "Consider using huge pages (transparent or explicit) to reduce fault frequency during large contiguous allocations."
+    ]
+  },
+  {
+    "anomaly": "Filesystem cache displacement and low free memory after the allocation burst (memory_free_bytes fell to ~0.27–0.57 GiB; cache dropped while anonymous grew).",
+    "root_causes": "Cache was reclaimed to satisfy anonymous growth, shrinking file cache and risking I/O latency spikes for subsequent file-backed workloads.",
+    "solutions": [
+      "If the workload benefits from cache, pin working sets or use posix_fadvise/madvise (MADV_WILLNEED/DONTNEED) to guide reclaim.",
+      "Separate I/O-heavy and memory-bursting phases or run them on nodes with adequate headroom.",
+      "Pre-warm critical datasets after the burst or schedule cache-sensitive jobs away from nodes under memory pressure."
+    ]
+  },
+  {
+    "anomaly": "Monitoring anomaly: file descriptor maximum reported as 9.22e18, yielding near-zero filefd_usage_percent.",
+    "root_causes": "Collector reading RLIMIT_NOFILE hard limit or a sentinel value producing unrealistic capacity, masking true FD utilization.",
+    "solutions": [
+      "Validate node ulimit -n (soft/hard) and exporter configuration; ensure the metric reflects actual RLIMIT_NOFILE.",
+      "Alerting thresholds should use absolute FDs (filefd_allocated) rather than percentage until the scaling bug is corrected."
+    ]
+  }
+]

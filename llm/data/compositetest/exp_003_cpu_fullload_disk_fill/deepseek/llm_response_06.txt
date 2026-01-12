@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage with elevated system load during job execution",
+    "root_causes": "The compute-intensive job 'ft_cgC' is consuming significant CPU resources, causing sustained high system load (peaking at 7.5 load average on an 8-core system)",
+    "solutions": [
+      "Analyze job's CPU affinity settings to ensure optimal core utilization",
+      "Check if the job's thread count matches the allocated resources",
+      "Consider adjusting job scheduling parameters to avoid system overload"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure leading to active swapping",
+    "root_causes": "Job memory usage triggered swapping activity (page_swap_out_rate reaching 31839), though swap usage remained below 50% of capacity",
+    "solutions": [
+      "Verify requested memory allocation matches actual job requirements",
+      "Consider pre-touching memory for memory-intensive applications",
+      "Monitor per-process memory usage to identify potential leaks"
+    ]
+  },
+  {
+    "anomaly": "Network spikes correlating with job activity",
+    "root_causes": "Network transmit rate peaked at 32.7 MB/s during job execution, though no packet loss or errors were observed",
+    "solutions": [
+      "Analyze job's network communication patterns",
+      "Consider using network QoS for MPI jobs if network congestion is suspected",
+      "Verify network driver and fabric configuration matches job requirements"
+    ]
+  }
+]

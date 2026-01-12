@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high CPU usage with system load average consistently above 9.0",
+    "root_causes": "CPU resource saturation likely from the FT benchmark job, evidenced by high user and system CPU percentages with significant I/O wait time",
+    "solutions": [
+      "Review FT job configuration for possible optimization opportunities",
+      "Check for CPU throttling or thermal throttling issues",
+      "Monitor individual process CPU usage during benchmark execution"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure nearing 100% with severe swapping activity",
+    "root_causes": "Memory demand from FT benchmark exceeding available RAM, causing heavy page swapping and high major fault rates",
+    "solutions": [
+      "Increase physical memory allocation for this workload",
+      "Optimize FT benchmark memory usage parameters",
+      "Consider using larger memory nodes for this type of computation"
+    ]
+  },
+  {
+    "anomaly": "High disk I/O pressure with significant time spent in I/O wait",
+    "root_causes": "Simultaneous heavy memory swapping and active disk I/O from the FT benchmark",
+    "solutions": [
+      "Check disk health and performance metrics",
+      "Consider using faster storage or local SSDs for swap",
+      "Review filesystem cache settings"
+    ]
+  }
+]

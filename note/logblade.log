@@ -1,0 +1,93 @@
+$ blade create -h > ./note/logblade.log   
+
+Create a chaos engineering experiment
+
+Usage:
+  blade create [command]
+
+Aliases:
+  create, c
+
+Examples:
+blade create cpu load --cpu-percent 60
+
+Available Commands:
+  aliyun      Aliyun experiment
+  ck          Clickhouse experiment 
+  cplus       C++ chaos experiments
+  cpu         Cpu experiment
+  cri         CRI experiment
+  disk        Disk experiment
+  druid       Experiment with the Druid
+  dubbo       Experiment with the Dubbo
+  es          ElasticSearch experiment!
+  feign       feign experiment
+  file        File experiment
+  gateway     gateway experiment!
+  hbase       hbase experiment!
+  http        http experiment
+  jedis       jedis experiment
+  jvm         Experiment with the JVM
+  k8s         Kubernetes experiment
+  kafka       kafka experiment
+  lettuce     redis client lettuce experiment
+  log         log experiment
+  mem         Mem experiment
+  mongodb     MongoDB experiment
+  mysql       mysql experiment
+  network     Network experiment
+  nginx       Nginx experiment
+  process     Process experiment
+  psql        Postgrelsql experiment
+  rabbitmq    rabbitmq experiment
+  redis       Redis experiment
+  redisson    redisson experiment
+  rocketmq    Rocketmq experiment,can make message send or pull delay and exception
+  script      Script chaos experiment
+  security    SpringSecurity login experiment
+  servlet     java servlet experiment
+  strace      strace experiment
+  systemd     Systemd experiment
+  tars        tars experiment
+  time        Time experiment
+  zk          zk experiment
+
+Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -h, --help              help for create
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+Global Flags:
+  -d, --debug   Set client to DEBUG mode
+
+Use "blade create [command] --help" for more information about a command.
+
+
+
+
+
+
+$ blade create cpu -h >> note/logblade.log
+
+Cpu experiment, for example full load
+
+Usage:
+  blade create cpu [flags]
+  blade create cpu [command]
+
+Available Commands:
+  fullload    cpu load
+
+Flags:
+  -h, --help   help for cpu
+
+Global Flags:
+  -a, --async             whether to create asynchronously, default is false
+  -d, --debug             Set client to DEBUG mode
+  -e, --endpoint string   the create result reporting address. It takes effect only when the async value is true and the value is not empty
+  -n, --nohup             used to internal async create, no need to config
+      --uid string        Set Uid for the experiment, adapt to docker and cri
+
+Use "blade create cpu [command] --help" for more information about a command.

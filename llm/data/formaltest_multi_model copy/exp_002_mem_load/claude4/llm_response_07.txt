@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system performance degradation.",
+    "root_causes": "Memory usage spiked to 73.67% during job execution with significant increase in anonymous memory allocation from 22.32% to 62.62%, indicating the ft_cgC job consumed excessive memory resources.",
+    "solutions": [
+      "Monitor memory usage patterns of the ft_cgC job to identify potential memory leaks or inefficient allocation",
+      "Consider implementing memory limits using cgroups or Slurm job constraints to prevent future memory exhaustion",
+      "Review the ft_cgC application code for memory optimization opportunities",
+      "Add more physical memory to the node if this workload pattern is expected to continue"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in CPU system time and context switching during memory pressure.",
+    "root_causes": "CPU system time increased from 1.75% to over 4% and context switches rose dramatically, indicating the kernel is spending excessive time managing memory allocation and process scheduling due to memory contention.",
+    "solutions": [
+      "Optimize the ft_cgC application to reduce memory allocation frequency and improve memory access patterns",
+      "Consider tuning kernel memory management parameters such as vm.swappiness and vm.dirty_ratio",
+      "Implement process scheduling optimizations to reduce context switching overhead",
+      "Monitor for memory fragmentation issues that could be causing inefficient allocations"
+    ]
+  }
+]

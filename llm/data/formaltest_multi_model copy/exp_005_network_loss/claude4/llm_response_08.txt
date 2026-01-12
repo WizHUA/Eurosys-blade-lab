@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU usage sustained around 48-51% with elevated I/O wait times during job execution period.",
+    "root_causes": "The 'ft_cgC' job is executing computationally intensive operations with significant disk I/O requirements, causing sustained CPU load and periodic I/O blocking.",
+    "solutions": [
+      "Monitor the specific processes within the 'ft_cgC' job using 'htop' or 'top' to identify which components are most CPU-intensive.",
+      "Consider optimizing the job's I/O patterns or using faster storage if the I/O wait times become problematic.",
+      "Evaluate if the job can benefit from CPU affinity settings to optimize cache usage and reduce context switching."
+    ]
+  },
+  {
+    "anomaly": "Memory usage has increased to 32% with growing anonymous memory consumption.",
+    "root_causes": "The running job is allocating significant amounts of memory for computational work, with anonymous memory increasing from 450MB to 1575MB during the monitoring period.",
+    "solutions": [
+      "Monitor memory usage trends to ensure the job doesn't exceed available memory and trigger swapping.",
+      "Check if the job has appropriate memory limits configured in Slurm to prevent memory exhaustion.",
+      "Review the job's memory allocation patterns to identify potential memory leaks or inefficient usage."
+    ]
+  },
+  {
+    "anomaly": "Network activity shows increased transmission rates and connection establishment patterns.",
+    "root_causes": "The job is performing network communications, possibly for distributed computing or data transfer operations, with TCP connections being actively established.",
+    "solutions": [
+      "Monitor network bandwidth utilization to ensure the job's network requirements don't saturate the available bandwidth.",
+      "Check for any network errors or retransmissions that might indicate network performance issues.",
+      "Verify that the job's network communication patterns are efficient and not causing unnecessary overhead."
+    ]
+  }
+]

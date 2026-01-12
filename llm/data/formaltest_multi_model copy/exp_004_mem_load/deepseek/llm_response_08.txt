@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike causing significant anonymous memory usage and active swapping",
+    "root_causes": "Application memory requirements exceeded available physical RAM during computation phase, triggering swap usage and page faults",
+    "solutions": [
+      "Monitor anonymous memory (active_anon_bytes) to profile application memory needs",
+      "Consider increasing physical RAM allocation or optimizing the application's memory usage",
+      "Review memory usage patterns throughout the job execution to identify peak requirements"
+    ]
+  },
+  {
+    "anomaly": "Increased disk I/O activity with elevated read/write operations",
+    "root_causes": "Application likely performing intensive checkpointing or temporary file operations during computation",
+    "solutions": [
+      "Analyze application I/O patterns to identify if temporary files or checkpoints can be optimized",
+      "Consider using faster local storage or RAM disks for temporary files if appropriate",
+      "Evaluate if I/O operations can be batched or reduced through algorithm optimization"
+    ]
+  },
+  {
+    "anomaly": "System load remains moderately high after job completion",
+    "root_causes": "Potential cleanup operations or residual memory pressure continuing post-execution",
+    "solutions": [
+      "Verify all job processes have fully terminated and resources have been released",
+      "Monitor system for memory leaks in application or dependencies",
+      "Check for orphaned child processes that may still be consuming resources"
+    ]
+  }
+]

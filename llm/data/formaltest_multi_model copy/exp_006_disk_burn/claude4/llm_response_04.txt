@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "System is experiencing severe memory pressure with significant disk I/O thrashing.",
+    "root_causes": "Massive increase in page swap-in activity indicating the system is swapping heavily due to memory pressure, with swap-in rates reaching 573,695 KB/sec.",
+    "solutions": [
+      "Use 'vmstat 1' to monitor swap activity in real-time and confirm the extent of memory pressure.",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to find processes consuming excessive memory.",
+      "Check if the completed job 'ft_cgC' has left behind any orphaned processes or memory leaks using 'pstree' and 'lsof'.",
+      "Consider increasing swap space temporarily or adding more physical memory to handle workload demands."
+    ]
+  },
+  {
+    "anomaly": "CPU utilization is extremely high with sustained load above 75%.",
+    "root_causes": "High CPU usage combined with increased I/O wait time suggests the system is struggling with both computational load and disk I/O bottlenecks.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify processes consuming the most CPU cycles.",
+      "Monitor I/O wait percentage which has increased to nearly 5%, indicating disk I/O is becoming a bottleneck.",
+      "Check for runaway processes that may have been left behind by the completed job.",
+      "Consider load balancing by migrating some workload to other nodes in the cluster."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O performance has degraded significantly with extremely high utilization.",
+    "root_causes": "Disk utilization has reached critical levels above 60% with massive increases in both read and write operations, likely caused by memory swapping.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the heaviest disk I/O load.",
+      "Monitor disk queue depths and latencies using 'iostat -x 1' to assess storage subsystem health.",
+      "The primary solution is resolving the memory pressure issue which will reduce swap-related I/O.",
+      "Consider implementing I/O scheduling optimizations or using faster storage for swap space."
+    ]
+  }
+]

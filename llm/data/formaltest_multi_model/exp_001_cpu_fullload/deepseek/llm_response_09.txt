@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU usage spikes to 83% with sustained high load averages",
+    "root_causes": "Intensive computational workload from completed FT_CG job causing prolonged CPU utilization",
+    "solutions": [
+      "Review FT_CG job parameters to optimize CPU core utilization",
+      "Check for potential CPU-bound processes still running post-job completion",
+      "Monitor CPU temperature and frequency scaling during high utilization periods"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure increases during job execution with active swapping",
+    "root_causes": "Memory-intensive operations during FT_CG job execution consuming available RAM",
+    "solutions": [
+      "Analyze memory usage patterns of FT_CG application",
+      "Consider adjusting Slurm job memory allocation parameters",
+      "Monitor swap usage trends during similar computational workloads"
+    ]
+  },
+  {
+    "anomaly": "Network retransmissions detected during job execution period",
+    "root_causes": "Potential network congestion during MPI communication phases of FT_CG workload",
+    "solutions": [
+      "Verify network infrastructure health checks during MPI job execution",
+      "Monitor network interface errors and packet drops during high traffic periods",
+      "Consider adjusting MPI communication parameters for better network utilization"
+    ]
+  }
+]

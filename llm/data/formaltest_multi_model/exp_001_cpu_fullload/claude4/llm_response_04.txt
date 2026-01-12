@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O activity with massive write operations during job execution.",
+    "root_causes": "The ft_cgC job is performing intensive disk write operations, generating over 240KB/s write rates at peak and sustained high I/O throughout execution.",
+    "solutions": [
+      "Monitor the ft_cgC application to determine if the high disk write activity is expected behavior or indicates inefficient I/O patterns.",
+      "Consider using faster storage (SSD) or optimizing the application's I/O buffering to reduce disk bottlenecks.",
+      "Evaluate if the application can use memory-mapped files or larger buffer sizes to reduce frequent disk writes.",
+      "Check if the job requires temporary file cleanup or if it's writing unnecessary intermediate data to disk."
+    ]
+  },
+  {
+    "anomaly": "High network traffic with significant packet transmission rates during computation.",
+    "root_causes": "The system is experiencing sustained network activity with over 400 bytes/sec receive rates and 2+ packets/sec transmission, unusual for a single-node job.",
+    "solutions": [
+      "Investigate if the ft_cgC job is performing unexpected network communications or data transfers.",
+      "Check for background services or monitoring agents that might be generating network traffic during job execution.",
+      "Monitor network connections using 'netstat -an' to identify active connections and their purposes.",
+      "Verify if the application is designed to perform network I/O or if this indicates a configuration issue."
+    ]
+  }
+]

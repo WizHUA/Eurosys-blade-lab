@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Sudden swap storm and escalating disk I/O starting around 07:12:28: page_swap_in_rate jumped from ~0 to 148,548–573,695/s and page_swap_out_rate to 70,784–193,275/s; disk_io_usage_percent rose from ~0.05% to 60.18%; cpu_iowait_percent climbed to 4.87%; processes_blocked appeared (up to 2).",
+    "root_causes": "Large file I/O by the running job (ft_cgC) rapidly expanded the page cache (memory_cached_bytes ~5.18 GiB; cache_usage_percent spiked from ~24% to ~75%), while swap was already ~46.6% utilized. The kernel favored keeping file cache, pushing anonymous pages to swap despite memory_available_bytes remaining high (~5.3 GiB), causing sustained swapping and storage queueing.",
+    "solutions": [
+      "Reduce vm.swappiness on compute nodes (e.g., to 10–20) so the kernel prefers reclaiming file cache over swapping anonymous memory during heavy I/O.",
+      "Constrain job memory+swap via Slurm/cgroups (e.g., MemoryMax/MemoryHigh and memory.swap.max=0 or a small value) to prevent swap thrash.",
+      "Modify the workload to avoid unnecessary page cache growth: use O_DIRECT where appropriate or call posix_fadvise(POSIX_FADV_DONTNEED)/madvise(MADV_DONTNEED) after large sequential reads/writes; consider reducing readahead.",
+      "Throttle or isolate the job’s I/O (cgroup io.max/blkio.throttle) or direct scratch to faster local storage (e.g., NVMe) to reduce queueing and iowait.",
+      "If recurrent, increase RAM per node or reduce job concurrency on this node so the working set fits without swapping."
+    ]
+  },
+  {
+    "anomaly": "Kernel CPU and interrupt/softirq overhead surged alongside the I/O burst: cpu_system_percent rose from ~0.65% to ~17.8% and cpu_iowait_percent to ~4.9%; interrupts_rate increased from ~4.5k/s to ~6.5k/s.",
+    "root_causes": "The paging and heavy block I/O path increased kernel work (VFS, reclaim, block layer), driving system CPU and interrupt handling while user-space CPU stayed comparatively lower.",
+    "solutions": [
+      "Identify the top I/O contributors with iotop or pidstat -d -wt and correlate to ft_cgC processes to confirm sources of kernel time.",
+      "Ensure an appropriate I/O scheduler for the device (e.g., mq-deadline/none for NVMe, deadline for SATA) and verify writeback tuning (vm.dirty_ratio and vm.dirty_background_ratio) to avoid long writeback bursts.",
+      "Reduce per-process I/O concurrency or queue depth in the application if possible; otherwise rate-limit with cgroups.",
+      "Verify the storage stack (virtual disk/HDD/SSD) is not saturated: check disk_io_now and sustained disk_io_usage_percent during the run and adjust placement or device choice if saturated."
+    ]
+  },
+  {
+    "anomaly": "Transient filesystem usage spike: filesystem_usage_percent peaked at 85.61% at 07:12:58 (then fell to ~75–78%), indicating large temporary data creation during the job window.",
+    "root_causes": "The running job likely created and later removed sizable scratch/output files, temporarily increasing space consumption without sustained growth.",
+    "solutions": [
+      "Direct temporary/scratch data to a designated high-throughput scratch filesystem and ensure automatic cleanup at job end.",
+      "Set monitoring alerts for filesystem usage thresholds (e.g., 80–85%) and enforce per-job quotas to prevent accidental fills.",
+      "If scratch workload is heavy, consider moving it to faster local storage (NVMe) or distributing it across multiple devices to reduce pressure spikes."
+    ]
+  }
+]

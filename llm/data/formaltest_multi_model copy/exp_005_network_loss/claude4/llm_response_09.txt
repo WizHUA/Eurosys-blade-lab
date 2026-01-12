@@ -1,0 +1,20 @@
+[
+  {
+    "anomaly": "High CPU utilization with elevated I/O wait times during job execution period.",
+    "root_causes": "The ft_cgC job is causing sustained CPU load around 48-51% with I/O wait consistently above normal levels, indicating the application is performing computationally intensive operations with significant disk access patterns.",
+    "solutions": [
+      "Monitor the specific processes within the ft_cgC job using 'top' or 'htop' to identify which components are CPU-intensive",
+      "Check if the job can benefit from I/O optimization such as using faster storage or adjusting I/O scheduling policies",
+      "Consider job placement on nodes with better CPU-to-storage ratios if this workload pattern is expected to continue"
+    ]
+  },
+  {
+    "anomaly": "Memory usage consistently high at 32% with increasing memory pressure indicators.",
+    "root_causes": "The system shows sustained memory consumption around 32% with gradual increases in active anonymous memory and committed memory, suggesting the ft_cgC job has significant memory requirements that are growing over time.",
+    "solutions": [
+      "Monitor memory usage patterns of the ft_cgC job to determine if it has memory leaks or expected growth patterns",
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes within the job",
+      "Consider allocating the job to nodes with more available memory if the current usage represents normal behavior for this workload type"
+    ]
+  }
+]

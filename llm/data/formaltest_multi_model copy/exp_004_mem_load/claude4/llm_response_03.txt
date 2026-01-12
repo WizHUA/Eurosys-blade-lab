@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Memory usage spiked dramatically from 32% to 55% at 07:08:28, indicating sudden memory allocation.",
+    "root_causes": "Large memory allocation by a process, likely the ft_cgC job which shows characteristics of memory-intensive computational workload.",
+    "solutions": [
+      "Monitor memory usage of the ft_cgC job using 'ps aux --sort=-%mem' to identify specific memory consumption patterns.",
+      "Check if the job has memory leaks by monitoring its memory usage over time with 'top -p <pid>'.",
+      "Review job resource requirements and consider increasing memory allocation if this is expected behavior.",
+      "Implement memory limits using cgroups to prevent system-wide memory exhaustion."
+    ]
+  },
+  {
+    "anomaly": "Disk write activity increased significantly from 110KB/s to over 160MB/s at 07:08:28.",
+    "root_causes": "High-volume disk I/O operations, possibly data checkpointing, output generation, or temporary file creation by the computational job.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the high disk write activity.",
+      "Monitor disk space usage to ensure sufficient capacity for job outputs using 'df -h'.",
+      "Consider optimizing I/O patterns in the application if this is causing performance bottlenecks.",
+      "Evaluate if faster storage or I/O scheduling optimizations would benefit this workload."
+    ]
+  }
+]

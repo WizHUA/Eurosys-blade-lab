@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure with swap space heavily utilized and memory availability critically low.",
+    "root_causes": "Memory resource exhaustion with swap usage at 54% and available memory dropping to dangerous levels, causing frequent swapping operations.",
+    "solutions": [
+      "Monitor swap activity using 'vmstat 1' to confirm the extent of swapping - page_swap_in_rate peaks at 693K/sec and page_swap_out_rate at 210K/sec indicate heavy swapping",
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top' to find applications consuming excessive memory",
+      "Consider increasing system RAM or optimizing application memory usage to reduce reliance on swap space",
+      "Review the completed job 'ft_cgC' which may have left memory-intensive processes or memory leaks behind"
+    ]
+  },
+  {
+    "anomaly": "Extremely high disk I/O utilization causing system performance degradation.",
+    "root_causes": "Disk I/O bottleneck with utilization reaching 87% and sustained high read/write rates primarily due to memory swapping activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing the highest disk I/O - disk write rates peak at 214MB/sec which is excessive",
+      "The high I/O is strongly correlated with swap activity, so resolving memory pressure will significantly reduce disk load",
+      "Consider using faster storage (SSD) for swap partitions if memory upgrades are not immediately feasible",
+      "Monitor disk queue depth and latency to ensure storage subsystem can handle the load"
+    ]
+  },
+  {
+    "anomaly": "High CPU I/O wait time indicating the system is CPU-bound due to disk operations.",
+    "root_causes": "CPU spending significant time waiting for I/O operations to complete, reaching 22% I/O wait time, primarily due to swap-related disk activity.",
+    "solutions": [
+      "The high cpu_iowait_percent of up to 22% confirms that CPU cores are frequently waiting for disk I/O completion",
+      "Reducing memory pressure and associated swapping will directly improve CPU I/O wait times",
+      "Use 'iostat -x 1' to monitor per-device I/O statistics and identify specific storage devices under stress",
+      "Consider load balancing or process scheduling adjustments to reduce I/O contention"
+    ]
+  }
+]

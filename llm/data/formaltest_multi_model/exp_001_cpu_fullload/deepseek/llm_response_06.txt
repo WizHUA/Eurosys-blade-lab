@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization spikes reaching up to 83% during job execution",
+    "root_causes": "Compute-intensive MPI job (ft_cgC) placing significant load on CPU resources",
+    "solutions": [
+      "Review job's CPU affinity settings to ensure optimal core utilization",
+      "Consider spreading workload across more nodes if CPU-bound",
+      "Monitor CPU temperature and throttling during high utilization periods"
+    ]
+  },
+  {
+    "anomaly": "Increasing system load average (from 1.77 to 4.88) disproportionate to CPU utilization",
+    "root_causes": "Potential I/O wait contention or memory pressure during computation phases",
+    "solutions": [
+      "Check disk I/O wait times with 'iostat -x 1' during heavy computation periods",
+      "Monitor memory pressure metrics ('memory_pressure_waiting_rate')",
+      "Consider increasing job memory allocation if hitting limits"
+    ]
+  },
+  {
+    "anomaly": "Network transmit/receive errors accumulating during job execution",
+    "root_causes": "MPI communication patterns causing network congestion",
+    "solutions": [
+      "Verify MPI implementation and network driver configuration",
+      "Monitor network interface statistics ('netstat -i') for errors",
+      "Consider using more efficient MPI collective operations"
+    ]
+  }
+]

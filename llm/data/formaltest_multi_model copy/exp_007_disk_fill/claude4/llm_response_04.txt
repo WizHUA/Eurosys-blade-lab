@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe I/O wait time indicating storage bottleneck affecting system performance.",
+    "root_causes": "Disk I/O subsystem experiencing significant delays, likely due to high storage load from the completed compute-intensive job or ongoing background processes.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O and their read/write patterns.",
+      "Check disk health using 'smartctl -a /dev/sdX' to rule out hardware issues.",
+      "Monitor filesystem fragmentation and consider defragmentation if necessary.",
+      "Evaluate if the storage subsystem can handle the I/O demands of compute workloads."
+    ]
+  },
+  {
+    "anomaly": "High memory pressure with significant page fault activity indicating memory stress.",
+    "root_causes": "Memory subsystem under pressure with active swapping and high page fault rates, suggesting insufficient available memory for current workload demands.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' and 'top'.",
+      "Monitor swap usage with 'vmstat 1' to confirm active swapping patterns.",
+      "Review memory allocation patterns of recently completed jobs to identify potential memory leaks.",
+      "Consider increasing available memory or optimizing application memory usage patterns."
+    ]
+  },
+  {
+    "anomaly": "Elevated TCP connection activity with increased retransmission rates indicating network stress.",
+    "root_causes": "Network subsystem experiencing connection establishment overhead and packet retransmissions, possibly related to distributed computing communication patterns.",
+    "solutions": [
+      "Monitor network interface statistics for packet loss and errors using 'netstat -i'.",
+      "Check network bandwidth utilization and latency to identify bottlenecks.",
+      "Review TCP connection patterns and consider connection pooling for frequent communications.",
+      "Evaluate network infrastructure capacity for handling distributed computing workloads."
+    ]
+  }
+]

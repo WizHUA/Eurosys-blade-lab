@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU usage peaking at 83% with sustained high system load",
+    "root_causes": "FT-CG benchmark computation causing CPU stress during its execution window",
+    "solutions": [
+      "Review FT-CG job parameters and resource allocation",
+      "Check for CPU frequency scaling/throttling issues during computation",
+      "Monitor CPU temperature and cooling system performance"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with 34% usage and active paging",
+    "root_causes": "Memory-intensive operations from the FT-CG benchmark stressing system RAM",
+    "solutions": [
+      "Verify FT-CG memory allocation matches available resources",
+      "Check for memory leaks in the application",
+      "Consider increasing swap space if this is expected workload behavior"
+    ]
+  },
+  {
+    "anomaly": "Network stack showing intermittent retransmissions",
+    "root_causes": "Possible network contention during FT-CG's MPI communications",
+    "solutions": [
+      "Verify network fabric health and interface statistics",
+      "Check MPI configuration for optimal message passing parameters",
+      "Monitor for packet loss at switch/router level"
+    ]
+  }
+]

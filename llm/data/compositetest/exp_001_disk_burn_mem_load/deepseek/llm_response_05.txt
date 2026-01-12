@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Memory pressure spike causing excessive swapping and memory fragmentation",
+    "root_causes": "Memory usage rapidly increased from 36% to 89% within a short period, triggering heavy swap activity and memory compression operations",
+    "solutions": [
+      "Review the memory allocation patterns of the FT (Fourier Transform) application that was running",
+      "Adjust SLURM job memory limits to prevent memory pressure spikes",
+      "Monitor memory fragmentation metrics during job execution"
+    ]
+  },
+  {
+    "anomaly": "CPU usage spikes with high system time percentage",
+    "root_causes": "System CPU usage increased from 2% to over 31%, indicating kernel-level processing overhead possibly related to memory management during the swap operations",
+    "solutions": [
+      "Investigate kernel-level processing loads during memory pressure events",
+      "Check for excessive system calls from the application",
+      "Profile the application's syscall patterns"
+    ]
+  },
+  {
+    "anomaly": "Disk I/O contention during memory pressure events",
+    "root_causes": "Disk write operations spiked to 241MB/s during memory compression and swapping operations",
+    "solutions": [
+      "Consider using faster storage for swap space",
+      "Review application checkpointing settings",
+      "Adjust vm.swappiness parameter for better swap behavior"
+    ]
+  }
+]

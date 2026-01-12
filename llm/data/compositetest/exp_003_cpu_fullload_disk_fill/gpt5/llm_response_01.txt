@@ -1,0 +1,30 @@
+[
+  {
+    "anomaly": "Root filesystem nearly filled during the job window (usage spiked to ~95.36%, avail dropped from ~22.3 GB to ~3.89 GB, recovered later).",
+    "root_causes": "Large, short-lived writes to the root filesystem by the running workload (ft_cgC) caused a sudden space surge; metrics show filesystem_usage_percent rising from ~73.36% to ~95.36% between 23:20:25–23:20:55, then returning to ~73.36% by 23:21:25, consistent with temporary job data/logs.",
+    "solutions": [
+      "Redirect job scratch and checkpoints to a high-capacity scratch filesystem (e.g., node-local /scratch or parallel FS) via TMPDIR/SLURM_TMPDIR or job scripts.",
+      "Review the job's output and temporary paths; delete or relocate large intermediates produced around 23:20:25.",
+      "Implement filesystem usage alerts at 85–90% and enforce per-job quotas to prevent root FS exhaustion.",
+      "Consider expanding or separating the root/log filesystem from workload data paths to reduce risk."
+    ]
+  },
+  {
+    "anomaly": "Sustained swap usage with bursts of very high swap activity despite ample free memory (swap ~48–54% used; swap out up to ~31.8k pages/s at 23:19:40 while memory_available_bytes ≈ 5.5 GB).",
+    "root_causes": "Aggressive kernel swapping behavior or workload/cgroup memory policy caused active swapping even without global RAM scarcity; evidenced by high page_swap_out_rate (31,840→17,161→~200/s) and swap_usage_percent ~54% dropping to ~48% while memory usage stayed ~33%.",
+    "solutions": [
+      "Lower vm.swappiness (e.g., to 10) and verify no memory cgroup limits are forcing swapping for the job.",
+      "Identify processes with high page churn using vmstat/ps and optimize memory usage or pin frequently accessed data in RAM.",
+      "Keep swap on fast storage and reduce swap footprint by freeing inactive caches; consider disabling swap for latency-sensitive jobs after validation."
+    ]
+  },
+  {
+    "anomaly": "Disk I/O pressure and elevated iowait during the same interval (disk_io_usage_percent ~62% and cpu_iowait_percent ~8.0% at 23:19:40; write rate peaked ~32.7 MB/s).",
+    "root_causes": "Burst writes from the workload and concurrent swapping produced storage contention, increasing I/O wait and device busy time.",
+    "solutions": [
+      "Use iotop/blktrace to pinpoint the processes and files causing the write bursts; stagger or batch large writes.",
+      "Throttle per-job I/O with cgroup io.max/blkio.weight or schedule onto nodes with faster local SSDs for write-heavy phases.",
+      "Mitigate swapping (see above) to remove swap-induced I/O load and smooth overall latency."
+    ]
+  }
+]

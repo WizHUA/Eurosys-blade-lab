@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Severe memory pressure spike with 23% increase in memory usage during active job execution.",
+    "root_causes": "The ft_cgC job caused a significant increase in active anonymous memory from 1.58GB to 3.43GB, indicating memory-intensive computation that exceeded expected resource allocation.",
+    "solutions": [
+      "Monitor the ft_cgC job type for memory usage patterns and adjust resource allocation accordingly",
+      "Implement memory limits using cgroups to prevent future jobs from consuming excessive memory",
+      "Review job submission requirements to ensure adequate memory is requested upfront",
+      "Consider splitting memory-intensive jobs into smaller chunks or using memory-efficient algorithms"
+    ]
+  },
+  {
+    "anomaly": "Substantial increase in page swap activity indicating memory pressure.",
+    "root_causes": "Page swap out rate increased dramatically from 10.7 to 167.2 pages per second, correlating with the memory usage spike during job execution.",
+    "solutions": [
+      "Add more physical memory to the node if this workload pattern is common",
+      "Monitor swap usage trends and consider increasing swap space if memory pressure is frequent",
+      "Implement job scheduling policies that consider memory requirements to prevent overcommitment",
+      "Use 'vmstat' and 'sar' tools to establish baseline memory usage patterns for better capacity planning"
+    ]
+  },
+  {
+    "anomaly": "Significant increase in disk I/O activity during job execution.",
+    "root_causes": "Disk write rate increased from 10.9KB/s to 171KB/s, likely due to increased swapping activity and job-related I/O operations.",
+    "solutions": [
+      "Monitor disk I/O patterns for the ft_cgC job type to understand if this is expected behavior",
+      "Consider using faster storage (SSD) for swap partitions if memory pressure is frequent",
+      "Implement I/O scheduling policies to prioritize critical system operations over job I/O",
+      "Use 'iotop' to identify specific processes causing high I/O and optimize accordingly"
+    ]
+  }
+]

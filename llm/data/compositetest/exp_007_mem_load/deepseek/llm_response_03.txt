@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Extremely high CPU I/O wait time consuming 45-53% of CPU resources",
+    "root_causes": "Disk I/O bottleneck likely caused by concurrent heavy disk operations from batch job processing and swapping due to memory pressure",
+    "solutions": [
+      "Investigate active disk operations using 'iotop' to identify processes with high I/O",
+      "Check if memory pressure (99%+ usage) is causing excessive swapping with 'vmstat 1'",
+      "Analyze filesystem performance for the batch job working directory with 'df -i' and 'iostat -x'"
+    ]
+  },
+  {
+    "anomaly": "Critical memory exhaustion with only 120MB free out of 8GB total",
+    "root_causes": "Memory resource exhaustion from job execution combined with page cache buildup",
+    "solutions": [
+      "Review memory usage patterns of completed job 285.batch (ExitCode 15 suggests possible memory issue)",
+      "Check for memory leaks in the application using 'pmap -x' on running processes",
+      "Consider adjusting Slurm job memory limits or implementing memory monitoring alerts"
+    ]
+  },
+  {
+    "anomaly": "Persistent high system load averages (11+) despite CPU usage under 100%",
+    "root_causes": "CPU saturation combined with I/O wait and memory pressure causing process contention",
+    "solutions": [
+      "Analyze process states with 'ps -eo state,pid,cmd | grep ^D' to identify blocked processes",
+      "Consider optimizing job scheduling to avoid overlapping I/O-intensive tasks",
+      "Review kernel parameters (vm.swappiness, dirty ratios) for better memory/disk balancing"
+    ]
+  }
+]

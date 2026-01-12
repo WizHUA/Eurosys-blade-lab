@@ -1,0 +1,39 @@
+[
+  {
+    "anomaly": "Severe disk I/O saturation with rapidly rising I/O wait and queueing",
+    "root_causes": "During the ft_cgC job window, disk throughput surged (disk_read_rate_bytes_per_sec up to ~5.08e8 and disk_write_rate_bytes_per_sec up to ~1.86e8) and disk_io_usage_percent climbed from <1% to ~54.9%, with cpu_iowait_percent increasing from ~0.03% to ~3.77% and processes_blocked reaching 2, indicating the job is saturating storage.",
+    "solutions": [
+      "Identify top I/O offenders with iostat -x 1, iotop, and pidstat -d to confirm per-process/device pressure.",
+      "Redirect job I/O to high-throughput scratch or parallel storage; avoid writing to the system/root filesystem.",
+      "Apply cgroup I/O controls (io.max/blkio throttling) or scheduler QoS to cap per-job bandwidth/IOPS.",
+      "Tune storage and writeback (e.g., select an appropriate I/O scheduler and adjust vm.dirty_background_ratio/vm.dirty_ratio) to reduce long writeback stalls."
+    ]
+  },
+  {
+    "anomaly": "Intense swap churn (thrashing) under heavy write activity",
+    "root_causes": "Page swap activity spiked dramatically (page_swap_in_rate up to ~363,062/s and page_swap_out_rate up to ~147,796/s) while swap_usage_percent stayed ~47.8% and memory_available_bytes remained ~5.2 GiB, consistent with aggressive reclaim under heavy page cache and writeback pressure during ft_cgC.",
+    "solutions": [
+      "Reduce vm.swappiness (e.g., to 10) and consider enabling zswap or using a faster swap device.",
+      "Constrain job memory with cgroups (memory.high/memory.max) and reserve headroom for the OS; reduce job concurrency if necessary.",
+      "Control page cache growth and writeback (tune vm.dirty_*), and ensure large, temporary writes target local scratch or parallel filesystems."
+    ]
+  },
+  {
+    "anomaly": "Rapid filesystem space consumption approaching high utilization",
+    "root_causes": "Filesystem usage increased quickly from ~73.36% to ~87.05% (filesystem_avail_bytes dropped from ~22.33 GiB to ~10.85 GiB) during the job, indicating substantial output/checkpoint data written to the same filesystem.",
+    "solutions": [
+      "Redirect large outputs and checkpoints to project or scratch storage with sufficient capacity.",
+      "Enforce quotas and alerts (e.g., warn at 85%) and clean up temporary files immediately after job completion.",
+      "Plan capacity or extend the filesystem if sustained growth is expected."
+    ]
+  },
+  {
+    "anomaly": "Transient spike in TCP retransmissions/SYN retransmits",
+    "root_causes": "At 23:22:25, node_netstat counters show Tcp_RetransSegs ~30/s and TCPSynRetrans ~6/s (TCPTimeouts 15), suggesting brief network reliability degradation during the run.",
+    "solutions": [
+      "Check NIC and switch error counters for that interval; review dmesg for driver resets or link flaps.",
+      "Verify MTU and offload settings and inspect cabling; monitor for recurrence during similar workloads.",
+      "If the job communicates over the network, consider isolating traffic to a dedicated interface or adjusting retry/backoff settings."
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "CPU usage spiked to 83% with user processes consuming excessive resources",
+    "root_causes": "Computationally intensive job execution (ft_cgC) and potential poor CPU scheduling",
+    "solutions": [
+      "Review the ft_cgC job's resource requirements and optimize its algorithm",
+      "Check CPU scheduler configurations and consider adjusting process priorities",
+      "Monitor for CPU-bound processes that may be competing with critical system services"
+    ]
+  },
+  {
+    "anomaly": "System load increased dramatically from 1.77 to 4.88 while CPU usage was already high",
+    "root_causes": "Unusually high number of processes competing for CPU time during peak workload",
+    "solutions": [
+      "Investigate why the load avg exceeds physical core count (8 cores)",
+      "Check for process throttling or scheduling latency issues",
+      "Analyze the process queue for resource starvation"
+    ]
+  },
+  {
+    "anomaly": "TCP retransmission rate increased significantly during the job execution",
+    "root_causes": "Network congestion or packet loss affecting MPI communications during the computation",
+    "solutions": [
+      "Check network infrastructure including switch buffers and link status",
+      "Monitor network bandwidth utilization during high-load periods",
+      "Review MPI configuration and consider adjusting message chunk sizes"
+    ]
+  }
+]

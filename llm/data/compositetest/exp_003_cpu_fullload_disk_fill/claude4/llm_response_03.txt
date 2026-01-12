@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O wait time causing severe system performance degradation.",
+    "root_causes": "Disk I/O bottleneck with consistent 25-62% I/O wait time, indicating storage subsystem cannot keep up with demand.",
+    "solutions": [
+      "Use 'iotop' to identify which processes are generating the heaviest disk I/O load.",
+      "Check disk health using 'smartctl -a /dev/sdX' to identify potential hardware failures.",
+      "Monitor disk queue depth and consider upgrading to faster storage (SSD) or implementing RAID for better I/O performance.",
+      "Analyze the completed job 'ft_cgC' logs to determine if it was performing intensive file operations that may have saturated the storage."
+    ]
+  },
+  {
+    "anomaly": "Filesystem utilization critically high at 95% capacity.",
+    "root_causes": "Filesystem is nearly full, leaving minimal space for system operations and temporary files.",
+    "solutions": [
+      "Immediately clean up unnecessary files using 'du -sh /*' to identify large directories consuming space.",
+      "Check for large log files in /var/log/ and rotate or compress them as needed.",
+      "Remove temporary files and clean package caches using system-appropriate cleanup tools.",
+      "Consider expanding the filesystem or moving data to additional storage volumes to prevent system instability."
+    ]
+  },
+  {
+    "anomaly": "High memory pressure with significant swap usage at 47% despite adequate free memory.",
+    "root_causes": "Memory management inefficiency or memory fragmentation causing unnecessary swap utilization.",
+    "solutions": [
+      "Monitor memory usage patterns using 'vmstat 1' to identify if swapping is actively occurring.",
+      "Use 'swapon -s' and 'cat /proc/swaps' to verify swap configuration and usage.",
+      "Consider adjusting vm.swappiness kernel parameter to reduce aggressive swapping behavior.",
+      "Investigate if the completed job left behind memory-mapped files or shared memory segments consuming swap space."
+    ]
+  }
+]

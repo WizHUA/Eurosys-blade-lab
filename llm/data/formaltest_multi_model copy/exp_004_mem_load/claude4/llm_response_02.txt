@@ -1,0 +1,22 @@
+[
+  {
+    "anomaly": "Severe memory pressure causing system instability and performance degradation.",
+    "root_causes": "Memory usage spiked from 32% to 55% at 07:08:28, indicating excessive memory allocation by a process or memory leak. The system shows signs of memory exhaustion with increased page swapping activity.",
+    "solutions": [
+      "Identify memory-intensive processes using 'ps aux --sort=-%mem' to find the root cause of the memory spike",
+      "Monitor swap usage and consider adding more swap space if physical memory cannot be increased",
+      "Check for memory leaks in the completed job 'ft_cgC' by reviewing application logs",
+      "Consider implementing memory limits using cgroups to prevent future memory exhaustion"
+    ]
+  },
+  {
+    "anomaly": "Excessive disk I/O activity during memory pressure period.",
+    "root_causes": "Disk write rate increased dramatically to over 160KB/sec during the memory pressure event, likely caused by swap activity and memory pages being written to disk.",
+    "solutions": [
+      "Use 'iotop' to identify processes causing high disk I/O during memory pressure events",
+      "Monitor swap in/out rates using 'vmstat 1' to confirm if I/O is swap-related",
+      "Consider upgrading to faster storage (SSD) to reduce I/O latency during swap operations",
+      "Optimize application memory usage to reduce dependency on swap space"
+    ]
+  }
+]

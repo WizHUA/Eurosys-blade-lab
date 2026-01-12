@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU utilization (73-83%) accompanied by elevated system load (5.77-6.8)",
+    "root_causes": "CPU-intensive computational workload from the completed ft_cgC job",
+    "solutions": [
+      "Analyze completed job metrics to understand CPU consumption patterns",
+      "Verify CPU affinity settings for MPI processes",
+      "Check for potential thread oversubscription"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure fluctuations (32-92% usage) with temporary spikes",
+    "root_causes": "Memory-intensive phases during the ft_cgC job execution",
+    "solutions": [
+      "Review job memory allocation versus actual usage",
+      "Check for memory leaks in application code",
+      "Consider optimizing memory access patterns"
+    ]
+  },
+  {
+    "anomaly": "Network communication spikes during job execution",
+    "root_causes": "MPI collective operations in the ft_cgC benchmark",
+    "solutions": [
+      "Analyze MPI communication patterns",
+      "Verify network fabric health and configuration",
+      "Consider tuning MPI buffer sizes"
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extremely high disk I/O activity and severe disk utilization bottleneck",
+    "root_causes": "Disk I/O load causing severe performance degradation with disk utilization reaching 67-90% and massive write operations exceeding 100GB/s",
+    "solutions": [
+      "Use 'iotop -ao' to identify the specific processes causing the massive disk write activity",
+      "Check if the completed job 'ft_cgC' left behind any background processes still performing I/O operations",
+      "Monitor disk queue depths and consider I/O scheduling optimizations or storage hardware upgrades",
+      "Verify filesystem health and consider defragmentation if the workload involved heavy random writes"
+    ]
+  },
+  {
+    "anomaly": "Significant memory pressure with high cache utilization and swap activity",
+    "root_causes": "Memory resource load indicated by 64% cache usage, active swap operations, and consistent page fault activity",
+    "solutions": [
+      "Monitor memory usage patterns to determine if the high cache usage is from legitimate file operations or memory leaks",
+      "Check for memory-intensive background processes that may still be running after job completion",
+      "Review swap usage patterns as the system shows consistent swap activity which may impact performance",
+      "Consider memory cleanup operations if the cache usage remains high without active workloads"
+    ]
+  },
+  {
+    "anomaly": "High CPU system time and sustained processing load",
+    "root_causes": "CPU resource load with consistently high system time (10-49%) and elevated load averages indicating kernel-level processing overhead",
+    "solutions": [
+      "Use 'perf top' to identify kernel functions consuming high CPU cycles",
+      "Check for I/O-related system calls that may be causing the high system CPU usage",
+      "Monitor for any remaining background processes from the completed 'ft_cgC' job",
+      "Consider system resource cleanup if the high system load persists without active user workloads"
+    ]
+  }
+]

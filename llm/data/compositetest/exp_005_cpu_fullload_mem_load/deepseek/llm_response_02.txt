@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "High CPU user time percentage (74.66%) during job execution",
+    "root_causes": "Computationally intensive application (ft_cgC) consuming significant CPU resources",
+    "solutions": [
+      "Profile the ft_cgC application to identify optimization opportunities",
+      "Consider adjusting job scheduling parameters to reduce resource contention",
+      "Check for CPU throttling or thermal issues that might be impacting performance"
+    ]
+  },
+  {
+    "anomaly": "Memory pressure with high cache usage (62.94%)",
+    "root_causes": "Application working set exceeds available physical memory, leading to caching overhead",
+    "solutions": [
+      "Monitor application memory requirements and adjust job allocation parameters",
+      "Consider optimizing the application's memory access patterns",
+      "Increase available memory if the workload consistently requires more resources"
+    ]
+  },
+  {
+    "anomaly": "High I/O wait percentage (5.21% peak)",
+    "root_causes": "Storage subsystem bottleneck during application I/O operations",
+    "solutions": [
+      "Profile application I/O patterns and optimize file access",
+      "Consider using faster storage or distributed filesystem if available",
+      "Check for parallel filesystem contention with other jobs"
+    ]
+  }
+]

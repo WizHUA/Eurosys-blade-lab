@@ -1,0 +1,29 @@
+[
+  {
+    "anomaly": "Severe memory pressure and swap exhaustion",
+    "root_causes": "Memory usage spiked to 98.58% with swap usage reaching 99.99%, indicating complete exhaustion of available memory resources",
+    "solutions": [
+      "Investigate memory leaks in the completed ft_ftC job",
+      "Increase physical memory allocation or optimize job memory requirements",
+      "Adjust SLURM job memory limits to prevent similar occurrences"
+    ]
+  },
+  {
+    "anomaly": "Sudden spike in IO wait percentage",
+    "root_causes": "CPU iowait percentage jumped from near zero to 26.98% during memory pressure, indicating disk thrashing due to memory swapping",
+    "solutions": [
+      "Monitor disk activity during high memory usage periods",
+      "Consider using faster storage for swap/temporary files",
+      "Review job's disk IO patterns and optimize"
+    ]
+  },
+  {
+    "anomaly": "Elevated system load average disproportionate to CPU usage",
+    "root_causes": "Load average peaked at 10.02 while CPU usage was at 84.39%, indicating blocked processes waiting for IO or memory",
+    "solutions": [
+      "Analyze process states during load spikes ('D' state processes)",
+      "Review system logs for OOM killer activity",
+      "Consider distributing workload across more nodes"
+    ]
+  }
+]

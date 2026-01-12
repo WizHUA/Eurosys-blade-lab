@@ -1,0 +1,32 @@
+[
+  {
+    "anomaly": "Extreme memory pressure with memory usage spiking to over 92% and severe cache eviction.",
+    "root_causes": "Memory resource exhaustion from high-demand computational workload exceeding available physical RAM.",
+    "solutions": [
+      "Monitor memory usage patterns using 'free -h' and 'vmstat 1' to confirm the extent of memory pressure.",
+      "Use 'ps aux --sort=-%mem' to identify the most memory-intensive processes.",
+      "Consider increasing system memory or optimizing the application's memory allocation patterns.",
+      "The dramatic drop in memory_cached_bytes from 5GB to 400MB indicates aggressive cache eviction under memory pressure."
+    ]
+  },
+  {
+    "anomaly": "Sustained high CPU utilization with peaks reaching 83% and elevated system load.",
+    "root_causes": "CPU resource saturation from computationally intensive workload running on the system.",
+    "solutions": [
+      "Use 'top' or 'htop' to identify specific processes consuming high CPU resources.",
+      "The load average consistently above 5.0 on what appears to be an 8-core system indicates moderate to high CPU contention.",
+      "Consider CPU affinity settings or process scheduling optimization for the running job.",
+      "Monitor for any background processes that might be competing for CPU resources."
+    ]
+  },
+  {
+    "anomaly": "Significantly elevated disk I/O activity with high wait times and utilization.",
+    "root_causes": "Disk I/O subsystem under stress from high read/write operations, likely exacerbated by memory pressure causing increased paging activity.",
+    "solutions": [
+      "Use 'iotop' to identify processes generating the highest disk I/O load.",
+      "The high page_swap_in_rate and page_swap_out_rate values indicate memory swapping is contributing to disk pressure.",
+      "Consider optimizing application I/O patterns or upgrading to faster storage if this is a recurring issue.",
+      "Resolving the memory pressure issue should help reduce swap-related disk activity."
+    ]
+  }
+]
