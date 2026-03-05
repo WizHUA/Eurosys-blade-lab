@@ -3,18 +3,31 @@ import os
 from openai import OpenAI
 from datetime import datetime
 import pandas as pd
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 class LLMAnalyzer:
-    def __init__(self, api_key="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"):
+    def __init__(self, api_key=None):
         """初始化LLM分析器"""
+        self.api_key = api_key or os.getenv("OPENROUTER_API_KEY")
+        if not self.api_key:
+            raise ValueError("未提供API Key，请设置 OPENROUTER_API_KEY 环境变量或在初始化时传入。")
+
         self.client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
-            api_key=api_key,
+            api_key=self.api_key,
         )
         
-        # 参考路径设置
-        self.ref_dir = "/opt/exp/llm/ref"
-        self.results_dir = "/opt/exp/llm/data/formaltest"
+        # 获取当前脚本所在目录
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 项目根目录 (假设 src 在 llm 下，llm 在根目录下)
+        project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+        
+        # 参考路径设置 (使用相对路径)
+        self.ref_dir = os.path.join(project_root, "llm", "ref")
+        self.results_dir = os.path.join(project_root, "llm", "data", "formaltest")
         os.makedirs(self.results_dir, exist_ok=True)
         
     def load_prompt(self, file_path):

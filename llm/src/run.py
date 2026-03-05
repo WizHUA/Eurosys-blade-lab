@@ -1,6 +1,11 @@
 import json
 from openai import OpenAI
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 def load_prompt(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -28,12 +33,17 @@ def get_in_period_job(metric_content, job_content):
         if not line.strip(): # 跳过空行
             continue
         parts = line.split('|')
+        if len(parts) < 6:
+            continue
         job_start_str = parts[4]
         job_end_str = parts[5]
-        job_start = datetime.strptime(job_start_str, "%Y-%m-%dT%H:%M:%S") # e.g. 2025-08-15T14:59:55
-        job_end = datetime.strptime(job_end_str, "%Y-%m-%dT%H:%M:%S")
-        if job_start <= metric_end and job_end >= metric_start:
-            filtered_jobs.append(line)
+        try:
+            job_start = datetime.strptime(job_start_str, "%Y-%m-%dT%H:%M:%S") # e.g. 2025-08-15T14:59:55
+            job_end = datetime.strptime(job_end_str, "%Y-%m-%dT%H:%M:%S")
+            if job_start <= metric_end and job_end >= metric_start:
+                filtered_jobs.append(line)
+        except ValueError:
+            continue
 
     return '\n'.join(filtered_jobs)
 
@@ -48,12 +58,26 @@ def get_sample_data():
 
     return system_metric, job_info
 
-def get_sample_data2():
-    with open("openrouter/src/testinfo/metric", 'r', encoding='utf-8') as f:
+import argparse
+
+def get_sample_data2(experiment_name="test"):
+    # 获取当前脚本所在目录
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+    
+    # 根据实验名称构建路径
+    metric_path = os.path.join(project_root, "dataset_builder", "data", experiment_name, "metric.csv")
+    jobinfo_path = os.path.join(project_root, "dataset_builder", "data", experiment_name, "jobinfo.csv")
+    
+    if not os.path.exists(metric_path):
+        print(f"Warning: Metric file not found at {metric_path}. Using sample data.")
+        return get_sample_data()
+
+    with open(metric_path, 'r', encoding='utf-8') as f:
         system_metric = f.read()
-    with open("openrouter/src/testinfo/jobinfo", 'r', encoding='utf-8') as f:
+    with open(jobinfo_path, 'r', encoding='utf-8') as f:
         job_info = f.read()
-    fliter_job = get_in_period_job(system_metric, job_info)
+    # fliter_job = get_in_period_job(system_metric, job_info)
     return system_metric, job_info
 
 def split_fewshot(fewshot_text):
@@ -64,54 +88,41 @@ def split_fewshot(fewshot_text):
     return fewshot_input, fewshot_output
 
 def test():
+    # ... (keeping test function as is, or removing it if not needed)
+    pass
+
+def run_analysis(experiment_name="test"):
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        print("Error: OPENROUTER_API_KEY not found in environment variables.")
+        return
+
     client = OpenAI(
       base_url="https://openrouter.ai/api/v1",
-      api_key="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",
+      api_key=api_key,
     )
     
-    system_prompt = load_prompt("openrouter/src/prompt.md")
-    fewshot_text = load_fewshot("openrouter/src/fewshot.md")
-
-    fewshot_input, fewshot_examples = split_fewshot(fewshot_text)
-
-    system_metric, job_info = get_sample_data()
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+    ref_dir = os.path.join(project_root, "llm", "ref")
     
-    note_front = "We are diagnosing abnormal behavior in an HPC cluster.\n\
-        The following JSON object contains two types of real-time monitoring data:"
-    note_back = "\nPlease analyze this data and generate a diagnostic report following the rules and format specified in the System Prompt."
-    user_data = system_metric + "\n" + job_info
-    user_prompt = note_front + user_data + note_back
+    prompt_path = os.path.join(ref_dir, "prompt.md")
+    if not os.path.exists(prompt_path):
+        print(f"Error: Prompt file not found at {prompt_path}")
+        return
 
-    completion = client.chat.completions.create(
-        model="deepseek/deepseek-chat-v3.1:free",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": fewshot_input},
-            {"role": "assistant", "content": fewshot_examples},
-            {"role": "user", "content": user_prompt}
-        ]
-    )
+    system_prompt = load_prompt(prompt_path)
 
-    print("Response from model:")
-    print(completion.choices[0].message.content)
-
-def test2():
-    client = OpenAI(
-      base_url="https://openrouter.ai/api/v1",
-      api_key="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",
-    )
-    
-    system_prompt = load_prompt("openrouter/src/prompt.md")
-
-    shot1_text = load_fewshot("openrouter/src/fewshot/shot1.md")
-    shot2_text = load_fewshot("openrouter/src/fewshot/shot2.md")
-    shot3_text = load_fewshot("openrouter/src/fewshot/shot3.md")
+    shot1_text = load_fewshot(os.path.join(ref_dir, "fewshot", "shot1.txt"))
+    shot2_text = load_fewshot(os.path.join(ref_dir, "fewshot", "shot2.txt"))
+    shot3_text = load_fewshot(os.path.join(ref_dir, "fewshot", "shot3.txt"))
 
     shot1_input, shot1_output = split_fewshot(shot1_text)
     shot2_input, shot2_output = split_fewshot(shot2_text)
     shot3_input, shot3_output = split_fewshot(shot3_text)
 
-    system_metric, job_info = get_sample_data2()
+    print(f"Loading data for experiment: {experiment_name}")
+    system_metric, job_info = get_sample_data2(experiment_name)
 
     input_data = {
     "system_metrics": system_metric,
@@ -126,6 +137,7 @@ def test2():
     Your output must start with '[' and end with ']'. Do not include any code block markers or extra text.
     """
 
+    print("Sending request to LLM...")
     completion = client.chat.completions.create(
         # model="deepseek/deepseek-chat-v3.1:free",
         # model = "openai/gpt-5",
@@ -144,12 +156,27 @@ def test2():
 
     print("Response from model:")
     res_content = completion.choices[0].message.content
-    out = json.loads(res_content)
-    print(json.dumps(out, indent=2, ensure_ascii=False))
-    pass
+    try:
+        out = json.loads(res_content)
+        print(json.dumps(out, indent=2, ensure_ascii=False))
+        
+        # 保存结果
+        result_dir = os.path.join(project_root, "llm", "data", experiment_name)
+        os.makedirs(result_dir, exist_ok=True)
+        with open(os.path.join(result_dir, "diagnosis_report.json"), "w", encoding="utf-8") as f:
+            json.dump(out, f, indent=2, ensure_ascii=False)
+        print(f"Report saved to {result_dir}/diagnosis_report.json")
+        
+    except json.JSONDecodeError:
+        print("Failed to parse JSON response:")
+        print(res_content)
 
 def main():
-    test2()
+    parser = argparse.ArgumentParser(description='Run LLM Diagnosis')
+    parser.add_argument('--experiment', type=str, default='test', help='Name of the experiment to analyze')
+    args = parser.parse_args()
+    
+    run_analysis(args.experiment)
 
 if __name__ == "__main__":
     main()
