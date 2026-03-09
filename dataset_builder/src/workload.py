@@ -8,7 +8,7 @@ import threading
 import time
 import pandas as pd
 
-RUNTAG = True
+RUNTAG = False
 
 def greenPrint(msg: str):
     if RUNTAG:

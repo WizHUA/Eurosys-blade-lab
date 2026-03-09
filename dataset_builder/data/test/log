@@ -1,0 +1,209 @@
+
+Initializing Experiment Manager for experiment: test
+================================================================================
+   Starting Experiment: test
+   Description: TEST
+   Output Directory: data/test
+   Run function Start Time: 2026-03-09 09:27:26
+================================================================================
+Initializing components...
+Monitor component initialized
+Validating ChaosBlade avbailability...
+ChaosBlade is available. Version: version: 1.7.4
+env: #1 SMP Thu Mar 17 17:08:06 UTC 2022 x86_64
+build-time: Wed Jul  3 09:25:20 UTC 2024
+Chaos component initialized
+Workload component initialized
+Validating experiment environment...
+Checking connectivity to Prometheus server...
+Successfully connected to Prometheus server.
+Environment validation completed
+Timeline Start: 2026-03-09 09:27:27
+
+Starting workload and chaos plan injecting
+Workload plan: light_background
+Chaos plan: single_cpu_stress
+Executing chaos plan: single_cpu_stress
+Waiting 10.0s to inject fault 'cpu_fullload'
+2026-03-09 09:27:27,451 - experiment - INFO - Workload timeline execution completed for plan: light_background
+Injecting fault: cpu_fullload
+Fault injected successfully: 5a317e1e3d3655e9
+[1/1] Fault cpu_fullload will run for 60s
+2026-03-09 09:27:38,250 - experiment - INFO - Chaos timeline execution completed for plan: single_cpu_stress
+Chaos expected end time reached
+All workload jobs cancelled
+Cleaning up all resources...
+Destroying all active faults...
+------------------------------------------------------------
+get active faults:
+Updated fault status: 1 faults marked as expired
+All active faults destroyed.
+All resources cleaned up.
+Exporting all data...
+Exporting monitored data...
+Exporting monitored data
+         from 2026-03-09 09:27:27.433999 to 2026-03-09 09:28:48.138369...
+Exporting metric  1/157: cpu_idle_seconds
+Exporting metric  2/157: cpu_user_seconds
+Exporting metric  3/157: cpu_system_seconds
+Exporting metric  4/157: cpu_iowait_seconds
+Exporting metric  5/157: cpu_irq_seconds
+Exporting metric  6/157: cpu_softirq_seconds
+Exporting metric  7/157: cpu_nice_seconds
+Exporting metric  8/157: cpu_steal_seconds
+Exporting metric  9/157: cpu_usage_percent
+Exporting metric 10/157: cpu_user_percent
+Exporting metric 11/157: cpu_system_percent
+Exporting metric 12/157: cpu_iowait_percent
+Exporting metric 13/157: context_switches_rate
+Exporting metric 14/157: interrupts_rate
+Exporting metric 15/157: process_forks_rate
+Exporting metric 16/157: load_1min
+Exporting metric 17/157: load_5min
+Exporting metric 18/157: load_15min
+Exporting metric 19/157: processes_running
+Exporting metric 20/157: processes_blocked
+Exporting metric 21/157: memory_total_bytes
+Exporting metric 22/157: memory_free_bytes
+Exporting metric 23/157: memory_available_bytes
+Exporting metric 24/157: memory_cached_bytes
+Exporting metric 25/157: memory_buffers_bytes
+Exporting metric 26/157: memory_active_anon_bytes
+Exporting metric 27/157: memory_active_file_bytes
+Exporting metric 28/157: memory_inactive_anon_bytes
+Exporting metric 29/157: memory_inactive_file_bytes
+Exporting metric 30/157: memory_shmem_bytes
+Exporting metric 31/157: memory_kreclaimable_bytes
+Exporting metric 32/157: memory_sunreclaim_bytes
+Exporting metric 33/157: memory_page_tables_bytes
+Exporting metric 34/157: memory_kernel_stack_bytes
+Exporting metric 35/157: memory_mapped_bytes
+Exporting metric 36/157: memory_committed_as_bytes
+Exporting metric 37/157: memory_dirty_bytes
+Exporting metric 38/157: memory_writeback_bytes
+Exporting metric 39/157: memory_usage_percent
+Exporting metric 40/157: cache_usage_percent
+Exporting metric 41/157: buffer_usage_percent
+Exporting metric 42/157: anon_memory_percent
+Exporting metric 43/157: swap_total_bytes
+Exporting metric 44/157: swap_free_bytes
+Exporting metric 45/157: swap_cached_bytes
+Exporting metric 46/157: swap_usage_percent
+Exporting metric 47/157: page_faults_rate
+Exporting metric 48/157: page_major_faults_rate
+Exporting metric 49/157: page_swap_in_rate
+Exporting metric 50/157: page_swap_out_rate
+Exporting metric 51/157: vm_oom_kills_total
+Exporting metric 52/157: disk_read_bytes_total
+Exporting metric 53/157: disk_written_bytes_total
+Exporting metric 54/157: disk_reads_completed_total
+Exporting metric 55/157: disk_writes_completed_total
+Exporting metric 56/157: disk_read_time_seconds_total
+Exporting metric 57/157: disk_write_time_seconds_total
+Exporting metric 58/157: disk_io_time_seconds_total
+Exporting metric 59/157: disk_io_weighted_time_seconds_total
+Exporting metric 60/157: disk_io_now
+Exporting metric 61/157: disk_reads_merged_total
+Exporting metric 62/157: disk_writes_merged_total
+Exporting metric 63/157: disk_io_usage_percent
+Exporting metric 64/157: disk_read_rate_bytes_per_sec
+Exporting metric 65/157: disk_write_rate_bytes_per_sec
+Exporting metric 66/157: disk_read_iops
+Exporting metric 67/157: disk_write_iops
+Exporting metric 68/157: disk_total_iops
+Exporting metric 69/157: filesystem_size_bytes
+Exporting metric 70/157: filesystem_avail_bytes
+Exporting metric 71/157: filesystem_free_bytes
+Exporting metric 72/157: filesystem_readonly
+Exporting metric 73/157: filesystem_usage_percent
+Exporting metric 74/157: filesystem_files_total
+Exporting metric 75/157: filesystem_files_free
+Exporting metric 76/157: filesystem_inode_usage_percent
+Exporting metric 77/157: filefd_allocated
+Exporting metric 78/157: filefd_maximum
+Exporting metric 79/157: filefd_usage_percent
+Exporting metric 80/157: network_receive_bytes_total
+Exporting metric 81/157: network_transmit_bytes_total
+Exporting metric 82/157: network_receive_packets_total
+Exporting metric 83/157: network_transmit_packets_total
+Exporting metric 84/157: network_receive_errs_total
+Exporting metric 85/157: network_transmit_errs_total
+Exporting metric 86/157: network_receive_drop_total
+Exporting metric 87/157: network_transmit_drop_total
+Exporting metric 88/157: network_receive_fifo_total
+Exporting metric 89/157: network_transmit_fifo_total
+Exporting metric 90/157: network_receive_frame_total
+Exporting metric 91/157: network_transmit_carrier_total
+Exporting metric 92/157: network_transmit_colls_total
+Exporting metric 93/157: network_up
+Exporting metric 94/157: network_mtu_bytes
+Exporting metric 95/157: network_speed_bytes
+Exporting metric 96/157: network_receive_rate_bytes_per_sec
+Exporting metric 97/157: network_transmit_rate_bytes_per_sec
+Exporting metric 98/157: network_receive_packets_rate
+Exporting metric 99/157: network_transmit_packets_rate
+Exporting metric 100/157: network_receive_errors_rate
+Exporting metric 101/157: network_transmit_errors_rate
+Exporting metric 102/157: network_receive_drop_rate
+Exporting metric 103/157: network_transmit_drop_rate
+Exporting metric 104/157: tcp_current_connections
+Exporting metric 105/157: tcp_active_opens_rate
+Exporting metric 106/157: tcp_passive_opens_rate
+Exporting metric 107/157: tcp_timeouts_rate
+Exporting metric 108/157: tcp_retransmissions_rate
+Exporting metric 109/157: tcp_syn_retrans_rate
+Exporting metric 110/157: tcp_listen_overflows_rate
+Exporting metric 111/157: tcp_listen_drops_rate
+Exporting metric 112/157: tcp_resets_sent_rate
+Exporting metric 113/157: tcp_segments_received_rate
+Exporting metric 114/157: tcp_segments_sent_rate
+Exporting metric 115/157: tcp_receive_errors_rate
+Exporting metric 116/157: udp_receive_datagrams_rate
+Exporting metric 117/157: udp_transmit_datagrams_rate
+Exporting metric 118/157: udp_receive_errors_rate
+Exporting metric 119/157: udp_no_ports_rate
+Exporting metric 120/157: icmp_receive_msgs_rate
+Exporting metric 121/157: icmp_transmit_msgs_rate
+Exporting metric 122/157: icmp_receive_errors_rate
+Exporting metric 123/157: sockets_used
+Exporting metric 124/157: tcp_mem_bytes
+Exporting metric 125/157: udp_mem_bytes
+Exporting metric 126/157: systemd_units_active
+Exporting metric 127/157: systemd_units_inactive
+Exporting metric 128/157: systemd_units_failed
+Exporting metric 129/157: systemd_system_running
+Exporting metric 130/157: system_time_seconds
+Exporting metric 131/157: system_boot_time_seconds
+Exporting metric 132/157: system_uptime_seconds
+Exporting metric 133/157: time_sync_status
+Exporting metric 134/157: time_offset_seconds
+Exporting metric 135/157: time_max_error_seconds
+Exporting metric 136/157: time_estimated_error_seconds
+Exporting metric 137/157: time_frequency_adjustment_ratio
+Exporting metric 138/157: time_loop_time_constant
+Exporting metric 139/157: time_status
+Exporting metric 140/157: time_zone_offset_seconds
+Exporting metric 141/157: entropy_available_bits
+Exporting metric 142/157: entropy_pool_size_bits
+Exporting metric 143/157: entropy_usage_percent
+Exporting metric 144/157: softnet_processed_total
+Exporting metric 145/157: softnet_dropped_total
+Exporting metric 146/157: softnet_times_squeezed_total
+Exporting metric 147/157: softnet_processed_rate
+Exporting metric 148/157: softnet_dropped_rate
+Exporting metric 149/157: softnet_squeezed_rate
+Exporting metric 150/157: arp_entries
+Exporting metric 151/157: cpu_pressure_waiting_rate
+Exporting metric 152/157: memory_pressure_waiting_rate
+Exporting metric 153/157: memory_pressure_stalled_rate
+Exporting metric 154/157: io_pressure_waiting_rate
+Exporting metric 155/157: io_pressure_stalled_rate
+Exporting metric 156/157: schedstat_running_rate
+Exporting metric 157/157: schedstat_waiting_rate
+Export completed. Data saved to data/test/metric.csv
+Exporting workload data...
+Exporting chaos data...
+================================================================================
+   Result:
+Experiment completed successfully
+================================================================================

@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=npb_experiment
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:05:00
 #SBATCH --output=/opt/exp/logs/npb_%j.out
@@ -14,7 +14,7 @@ mkdir -p /opt/exp/logs
 # 获取参数
 NPB_PROGRAM=${1:-"cg.B.x"}
 ITERATIONS=6  # 写死运行10次
-NPB_DIR="/opt/exp/npb/NPB3.4.2/NPB3.4-MPI/bin"
+NPB_DIR="/home/quantum/Eurosys-blade-lab/npb/NPB3.4.2/NPB3.4-MPI/bin"
 
 echo "开始执行NPB程序: $NPB_PROGRAM"
 echo "作业ID: $SLURM_JOB_ID"

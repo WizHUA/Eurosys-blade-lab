@@ -1,6 +1,6 @@
 # Slurm配置
 slurm:
-  partition: "CPU"
+  partition: "debug"
   account: null  # 如果需要指定account
   default_time_limit: "00:30:00"
   default_nodes: 1
@@ -164,5 +164,5 @@ workload_plans:
 
 # NPB可执行文件路径配置
 npb_config:
-  base_path: "/opt/exp/npb/NPB3.4.2/NPB3.4-MPI/bin"
-  sbatch_template: "/opt/exp/jobs/npb_job.sbatch"  # sbatch脚本模板路径
+  base_path: "/home/quantum/Eurosys-blade-lab/npb/NPB3.4.2/NPB3.4-MPI/bin"
+  sbatch_template: "/home/quantum/Eurosys-blade-lab/jobs/npb_job.sbatch"

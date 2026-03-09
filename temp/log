@@ -1,3 +1,23 @@
+~/Eurosys-blade-lab (main*) » set -e                   quantum@quantum-os
+cd /home/quantum/Eurosys-blade-lab
+
+echo "=== chaos.yaml ==="
+cat dataset_builder/config/chaos.yaml
+
+echo ""
+echo "=== workloads.yaml ==="
+cat dataset_builder/config/workloads.yaml
+
+echo ""
+echo "=== prometheus.yaml (若存在) ==="
+cat dataset_builder/config/prometheus.yaml 2>/dev/null || \
+cat dataset_builder/config/monitor.yaml    2>/dev/null || \
+echo "[NOT FOUND] 未找到监控配置文件"
+
+echo ""
+echo "=== 列出 config/ 下所有文件 ==="
+ls -la dataset_builder/config/
+=== chaos.yaml ===
 # ChaosBlade工具配置
 chaosblade:
   command: "blade"
@@ -659,18 +679,191 @@ chaos_plans:
         target_node: null
         custom_params:
           cpu-percent: 75
-          
-  single_cpu_stress:
-    description: "单次CPU压力测试（约2分钟）"
-    faults:
-      - fault_type: "cpu_fullload"
-        inject_delay: 10
-        duration: 60
-        target_node: null
-        custom_params:
-          cpu-percent: 70
 
 # 日志配置
 logging:
   log_file: "logs/chaos.log"
   level: "INFO"
+=== workloads.yaml ===
+# Slurm配置
+slurm:
+  partition: "CPU"
+  account: null  # 如果需要指定account
+  default_time_limit: "00:30:00"
+  default_nodes: 1
+  default_ntasks: 1
+
+# 作业信息查询配置
+job_info:
+  query_format: "JobID,JobName,NodeList,Submit,Start,End,State,ExitCode,Elapsed"
+  output_delimiter: "|"
+
+# NPB负载定义
+npb_programs:
+  # Class B
+  cg_B:
+    executable: "cg.B.x"
+    description: "Conjugate Gradient - Class B"
+    estimated_runtime: 300  # 预估运行时间(秒)
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:09:00"
+    
+  ep_B:
+    executable: "ep.B.x" 
+    description: "Embarrassingly Parallel - Class B"
+    estimated_runtime: 240
+    resource_requirements:
+      nodes: 1
+      ntasks: 2
+      time_limit: "00:09:00"
+      
+  ft_B:
+    executable: "ft.B.x"
+    description: "Fast Fourier Transform - Class B"
+    estimated_runtime: 360
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:09:00"
+      
+  is_B:
+    executable: "is.B.x"
+    description: "Integer Sort - Class B"
+    estimated_runtime: 180
+    resource_requirements:
+      nodes: 1
+      ntasks: 2
+      time_limit: "00:09:00"
+  
+  # Class C
+  cg_C:
+    executable: "cg.C.x"
+    description: "Conjugate Gradient - Class C (Large Scale)"
+    estimated_runtime: 1200  # 20分钟
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:25:00"
+
+  ep_C:
+    executable: "ep.C.x"
+    description: "Embarrassingly Parallel - Class C (Large Scale)"
+    estimated_runtime: 900   # 15分钟
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:20:00"
+
+  ft_C:
+    executable: "ft.C.x"
+    description: "Fast Fourier Transform - Class C (Large Scale)"
+    estimated_runtime: 1800  # 30分钟
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:35:00"
+
+  is_C:
+    executable: "is.C.x"
+    description: "Integer Sort - Class C (Large Scale)"
+    estimated_runtime: 720   # 12分钟
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:18:00"
+
+  mg_C:
+    executable: "mg.C.x"
+    description: "Multi-Grid - Class C (Large Scale)"
+    estimated_runtime: 1500  # 25分钟
+    resource_requirements:
+      nodes: 1
+      ntasks: 4
+      time_limit: "00:30:00"
+
+# 负载提交计划
+workload_plans:
+  light_background:
+    description: "轻量级背景负载"
+    jobs:
+      - program: "ep_B"
+        submit_delay: 0    # 实验开始后延迟提交时间(秒)
+        job_name: "bg_ep"
+      # - program: "ep_B"
+      #   submit_delay: 0    # 实验开始后延迟提交时间(秒)
+      #   job_name: "bg_ep"
+      # - program: "ep_B"
+      #   submit_delay: 0    # 实验开始后延迟提交时间(秒)
+      #   job_name: "bg_ep"
+        
+  medium_background:
+    description: "中等强度背景负载"
+    jobs:
+      - program: "cg_B"
+        submit_delay: 0
+        job_name: "bg_cg"
+      - program: "ep_B"
+        submit_delay: 10   # 10秒后提交第二个作业
+        job_name: "bg_ep"
+        
+  heavy_background:
+    description: "高强度背景负载"
+    jobs:
+      - program: "cg_B"
+        submit_delay: 0
+        job_name: "bg_cg"
+      - program: "ft_B"
+        submit_delay: 5
+        job_name: "bg_ft"
+      - program: "is_B"
+        submit_delay: 15
+        job_name: "bg_is"
+  
+  formaltest:
+    description: "正式测试负载"
+    jobs:
+      - program: "cg_C"
+        submit_delay: 0
+        job_name: "ft_cgC"
+      - program: "ft_C"
+        submit_delay: 0
+        job_name: "ft_ftC"
+      - program: "cg_B"
+        submit_delay: 0
+        job_name: "ft_cg"
+      - program: "ft_B"
+        submit_delay: 0
+        job_name: "ft_ft"
+      - program: "is_B"
+        submit_delay: 0
+        job_name: "ft_is"
+      - program: "ep_B"
+        submit_delay: 0
+        job_name: "ft_ep"
+      - program: "mg_C"
+        submit_delay: 30
+        job_name: "ft_mgC"
+      - program: "is_C"
+        submit_delay: 60
+        job_name: "ft_isC"
+
+# NPB可执行文件路径配置
+npb_config:
+  base_path: "/opt/exp/npb/NPB3.4.2/NPB3.4-MPI/bin"
+  sbatch_template: "/opt/exp/jobs/npb_job.sbatch"  # sbatch脚本模板路径
+=== prometheus.yaml (若存在) ===
+[NOT FOUND] 未找到监控配置文件
+
+=== 列出 config/ 下所有文件 ===
+total 64
+drwxrwxr-x 2 quantum quantum  4096 Mar  5 15:31 .
+drwxrwxr-x 8 quantum quantum  4096 Mar  5 15:31 ..
+-rw-rw-r-- 1 quantum quantum     0 Mar  5 15:31 chaos.csv
+-rw-rw-r-- 1 quantum quantum 17160 Mar  5 15:31 chaos.yaml
+-rw-rw-r-- 1 quantum quantum  3454 Mar  5 15:31 experiments.yaml
+-rw-rw-r-- 1 quantum quantum     0 Mar  5 15:31 faults.yaml
+-rw-rw-r-- 1 quantum quantum  1295 Mar  5 15:31 metric.csv
+-rw-rw-r-- 1 quantum quantum 20075 Mar  5 15:31 metrics.yaml
+-rw-rw-r-- 1 quantum quantum  4182 Mar  5 15:31 workloads.yaml

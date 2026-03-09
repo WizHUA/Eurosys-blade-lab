@@ -13,7 +13,7 @@ import pandas as pd
 
 # print(os.environ)
 
-RUNTAG = True
+RUNTAG = False
 
 def greenPrint(text: str):
     if RUNTAG:

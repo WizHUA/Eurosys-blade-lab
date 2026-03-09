@@ -8,7 +8,7 @@ from typing import Optional
 import threading
 import queue
 
-RUNTAG = True
+RUNTAG = False
 
 def greenPrint(text: str):
     if RUNTAG:
@@ -205,7 +205,7 @@ class PrometheusMonitor:
         self._monitoring = True
         self._monitoring_thread = threading.Thread(
             target=self._monitor_loop,
-            args=(interval)
+            args=(interval,)
         )
         self._monitoring_thread.start()
         self.logger.info("Started real-time monitoring.")

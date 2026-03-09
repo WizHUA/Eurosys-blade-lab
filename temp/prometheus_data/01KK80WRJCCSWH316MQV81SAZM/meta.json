@@ -1,0 +1,17 @@
+{
+	"ulid": "01KK80WRJCCSWH316MQV81SAZM",
+	"minTime": 1772980484413,
+	"maxTime": 1772985600000,
+	"stats": {
+		"numSamples": 151492,
+		"numSeries": 626,
+		"numChunks": 1291
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01KK80WRJCCSWH316MQV81SAZM"
+		]
+	},
+	"version": 1
+}

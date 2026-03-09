@@ -98,14 +98,25 @@ class ExperimentManager:
     
     def _setup_signal_handlers(self):
         """设置信号处理器，用于优雅关闭"""
+        self._shutting_down = False
+
         def signal_handler(signum, frame):
+            # 防止可重入：第二次 Ctrl+C 直接强制退出
+            if self._shutting_down:
+                yellowPrint("\nForced exit.")
+                os._exit(1)
+            self._shutting_down = True
+
             yellowPrint(f"\nReceived signal {signum}, initiating graceful shutdown...")
+            # 恢复默认信号处理，使后续 Ctrl+C 立即生效
+            signal.signal(signal.SIGINT, signal.SIG_DFL)
+            signal.signal(signal.SIGTERM, signal.SIG_DFL)
             try:
                 self._clean_all()
             except Exception as e:
                 redPrint(f"Error during clean up: {e}")
             sys.exit(0)
-        
+
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
 
