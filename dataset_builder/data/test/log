@@ -1,10 +1,9 @@
-
 Initializing Experiment Manager for experiment: test
 ================================================================================
    Starting Experiment: test
    Description: TEST
    Output Directory: data/test
-   Run function Start Time: 2026-03-09 09:27:26
+   Run function Start Time: 2026-03-09 10:31:11
 ================================================================================
 Initializing components...
 Monitor component initialized
@@ -13,24 +12,36 @@ ChaosBlade is available. Version: version: 1.7.4
 env: #1 SMP Thu Mar 17 17:08:06 UTC 2022 x86_64
 build-time: Wed Jul  3 09:25:20 UTC 2024
 Chaos component initialized
+Checking NPB workloads
+All NPB workloads are valid.
 Workload component initialized
 Validating experiment environment...
 Checking connectivity to Prometheus server...
 Successfully connected to Prometheus server.
+Checking SLURM status...
+SLURM is operational: slurm-wlm 21.08.5
+Partition "debug" is available.
+idle Node status: debug*       up   infinite      1   idle quantum-os
 Environment validation completed
-Timeline Start: 2026-03-09 09:27:27
+Timeline Start: 2026-03-09 10:31:12
 
 Starting workload and chaos plan injecting
 Workload plan: light_background
+Executing workload plan: light_background
+Description:              轻量级背景负载
 Chaos plan: single_cpu_stress
 Executing chaos plan: single_cpu_stress
+Job monitor started.
 Waiting 10.0s to inject fault 'cpu_fullload'
-2026-03-09 09:27:27,451 - experiment - INFO - Workload timeline execution completed for plan: light_background
+Job submitted successfully: Submitted batch job 30
+Submitted job 30: bg_ep (ep_B)
+2026-03-09 10:31:12,109 - experiment - INFO - Workload timeline execution completed for plan: light_background
 Injecting fault: cpu_fullload
-Fault injected successfully: 5a317e1e3d3655e9
+Fault injected successfully: d96f3d041dbaaaf2
 [1/1] Fault cpu_fullload will run for 60s
-2026-03-09 09:27:38,250 - experiment - INFO - Chaos timeline execution completed for plan: single_cpu_stress
+2026-03-09 10:31:22,899 - experiment - INFO - Chaos timeline execution completed for plan: single_cpu_stress
 Chaos expected end time reached
+Cancelling 1 jobs...
 All workload jobs cancelled
 Cleaning up all resources...
 Destroying all active faults...
@@ -38,11 +49,12 @@ Destroying all active faults...
 get active faults:
 Updated fault status: 1 faults marked as expired
 All active faults destroyed.
+No jobs to cancel.
 All resources cleaned up.
 Exporting all data...
 Exporting monitored data...
 Exporting monitored data
-         from 2026-03-09 09:27:27.433999 to 2026-03-09 09:28:48.138369...
+         from 2026-03-09 10:31:12.090619 to 2026-03-09 10:32:32.772259...
 Exporting metric  1/157: cpu_idle_seconds
 Exporting metric  2/157: cpu_user_seconds
 Exporting metric  3/157: cpu_system_seconds
@@ -202,8 +214,4 @@ Exporting metric 156/157: schedstat_running_rate
 Exporting metric 157/157: schedstat_waiting_rate
 Export completed. Data saved to data/test/metric.csv
 Exporting workload data...
-Exporting chaos data...
-================================================================================
-   Result:
-Experiment completed successfully
-================================================================================
+Error running experiment: 'WorkloadManager' object has no attribute 'export_job_info'

@@ -36,7 +36,11 @@ class WorkloadManager:
         self.workload_plans = self.config['workload_plans']
         self.npb_config = self.config['npb_config']
         # 运行时状态
-        self.submitted_jobs = [] # id
+        self.submitted_jobs = []  # id
+        self.job_records = {}     # job_id -> info dict，实时维护
+        self._monitor_active = False
+        self._monitor_thread = None
+        self._records_lock = threading.Lock()
         self.experiment_start_time = None
         self.logger = logging.getLogger(__name__)
 
@@ -138,7 +142,18 @@ class WorkloadManager:
                 redPrint(f"Job submitted successfully: {res.stdout.strip()}") # 调试用
                 job_id = res.stdout.strip().split()[-1]
                 self.submitted_jobs.append(job_id)
-                # print(job_id)
+                with self._records_lock:
+                    self.job_records[job_id] = {
+                        'JobID':      job_id,
+                        'JobName':    job_name,
+                        'NodeList':   'Unknown',
+                        'SubmitTime': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+                        'StartTime':  'Unknown',
+                        'EndTime':    'Unknown',
+                        'State':      'PENDING',
+                        'ExitCode':   'Unknown',
+                        'Elapsed':    'Unknown',
+                    }
                 greenPrint(f"Submitted job {job_id}: {job_name} ({program_name})")
                 return job_id
             else:
@@ -159,6 +174,7 @@ class WorkloadManager:
         greenPrint(f"Executing workload plan: {plan_name}")
         bluePrint(f"Description: {plan.get('description', 'No description') :>20}")
 
+        self._start_job_monitor()
         submit_threads = []
 
         for i, job_spec in enumerate(plan['jobs']):
@@ -230,47 +246,105 @@ class WorkloadManager:
             except Exception as e:
                 redPrint(f"Error cancelling job {job_id}: {e}")
         self.submitted_jobs.clear()
-    
-    def get_job_info(self, start_time: datetime,
-                     end_time: datetime) -> pd.DataFrame:
-        cmd = [
-            "sacct",
-            "--format", self.job_info_config['query_format'],
-            "--starttime", start_time.strftime('%Y-%m-%dT%H:%M:%S'),
-            "--endtime", end_time.strftime('%Y-%m-%dT%H:%M:%S')
-        ]
 
-        # 输出格式
-        cmd.extend(["--parsable2", "--noheader"])
+    _TERMINAL_STATES = {'COMPLETED', 'FAILED', 'CANCELLED', 'TIMEOUT', 'NODE_FAIL', 'PREEMPTED', 'OUT_OF_MEMORY'}
 
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-            if res.returncode == 0:
-                lines = res.stdout.strip().split('\n')
-                if not lines or lines == [""]:
-                    redPrint("No job data retrieved.")
-                    return pd.DataFrame()  # No data
-                data = []
-                col = self.job_info_config['query_format'].replace(" ", "").split(",") # 防止手贱打空格
-                for line in lines:
-                    if line.strip() == "":
+    def _start_job_monitor(self):
+        self._monitor_active = True
+        self._monitor_thread = threading.Thread(
+            target=self._monitor_jobs_loop, daemon=True, name="job-monitor"
+        )
+        self._monitor_thread.start()
+        greenPrint("Job monitor started.")
+
+    def _stop_job_monitor(self):
+        self._monitor_active = False
+        if self._monitor_thread and self._monitor_thread.is_alive():
+            self._monitor_thread.join(timeout=5)
+        greenPrint("Job monitor stopped.")
+
+    def _monitor_jobs_loop(self):
+        while self._monitor_active:
+            with self._records_lock:
+                job_ids = list(self.job_records.keys())
+            for job_id in job_ids:
+                with self._records_lock:
+                    state = self.job_records.get(job_id, {}).get('State', '')
+                if state in self._TERMINAL_STATES:
+                    continue
+                try:
+                    res = subprocess.run(
+                        ['scontrol', 'show', 'job', job_id],
+                        capture_output=True, text=True, timeout=10
+                    )
+                    if res.returncode != 0:
                         continue
-                    values = line.split("|")
-                    if len(values) == len(col):
-                        data.append(values)
-                if data:
-                    df = pd.DataFrame(data, columns=col)
-                    return df
-                else:
-                    redPrint("No valid job data found.")
-                    return pd.DataFrame()
-            else:
-                redPrint(f"Failed to retrieve job info: {res.stderr.strip()}")
-                return pd.DataFrame()
+                    fields = {}
+                    for token in res.stdout.replace('\n', ' ').split():
+                        if '=' in token:
+                            k, _, v = token.partition('=')
+                            fields[k] = v
+                    with self._records_lock:
+                        if job_id in self.job_records:
+                            rec = self.job_records[job_id]
+                            rec.update({
+                                'State':     fields.get('JobState',  rec['State']),
+                                'StartTime': fields.get('StartTime', rec['StartTime']),
+                                'EndTime':   fields.get('EndTime',   rec['EndTime']),
+                                'NodeList':  fields.get('NodeList',  rec['NodeList']),
+                                'ExitCode':  fields.get('ExitCode',  rec['ExitCode']),
+                                'Elapsed':   fields.get('RunTime',   rec['Elapsed']),
+                            })
+                except Exception:
+                    pass
+            time.sleep(15)
 
-        except Exception as e:
-            redPrint(f"Error retrieving job info: {e}")
+    def get_job_info(self, start_time: datetime,
+                    end_time: datetime) -> pd.DataFrame:
+        # 强制对所有非终态作业做一次同步快照，确保拿到最终状态
+        with self._records_lock:
+            job_ids = list(self.job_records.keys())
+        for job_id in job_ids:
+            with self._records_lock:
+                state = self.job_records.get(job_id, {}).get('State', '')
+            if state in self._TERMINAL_STATES:
+                continue
+            try:
+                res = subprocess.run(
+                    ['scontrol', 'show', 'job', job_id],
+                    capture_output=True, text=True, timeout=10
+                )
+                if res.returncode != 0:
+                    continue
+                fields = {}
+                for token in res.stdout.replace('\n', ' ').split():
+                    if '=' in token:
+                        k, _, v = token.partition('=')
+                        fields[k] = v
+                with self._records_lock:
+                    if job_id in self.job_records:
+                        rec = self.job_records[job_id]
+                        rec.update({
+                            'State':     fields.get('JobState',  rec['State']),
+                            'StartTime': fields.get('StartTime', rec['StartTime']),
+                            'EndTime':   fields.get('EndTime',   rec['EndTime']),
+                            'NodeList':  fields.get('NodeList',  rec['NodeList']),
+                            'ExitCode':  fields.get('ExitCode',  rec['ExitCode']),
+                            'Elapsed':   fields.get('RunTime',   rec['Elapsed']),
+                        })
+            except Exception:
+                pass
+
+        with self._records_lock:
+            records = list(self.job_records.values())
+        if not records:
+            redPrint("No job records available.")
             return pd.DataFrame()
+        cols = ["JobID", "JobName", "NodeList", "SubmitTime", "StartTime", "EndTime", "State", "ExitCode", "Elapsed"]
+        data = [[r.get(c, '') for c in cols] for r in records]
+        df = pd.DataFrame(data, columns=cols)
+        greenPrint(f"Job info retrieved: {len(df)} records.")
+        return df
     
     def export_job_info(self, output_path: str = "temp/job_info.csv", start_time: Optional[datetime] = None,
                         end_time: Optional[datetime] = None):
@@ -295,8 +369,10 @@ class WorkloadManager:
 
     def cleanup(self):
         bluePrint("Cleaning up WorkloadManager state...")
+        self._stop_job_monitor()
         self.cancel_all_jobs()
-        self.submitted_jobs.clear()
+        with self._records_lock:
+            self.job_records.clear()
         self.experiment_start_time = None
         greenPrint("WorkloadManager state has been reset.")
 

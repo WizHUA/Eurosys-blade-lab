@@ -1,0 +1,150 @@
+<mxfile host="65bd71144e">
+    <diagram id="v3-single-agent" name="v3">
+        <mxGraphModel dx="675" dy="595" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="style_container" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#333333;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="style_process" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="1" vertex="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="style_data" value="" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#eeeeee;strokeColor=#666666;strokeWidth=1;size=15;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="style_db" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_container" value="Layer 0: Knowledge Base (Offline Preparation)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f9f9f9;strokeColor=#999999;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#666666;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="60" width="220" height="720" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_metrics" value="Metric KB&#10;(指标语义/范围)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="kb_container" vertex="1">
+                    <mxGeometry x="40" y="60" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_baseline" value="Baseline Profile&#10;(正常基线统计)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="kb_container" vertex="1">
+                    <mxGeometry x="40" y="220" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_faults" value="Fault Pattern Library&#10;(故障模式规则集)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;" parent="kb_container" vertex="1">
+                    <mxGeometry x="40" y="560" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="input_metrics" value="Prometheus Metrics&#10;(raw time series)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=15;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="80" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="input_logs" value="Job Logs&#10;(scheduler/app)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=15;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="60" y="160" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_container" value="Diagnosis Agent (Triage + Reasoning Loop)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#333333;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#000000;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="240" y="50" width="380" height="470" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_triage" value="Triage (Deterministic)&#10;异常检测/作业关联/降噪" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="agent_container" vertex="1">
+                    <mxGeometry x="30" y="50" width="220" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="data_focus" value="Focus Context&#10;(Top-K anomalies + jobs)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#e1e1e1;strokeColor=#666666;strokeWidth=1;size=15;fontColor=#333333;" parent="agent_container" vertex="1">
+                    <mxGeometry x="40" y="130" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_hypo" value="Hypothesize&#10;(提出假设)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=10;" parent="agent_container" vertex="1">
+                    <mxGeometry x="40" y="215" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_decision" value="Confident?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=1;fontColor=#000000;" parent="agent_container" vertex="1">
+                    <mxGeometry x="80" y="280" width="90" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_tools" value="Tools&#10;MetricQuery / KB Retrieval&#10;DataAnalysis" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;fontColor=#666666;dashed=1;" parent="agent_container" vertex="1">
+                    <mxGeometry x="210" y="280" width="150" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="agent_verify" value="Verify / Analyze&#10;(验证假设)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="agent_container" vertex="1">
+                    <mxGeometry x="40" y="375" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_triage_out" parent="agent_container" source="agent_triage" target="data_focus" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_focus_hypo" parent="agent_container" source="data_focus" target="agent_hypo" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_hypo_dec" parent="agent_container" source="agent_hypo" target="agent_decision" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_dec_tools" value="Need Info" parent="agent_container" source="agent_decision" target="agent_tools" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_tools_verify" parent="agent_container" source="agent_tools" target="agent_verify" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_verify_hypo" value="Refine/Next" parent="agent_container" source="agent_verify" target="agent_hypo" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="20" y="400"/>
+                            <mxPoint x="20" y="240"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="l3_container" value="Layer 3: Evolution (Reflect &amp; Accumulate)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#333333;arcSize=5;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="560" width="540" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="data_final_report" value="Final Diagnosis&#10;Report" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#333333;strokeColor=#000000;strokeWidth=1;size=15;fontColor=#ffffff;" parent="l3_container" vertex="1">
+                    <mxGeometry x="40" y="60" width="140" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="proc_reflect" value="Reflector&#10;(Review &amp; Extract Rules)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="l3_container" vertex="1">
+                    <mxGeometry x="240" y="55" width="240" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_report_reflect" parent="l3_container" source="data_final_report" target="proc_reflect" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_in1" parent="1" source="input_metrics" target="agent_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="220" y="110"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_in2" parent="1" source="input_logs" target="agent_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="220" y="190"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_dec_done" value="Done" parent="1" source="agent_decision" target="data_final_report" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="340" y="420"/>
+                            <mxPoint x="180" y="620"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_kb_baseline" style="dashed=1;strokeColor=#999999;" parent="1" source="kb_baseline" target="agent_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="620" y="210"/>
+                            <mxPoint x="520" y="130"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_kb_metrics" style="dashed=1;strokeColor=#999999;" parent="1" source="kb_metrics" target="agent_tools" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="620" y="300"/>
+                            <mxPoint x="590" y="320"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_kb_faults" style="dashed=1;strokeColor=#999999;" parent="1" source="kb_faults" target="agent_hypo" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="640" y="600"/>
+                            <mxPoint x="430" y="260"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_reflect_to_faults" style="dashed=1;strokeColor=#333333;strokeWidth=2;" parent="1" source="proc_reflect" target="kb_faults" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="560" y="640"/>
+                            <mxPoint x="760" y="640"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

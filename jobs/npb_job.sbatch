@@ -2,14 +2,12 @@
 
 #SBATCH --job-name=npb_experiment
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
 #SBATCH --time=00:05:00
-#SBATCH --output=/opt/exp/logs/npb_%j.out
-#SBATCH --error=/opt/exp/logs/npb_%j.err
+#SBATCH --output=/dev/null
+#SBATCH --error=/dev/null
 
 # 确保日志目录存在
-mkdir -p /opt/exp/logs
+mkdir -p /tmp/npb_logs 2>/dev/null || true
 
 # 获取参数
 NPB_PROGRAM=${1:-"cg.B.x"}

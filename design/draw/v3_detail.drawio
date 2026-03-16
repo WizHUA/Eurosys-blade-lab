@@ -1,0 +1,320 @@
+<mxfile host="65bd71144e">
+  <diagram id="v3_detail" name="v3_detail">
+    <mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- 现代宋韵工程风：黑白灰、细线、强分层容器、正交连线 -->
+
+        <!-- Styles -->
+        <mxCell id="s_container" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#555555;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#222222;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_subcontainer" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_node" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_node_dark" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=10;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_note" value="" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.08;fillColor=#eeeeee;strokeColor=#666666;strokeWidth=1;size=14;fontColor=#333333;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_db" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=16;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_decision" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry as="geometry"/>
+        </mxCell>
+        <mxCell id="s_edge_solid" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_edge_dashed" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_edge_thick_dashed" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=2;dashed=1;dashPattern=6 4;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Title -->
+        <mxCell id="title" value="v3_detail — Single Diagnosis Agent with Deterministic Triage, Evidence Gating, Tools &amp; Evolution" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#111111;" parent="1" vertex="1">
+          <mxGeometry x="40" y="20" width="1000" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend&#10;— Solid: data/control flow&#10;— Dashed: retrieval/knowledge/support&#10;— Thick dashed: rule write-back (evolution)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="1" vertex="1">
+          <mxGeometry x="40" y="60" width="260" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Inputs -->
+        <mxCell id="c_inputs" value="Inputs (Run Artifacts)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="40" y="170" width="300" height="250" as="geometry"/>
+        </mxCell>
+        <mxCell id="in_metrics" value="metrics.csv&#10;Raw time series&#10;(150+ metrics, per-node)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=14;fontColor=#333333;" parent="c_inputs" vertex="1">
+          <mxGeometry x="20" y="50" width="260" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="in_jobinfo" value="jobinfo.csv&#10;Job intervals / nodes / status" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=14;fontColor=#333333;" parent="c_inputs" vertex="1">
+          <mxGeometry x="20" y="130" width="260" height="55" as="geometry"/>
+        </mxCell>
+        <mxCell id="in_chaos" value="chaos.csv (optional)&#10;Ground truth for offline evaluation" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#666666;" parent="c_inputs" vertex="1">
+          <mxGeometry x="20" y="195" width="260" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Knowledge Base -->
+        <mxCell id="c_kb" value="Layer 0: Offline Knowledge Base" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#555555;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#222222;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="1240" y="60" width="300" height="550" as="geometry"/>
+        </mxCell>
+        <mxCell id="kb_metric" value="Metric KB&#10;definition / unit / typical range&#10;subsystem mapping" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=16;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="c_kb" vertex="1">
+          <mxGeometry x="70" y="70" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="kb_base" value="Baseline Profile&#10;mean/var/quantiles/periodicity" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=16;fillColor=#e1e1e1;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="c_kb" vertex="1">
+          <mxGeometry x="70" y="190" width="160" height="90" as="geometry"/>
+        </mxCell>
+        <mxCell id="kb_fault" value="Fault Pattern Library&#10;symptom → cause&#10;verification steps / advice&#10;provenance + version" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=16;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;" parent="c_kb" vertex="1">
+          <mxGeometry x="70" y="360" width="160" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="kb_note" value="Key: provenance &amp; versioning&#10;- required for ablation &amp; audit&#10;- rule conflicts tracked" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="c_kb" vertex="1">
+          <mxGeometry x="30" y="490" width="240" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Agent Container -->
+        <mxCell id="c_agent" value="Single Diagnosis Agent" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#333333;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#000000;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="380" y="60" width="820" height="700" as="geometry"/>
+        </mxCell>
+
+        <!-- Agent: State & Trace -->
+        <mxCell id="c_state" value="State (JSON-serializable) + Trace" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="c_agent" vertex="1">
+          <mxGeometry x="520" y="40" width="270" height="190" as="geometry"/>
+        </mxCell>
+        <mxCell id="state_fields" value="run_id, inputs&#10;focus_context&#10;hypotheses[], evidence[]&#10;tool_calls[], budget&#10;decision, report" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="c_state" vertex="1">
+          <mxGeometry x="15" y="50" width="240" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Agent: StateGraph -->
+        <mxCell id="c_graph" value="Execution Semantics (StateGraph)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="c_agent" vertex="1">
+          <mxGeometry x="40" y="40" width="450" height="460" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="n_triage" value="TRIAGE&#10;Deterministic&#10;Focus Context" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="30" y="70" width="150" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_focus" value="Focus Context&#10;Top-K anomalies&#10;time windows / jobs / nodes" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.08;fillColor=#eaeaea;strokeColor=#666666;strokeWidth=1;size=14;fontColor=#333333;" parent="c_graph" vertex="1">
+          <mxGeometry x="210" y="80" width="200" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_hypo" value="HYPOTHESIZE&#10;candidate causes + plan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="30" y="180" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_gather" value="GATHER&#10;execute tool plan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="230" y="180" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_verify" value="VERIFY&#10;+light stats&#10;support / refute" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="230" y="270" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_gate" value="EVIDENCE&#10;GATE" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;" parent="c_graph" vertex="1">
+          <mxGeometry x="70" y="270" width="110" height="70" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_finalize" value="FINALIZE&#10;DiagnosisReport (JSON)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="30" y="360" width="150" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="n_reflect" value="REFLECT&#10;extract rules&#10;merge to library" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_graph" vertex="1">
+          <mxGeometry x="230" y="360" width="150" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Tooling -->
+        <mxCell id="c_tools" value="Tools (Function Calling + Strict Schemas)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="c_agent" vertex="1">
+          <mxGeometry x="40" y="520" width="450" height="160" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_triage" value="TriageTool&#10;inputs: metrics/jobinfo/baseline&#10;outputs: focus_context" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_tools" vertex="1">
+          <mxGeometry x="20" y="55" width="200" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_metric" value="MetricQueryTool&#10;nodes + metrics + window + agg&#10;returns aggregates/series" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_tools" vertex="1">
+          <mxGeometry x="235" y="20" width="195" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_kb" value="KBRetrievalTool&#10;metric meaning / rules / steps&#10;returns hits + provenance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_tools" vertex="1">
+          <mxGeometry x="235" y="90" width="195" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="t_stats" value="DataAnalysisTool&#10;corr / change-point / group diff&#10;returns stats + summary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=10;" parent="c_tools" vertex="1">
+          <mxGeometry x="20" y="20" width="200" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Safety & Budget -->
+        <mxCell id="c_safety" value="Safety / Failure Handling / Budget" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;" parent="c_agent" vertex="1">
+          <mxGeometry x="520" y="250" width="270" height="240" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_budget" value="Budgets&#10;- token budget&#10;- tool-call limit&#10;- retries (R)&#10;- timeouts" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="c_safety" vertex="1">
+          <mxGeometry x="15" y="50" width="240" height="85" as="geometry"/>
+        </mxCell>
+        <mxCell id="s_schema" value="Schema Enforcement&#10;- tool I/O validation&#10;- report JSON validation&#10;- fallback minimal report" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="c_safety" vertex="1">
+          <mxGeometry x="15" y="145" width="240" height="85" as="geometry"/>
+        </mxCell>
+
+        <!-- Output -->
+        <mxCell id="out_report" value="Output&#10;DiagnosisReport + Trace" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#333333;strokeColor=#000000;strokeWidth=1;size=14;fontColor=#ffffff;" parent="1" vertex="1">
+          <mxGeometry x="40" y="450" width="300" height="70" as="geometry"/>
+        </mxCell>
+
+        <!-- Evolution -->
+        <mxCell id="c_evo" value="Layer 3: Evolution (Reflect &amp; Accumulate)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#555555;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#222222;arcSize=6;" parent="1" vertex="1">
+          <mxGeometry x="1240" y="640" width="300" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="evo_note" value="Write-back semantics&#10;- rule extraction&#10;- conflict resolution&#10;- version bump" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.06;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;" parent="c_evo" vertex="1">
+          <mxGeometry x="30" y="45" width="240" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- Evaluation Panel (non-runtime) -->
+        <mxCell id="c_eval" value="Evaluation &amp; Reproducibility (Paper/Artifact)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;arcSize=6;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="820" y="770" width="720" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="eval_note" value="Metrics: accuracy/top-k, time-to-diagnosis, token cost, robustness&#10;Baselines: one-shot LLM, pure stats, ablations (no KB / no gate / no reflect / no triage)&#10;Artifacts: trace logs, fixed seeds, model configs, dataset hashes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;fontSize=12;fontColor=#444444;" parent="c_eval" vertex="1">
+          <mxGeometry x="15" y="28" width="690" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges: Inputs to Agent -->
+        <mxCell id="e_m_in" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="in_metrics" target="n_triage" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="260"/>
+              <mxPoint x="420" y="200"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_j_in" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="in_jobinfo" target="n_triage" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="350" y="320"/>
+              <mxPoint x="420" y="220"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Edges: KB to Agent -->
+        <mxCell id="e_base_triage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_base" target="n_triage" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1240" y="310"/>
+              <mxPoint x="560" y="220"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_fault_hypo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_fault" target="n_hypo" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1240" y="470"/>
+              <mxPoint x="540" y="280"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_metric_tools" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_metric" target="t_kb" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1240" y="160"/>
+              <mxPoint x="1000" y="630"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Agent flow -->
+        <mxCell id="e_triage_focus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_triage" target="n_focus" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_focus_hypo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_focus" target="n_hypo" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="170"/>
+              <mxPoint x="105" y="170"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_hypo_gather" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_hypo" target="n_gather" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_gather_verify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_gather" target="n_verify" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_verify_gate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_verify" target="n_gate" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210" y="300"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_gate_no" value="No → gather more / revise" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_gate" target="n_hypo" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="60" y="310"/>
+              <mxPoint x="60" y="210"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_gate_yes" value="Yes → finalize" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_gate" target="n_finalize" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_finalize_reflect" value="optional" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_graph" source="n_finalize" target="n_reflect" edge="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Tools linkage -->
+        <mxCell id="e_gather_tools" value="tool plan" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="c_agent" source="n_gather" target="c_tools" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="300" y="360"/>
+              <mxPoint x="260" y="560"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_verify_stats" value="stats" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="c_agent" source="n_verify" target="t_stats" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="360"/>
+              <mxPoint x="180" y="560"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Output edges -->
+        <mxCell id="e_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="n_finalize" target="out_report" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="440"/>
+              <mxPoint x="260" y="480"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Reflect write-back -->
+        <mxCell id="e_writeback" value="rule write-back" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=2;dashed=1;dashPattern=6 4;" parent="1" source="n_reflect" target="kb_fault" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="950" y="430"/>
+              <mxPoint x="1240" y="420"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Safety linkage -->
+        <mxCell id="e_budget_gate" value="budget &amp; schema constraints" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="c_agent" source="c_safety" target="n_gate" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="360"/>
+              <mxPoint x="210" y="340"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Evaluation link (conceptual) -->
+        <mxCell id="e_eval" value="trace → artifact" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#999999;strokeWidth=1;dashed=1;dashPattern=3 5;" parent="1" source="c_state" target="c_eval" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="900" y="260"/>
+              <mxPoint x="900" y="770"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
