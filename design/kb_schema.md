@@ -1,5 +1,10 @@
 # 知识库完整 Schema 规格
 
+> **⚠️ v5 变更说明（2026-03-19）**：v5 删除 Baseline Profile 组件（KB 由三层简化为两层：Metric KB + FPL）。
+> FPL 初始为空（v4 的 fpl_001~008 手工规则不再预填），系统通过 Reflect 从零积累。
+> Triage 的 Z-score 基线改为数据自适应计算。以 `design/v5.md Part V` 为准。
+> 本文件的 Metric KB 条目规格和 FPL Schema 仍然有效，Baseline Profile 相关内容已废弃。
+
 > **文档定位**：`design/v4.md §6` 的补充细化。v4.md 给出了 KB 三层结构的框架，
 > 本文档为工程师提供**可直接落地的完整条目示例、字段说明和构建规程**。
 > 工程师完成本文档后即可启动 Phase A 实施。

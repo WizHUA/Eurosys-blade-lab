@@ -49,19 +49,41 @@ Phase 3: Agent 升级 — **设计阶段**
 - [x] Pydantic Schema: `agent/schema.py`（12 个数据类，9/9 测试通过）
 - [x] 补充设计文档: `design/kb_schema.md`, `design/pydantic_schema.md`, `design/evidence_gating.md`
 
-### Phase B: Triage Stage (确定性分诊)
-- [ ] 异常检测算法: Z-score + 分位数 + 静态阈值
-- [ ] 持久性过滤 + 变化点检测
-- [ ] FocusContext 生成 (含 causal_order)
+### 2026-03-19: v4 → v5 设计迭代
+- 完成: 根据 7 条修改意见完成设计迭代 (v4 → v5)
+- 核心变更:
+  1. 删除 Baseline Profile，KB 简化为两层（Metric KB + FPL）
+  2. FPL 初始为空，通过 Reflect 从零积累
+  3. Triage 6 步合并为 3 步
+  4. 明确 THINK → GATE 路由决策机制（THINK 决定意图，GATE 验证证据）
+  5. Evidence Gating 精简为三项核心原理，不暴露具体阈值
+  6. Reflect 不依赖 Ground Truth，GT 比对移入独立评估框架
+  7. 消融实验精简为 4 ablation + 2 baseline（大块消融）
+- 产出:
+  - `design/v5.md`（完整 v5 设计，~600 行）
+  - `doc/agent_design_report.html`（HTML 报告更新至 v5）
+  - `design/evidence_gating.md`（添加 v5 变更说明）
+  - `design/kb_schema.md`（添加 v5 变更说明）
+  - `.github/copilot-instructions.md`（v4→v5 引用更新）
+  - `.github/instructions/design-docs.instructions.md`（v4→v5 引用更新）
+- 下一步: Phase B Triage 实现（按 v5 三步设计 + 数据自适应基线）
 
-### Phase C: Diagnosis Agent (LangGraph)
-- [ ] AgentState + Pydantic Schema
-- [ ] LangGraph StateGraph 定义
-- [ ] ReAct Loop 节点 (THINK/ACT/OBSERVE)
-- [ ] Evidence Gating (GATE 节点)
+---
+
+### Phase B: Triage Stage (确定性分诊) — 按 v5 设计
+- [ ] Step 1: 数据自适应异常评分 (Z-score + 持久性过滤 + 变化点检测)
+- [ ] Step 2: 时序因果排序 (causal_order + subsystem_scores + leading_subsystem)
+- [ ] Step 3: FocusContext 构建 (聚合 + jobinfo 关联 + triage_confidence)
+
+### Phase C: Diagnosis Agent (LangGraph) — 按 v5 设计
+- [ ] AgentState + Schema 更新 (清空 FPL、删除 Baseline Profile 依赖)
+- [ ] LangGraph StateGraph 定义 (含 v5 路由决策机制)
+- [ ] ReAct Loop 节点 (THINK/ACT/OBSERVE + Budget Check)
+- [ ] Evidence Gating (GATE 节点，三项核心原理)
 - [ ] 3 个 Tools 实现
+- [ ] FINALIZE 节点
 
 ### Phase D: Reflect & 评估
-- [ ] REFLECT 节点 + 规则写回
-- [ ] 消融实验矩阵
-- [ ] 基线对比实验
+- [ ] REFLECT 节点 (无监督规则提炼 + FPL 写回)
+- [ ] 评估框架 (GT 比对，独立于 Reflect)
+- [ ] 消融实验矩阵 (4 ablation + 2 baseline)

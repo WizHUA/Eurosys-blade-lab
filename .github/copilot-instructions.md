@@ -14,7 +14,7 @@
 
 **当前焦点**: Phase 3 — 参考 STELLAR (SC'25) 的 Agent 设计范式，构建 HPC-Diagnosis Agent。
 
-## 核心架构 (v4 设计)
+## 核心架构 (v5 设计)
 
 ```
 inputs (metrics.csv + jobinfo.csv)
@@ -31,7 +31,7 @@ inputs (metrics.csv + jobinfo.csv)
 
 | 路径 | 内容 |
 |------|------|
-| `design/` | 架构设计文档 (v1→v4 演进), **v4.md 是当前方案** |
+| `design/` | 架构设计文档 (v1→v5 演进), **v5.md 是当前方案** |
 | `design/draw/` | Draw.io 架构图 + 绘图风格规范 (principle.md) |
 | `design/stellar.md` | 参考论文 STELLAR (SC'25) |
 | `dataset_builder/` | Phase 1 数据采集 (已完成, 一般不改动) |
