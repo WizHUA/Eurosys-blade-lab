@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPC-Diagnosis Agent v4 — 设计报告</title>
+<style>
+:root{--primary:#1a4c8b;--accent:#2e86de;--bg:#f4f6f9;--card:#fff;--text:#2c3e50;--code-bg:#1e1e2e;--code-text:#cdd6f4;--border:#dce1e7;--green:#059669;--purple:#7c3aed;--orange:#f97316;--yellow:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.75}
+/* nav */
+nav{position:fixed;left:0;top:0;width:210px;height:100vh;background:var(--primary);overflow-y:auto;padding:0 0 24px;z-index:100}
+.nav-logo{color:#fff;font-size:13px;font-weight:700;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.4}
+.nav-logo span{display:block;font-weight:400;font-size:11px;opacity:.7;margin-top:4px}
+nav ul{list-style:none;padding:8px 0}
+nav li a{display:block;color:rgba(255,255,255,.72);text-decoration:none;padding:7px 18px;font-size:12.5px;transition:all .18s}
+nav li a:hover{color:#fff;background:rgba(255,255,255,.1)}
+nav li.sub a{padding-left:30px;font-size:12px;color:rgba(255,255,255,.55)}
+nav li.sub a:hover{color:rgba(255,255,255,.9)}
+/* main */
+main{margin-left:210px;min-height:100vh}
+/* hero */
+.hero{background:linear-gradient(135deg,var(--primary) 0%,#1e6ec8 100%);color:#fff;padding:60px 52px 52px}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:10px}
+.hero .sub{font-size:13.5px;opacity:.82;margin-bottom:22px}
+.hero .badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 13px;font-size:12px;margin:0 6px 6px 0}
+/* section layout */
+section{padding:48px 52px;max-width:980px}
+section+section{border-top:1px solid var(--border)}
+h2{font-size:21px;color:var(--primary);margin-bottom:22px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+h3{font-size:16.5px;color:#34495e;margin:26px 0 12px;font-weight:700}
+h4{font-size:14.5px;color:#555;margin:18px 0 9px;font-weight:700}
+p{margin-bottom:14px;font-size:14.5px}
+ul,ol{padding-left:22px;margin-bottom:14px;font-size:14.5px}
+li{margin-bottom:5px}
+/* tables */
+table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px}
+thead th{background:var(--primary);color:#fff;padding:9px 14px;text-align:left;font-weight:600}
+td{padding:9px 14px;border-bottom:1px solid var(--border)}
+tr:nth-child(even) td{background:#f8f9fb}
+/* code */
+pre{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:18px 20px;overflow-x:auto;font-size:12.5px;line-height:1.65;margin:14px 0}
+code{font-family:"JetBrains Mono",Consolas,monospace}
+p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-radius:4px;font-size:12.5px}
+/* info / warn boxes */
+.info{border-left:4px solid var(--accent);background:#eef6ff;border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;font-size:14px}
+.warn{border-left:4px solid var(--orange);background:#fff8f0;border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;font-size:14px}
+.contrib{border-left:4px solid #27ae60;background:#f0fff4;border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;font-size:14px}
+/* card grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.card h4{margin:0 0 8px;font-size:14px;color:var(--primary)}
+.card p{margin:0;font-size:13.5px}
+/* tag chips */
+.chip{display:inline-block;border-radius:12px;padding:2px 10px;font-size:11px;color:#fff;margin:0 3px 4px 0}
+.c-cpu{background:#e74c3c}.c-mem{background:#8e44ad}.c-net{background:#2980b9}.c-disk{background:#27ae60}.c-comp{background:#e67e22}.c-sys{background:#7f8c8d}
+/* progress badges */
+.pb{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin:8px 0}
+.pb-icon{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.done{background:#27ae60;color:#fff}.wip{background:#f39c12;color:#fff}.todo{background:#bdc3c7;color:#fff}
+.pb-body{flex:1}
+.pb-body strong{font-size:14px;display:block;margin-bottom:3px}
+.pb-body span{font-size:13px;color:#666}
+/* ablation table */
+.abl-contrib td:first-child{background:#fffbe6;font-weight:700;color:#78350f}
+/* divider */
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+/* svg container */
+.svg-wrap{overflow-x:auto;margin:20px 0;border-radius:8px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">HPC-Diagnosis<br>Agent v4<span>设计报告 · 2026-03-19</span></div>
+  <ul>
+    <li><a href="#s1">1. 项目背景</a></li>
+    <li><a href="#s2">2. 系统总览</a></li>
+    <li><a href="#s3">3. 设计展开</a></li>
+    <li class="sub"><a href="#s31">3.1 知识库体系</a></li>
+    <li class="sub"><a href="#s32">3.2 Triage Stage</a></li>
+    <li class="sub"><a href="#s33">3.3 Diagnosis Agent</a></li>
+    <li class="sub"><a href="#s34">3.4 Evidence Gating</a></li>
+    <li class="sub"><a href="#s35">3.5 Reflect &amp; 积累</a></li>
+    <li><a href="#s4">4. 当前进度</a></li>
+    <li><a href="#s5">5. 消融实验</a></li>
+  </ul>
+</nav>
+<main>
+<div class="hero">
+  <h1>HPC-Diagnosis Agent v4 &nbsp;—&nbsp; 完整设计报告</h1>
+  <div class="sub">基于 LLM Agent 的 HPC 系统异常诊断工具 &nbsp;·&nbsp; 版本 v4 &nbsp;·&nbsp; 目标投稿 SC'26</div>
+  <div>
+    <span class="badge">框架: LangGraph 1.1.3</span>
+    <span class="badge">LLM: deepseek/deepseek-chat via OpenRouter</span>
+    <span class="badge">数据: 29 个 formaltest 实验</span>
+    <span class="badge">Phase A: 已完成</span>
+  </div>
+</div>
+
+<!-- ════════════════ Section 1: 项目背景 ════════════════ -->
+<section id="s1">
+  <h2>1. 项目背景</h2>
+
+  <h3>1.1 HPC 异常诊断的挑战</h3>
+  <p>现代 HPC 集群运行 NPB（NAS Parallel Benchmarks）等大规模 MPI 作业，多节点协同计算时，单个节点上的 CPU 满载、内存高占用、网络丢包或磁盘 I/O 瓶颈，都会影响整个作业的完成。Prometheus 等监控系统会产生 <strong>150+ 时序指标</strong>，这些指标涵盖 CPU 使用率、内存分配、网络收发、磁盘 I/O 等多个子系统。</p>
+
+  <p>故障诊断面临以下核心困难：</p>
+  <ul>
+    <li><strong>指标爆炸</strong>：150+ 指标中，真正与故障相关的通常只有 5−10 个，大量无关指标会干扰推理过程。</li>
+    <li><strong>复合故障</strong>：实验数据中约 75% 的场景为复合故障（如 CPU 满载 + 内存高负载同时注入），需要同时诊断多个根因。</li>
+    <li><strong>时序因果依赖</strong>：故障传播有链式结构——CPU 满载可能继发内存 page cache 压力；diskfill 导致写入阻塞可能引发 iowait 上升。区分"独立注入"与"继发症状"是正确诊断的关键。</li>
+    <li><strong>知识积累难</strong>：新的故障模式不断出现，纯静态规则系统无法及时更新，需要一个可持续积累的诊断知识库。</li>
+  </ul>
+
+  <h3>1.2 现有方案的局限性</h3>
+  <table>
+    <thead><tr><th>方案类型</th><th>代表系统</th><th>主要局限</th></tr></thead>
+    <tbody>
+      <tr><td>基于规则系统</td><td>静态阈值规则</td><td>规则需手工维护；无法处理未预见的故障组合；阈值对不同 workload 不通用</td></tr>
+      <tr><td>纯统计方法</td><td>Z-score 异常检测</td><td>只能发现"有异常"，不能解释"为什么"；误报率高</td></tr>
+      <tr><td>单次 LLM 调用</td><td>本项目 Phase 2 基线</td><td>输入全量 150+ 指标，大量 context 浪费；无中间验证步骤，容易"编故事式推理"；无法积累经验</td></tr>
+      <tr><td>STELLAR (SC'25)</td><td>I/O 参数调优</td><td>面向系统调优而非异常诊断；无 Evidence Gating，无多假设并行；知识库不区分规则来源/置信度</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 我们的核心切入点</h3>
+  <div class="contrib">
+    <strong>四个核心设计贡献（每个均有对应消融实验支撑）：</strong>
+    <ol style="margin:10px 0 0 18px">
+      <li><strong>Hybrid Control</strong>：确定性 Triage（压缩 context，提取时序因果先验）+ LLM Agent（聚焦推理），两阶段逻辑独立，消融边界清晰。</li>
+      <li><strong>Evidence Gating</strong>：结论必须有最低量化证据支撑（Rule A/B/C + 复合故障 Rule D），防止 LLM 在证据不足时强行下结论。</li>
+      <li><strong>Fault Pattern Library（FPL）</strong>：可积累、可写回的结构化故障知识库。每次诊断后通过 Reflect 节点自动提炼规则，以 JSONL 格式追加（带去重和置信度衰减机制）。</li>
+      <li><strong>多假设并行 + 继发症状甄别</strong>：AgentState 显式维护 N 个假设，Stage B cascade 检测区分"复合故障"与"继发症状链"，解决 SC'26 复合故障场景的诊断难题。</li>
+    </ol>
+  </div>
+</section>
+<!-- ════════════════ Section 2: 系统总览 ════════════════ -->
+<section id="s2">
+  <h2>2. 系统总览</h2>
+
+  <h3>2.1 输入 / 输出</h3>
+  <table>
+    <thead><tr><th>方向</th><th>内容</th><th>格式</th></tr></thead>
+    <tbody>
+      <tr><td>输入</td><td><code>metrics.csv</code> — 时序指标矩阵（~150 列，每行 1 个采样点）</td><td>CSV，时间戳索引</td></tr>
+      <tr><td>输入</td><td><code>jobinfo.csv</code> — Slurm 作业信息（节点分配、时间段）</td><td>CSV，<code>|</code> 分隔</td></tr>
+      <tr><td>输入 (可选)</td><td><code>chaos.csv</code> — 故障注入记录，用于评估模式 ground truth 比对</td><td>CSV</td></tr>
+      <tr><td>输出</td><td><code>DiagnosisReport</code> — 根因列表、证据链、解决建议</td><td>JSON</td></tr>
+      <tr><td>输出</td><td><code>ExecutionTrace</code> — 完整 Thought-Action-Observation 轨迹</td><td>JSON</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 四阶段架构图</h3>
+  <div class="svg-wrap">
+  <svg width="760" height="510" viewBox="0 0 760 510" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="ahp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="aho" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f97316"/>
+    </marker>
+  </defs>
+  <rect width="760" height="510" fill="#f8fafc"/>
+
+  <!-- Input box -->
+  <rect x="592" y="8" width="155" height="56" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="670" y="26" text-anchor="middle" font-size="10.5" fill="#475569" font-weight="700">输入数据</text>
+  <text x="670" y="42" text-anchor="middle" font-size="11" fill="#475569">metrics.csv</text>
+  <text x="670" y="56" text-anchor="middle" font-size="11" fill="#475569">jobinfo.csv</text>
+
+  <!-- Stage 0: KB -->
+  <rect x="10" y="8" width="570" height="62" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="22" y="25" font-size="10.5" fill="#1e40af" font-weight="700">Stage 0  Offline Knowledge Base — 离线一次性构建，不消耗推理时间</text>
+  <rect x="22" y="31" width="165" height="30" rx="5" fill="#3b82f6"/>
+  <text x="105" y="51" text-anchor="middle" fill="white" font-size="11.5">Metric KB（YAML + 向量索引）</text>
+  <rect x="200" y="31" width="165" height="30" rx="5" fill="#3b82f6"/>
+  <text x="283" y="51" text-anchor="middle" fill="white" font-size="11.5">Fault Pattern Library（JSONL）</text>
+  <rect x="378" y="31" width="160" height="30" rx="5" fill="#3b82f6"/>
+  <text x="458" y="51" text-anchor="middle" fill="white" font-size="11.5">Baseline Profile（JSON）</text>
+
+  <!-- Arrow 0→1 -->
+  <line x1="290" y1="70" x2="290" y2="90" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- Input arrow into Stage1 -->
+  <line x1="592" y1="64" x2="570" y2="100" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ah)"/>
+
+  <!-- Stage 1: Triage -->
+  <rect x="10" y="90" width="570" height="64" rx="7" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="22" y="107" font-size="10.5" fill="#064e3b" font-weight="700">Stage 1  Triage — 确定性分诊，纯 Python，零 LLM Token</text>
+  <rect x="22" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="76" y="130" text-anchor="middle" fill="white" font-size="11">异常检测</text>
+  <line x1="130" y1="126" x2="148" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="148" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="202" y="130" text-anchor="middle" fill="white" font-size="11">时序排序</text>
+  <line x1="256" y1="126" x2="274" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="274" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="328" y="130" text-anchor="middle" fill="white" font-size="11">子系统初判</text>
+  <line x1="382" y1="126" x2="400" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="400" y="112" width="160" height="28" rx="5" fill="#065f46"/>
+  <text x="480" y="130" text-anchor="middle" fill="white" font-size="11" font-weight="700">→ FocusContext</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="290" y1="154" x2="290" y2="174" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="302" y="168" font-size="10" fill="#64748b">FocusContext + causal_order</text>
+
+  <!-- Stage 2: Diagnosis Agent -->
+  <rect x="10" y="174" width="570" height="185" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="22" y="192" font-size="10.5" fill="#4c1d95" font-weight="700">Stage 2  Diagnosis Agent — LangGraph ReAct + 多假设并行</text>
+
+  <!-- HYPOTHESIZE -->
+  <rect x="22" y="198" width="128" height="30" rx="5" fill="#7c3aed"/>
+  <text x="86" y="218" text-anchor="middle" fill="white" font-size="11">HYPOTHESIZE</text>
+  <text x="86" y="230" text-anchor="middle" fill="white" font-size="9">(LLM)</text>
+
+  <!-- Arrow HYPO → REACT -->
+  <line x1="150" y1="212" x2="170" y2="212" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+
+  <!-- REACT LOOP -->
+  <rect x="170" y="196" width="278" height="115" rx="6" fill="rgba(109,40,217,.07)" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="182" y="210" font-size="9.5" fill="#6d28d9" font-weight="700">REACT LOOP</text>
+  <rect x="180" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="217" y="232" text-anchor="middle" fill="white" font-size="11">THINK</text>
+  <line x1="255" y1="227" x2="270" y2="227" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <rect x="270" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="307" y="232" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <line x1="345" y1="227" x2="360" y2="227" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <rect x="360" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="397" y="232" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
+  <!-- Return arc in loop -->
+  <path d="M435 240 Q435 278 307 278 Q180 278 180 240" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ahp)"/>
+  <text x="307" y="292" text-anchor="middle" fill="#6d28d9" font-size="9.5">iterate</text>
+
+  <!-- Arrow REACT → GATE -->
+  <line x1="448" y1="212" x2="465" y2="212" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+
+  <!-- GATE -->
+  <rect x="465" y="196" width="100" height="30" rx="5" fill="#7c3aed"/>
+  <text x="515" y="216" text-anchor="middle" fill="white" font-size="11">GATE</text>
+  <text x="515" y="227" text-anchor="middle" fill="white" font-size="9">(规则，纯Python)</text>
+
+  <!-- pass arrow down -->
+  <line x1="515" y1="226" x2="515" y2="302" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <text x="525" y="266" fill="#4c1d95" font-size="10">pass</text>
+
+  <!-- fail arc back to hypothesize -->
+  <path d="M465 217 Q86 217 86 240" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahp)"/>
+  <text x="268" y="210" fill="#4c1d95" font-size="9.5">fail → continue / degrade</text>
+
+  <!-- FINALIZE -->
+  <rect x="444" y="302" width="142" height="30" rx="5" fill="#4c1d95"/>
+  <text x="515" y="322" text-anchor="middle" fill="white" font-size="11">FINALIZE（LLM）</text>
+
+  <!-- Arrow FINALIZE → Stage3 (left then down) -->
+  <path d="M444 317 L290 317 L290 356" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Stage 3: Reflect -->
+  <rect x="10" y="356" width="570" height="55" rx="7" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="22" y="374" font-size="10.5" fill="#78350f" font-weight="700">Stage 3  Reflect — 规则提炼 → 写回 Fault Pattern Library</text>
+  <text x="22" y="391" font-size="11" fill="#92400e">LLM 提炼症状签名 → 相似度去重 → fpl.jsonl append（候选状态）→ 2 次成功诊断后升为正式规则</text>
+  <text x="398" y="400" font-size="9.5" fill="#92400e">（可同步/异步执行）</text>
+
+  <!-- Arrow Reflect → output -->
+  <line x1="290" y1="411" x2="290" y2="428" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Output box -->
+  <rect x="72" y="428" width="436" height="30" rx="6" fill="#1e293b"/>
+  <text x="290" y="448" text-anchor="middle" fill="#e2e8f0" font-size="12">输出: DiagnosisReport (JSON) + ExecutionTrace</text>
+
+  <!-- Tools box -->
+  <rect x="594" y="174" width="155" height="185" rx="7" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="672" y="192" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Tools）</text>
+  <rect x="604" y="198" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="216" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
+  <rect x="604" y="232" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="250" text-anchor="middle" fill="white" font-size="11">KBRetrievalTool</text>
+  <rect x="604" y="266" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="284" text-anchor="middle" fill="white" font-size="11">DataAnalysisTool</text>
+  <text x="671" y="320" text-anchor="middle" font-size="9.5" fill="#7c2d12">↕ LLM function calling</text>
+  <text x="671" y="335" text-anchor="middle" font-size="9.5" fill="#7c2d12">输出经摘要压缩后</text>
+  <text x="671" y="348" text-anchor="middle" font-size="9.5" fill="#7c2d12">写入 Evidence 列表</text>
+
+  <!-- ACT → Tools -->
+  <line x1="580" y1="227" x2="594" y2="227" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#aho)"/>
+  <!-- Tools → OBSERVE (return) -->
+  <line x1="594" y1="240" x2="435" y2="240" stroke="#f97316" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#aho)"/>
+
+  <!-- KB feeds into Stage 1 (dashed line) -->
+  <line x1="458" y1="61" x2="550" y2="90" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ah)"/>
+  <!-- KB/FPL feeds into Stage 2 (dashed) -->
+  <line x1="283" y1="61" x2="283" y2="87" stroke="#3b82f6" stroke-width="0.8" stroke-dasharray="2,2"/>
+  </svg>
+  </div>
+
+  <h3>2.3 与参考系统 STELLAR (SC'25) 的对比定位</h3>
+  <table>
+    <thead><tr><th>维度</th><th>STELLAR (SC'25)</th><th>本系统 (HPC-Diagnosis Agent)</th></tr></thead>
+    <tbody>
+      <tr><td>应用目标</td><td>I/O 参数自动调优</td><td>故障根因诊断 + 解决建议</td></tr>
+      <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + LLM Agent（双层控制）</td></tr>
+      <tr><td>证据验证</td><td>无 Evidence Gating</td><td><strong>Rule A/B/C/D + Cascade 检测</strong>，强制量化支撑</td></tr>
+      <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障诊断</td></tr>
+      <tr><td>知识库</td><td>RAG 检索文档片段</td><td><strong>结构化 FPL</strong>（含置信度、版本、来源追踪）</td></tr>
+      <tr><td>消融实验</td><td>5 组件 ablation</td><td>7 个维度（5 ablation + 2 baseline）</td></tr>
+    </tbody>
+  </table>
+</section>
+<!-- ════════════════ Section 3: 设计展开 ════════════════ -->
+<section id="s3">
+  <h2>3. 设计展开</h2>
+  <p>以下各节对应 <code>design/v4.md</code> 的不同部分，并包含 <code>design/kb_schema.md</code>、<code>design/pydantic_schema.md</code>、<code>design/evidence_gating.md</code> 的细化内容。</p>
+
+  <!-- 3.1 知识库 -->
+  <h3 id="s31">3.1 知识库体系（Stage 0）</h3>
+  <p>知识库在系统启动前离线构建一次，不消耗推理时间。由三层组成，各有不同的存储格式和使用场景：</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Metric KB</h4>
+      <p>存储格式：<strong>YAML + ChromaDB 向量索引</strong><br>
+      覆盖 22 个关键指标，5 个子系统（CPU/Memory/Network/Disk/System）。每个条目包含语义描述、正常范围、<code>strength_thresholds</code>（weak/medium/strong × 值域 + 持续时间）、下游因果效应（<code>downstream_effects</code>，用于 cascade 判断）。</p>
+    </div>
+    <div class="card">
+      <h4>Fault Pattern Library (FPL)</h4>
+      <p>存储格式：<strong>JSONL（每行一条规则）</strong><br>
+      初始 8 条规则（fpl_001~008），覆盖 5 种单故障 + 2 种常见复合故障。每条包含症状签名 <code>symptom_signature</code>、可验证步骤 <code>verification_steps</code>、置信度、来源（manual/learned）和 <code>composite_discrimination</code> 字段。</p>
+    </div>
+    <div class="card">
+      <h4>Baseline Profile</h4>
+      <p>存储格式：<strong>JSON（按实验条件分文件）</strong><br>
+      从 29 个 formaltest 实验的故障注入前 5 分钟提取正常态统计量（mean/std/p5/p95）。Fallback 优先级：精确匹配 → workload 类型匹配 → global 聚合 → 静态硬编码阈值，每级 fallback 对 <code>triage_confidence</code> 施加折减因子。</p>
+    </div>
+  </div>
+
+  <h4>FPL 条目示例（fpl_007：CPU 满载 + 内存高负载复合故障）</h4>
+  <pre><code>{
+  "pattern_id": "fpl_007",
+  "fault_type": "composite:cpu_fullload+mem_load",
+  "confidence": 0.82,
+  "symptom_signature": {
+    "leading_subsystem": "cpu",
+    "required_metrics": ["cpu_usage_percent", "memory_usage_percent"],
+    "causal_order_hint": ["cpu_usage_percent", "memory_usage_percent", "anon_memory_percent"]
+  },
+  "composite_discrimination": {
+    "cascade_indicator":  "memory onset &gt; 120s after CPU AND anon_memory increase &lt; 15%  → single_fault:cpu_fullload",
+    "composite_indicator":"anon_memory_percent rises &gt; 20pp from baseline → composite_fault"
+  },
+  "verification_steps": [
+    "confirm cpu_usage_percent p95 &gt; 90% sustained &gt; 3 min",
+    "confirm memory_usage_percent &gt; 80% sustained &gt; 3 min",
+    "confirm anon_memory_percent increased &gt; 20pp from baseline (independent malloc)",
+    "check onset time diff: |t_onset(cpu) - t_onset(memory)| &lt; 120s supports co-injection"
+  ]
+}</code></pre>
+
+  <div class="info">
+    <strong>设计亮点：</strong><code>strength</code> 由 Metric KB 的 <code>strength_thresholds</code> 规则确定性打标，不由 LLM 主观判断。这是 Evidence Gating 可依赖的前提。
+  </div>
+
+  <!-- 3.2 Triage Stage -->
+  <h3 id="s32">3.2 Triage Stage（Stage 1）</h3>
+  <p>Triage 是纯确定性 Python 代码，不调用 LLM。职责：从 150+ 原始指标中压缩出 Top-K 异常指标，并输出带时序因果先验的 <code>FocusContext</code>。</p>
+
+  <h4>处理流程</h4>
+  <ol>
+    <li><strong>异常检测</strong>：对每个指标做 Z-score / 分位数偏离 / 静态阈值三重判定</li>
+    <li><strong>持久性过滤</strong>：连续超阈值比例 &gt; <code>persistence_ratio</code> 才保留（去除毛刺）</li>
+    <li><strong>时序排序</strong>：记录每个异常指标首次超阈时间 <code>t_onset</code>，按时序升序排列为 <code>causal_order</code>（时序因果先验）</li>
+    <li><strong>变化点检测</strong>：对 Top-K 异常指标做 PELT/BOCPD，标注 <code>change_point</code> 时刻</li>
+    <li><strong>子系统分组</strong>：按 Metric KB <code>subsystem</code> 字段分组，计算 <code>subsystem_scores</code>，得出 <code>leading_subsystem</code></li>
+    <li><strong>作业关联</strong>：时间窗口与 <code>jobinfo.csv</code> 做交集，计算 <code>overlap_ratio</code></li>
+  </ol>
+
+  <h4>FocusContext 核心字段</h4>
+  <table>
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>causal_order</code></td><td><code>list[str]</code></td><td>按 t_onset 升序排列的指标名列表，是 HYPOTHESIZE 的时序因果先验（v4 新增贡献）</td></tr>
+      <tr><td><code>leading_subsystem</code></td><td><code>str</code></td><td>分诊初判的首发子系统，引导 HYPOTHESIZE 生成优先假设</td></tr>
+      <tr><td><code>top_metrics</code></td><td><code>list[TopMetric]</code></td><td>Top-K 异常指标，含 score/direction/t_onset/change_point/onset_rank</td></tr>
+      <tr><td><code>triage_confidence</code></td><td><code>float [0,1]</code></td><td>分诊可信度，影响 HYPOTHESIZE 生成的假设数量（低时生成更多候选）</td></tr>
+      <tr><td><code>subsystem_scores</code></td><td><code>dict</code></td><td>各子系统加权异常总分，用于初步量化哪个系统问题最大</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info">
+    <strong>消融实验对应：</strong>Ablation-A（无 Triage，全量 metrics 直接输入）和 Ablation-D（FocusContext 不含 causal_order）均可独立于 Stage 2 进行，分别验证"context 压缩效果"与"时序因果先验效果"。
+  </div>
+</section>
+<section id="s3b" style="padding-top:0;border-top:none">
+
+  <!-- 3.3 Diagnosis Agent -->
+  <h3 id="s33">3.3 Diagnosis Agent（Stage 2）</h3>
+
+  <h4>3.3.1 LangGraph 节点图</h4>
+  <p>Agent 使用 LangGraph <code>StateGraph</code> 构建，状态类型为 <code>AgentState</code>（TypedDict）。节点间数据传递通过状态更新完成，所有中间推理步骤写入 <code>react_trace</code> 字段，支持完整审计。</p>
+  <table>
+    <thead><tr><th>节点</th><th>类型</th><th>职责</th><th>输入</th><th>输出（写入 State）</th></tr></thead>
+    <tbody>
+      <tr><td><code>HYPOTHESIZE</code></td><td>LLM 节点</td><td>基于 FocusContext + FPL 检索结果，生成 2–4 个候选假设</td><td>FocusContext, FPL Top-3 pattern hits</td><td>hypotheses[], first_action</td></tr>
+      <tr><td><code>THINK</code></td><td>LLM 节点（ReAct）</td><td>分析当前证据状态，决定下一步工具调用或宣告结论</td><td>hypotheses, evidence(摘要), 上次OBSERVE结果</td><td>thought + action plan → ReActStep</td></tr>
+      <tr><td><code>ACT</code></td><td>确定性节点</td><td>按 THINK 输出执行工具调用，记录调用消耗</td><td>action plan</td><td>tool raw output</td></tr>
+      <tr><td><code>OBSERVE</code></td><td>确定性节点</td><td>摘要压缩工具输出；按 strength_thresholds 打 strength 标签；更新 verification 状态</td><td>tool raw output, Metric KB</td><td>evidence[] append, hypothesis verification update</td></tr>
+      <tr><td><code>GATE</code></td><td>纯 Python 节点</td><td>三阶段规则判断：单假设评估 → cascade 甄别 → 全局决策</td><td>hypotheses, evidence, budget</td><td>gate_result: decision/diagnosis_type</td></tr>
+      <tr><td><code>FINALIZE</code></td><td>LLM 节点</td><td>按 DiagnosisReport schema 生成结构化最终报告</td><td>confirmed hypotheses, evidence chain</td><td>report: DiagnosisReport</td></tr>
+    </tbody>
+  </table>
+
+  <h4>3.3.2 Pydantic Schema 结构（部分核心类）</h4>
+  <pre><code>class Hypothesis(BaseModel):
+    id: str                         # h1, h2, h3...
+    root_cause: str                 # 自然语言描述
+    fault_type: str                 # 对应 FPL fault_type，用于 KB 检索
+    subsystem: str                  # cpu | memory | network | disk
+    prior_confidence: float         # FPL 命中规则的 confidence，无命中默认 0.30
+    current_confidence: float       # OBSERVE 节点实时更新
+    required_verifications: list[VerificationItem]  # 来自 FPL.verification_steps
+    status: Literal["active", "confirmed", "refuted", "derived"]
+
+class Evidence(BaseModel):
+    id: str                         # e1, e2, e3...
+    hypothesis_ids: list[str]       # 关联的假设 ID
+    type: Literal["supporting", "refuting", "neutral"]
+    source_tool: str                # MetricQueryTool | KBRetrievalTool | DataAnalysisTool
+    query_summary: str              # 查询摘要（用于独立性去重）
+    result_digest: str              # 1-2 句话的结果描述（进入 LLM context）
+    raw_stats: dict                 # 统计量，不进入 context，用于 Gate 规则判断
+    strength: Literal["strong", "medium", "weak"]   # 由 Metric KB 规则确定，非 LLM 主观</code></pre>
+
+  <h4>3.3.3 多假设并行（复合故障支持）</h4>
+  <p><code>AgentState.hypotheses</code> 是一个列表，可同时维护多个互不排斥的假设（如 h1=CPU故障, h2=内存故障）。THINK 节点在每轮决策时综合所有 active 假设的证据状态，决定优先验证哪个假设。</p>
+  <p>复合故障的 <code>diagnosis_type</code> 由 GATE 节点在 Stage C 根据 confirmed 假设数量确定：</p>
+  <ul>
+    <li><code>single_fault</code>：恰好 1 个 confirmed 假设，无 active</li>
+    <li><code>composite_fault</code>：≥ 2 个独立 confirmed 假设，均通过 cascade 甄别</li>
+    <li><code>partial</code>：≥ 1 个 confirmed，仍有 active（budget 耗尽时）</li>
+    <li><code>inconclusive</code>：所有假设均 refuted 或 budget 耗尽且无 confirmed</li>
+  </ul>
+
+  <h4>3.3.4 工具摘要机制（防 token 爆炸）</h4>
+  <p>OBSERVE 节点对工具原始输出执行摘要压缩：只保留统计量（p95/mean/max/duration 等）和 1-2 句文字摘要，写入 <code>Evidence.result_digest</code>；原始时序序列不进入 LLM context，仅用于离线调试。这保证了 10 次工具调用后 context 仍在 token 预算内。</p>
+
+  <!-- 3.4 Evidence Gating -->
+  <h3 id="s34">3.4 Evidence Gating（核心贡献）</h3>
+  <p>Evidence Gating 是防止"LLM 编故事"的核心机制。GATE 节点是纯 Python 规则，不消耗 LLM token。结论必须满足量化证据条件才能通过，否则继续收集证据或输出降级报告。</p>
+
+  <h4>三阶段 Gate 决策框架</h4>
+  <table>
+    <thead><tr><th>阶段</th><th>内容</th><th>关键逻辑</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Stage A</strong></td><td>单假设评估</td><td>对每个 active 假设独立判断应升为 confirmed/refuted/active</td></tr>
+      <tr><td><strong>Stage B</strong></td><td>继发症状甄别（Cascade Detection）</td><td>对所有 ≥2 个 confirmed 假设两两检查是否存在因果从属关系，防止将继发效应误判为复合故障</td></tr>
+      <tr><td><strong>Stage C</strong></td><td>全局决策</td><td>输出 pass / continue / degrade 和最终 diagnosis_type</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Stage A：单假设通过规则（Rule A / B / C / D）</h4>
+  <table>
+    <thead><tr><th>规则</th><th>通过条件</th><th>适用场景</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Rule A</strong></td><td>≥2 条来自不同工具+不同指标的支持证据，至少 1 条 strong</td><td>标准场景，强调证据独立性</td></tr>
+      <tr><td><strong>Rule B</strong></td><td>1 条 strong + 所有 required_verifications 完成（含 unverifiable）</td><td>数据有缺失时的兜底</td></tr>
+      <tr><td><strong>Rule C</strong></td><td>FPL 先验 &gt; 0.80 + ≥1 条 verification 已核实 + 1 条 strong 证据</td><td>高置信度历史规则辅助</td></tr>
+      <tr><td><strong>Rule D（新增）</strong></td><td>当 ≥2 假设共享 &gt;50% 支持证据时，置信度最高者胜出，另一者 refuted</td><td>互斥假设（共享证据但解释矛盾）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Stage B：继发症状甄别算法（<code>check_cascade</code>）</h4>
+  <p>对两个 confirmed 假设 (h_primary, h_secondary)，依次检查：</p>
+  <ol>
+    <li><strong>时序先后性</strong>：若 <code>onset_lag &lt; 60s</code>（可配置）→ <code>independent</code>（几乎同时出现，说明独立注入）</li>
+    <li><strong>因果链检查</strong>：查询 Metric KB <code>downstream_effects</code>，若 h_primary 的核心指标没有已知下游效应涉及 h_secondary 的子系统 → <code>independent</code></li>
+    <li><strong>异常幅度检查</strong>：若 h_secondary 的 p95 值 ≥ Metric KB 对应的 strong 阈值 → 继发效应不可能达到此幅度，判定 <code>independent</code></li>
+    <li><strong>特征量判断（CPU+MEM 特化）</strong>：<code>anon_memory_percent</code> 增幅 &gt; 20pp → 独立 malloc 注入，判定 <code>independent</code></li>
+    <li>以上均不通过 → <code>cascade</code>（h_secondary 降级为 <code>derived</code>）</li>
+  </ol>
+
+  <h4>可参数化阈值（均可在 <code>config/gate_config.yaml</code> 中覆盖，用于消融实验）</h4>
+  <table>
+    <thead><tr><th>参数名</th><th>默认值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>min_independent_sources</code></td><td>2</td><td>Rule A 所需最少独立证据数</td></tr>
+      <tr><td><code>fpl_confidence_threshold</code></td><td>0.80</td><td>Rule C 生效的 FPL 先验阈值</td></tr>
+      <tr><td><code>cascade_lag_threshold_sec</code></td><td>60</td><td>Stage B：同时出现的时间窗口（秒）</td></tr>
+      <tr><td><code>anon_memory_independence_threshold</code></td><td>20.0</td><td>Stage B CPU+MEM：anon_memory 增幅独立性判断（百分点）</td></tr>
+      <tr><td><code>min_budget_per_hypothesis</code></td><td>2</td><td>继续处理每个 active 假设所需最低剩余工具调用次数</td></tr>
+      <tr><td><code>tool_calls_limit</code></td><td>12</td><td>单次诊断的工具调用上限（全局 budget）</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.5 Reflect -->
+  <h3 id="s35">3.5 Reflect &amp; 知识积累（Stage 3）</h3>
+  <p>每次 FINALIZE 完成后触发 Reflect 节点（可同步或异步）。核心职责：将本次诊断经验提炼为 FPL 规则，实现知识积累。</p>
+
+  <h4>执行步骤</h4>
+  <ol>
+    <li><strong>Ground Truth 比对</strong>（评估模式）：将 <code>root_causes</code> 与 <code>chaos.csv</code> 中实际注入故障比对，输出 Hit@1 / Hit@K，写入 trace</li>
+    <li><strong>规则提炼</strong>：LLM 分析本次诊断的"有效症状签名"与"有效验证路径"，按 FPL Schema 生成候选规则条目</li>
+    <li><strong>去重写入</strong>：计算 <code>symptom_signature</code> 哈希，若与已有规则 cosine_similarity &gt; 0.85 → 版本号 +1（更新），否则 → 新增（候选状态）</li>
+    <li><strong>规则升级</strong>：候选规则被 ≥2 次成功诊断确认后升为正式规则（<code>status: confirmed</code>）</li>
+    <li><strong>规则衰减</strong>：最近 5 次相关诊断准确率 &lt; 40% → <code>confidence</code> 降低并标记 <code>deprecated</code></li>
+  </ol>
+
+  <div class="warn">
+    <strong>防污染措施：</strong>LLM 只生成 <code>symptom_signature</code>、<code>verification_steps</code>、<code>solutions</code> 三个字段；<code>confidence</code> 由系统根据历史准确率计算（初始 0.5），不允许 LLM 直接设置。
+  </div>
+</section>
+<!-- ════════════════ Section 4: 当前进度 ════════════════ -->
+<section id="s4">
+  <h2>4. 当前进度</h2>
+
+  <div class="pb">
+    <div class="pb-icon done">✓</div>
+    <div class="pb-body">
+      <strong>Phase A — 离线知识库构建（已完成，2026-03-19）</strong>
+      <span>
+        <code>agent/schema.py</code>（12 个 Pydantic/TypedDict 类，9/9 测试通过）·
+        <code>agent/kb/metrics.yaml</code>（22 条指标，5 子系统）·
+        <code>agent/kb/fpl.jsonl</code>（8 条规则 fpl_001~008）·
+        <code>agent/kb/baseline/</code>（29 个实验预fault基线 + global.json）·
+        <code>agent/kb/chroma_db/</code>（离线 TF-IDF 向量索引）·
+        补充设计文档：<code>design/kb_schema.md</code>, <code>design/pydantic_schema.md</code>, <code>design/evidence_gating.md</code>
+      </span>
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-icon todo">B</div>
+    <div class="pb-body">
+      <strong>Phase B — Triage Stage 实现（待开始）</strong>
+      <span>
+        实现 <code>agent/triage.py</code>：异常检测（Z-score + 分位数 + 静态阈值）· 持久性过滤 · 变化点检测（PELT/ruptures）· FocusContext 生成。
+        单测：覆盖 29 个 formaltest 场景，验证 <code>leading_subsystem</code> 与 ground truth 一致率 &gt; 80%。
+      </span>
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-icon todo">C</div>
+    <div class="pb-body">
+      <strong>Phase C — Diagnosis Agent 实现（待开始，依赖 A + B）</strong>
+      <span>
+        实现 <code>agent/diagnosis.py</code>（LangGraph StateGraph）· 6 个节点（HYPOTHESIZE/THINK/ACT/OBSERVE/GATE/FINALIZE）·
+        3 个工具（MetricQueryTool/KBRetrievalTool/DataAnalysisTool）·
+        GATE 算法（<code>design/evidence_gating.md</code> 三阶段伪代码）·
+        全流程集成测试：在 formaltest 数据上跑通单故障 + 复合故障各 3 个场景。
+      </span>
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-icon todo">D</div>
+    <div class="pb-body">
+      <strong>Phase D — Reflect + 评估框架（待开始，依赖 C）</strong>
+      <span>
+        实现 <code>agent/reflect.py</code>（规则提炼 + FPL 写回）·
+        实现 <code>eval/evaluate.py</code>（Ground Truth 比对，计算 Hit@1/Hit@3/coverage）·
+        跑全量 29 个 formaltest 场景，建立性能基线。
+      </span>
+    </div>
+  </div>
+
+  <div class="pb">
+    <div class="pb-icon todo">E</div>
+    <div class="pb-body">
+      <strong>Phase E — 消融实验 + 论文写作（待开始，依赖 D）</strong>
+      <span>
+        按第 5 节消融矩阵执行 7 组实验 · 整理指标表格 · 撰写论文 §5（Evaluation）。
+      </span>
+    </div>
+  </div>
+
+  <h3>数据集说明</h3>
+  <table>
+    <thead><tr><th>数据集</th><th>路径</th><th>规模</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td>formaltest</td><td><code>dataset_builder/data/formaltest/extracted_data/</code></td><td>29 实验（7 单故障 + 22 复合故障）</td><td>主评测数据集</td></tr>
+      <tr><td>compositetest_backup</td><td><code>dataset_builder/data/compositetest_backup/extracted_data/</code></td><td>8 实验（复合故障为主）</td><td>补充评测，Phase E 使用</td></tr>
+    </tbody>
+  </table>
+  <div class="info">
+    <strong>全流程跑通策略：</strong>Phase A → Phase B Phase C（可并行） → Phase D → Phase E。
+    在 Phase D 跑通前，<strong>只使用离线数据，不启动真实 HPC 集群</strong>。
+  </div>
+</section>
+
+<!-- ════════════════ Section 5: 消融实验 ════════════════ -->
+<section id="s5">
+  <h2>5. 消融实验设计</h2>
+  <p>论文贡献点必须通过消融实验量化验证。以下 7 组实验覆盖全部核心设计维度，每组均在相同的 29 个 formaltest 场景上运行，使用相同的 evaluation harness（<code>eval/evaluate.py</code>）。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>编号</th>
+        <th>实验名称</th>
+        <th>消融方式</th>
+        <th>验证的研究问题</th>
+        <th>论文 Contribution</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="abl-contrib">
+        <td>Full</td>
+        <td>完整系统（v4）</td>
+        <td>无消融</td>
+        <td>完整系统性能上限</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Abl-A</td>
+        <td>无 Triage</td>
+        <td>跳过 Stage 1；将所有指标的统计摘要直接输入 HYPOTHESIZE</td>
+        <td>确定性分诊对准确率和 token 效率的贡献</td>
+        <td>Hybrid Control</td>
+      </tr>
+      <tr>
+        <td>Abl-B</td>
+        <td>无 Evidence Gating</td>
+        <td>移除 GATE 节点；THINK 节点输出 <code>conclude</code> 时直接 FINALIZE</td>
+        <td>Evidence Gating 对误报率和幻觉率的抑制效果</td>
+        <td>Evidence Gating</td>
+      </tr>
+      <tr>
+        <td>Abl-C</td>
+        <td>无 Knowledge Base</td>
+        <td>KBRetrievalTool 返回空；HYPOTHESIZE 不使用 FPL，MetricQueryTool 不使用 strength_thresholds</td>
+        <td>结构化知识库对诊断质量的贡献（RAG 效果）</td>
+        <td>Fault Pattern Library</td>
+      </tr>
+      <tr>
+        <td>Abl-D</td>
+        <td>无时序因果先验</td>
+        <td>FocusContext 的 <code>causal_order</code> 打乱顺序（随机排列 Top-K 指标）</td>
+        <td>时序因果排序对 HYPOTHESIZE 质量的影响（v4 特有贡献，相比 v3）</td>
+        <td>Temporal Causal Prior</td>
+      </tr>
+      <tr>
+        <td>Abl-E</td>
+        <td>无 Reflect（无 FPL 积累）</td>
+        <td>FPL 在诊断间保持固定（只用初始 8 条人工规则），不写入新规则</td>
+        <td>FPL 自增长对诊断质量的影响（需要 ≥2 轮实验才能观察到效果）</td>
+        <td>Self-Accumulating KB</td>
+      </tr>
+      <tr>
+        <td>BL-1</td>
+        <td>Baseline：单次 LLM 调用</td>
+        <td>使用 <code>llm/src/main.py</code> 现有实现（Phase 2 系统）</td>
+        <td>相比 baseline 的整体性能提升</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>BL-2</td>
+        <td>Baseline：纯统计规则</td>
+        <td>只运行 Triage + 基于 FPL 的硬编码规则匹配，完全不调用 LLM</td>
+        <td>LLM Agent 相比纯规则系统的增益；验证 LLM 是否真正有价值</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>主要评估指标</h3>
+  <table>
+    <thead><tr><th>类别</th><th>指标</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>准确性</td><td>Root Cause Hit@1</td><td>Top-1 预测与 ground truth 匹配率</td></tr>
+      <tr><td>准确性</td><td>Root Cause Hit@3</td><td>ground truth 在 Top-3 候选中的覆盖率</td></tr>
+      <tr><td>准确性</td><td>Composite Coverage</td><td>复合故障场景下，所有注入故障均被诊断出的比例</td></tr>
+      <tr><td>效率</td><td>Avg Tool Calls</td><td>每次诊断的平均工具调用次数，衡量推理效率</td></tr>
+      <tr><td>效率</td><td>End-to-end Latency</td><td>从输入到输出的总耗时（秒）</td></tr>
+      <tr><td>成本</td><td>Token Usage (in/out)</td><td>每次诊断的输入/输出 token 数，估算 API 费用</td></tr>
+      <tr><td>鲁棒性</td><td>Hit@1 @ 20% missing</td><td>随机删除 20% 指标列后的 Hit@1 下降幅度</td></tr>
+      <tr><td>KB 增益</td><td>ΔHit@1 (with/without FPL)</td><td>Abl-C vs Full 的 Hit@1 差异，量化 KB 贡献</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ════════════════ Footer ════════════════ -->
+<footer style="margin-left:210px;padding:28px 52px;background:#fff;border-top:1px solid #dce1e7;font-size:13px;color:#888">
+  <div>HPC-Diagnosis Agent v4 设计报告 &nbsp;·&nbsp; 生成于 2026-03-19 &nbsp;·&nbsp; SC'26 项目</div>
+  <div style="margin-top:6px">
+    核心文档：
+    <code>design/v4.md</code> &nbsp;·&nbsp;
+    <code>design/kb_schema.md</code> &nbsp;·&nbsp;
+    <code>design/pydantic_schema.md</code> &nbsp;·&nbsp;
+    <code>design/evidence_gating.md</code>
+  </div>
+</footer>
+
+<script>
+// 滚动高亮侧边导航
+const sections = document.querySelectorAll('section[id], div[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) cur = s.id; });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + cur) a.classList.add('active');
+  });
+}, {passive: true});
+</script>
+</main>
+</body>
+</html>

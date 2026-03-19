@@ -1,5 +1,24 @@
-openai
-pandas
-python-dotenv
-pyyaml
-requests
+# Core
+openai>=2.0.0
+pandas>=2.0.0
+python-dotenv>=1.0.0
+pyyaml>=6.0
+requests>=2.32.0
+numpy>=2.0.0
+scipy>=1.10.0
+
+# Agent framework
+langchain>=0.3.0
+langchain-openai>=0.3.0
+langgraph>=0.2.0
+langsmith>=0.1.0
+
+# Vector DB
+chromadb>=1.0.0
+
+# Schema validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Token counting
+tiktoken>=0.5.0

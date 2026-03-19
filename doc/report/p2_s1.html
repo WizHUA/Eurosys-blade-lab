@@ -1,0 +1,48 @@
+<div class="hero">
+  <h1>HPC-Diagnosis Agent v4 &nbsp;—&nbsp; 完整设计报告</h1>
+  <div class="sub">基于 LLM Agent 的 HPC 系统异常诊断工具 &nbsp;·&nbsp; 版本 v4 &nbsp;·&nbsp; 目标投稿 SC'26</div>
+  <div>
+    <span class="badge">框架: LangGraph 1.1.3</span>
+    <span class="badge">LLM: deepseek/deepseek-chat via OpenRouter</span>
+    <span class="badge">数据: 29 个 formaltest 实验</span>
+    <span class="badge">Phase A: 已完成</span>
+  </div>
+</div>
+
+<!-- ════════════════ Section 1: 项目背景 ════════════════ -->
+<section id="s1">
+  <h2>1. 项目背景</h2>
+
+  <h3>1.1 HPC 异常诊断的挑战</h3>
+  <p>现代 HPC 集群运行 NPB（NAS Parallel Benchmarks）等大规模 MPI 作业，多节点协同计算时，单个节点上的 CPU 满载、内存高占用、网络丢包或磁盘 I/O 瓶颈，都会影响整个作业的完成。Prometheus 等监控系统会产生 <strong>150+ 时序指标</strong>，这些指标涵盖 CPU 使用率、内存分配、网络收发、磁盘 I/O 等多个子系统。</p>
+
+  <p>故障诊断面临以下核心困难：</p>
+  <ul>
+    <li><strong>指标爆炸</strong>：150+ 指标中，真正与故障相关的通常只有 5−10 个，大量无关指标会干扰推理过程。</li>
+    <li><strong>复合故障</strong>：实验数据中约 75% 的场景为复合故障（如 CPU 满载 + 内存高负载同时注入），需要同时诊断多个根因。</li>
+    <li><strong>时序因果依赖</strong>：故障传播有链式结构——CPU 满载可能继发内存 page cache 压力；diskfill 导致写入阻塞可能引发 iowait 上升。区分"独立注入"与"继发症状"是正确诊断的关键。</li>
+    <li><strong>知识积累难</strong>：新的故障模式不断出现，纯静态规则系统无法及时更新，需要一个可持续积累的诊断知识库。</li>
+  </ul>
+
+  <h3>1.2 现有方案的局限性</h3>
+  <table>
+    <thead><tr><th>方案类型</th><th>代表系统</th><th>主要局限</th></tr></thead>
+    <tbody>
+      <tr><td>基于规则系统</td><td>静态阈值规则</td><td>规则需手工维护；无法处理未预见的故障组合；阈值对不同 workload 不通用</td></tr>
+      <tr><td>纯统计方法</td><td>Z-score 异常检测</td><td>只能发现"有异常"，不能解释"为什么"；误报率高</td></tr>
+      <tr><td>单次 LLM 调用</td><td>本项目 Phase 2 基线</td><td>输入全量 150+ 指标，大量 context 浪费；无中间验证步骤，容易"编故事式推理"；无法积累经验</td></tr>
+      <tr><td>STELLAR (SC'25)</td><td>I/O 参数调优</td><td>面向系统调优而非异常诊断；无 Evidence Gating，无多假设并行；知识库不区分规则来源/置信度</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.3 我们的核心切入点</h3>
+  <div class="contrib">
+    <strong>四个核心设计贡献（每个均有对应消融实验支撑）：</strong>
+    <ol style="margin:10px 0 0 18px">
+      <li><strong>Hybrid Control</strong>：确定性 Triage（压缩 context，提取时序因果先验）+ LLM Agent（聚焦推理），两阶段逻辑独立，消融边界清晰。</li>
+      <li><strong>Evidence Gating</strong>：结论必须有最低量化证据支撑（Rule A/B/C + 复合故障 Rule D），防止 LLM 在证据不足时强行下结论。</li>
+      <li><strong>Fault Pattern Library（FPL）</strong>：可积累、可写回的结构化故障知识库。每次诊断后通过 Reflect 节点自动提炼规则，以 JSONL 格式追加（带去重和置信度衰减机制）。</li>
+      <li><strong>多假设并行 + 继发症状甄别</strong>：AgentState 显式维护 N 个假设，Stage B cascade 检测区分"复合故障"与"继发症状链"，解决 SC'26 复合故障场景的诊断难题。</li>
+    </ol>
+  </div>
+</section>

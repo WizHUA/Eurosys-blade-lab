@@ -1,0 +1,118 @@
+<section id="s3b" style="padding-top:0;border-top:none">
+
+  <!-- 3.3 Diagnosis Agent -->
+  <h3 id="s33">3.3 Diagnosis Agent（Stage 2）</h3>
+
+  <h4>3.3.1 LangGraph 节点图</h4>
+  <p>Agent 使用 LangGraph <code>StateGraph</code> 构建，状态类型为 <code>AgentState</code>（TypedDict）。节点间数据传递通过状态更新完成，所有中间推理步骤写入 <code>react_trace</code> 字段，支持完整审计。</p>
+  <table>
+    <thead><tr><th>节点</th><th>类型</th><th>职责</th><th>输入</th><th>输出（写入 State）</th></tr></thead>
+    <tbody>
+      <tr><td><code>HYPOTHESIZE</code></td><td>LLM 节点</td><td>基于 FocusContext + FPL 检索结果，生成 2–4 个候选假设</td><td>FocusContext, FPL Top-3 pattern hits</td><td>hypotheses[], first_action</td></tr>
+      <tr><td><code>THINK</code></td><td>LLM 节点（ReAct）</td><td>分析当前证据状态，决定下一步工具调用或宣告结论</td><td>hypotheses, evidence(摘要), 上次OBSERVE结果</td><td>thought + action plan → ReActStep</td></tr>
+      <tr><td><code>ACT</code></td><td>确定性节点</td><td>按 THINK 输出执行工具调用，记录调用消耗</td><td>action plan</td><td>tool raw output</td></tr>
+      <tr><td><code>OBSERVE</code></td><td>确定性节点</td><td>摘要压缩工具输出；按 strength_thresholds 打 strength 标签；更新 verification 状态</td><td>tool raw output, Metric KB</td><td>evidence[] append, hypothesis verification update</td></tr>
+      <tr><td><code>GATE</code></td><td>纯 Python 节点</td><td>三阶段规则判断：单假设评估 → cascade 甄别 → 全局决策</td><td>hypotheses, evidence, budget</td><td>gate_result: decision/diagnosis_type</td></tr>
+      <tr><td><code>FINALIZE</code></td><td>LLM 节点</td><td>按 DiagnosisReport schema 生成结构化最终报告</td><td>confirmed hypotheses, evidence chain</td><td>report: DiagnosisReport</td></tr>
+    </tbody>
+  </table>
+
+  <h4>3.3.2 Pydantic Schema 结构（部分核心类）</h4>
+  <pre><code>class Hypothesis(BaseModel):
+    id: str                         # h1, h2, h3...
+    root_cause: str                 # 自然语言描述
+    fault_type: str                 # 对应 FPL fault_type，用于 KB 检索
+    subsystem: str                  # cpu | memory | network | disk
+    prior_confidence: float         # FPL 命中规则的 confidence，无命中默认 0.30
+    current_confidence: float       # OBSERVE 节点实时更新
+    required_verifications: list[VerificationItem]  # 来自 FPL.verification_steps
+    status: Literal["active", "confirmed", "refuted", "derived"]
+
+class Evidence(BaseModel):
+    id: str                         # e1, e2, e3...
+    hypothesis_ids: list[str]       # 关联的假设 ID
+    type: Literal["supporting", "refuting", "neutral"]
+    source_tool: str                # MetricQueryTool | KBRetrievalTool | DataAnalysisTool
+    query_summary: str              # 查询摘要（用于独立性去重）
+    result_digest: str              # 1-2 句话的结果描述（进入 LLM context）
+    raw_stats: dict                 # 统计量，不进入 context，用于 Gate 规则判断
+    strength: Literal["strong", "medium", "weak"]   # 由 Metric KB 规则确定，非 LLM 主观</code></pre>
+
+  <h4>3.3.3 多假设并行（复合故障支持）</h4>
+  <p><code>AgentState.hypotheses</code> 是一个列表，可同时维护多个互不排斥的假设（如 h1=CPU故障, h2=内存故障）。THINK 节点在每轮决策时综合所有 active 假设的证据状态，决定优先验证哪个假设。</p>
+  <p>复合故障的 <code>diagnosis_type</code> 由 GATE 节点在 Stage C 根据 confirmed 假设数量确定：</p>
+  <ul>
+    <li><code>single_fault</code>：恰好 1 个 confirmed 假设，无 active</li>
+    <li><code>composite_fault</code>：≥ 2 个独立 confirmed 假设，均通过 cascade 甄别</li>
+    <li><code>partial</code>：≥ 1 个 confirmed，仍有 active（budget 耗尽时）</li>
+    <li><code>inconclusive</code>：所有假设均 refuted 或 budget 耗尽且无 confirmed</li>
+  </ul>
+
+  <h4>3.3.4 工具摘要机制（防 token 爆炸）</h4>
+  <p>OBSERVE 节点对工具原始输出执行摘要压缩：只保留统计量（p95/mean/max/duration 等）和 1-2 句文字摘要，写入 <code>Evidence.result_digest</code>；原始时序序列不进入 LLM context，仅用于离线调试。这保证了 10 次工具调用后 context 仍在 token 预算内。</p>
+
+  <!-- 3.4 Evidence Gating -->
+  <h3 id="s34">3.4 Evidence Gating（核心贡献）</h3>
+  <p>Evidence Gating 是防止"LLM 编故事"的核心机制。GATE 节点是纯 Python 规则，不消耗 LLM token。结论必须满足量化证据条件才能通过，否则继续收集证据或输出降级报告。</p>
+
+  <h4>三阶段 Gate 决策框架</h4>
+  <table>
+    <thead><tr><th>阶段</th><th>内容</th><th>关键逻辑</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Stage A</strong></td><td>单假设评估</td><td>对每个 active 假设独立判断应升为 confirmed/refuted/active</td></tr>
+      <tr><td><strong>Stage B</strong></td><td>继发症状甄别（Cascade Detection）</td><td>对所有 ≥2 个 confirmed 假设两两检查是否存在因果从属关系，防止将继发效应误判为复合故障</td></tr>
+      <tr><td><strong>Stage C</strong></td><td>全局决策</td><td>输出 pass / continue / degrade 和最终 diagnosis_type</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Stage A：单假设通过规则（Rule A / B / C / D）</h4>
+  <table>
+    <thead><tr><th>规则</th><th>通过条件</th><th>适用场景</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Rule A</strong></td><td>≥2 条来自不同工具+不同指标的支持证据，至少 1 条 strong</td><td>标准场景，强调证据独立性</td></tr>
+      <tr><td><strong>Rule B</strong></td><td>1 条 strong + 所有 required_verifications 完成（含 unverifiable）</td><td>数据有缺失时的兜底</td></tr>
+      <tr><td><strong>Rule C</strong></td><td>FPL 先验 &gt; 0.80 + ≥1 条 verification 已核实 + 1 条 strong 证据</td><td>高置信度历史规则辅助</td></tr>
+      <tr><td><strong>Rule D（新增）</strong></td><td>当 ≥2 假设共享 &gt;50% 支持证据时，置信度最高者胜出，另一者 refuted</td><td>互斥假设（共享证据但解释矛盾）</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Stage B：继发症状甄别算法（<code>check_cascade</code>）</h4>
+  <p>对两个 confirmed 假设 (h_primary, h_secondary)，依次检查：</p>
+  <ol>
+    <li><strong>时序先后性</strong>：若 <code>onset_lag &lt; 60s</code>（可配置）→ <code>independent</code>（几乎同时出现，说明独立注入）</li>
+    <li><strong>因果链检查</strong>：查询 Metric KB <code>downstream_effects</code>，若 h_primary 的核心指标没有已知下游效应涉及 h_secondary 的子系统 → <code>independent</code></li>
+    <li><strong>异常幅度检查</strong>：若 h_secondary 的 p95 值 ≥ Metric KB 对应的 strong 阈值 → 继发效应不可能达到此幅度，判定 <code>independent</code></li>
+    <li><strong>特征量判断（CPU+MEM 特化）</strong>：<code>anon_memory_percent</code> 增幅 &gt; 20pp → 独立 malloc 注入，判定 <code>independent</code></li>
+    <li>以上均不通过 → <code>cascade</code>（h_secondary 降级为 <code>derived</code>）</li>
+  </ol>
+
+  <h4>可参数化阈值（均可在 <code>config/gate_config.yaml</code> 中覆盖，用于消融实验）</h4>
+  <table>
+    <thead><tr><th>参数名</th><th>默认值</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>min_independent_sources</code></td><td>2</td><td>Rule A 所需最少独立证据数</td></tr>
+      <tr><td><code>fpl_confidence_threshold</code></td><td>0.80</td><td>Rule C 生效的 FPL 先验阈值</td></tr>
+      <tr><td><code>cascade_lag_threshold_sec</code></td><td>60</td><td>Stage B：同时出现的时间窗口（秒）</td></tr>
+      <tr><td><code>anon_memory_independence_threshold</code></td><td>20.0</td><td>Stage B CPU+MEM：anon_memory 增幅独立性判断（百分点）</td></tr>
+      <tr><td><code>min_budget_per_hypothesis</code></td><td>2</td><td>继续处理每个 active 假设所需最低剩余工具调用次数</td></tr>
+      <tr><td><code>tool_calls_limit</code></td><td>12</td><td>单次诊断的工具调用上限（全局 budget）</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 3.5 Reflect -->
+  <h3 id="s35">3.5 Reflect &amp; 知识积累（Stage 3）</h3>
+  <p>每次 FINALIZE 完成后触发 Reflect 节点（可同步或异步）。核心职责：将本次诊断经验提炼为 FPL 规则，实现知识积累。</p>
+
+  <h4>执行步骤</h4>
+  <ol>
+    <li><strong>Ground Truth 比对</strong>（评估模式）：将 <code>root_causes</code> 与 <code>chaos.csv</code> 中实际注入故障比对，输出 Hit@1 / Hit@K，写入 trace</li>
+    <li><strong>规则提炼</strong>：LLM 分析本次诊断的"有效症状签名"与"有效验证路径"，按 FPL Schema 生成候选规则条目</li>
+    <li><strong>去重写入</strong>：计算 <code>symptom_signature</code> 哈希，若与已有规则 cosine_similarity &gt; 0.85 → 版本号 +1（更新），否则 → 新增（候选状态）</li>
+    <li><strong>规则升级</strong>：候选规则被 ≥2 次成功诊断确认后升为正式规则（<code>status: confirmed</code>）</li>
+    <li><strong>规则衰减</strong>：最近 5 次相关诊断准确率 &lt; 40% → <code>confidence</code> 降低并标记 <code>deprecated</code></li>
+  </ol>
+
+  <div class="warn">
+    <strong>防污染措施：</strong>LLM 只生成 <code>symptom_signature</code>、<code>verification_steps</code>、<code>solutions</code> 三个字段；<code>confidence</code> 由系统根据历史准确率计算（初始 0.5），不允许 LLM 直接设置。
+  </div>
+</section>

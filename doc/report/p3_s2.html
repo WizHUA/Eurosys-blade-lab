@@ -1,0 +1,173 @@
+<!-- ════════════════ Section 2: 系统总览 ════════════════ -->
+<section id="s2">
+  <h2>2. 系统总览</h2>
+
+  <h3>2.1 输入 / 输出</h3>
+  <table>
+    <thead><tr><th>方向</th><th>内容</th><th>格式</th></tr></thead>
+    <tbody>
+      <tr><td>输入</td><td><code>metrics.csv</code> — 时序指标矩阵（~150 列，每行 1 个采样点）</td><td>CSV，时间戳索引</td></tr>
+      <tr><td>输入</td><td><code>jobinfo.csv</code> — Slurm 作业信息（节点分配、时间段）</td><td>CSV，<code>|</code> 分隔</td></tr>
+      <tr><td>输入 (可选)</td><td><code>chaos.csv</code> — 故障注入记录，用于评估模式 ground truth 比对</td><td>CSV</td></tr>
+      <tr><td>输出</td><td><code>DiagnosisReport</code> — 根因列表、证据链、解决建议</td><td>JSON</td></tr>
+      <tr><td>输出</td><td><code>ExecutionTrace</code> — 完整 Thought-Action-Observation 轨迹</td><td>JSON</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 四阶段架构图</h3>
+  <div class="svg-wrap">
+  <svg width="760" height="510" viewBox="0 0 760 510" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="ahp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="aho" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#f97316"/>
+    </marker>
+  </defs>
+  <rect width="760" height="510" fill="#f8fafc"/>
+
+  <!-- Input box -->
+  <rect x="592" y="8" width="155" height="56" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="670" y="26" text-anchor="middle" font-size="10.5" fill="#475569" font-weight="700">输入数据</text>
+  <text x="670" y="42" text-anchor="middle" font-size="11" fill="#475569">metrics.csv</text>
+  <text x="670" y="56" text-anchor="middle" font-size="11" fill="#475569">jobinfo.csv</text>
+
+  <!-- Stage 0: KB -->
+  <rect x="10" y="8" width="570" height="62" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="22" y="25" font-size="10.5" fill="#1e40af" font-weight="700">Stage 0  Offline Knowledge Base — 离线一次性构建，不消耗推理时间</text>
+  <rect x="22" y="31" width="165" height="30" rx="5" fill="#3b82f6"/>
+  <text x="105" y="51" text-anchor="middle" fill="white" font-size="11.5">Metric KB（YAML + 向量索引）</text>
+  <rect x="200" y="31" width="165" height="30" rx="5" fill="#3b82f6"/>
+  <text x="283" y="51" text-anchor="middle" fill="white" font-size="11.5">Fault Pattern Library（JSONL）</text>
+  <rect x="378" y="31" width="160" height="30" rx="5" fill="#3b82f6"/>
+  <text x="458" y="51" text-anchor="middle" fill="white" font-size="11.5">Baseline Profile（JSON）</text>
+
+  <!-- Arrow 0→1 -->
+  <line x1="290" y1="70" x2="290" y2="90" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <!-- Input arrow into Stage1 -->
+  <line x1="592" y1="64" x2="570" y2="100" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ah)"/>
+
+  <!-- Stage 1: Triage -->
+  <rect x="10" y="90" width="570" height="64" rx="7" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="22" y="107" font-size="10.5" fill="#064e3b" font-weight="700">Stage 1  Triage — 确定性分诊，纯 Python，零 LLM Token</text>
+  <rect x="22" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="76" y="130" text-anchor="middle" fill="white" font-size="11">异常检测</text>
+  <line x1="130" y1="126" x2="148" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="148" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="202" y="130" text-anchor="middle" fill="white" font-size="11">时序排序</text>
+  <line x1="256" y1="126" x2="274" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="274" y="112" width="108" height="28" rx="5" fill="#059669"/>
+  <text x="328" y="130" text-anchor="middle" fill="white" font-size="11">子系统初判</text>
+  <line x1="382" y1="126" x2="400" y2="126" stroke="#064e3b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="400" y="112" width="160" height="28" rx="5" fill="#065f46"/>
+  <text x="480" y="130" text-anchor="middle" fill="white" font-size="11" font-weight="700">→ FocusContext</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="290" y1="154" x2="290" y2="174" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="302" y="168" font-size="10" fill="#64748b">FocusContext + causal_order</text>
+
+  <!-- Stage 2: Diagnosis Agent -->
+  <rect x="10" y="174" width="570" height="185" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="22" y="192" font-size="10.5" fill="#4c1d95" font-weight="700">Stage 2  Diagnosis Agent — LangGraph ReAct + 多假设并行</text>
+
+  <!-- HYPOTHESIZE -->
+  <rect x="22" y="198" width="128" height="30" rx="5" fill="#7c3aed"/>
+  <text x="86" y="218" text-anchor="middle" fill="white" font-size="11">HYPOTHESIZE</text>
+  <text x="86" y="230" text-anchor="middle" fill="white" font-size="9">(LLM)</text>
+
+  <!-- Arrow HYPO → REACT -->
+  <line x1="150" y1="212" x2="170" y2="212" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+
+  <!-- REACT LOOP -->
+  <rect x="170" y="196" width="278" height="115" rx="6" fill="rgba(109,40,217,.07)" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="182" y="210" font-size="9.5" fill="#6d28d9" font-weight="700">REACT LOOP</text>
+  <rect x="180" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="217" y="232" text-anchor="middle" fill="white" font-size="11">THINK</text>
+  <line x1="255" y1="227" x2="270" y2="227" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <rect x="270" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="307" y="232" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <line x1="345" y1="227" x2="360" y2="227" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <rect x="360" y="214" width="75" height="26" rx="4" fill="#6d28d9"/>
+  <text x="397" y="232" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
+  <!-- Return arc in loop -->
+  <path d="M435 240 Q435 278 307 278 Q180 278 180 240" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ahp)"/>
+  <text x="307" y="292" text-anchor="middle" fill="#6d28d9" font-size="9.5">iterate</text>
+
+  <!-- Arrow REACT → GATE -->
+  <line x1="448" y1="212" x2="465" y2="212" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+
+  <!-- GATE -->
+  <rect x="465" y="196" width="100" height="30" rx="5" fill="#7c3aed"/>
+  <text x="515" y="216" text-anchor="middle" fill="white" font-size="11">GATE</text>
+  <text x="515" y="227" text-anchor="middle" fill="white" font-size="9">(规则，纯Python)</text>
+
+  <!-- pass arrow down -->
+  <line x1="515" y1="226" x2="515" y2="302" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <text x="525" y="266" fill="#4c1d95" font-size="10">pass</text>
+
+  <!-- fail arc back to hypothesize -->
+  <path d="M465 217 Q86 217 86 240" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahp)"/>
+  <text x="268" y="210" fill="#4c1d95" font-size="9.5">fail → continue / degrade</text>
+
+  <!-- FINALIZE -->
+  <rect x="444" y="302" width="142" height="30" rx="5" fill="#4c1d95"/>
+  <text x="515" y="322" text-anchor="middle" fill="white" font-size="11">FINALIZE（LLM）</text>
+
+  <!-- Arrow FINALIZE → Stage3 (left then down) -->
+  <path d="M444 317 L290 317 L290 356" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Stage 3: Reflect -->
+  <rect x="10" y="356" width="570" height="55" rx="7" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="22" y="374" font-size="10.5" fill="#78350f" font-weight="700">Stage 3  Reflect — 规则提炼 → 写回 Fault Pattern Library</text>
+  <text x="22" y="391" font-size="11" fill="#92400e">LLM 提炼症状签名 → 相似度去重 → fpl.jsonl append（候选状态）→ 2 次成功诊断后升为正式规则</text>
+  <text x="398" y="400" font-size="9.5" fill="#92400e">（可同步/异步执行）</text>
+
+  <!-- Arrow Reflect → output -->
+  <line x1="290" y1="411" x2="290" y2="428" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Output box -->
+  <rect x="72" y="428" width="436" height="30" rx="6" fill="#1e293b"/>
+  <text x="290" y="448" text-anchor="middle" fill="#e2e8f0" font-size="12">输出: DiagnosisReport (JSON) + ExecutionTrace</text>
+
+  <!-- Tools box -->
+  <rect x="594" y="174" width="155" height="185" rx="7" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="672" y="192" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Tools）</text>
+  <rect x="604" y="198" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="216" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
+  <rect x="604" y="232" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="250" text-anchor="middle" fill="white" font-size="11">KBRetrievalTool</text>
+  <rect x="604" y="266" width="135" height="26" rx="4" fill="#f97316"/>
+  <text x="671" y="284" text-anchor="middle" fill="white" font-size="11">DataAnalysisTool</text>
+  <text x="671" y="320" text-anchor="middle" font-size="9.5" fill="#7c2d12">↕ LLM function calling</text>
+  <text x="671" y="335" text-anchor="middle" font-size="9.5" fill="#7c2d12">输出经摘要压缩后</text>
+  <text x="671" y="348" text-anchor="middle" font-size="9.5" fill="#7c2d12">写入 Evidence 列表</text>
+
+  <!-- ACT → Tools -->
+  <line x1="580" y1="227" x2="594" y2="227" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#aho)"/>
+  <!-- Tools → OBSERVE (return) -->
+  <line x1="594" y1="240" x2="435" y2="240" stroke="#f97316" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#aho)"/>
+
+  <!-- KB feeds into Stage 1 (dashed line) -->
+  <line x1="458" y1="61" x2="550" y2="90" stroke="#3b82f6" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ah)"/>
+  <!-- KB/FPL feeds into Stage 2 (dashed) -->
+  <line x1="283" y1="61" x2="283" y2="87" stroke="#3b82f6" stroke-width="0.8" stroke-dasharray="2,2"/>
+  </svg>
+  </div>
+
+  <h3>2.3 与参考系统 STELLAR (SC'25) 的对比定位</h3>
+  <table>
+    <thead><tr><th>维度</th><th>STELLAR (SC'25)</th><th>本系统 (HPC-Diagnosis Agent)</th></tr></thead>
+    <tbody>
+      <tr><td>应用目标</td><td>I/O 参数自动调优</td><td>故障根因诊断 + 解决建议</td></tr>
+      <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + LLM Agent（双层控制）</td></tr>
+      <tr><td>证据验证</td><td>无 Evidence Gating</td><td><strong>Rule A/B/C/D + Cascade 检测</strong>，强制量化支撑</td></tr>
+      <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障诊断</td></tr>
+      <tr><td>知识库</td><td>RAG 检索文档片段</td><td><strong>结构化 FPL</strong>（含置信度、版本、来源追踪）</td></tr>
+      <tr><td>消融实验</td><td>5 组件 ablation</td><td>7 个维度（5 ablation + 2 baseline）</td></tr>
+    </tbody>
+  </table>
+</section>

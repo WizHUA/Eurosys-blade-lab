@@ -1,0 +1,83 @@
+<!-- ════════════════ Section 3: 设计展开 ════════════════ -->
+<section id="s3">
+  <h2>3. 设计展开</h2>
+  <p>以下各节对应 <code>design/v4.md</code> 的不同部分，并包含 <code>design/kb_schema.md</code>、<code>design/pydantic_schema.md</code>、<code>design/evidence_gating.md</code> 的细化内容。</p>
+
+  <!-- 3.1 知识库 -->
+  <h3 id="s31">3.1 知识库体系（Stage 0）</h3>
+  <p>知识库在系统启动前离线构建一次，不消耗推理时间。由三层组成，各有不同的存储格式和使用场景：</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Metric KB</h4>
+      <p>存储格式：<strong>YAML + ChromaDB 向量索引</strong><br>
+      覆盖 22 个关键指标，5 个子系统（CPU/Memory/Network/Disk/System）。每个条目包含语义描述、正常范围、<code>strength_thresholds</code>（weak/medium/strong × 值域 + 持续时间）、下游因果效应（<code>downstream_effects</code>，用于 cascade 判断）。</p>
+    </div>
+    <div class="card">
+      <h4>Fault Pattern Library (FPL)</h4>
+      <p>存储格式：<strong>JSONL（每行一条规则）</strong><br>
+      初始 8 条规则（fpl_001~008），覆盖 5 种单故障 + 2 种常见复合故障。每条包含症状签名 <code>symptom_signature</code>、可验证步骤 <code>verification_steps</code>、置信度、来源（manual/learned）和 <code>composite_discrimination</code> 字段。</p>
+    </div>
+    <div class="card">
+      <h4>Baseline Profile</h4>
+      <p>存储格式：<strong>JSON（按实验条件分文件）</strong><br>
+      从 29 个 formaltest 实验的故障注入前 5 分钟提取正常态统计量（mean/std/p5/p95）。Fallback 优先级：精确匹配 → workload 类型匹配 → global 聚合 → 静态硬编码阈值，每级 fallback 对 <code>triage_confidence</code> 施加折减因子。</p>
+    </div>
+  </div>
+
+  <h4>FPL 条目示例（fpl_007：CPU 满载 + 内存高负载复合故障）</h4>
+  <pre><code>{
+  "pattern_id": "fpl_007",
+  "fault_type": "composite:cpu_fullload+mem_load",
+  "confidence": 0.82,
+  "symptom_signature": {
+    "leading_subsystem": "cpu",
+    "required_metrics": ["cpu_usage_percent", "memory_usage_percent"],
+    "causal_order_hint": ["cpu_usage_percent", "memory_usage_percent", "anon_memory_percent"]
+  },
+  "composite_discrimination": {
+    "cascade_indicator":  "memory onset &gt; 120s after CPU AND anon_memory increase &lt; 15%  → single_fault:cpu_fullload",
+    "composite_indicator":"anon_memory_percent rises &gt; 20pp from baseline → composite_fault"
+  },
+  "verification_steps": [
+    "confirm cpu_usage_percent p95 &gt; 90% sustained &gt; 3 min",
+    "confirm memory_usage_percent &gt; 80% sustained &gt; 3 min",
+    "confirm anon_memory_percent increased &gt; 20pp from baseline (independent malloc)",
+    "check onset time diff: |t_onset(cpu) - t_onset(memory)| &lt; 120s supports co-injection"
+  ]
+}</code></pre>
+
+  <div class="info">
+    <strong>设计亮点：</strong><code>strength</code> 由 Metric KB 的 <code>strength_thresholds</code> 规则确定性打标，不由 LLM 主观判断。这是 Evidence Gating 可依赖的前提。
+  </div>
+
+  <!-- 3.2 Triage Stage -->
+  <h3 id="s32">3.2 Triage Stage（Stage 1）</h3>
+  <p>Triage 是纯确定性 Python 代码，不调用 LLM。职责：从 150+ 原始指标中压缩出 Top-K 异常指标，并输出带时序因果先验的 <code>FocusContext</code>。</p>
+
+  <h4>处理流程</h4>
+  <ol>
+    <li><strong>异常检测</strong>：对每个指标做 Z-score / 分位数偏离 / 静态阈值三重判定</li>
+    <li><strong>持久性过滤</strong>：连续超阈值比例 &gt; <code>persistence_ratio</code> 才保留（去除毛刺）</li>
+    <li><strong>时序排序</strong>：记录每个异常指标首次超阈时间 <code>t_onset</code>，按时序升序排列为 <code>causal_order</code>（时序因果先验）</li>
+    <li><strong>变化点检测</strong>：对 Top-K 异常指标做 PELT/BOCPD，标注 <code>change_point</code> 时刻</li>
+    <li><strong>子系统分组</strong>：按 Metric KB <code>subsystem</code> 字段分组，计算 <code>subsystem_scores</code>，得出 <code>leading_subsystem</code></li>
+    <li><strong>作业关联</strong>：时间窗口与 <code>jobinfo.csv</code> 做交集，计算 <code>overlap_ratio</code></li>
+  </ol>
+
+  <h4>FocusContext 核心字段</h4>
+  <table>
+    <thead><tr><th>字段</th><th>类型</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>causal_order</code></td><td><code>list[str]</code></td><td>按 t_onset 升序排列的指标名列表，是 HYPOTHESIZE 的时序因果先验（v4 新增贡献）</td></tr>
+      <tr><td><code>leading_subsystem</code></td><td><code>str</code></td><td>分诊初判的首发子系统，引导 HYPOTHESIZE 生成优先假设</td></tr>
+      <tr><td><code>top_metrics</code></td><td><code>list[TopMetric]</code></td><td>Top-K 异常指标，含 score/direction/t_onset/change_point/onset_rank</td></tr>
+      <tr><td><code>triage_confidence</code></td><td><code>float [0,1]</code></td><td>分诊可信度，影响 HYPOTHESIZE 生成的假设数量（低时生成更多候选）</td></tr>
+      <tr><td><code>subsystem_scores</code></td><td><code>dict</code></td><td>各子系统加权异常总分，用于初步量化哪个系统问题最大</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info">
+    <strong>消融实验对应：</strong>Ablation-A（无 Triage，全量 metrics 直接输入）和 Ablation-D（FocusContext 不含 causal_order）均可独立于 Stage 2 进行，分别验证"context 压缩效果"与"时序因果先验效果"。
+  </div>
+</section>
