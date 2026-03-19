@@ -170,7 +170,7 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
     </tbody>
   </table>
 
-  <h3>2.2 四阶段架构图</h3>
+  <h3>2.2 系统架构图</h3>
   <div class="svg-wrap">
   <svg width="760" height="510" viewBox="0 0 760 510" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
@@ -316,7 +316,7 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
     <tbody>
       <tr><td>应用目标</td><td>I/O 参数自动调优</td><td>故障根因诊断 + 解决建议</td></tr>
       <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + LLM Agent（双层控制）</td></tr>
-      <tr><td>证据验证</td><td>无 Evidence Gating</td><td><strong>Rule A/B/C/D + Cascade 检测</strong>，强制量化支撑</td></tr>
+      <tr><td>证据验证</td><td>无 Evidence Gating</td><td><strong>规则驱动的证据门控</strong>，强制量化支撑</td></tr>
       <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障诊断</td></tr>
       <tr><td>知识库</td><td>RAG 检索文档片段</td><td><strong>结构化 FPL</strong>（含置信度、版本、来源追踪）</td></tr>
       <tr><td>消融实验</td><td>5 组件 ablation</td><td>6 组（4 ablation + 2 baseline）</td></tr>
@@ -330,7 +330,7 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
 
   <!-- 3.1 知识库 -->
   <h3 id="s31">3.1 知识库体系（两层结构）</h3>
-  <p>知识库在系统启动前离线构建一次，不消耗推理时间。v5 将 v4 的三层 KB 简化为<strong>两层</strong>：</p>
+  <p>知识库在系统启动前离线构建一次，不消耗推理时间，分为两层：</p>
 
   <div class="grid">
     <div class="card">
@@ -341,32 +341,28 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
     <div class="card">
       <h4>Fault Pattern Library (FPL)</h4>
       <p>存储格式：<strong>JSONL（每行一条规则）</strong><br>
-      <strong>v5 变更：初始为空</strong>。不预填任何人工规则，系统完全从零开始，通过 Reflect 节点在每次诊断后自动积累规则。每条规则包含症状签名 <code>symptom_signature</code>、可验证步骤 <code>verification_steps</code>、置信度和来源（learned）。</p>
+      初始为空，不预填任何人工规则，系统完全从零开始，通过 Reflect 节点在每次诊断后自动积累规则。每条规则包含症状签名 <code>symptom_signature</code>、可验证步骤 <code>verification_steps</code>、置信度和来源（learned）。</p>
     </div>
   </div>
 
-  <div class="warn">
-    <strong>v5 删除 Baseline Profile：</strong>v4 的 Baseline Profile 依赖从 29 个实验的 pre-fault 数据离线计算正常态统计量。v5 改为<strong>数据自适应基线</strong>——Triage 直接使用实验自身时序数据的前 N 个采样点作为基线，不依赖外部预计算 profile。这更符合真实部署场景。
+  <div class="info">
+    Triage 使用<strong>数据自适应基线</strong>——直接使用实验自身时序数据的前 N 个采样点计算统计基线，不依赖外部预计算的 Profile。这更符合真实部署场景，无需提前收集每种 workload 和节点配置下的正常态数据。
   </div>
 
   <div class="info">
-    <strong>FPL 初始为空的设计理由：</strong>(1) 消融对比更干净——空 FPL vs 积累后的 FPL vs 不用 FPL 三组；(2) 论文贡献更强——证明系统可自行学习故障模式；(3) <code>strength</code> 标签由 Metric KB 的 <code>strength_thresholds</code> 规则确定性打标，不由 LLM 主观判断，这是 Evidence Gating 可依赖的前提。
+    <strong>FPL 初始为空的设计理由：</strong>(1) 消融对比更干净——空 FPL vs 积累后的 FPL vs 无 FPL 三组；(2) 论文贡献更强——证明系统可自行学习故障模式；(3) <code>strength</code> 标签由 Metric KB 的 <code>strength_thresholds</code> 规则确定性打标，不由 LLM 主观判断，这是 Evidence Gating 可依赖的前提。
   </div>
 
   <!-- 3.2 Triage Stage -->
   <h3 id="s32">3.2 Triage Stage（Stage 1）</h3>
   <p>Triage 是纯确定性 Python 代码，不调用 LLM。职责：从 150+ 原始指标中压缩出 Top-K 异常指标，并输出带时序因果先验的 <code>FocusContext</code>。</p>
 
-  <h4>处理流程（v5：3 步精简版）</h4>
+  <h4>处理流程（3 步）</h4>
   <ol>
     <li><strong>异常指标筛选（Anomaly Scoring）</strong>：对每个指标做<strong>数据自适应 Z-score</strong>（使用实验自身时序数据的前 N 个采样点作为基线）+ 持久性过滤，可选增强变化点检测（PELT/BOCPD）标注 <code>change_point</code>。输出 Top-K 异常指标，每个附带 <code>score</code>、<code>direction</code>、<code>t_onset</code></li>
     <li><strong>时序因果排序（Temporal Ordering）</strong>：按 <code>t_onset</code> 升序排列生成 <code>causal_order</code>；按 Metric KB <code>subsystem</code> 字段分组计算 <code>subsystem_scores</code>，确定 <code>leading_subsystem</code></li>
     <li><strong>FocusContext 构建</strong>：聚合所有信息；与 <code>jobinfo.csv</code> 做时间窗口交集关联作业和节点；计算 <code>triage_confidence</code>；生成完整 FocusContext 输入给 Stage 2</li>
   </ol>
-
-  <div class="warn">
-    <strong>v5 变更：</strong>v4 的 6 步流程（异常检测 → 持久性过滤 → 时序排序 → 变化点检测 → 子系统分组 → 作业关联）合并为 3 步。Z-score 基线由 Baseline Profile 查表改为<strong>数据自适应计算</strong>，不依赖外部预计算 profile。
-  </div>
 
   <h4>FocusContext 核心字段</h4>
   <table>
@@ -403,8 +399,8 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
     </tbody>
   </table>
 
-  <h4>3.3.2 路由决策机制（v5 明确）</h4>
-  <p>v4 未定义"谁在 THINK 之后决定走向 GATE 还是继续循环"。v5 给出清晰的路由规则：</p>
+  <h4>3.3.2 路由决策机制</h4>
+  <p>THINK 节点通过 <code>action.type</code> 表达意图，GATE 节点负责规则验证，Budget Check 提供确定性兜底：</p>
   <div class="svg-wrap">
   <svg width="680" height="340" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
@@ -531,22 +527,22 @@ class Evidence(BaseModel):
   </table>
 
   <div class="info">
-    <strong>v5 精简说明：</strong>v4 的 Rule A/B/C/D 各含具体阈值条件（如 <code>min_independent_sources=2</code>、<code>fpl_confidence_threshold=0.80</code>）。v5 将这些阈值收敛为可配置实现细节（<code>config/gate_config.yaml</code>），设计文档聚焦于上述三项核心原理，不暴露具体数值。
+    具体阈值（独立证据来源数量、FPL 先验置信度要求等）作为可配置参数，不在设计文档中暴露，见 <code>config/gate_config.yaml</code>。
   </div>
 
   <!-- 3.5 Reflect -->
   <h3 id="s35">3.5 Reflect &amp; 知识积累（Stage 3）</h3>
   <p>每次 FINALIZE 完成后触发 Reflect 节点（可同步或异步）。核心职责：将本次诊断经验提炼为 FPL 规则，实现<strong>无监督知识积累</strong>。</p>
 
-  <h4>执行步骤（v5：不依赖 Ground Truth）</h4>
+  <h4>执行步骤</h4>
   <ol>
     <li><strong>规则提炼</strong>：LLM 分析本次诊断的有效症状签名（leading_subsystem + anomaly metrics + temporal_pattern）和有效验证路径，按 FPL Schema 生成候选规则条目</li>
     <li><strong>去重写入</strong>：计算 <code>symptom_signature</code> 与已有规则的相似度，高相似度 → 版本号 +1（更新），否则 → 新增。新规则初始 <code>status: "candidate"</code>，<code>confidence: 0.5</code></li>
     <li><strong>规则升级 / 衰减</strong>：候选规则被后续诊断成功匹配确认 ≥2 次 → 升为 <code>"confirmed"</code>；最近若干次表现不佳 → <code>confidence</code> 降低，标记 <code>"deprecated"</code></li>
   </ol>
 
-  <div class="warn">
-    <strong>v5 变更：</strong>v4 的 Reflect 第 1 步是 Ground Truth 比对（使用 <code>chaos.csv</code>），这在真实部署中不可用。v5 将 GT 比对<strong>完全移出 Reflect</strong>，放入独立评估框架。Reflect 本身是无监督的——仅基于诊断过程中收集到的证据质量和一致性来提炼规则。
+  <div class="info">
+    Reflect 是无监督的——仅基于诊断过程中收集到的证据质量和一致性来提炼规则，无需知道"正确答案"。<code>chaos.csv</code>（注入记录）和 Ground Truth 比对放在独立的评估框架 <code>eval/evaluate.py</code> 中，不影响 Reflect 的规则积累逻辑。
   </div>
 
   <div class="info">
@@ -560,13 +556,12 @@ class Evidence(BaseModel):
   <div class="pb">
     <div class="pb-icon done">✓</div>
     <div class="pb-body">
-      <strong>Phase A — 离线知识库构建（已完成，v5 更新待应用）</strong>
+      <strong>Phase A — 离线知识库构建（已完成）</strong>
       <span>
         <code>agent/schema.py</code>（12 个 Pydantic/TypedDict 类）·
         <code>agent/kb/metrics.yaml</code>（22 条指标，5 子系统）·
-        <code>agent/kb/fpl.jsonl</code>（v5 设计为初始为空）·
+        <code>agent/kb/fpl.jsonl</code>（初始为空，由 Reflect 积累）·
         <code>agent/kb/chroma_db/</code>（离线 TF-IDF 向量索引）·
-        v5 变更：删除 Baseline Profile，FPL 初始为空。
         补充设计文档：<code>design/kb_schema.md</code>, <code>design/pydantic_schema.md</code>, <code>design/evidence_gating.md</code>
       </span>
     </div>

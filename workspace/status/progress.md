@@ -70,6 +70,19 @@ Phase 3: Agent 升级 — **设计阶段**
 
 ---
 
+## 2026-03-19: 文档全面清理（视觉一致性 + 独立语境）
+- 完成: 清除所有设计文档中的内联版本对比说明，使文档具有独立语境
+- 核心操作:
+  1. 创建 `design/changelog.md`，收录 v1→v5 完整变更历史
+  2. 清理 `design/v5.md`：删除 Part I "v4→v5变更摘要"，改为"设计原则"；删除所有 `v5 变更` 注释块；修复含版本引用的标题（"3 步精简版"→"3 步"、"两层体系（v5 简化）"→"两层结构"等）
+  3. 清理 `doc/agent_design_report.html`：修复 §2.2 "四阶段"→"系统架构图"；删除所有 "v5 变更" warn 框；修复 STELLAR 对比表措辞；修复各处含版本号的标题
+  4. 重写 `design/evidence_gating.md` 头部：去除 ⚠️ 警告块，改为简洁文档定位说明
+  5. 重写 `design/kb_schema.md` 头部：同上
+- 产出: `design/changelog.md`（新建）；上述 4 个文件头部已清理
+- 下一步: Phase B Triage 实现
+
+---
+
 ### Phase B: Triage Stage (确定性分诊) — 按 v5 设计
 - [ ] Step 1: 数据自适应异常评分 (Z-score + 持久性过滤 + 变化点检测)
 - [ ] Step 2: 时序因果排序 (causal_order + subsystem_scores + leading_subsystem)
