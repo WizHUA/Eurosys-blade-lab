@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l **/*.py 2>/dev/null | tail -20)"
+    ]
+  }
+}

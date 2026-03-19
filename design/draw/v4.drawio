@@ -1,0 +1,253 @@
+<mxfile host="65bd71144e">
+    <diagram id="v4_design" name="v4">
+        <mxGraphModel dx="1768" dy="943" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="950" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="v4 — HPC-Diagnosis Agent：单 Agent 内嵌分诊 · ReAct 循环 · 多假设并行 · 时序因果先验" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontStyle=1;fontColor=#111111;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="18" width="1200" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend" value="图例&#10;—— 实线：数据/控制流&#10;- - 细虚线：检索/知识引用&#10;━ ━ 粗虚线：规则回写（进化）&#10;★ 深色节点：LLM 节点" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#999999;strokeWidth=1;size=14;fontColor=#444444;align=left;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="58" width="215" height="105" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_inputs" value="输入" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="185" width="215" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="in_metrics" value="metrics.csv&#10;原始时序（150+ 指标）" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=13;fontColor=#333333;fontSize=11;" parent="c_inputs" vertex="1">
+                    <mxGeometry x="15" y="45" width="185" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="in_jobinfo" value="jobinfo.csv&#10;作业区间/节点/状态" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#ffffff;strokeColor=#666666;strokeWidth=1;size=13;fontColor=#333333;fontSize=11;" parent="c_inputs" vertex="1">
+                    <mxGeometry x="15" y="115" width="185" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="in_chaos" value="chaos.csv（可选）&#10;离线评估 ground truth" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#ffffff;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#777777;fontSize=11;" parent="c_inputs" vertex="1">
+                    <mxGeometry x="15" y="180" width="185" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="out_report" value="输出&#10;DiagnosisReport + ExecutionTrace" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#333333;strokeColor=#000000;strokeWidth=1;size=13;fontColor=#ffffff;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="470" width="215" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_kb" value="Layer 0：离线知识库（一次性构建，持续更新）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#555555;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#222222;" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="55" width="225" height="560" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_metric" value="Metric KB&#10;指标定义/单位/正常范围&#10;strength_thresholds&#10;子系统映射" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e8e8e8;strokeColor=#333333;strokeWidth=2;fontColor=#000000;fontSize=11;" parent="c_kb" vertex="1">
+                    <mxGeometry x="32" y="60" width="160" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_base" value="Baseline Profile&#10;均值/方差/分位数&#10;（按 workload 类型）" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#e8e8e8;strokeColor=#333333;strokeWidth=2;fontColor=#000000;fontSize=11;" parent="c_kb" vertex="1">
+                    <mxGeometry x="32" y="195" width="160" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_fpl" value="Fault Pattern Library&#10;症状签名 → 根因&#10;验证步骤/建议&#10;来源+版本（候选/正式）" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;fontSize=11;" parent="c_kb" vertex="1">
+                    <mxGeometry x="32" y="370" width="160" height="115" as="geometry"/>
+                </mxCell>
+                <mxCell id="kb_note" value="规则回写需去重（cosine sim）&#10;新规则先进候选态，&#10;2 次确认后升为正式" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#555555;fontSize=10;" parent="c_kb" vertex="1">
+                    <mxGeometry x="15" y="502" width="195" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_agent" value="Diagnosis Agent（LangGraph StateGraph）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#333333;strokeWidth=2;verticalAlign=top;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="285" y="55" width="730" height="780" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_state" value="Agent State（可 JSON 序列化）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="450" y="40" width="260" height="185" as="geometry"/>
+                </mxCell>
+                <mxCell id="state_fields" value="run_id, inputs&#10;focus_context（含 causal_order）&#10;hypotheses[]（多假设并行）&#10;evidence[]（含 strength）&#10;react_trace[]&#10;budget {calls_used / limit / tokens}&#10;gate_result, report" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#444444;fontSize=10;align=left;" parent="c_state" vertex="1">
+                    <mxGeometry x="10" y="42" width="240" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_triage" value="Stage 1：TRIAGE（确定性 Python，无 LLM）&#10;Z-score / 分位数偏离 / 持久性过滤&#10;PELT 变化点检测 · 指标异常时序排序&#10;子系统分组 · 作业时间窗关联" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="20" y="40" width="405" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_focus" value="Focus Context&#10;anomaly_window · top_metrics&#10;causal_order（★ 时序因果先验）&#10;leading_subsystem · nodes · jobs" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#e0e0e0;strokeColor=#555555;strokeWidth=1;size=13;fontColor=#222222;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="20" y="148" width="235" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_hypo" value="HYPOTHESIZE（LLM ★）&#10;基于 causal_order + FPL 命中&#10;生成 2-4 个候选 Hypothesis&#10;（含 prior_confidence + required_verifications）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=8;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="20" y="260" width="405" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_react" value="ReAct 推理循环（每次工具调用前后均有 Thought）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#777777;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="20" y="365" width="405" height="215" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_think" value="THINK（LLM ★）&#10;推理：更新假设置信度&#10;输出 Thought + 下一步 Action" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=8;fontSize=11;" parent="c_react" vertex="1">
+                    <mxGeometry x="15" y="50" width="175" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_act" value="ACT&#10;执行工具调用" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=11;" parent="c_react" vertex="1">
+                    <mxGeometry x="215" y="50" width="170" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_observe" value="OBSERVE（确定性 Python）&#10;工具输出 → 统计摘要压缩&#10;对照 strength_thresholds 打强度标签&#10;更新 hypothesis.required_verifications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=11;" parent="c_react" vertex="1">
+                    <mxGeometry x="80" y="140" width="260" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_think_act" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_react" source="n_think" target="n_act" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_act_observe" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_react" source="n_act" target="n_observe" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_observe_think" value="下一轮" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_react" source="n_observe" target="n_think" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="60" y="172"/>
+                            <mxPoint x="60" y="85"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="n_gate" value="GATE&#10;（纯 Python 规则）" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="155" y="605" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="gate_rules" value="Rule A: 2条独立证据(≥1 strong)&#10;Rule B: 1 strong + 所有verif通过&#10;Rule C: FPL命中(conf&gt;0.8)+最小验证&#10;否则：继续 / 预算耗尽→降级" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#444444;fontSize=9;align=left;" parent="c_agent" vertex="1">
+                    <mxGeometry x="330" y="605" width="250" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_finalize" value="FINALIZE（LLM ★）&#10;生成 DiagnosisReport&#10;支持 single_fault / composite_fault&#10;多根因 + derived_symptoms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#000000;strokeWidth=2;fontColor=#ffffff;arcSize=8;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="20" y="715" width="250" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="n_reflect" value="REFLECT（LLM + 规则校验）&#10;提炼症状签名 + 验证步骤 → 候选规则&#10;（cosine 去重 · 候选态 · 2次确认升正式）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="295" y="715" width="295" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="c_tools" value="工具箱（函数调用，严格 Schema）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;fontSize=11;" parent="c_agent" vertex="1">
+                    <mxGeometry x="450" y="245" width="260" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="t_metric_q" value="MetricQueryTool&#10;nodes + metrics + window + agg&#10;→ 统计摘要（非原始序列）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=10;" parent="c_tools" vertex="1">
+                    <mxGeometry x="15" y="45" width="230" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="t_kb_ret" value="KBRetrievalTool&#10;metric_lookup / pattern_match&#10;→ 命中规则 + provenance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=10;" parent="c_tools" vertex="1">
+                    <mxGeometry x="15" y="130" width="230" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="t_stats" value="DataAnalysisTool&#10;correlation / changepoint&#10;group_compare / lag_analysis&#10;→ 统计量 + 文字摘要" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontColor=#000000;arcSize=8;fontSize=10;" parent="c_tools" vertex="1">
+                    <mxGeometry x="15" y="215" width="230" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_triage_focus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_agent" source="n_triage" target="n_focus" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="137" y="130"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_focus_hypo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_agent" source="n_focus" target="n_hypo" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="137" y="245"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_hypo_think" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_agent" source="n_hypo" target="n_think" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="112" y="345"/>
+                            <mxPoint x="112" y="418"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_observe_gate" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_agent" source="n_observe" target="n_gate" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="290" y="595"/>
+                            <mxPoint x="225" y="595"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_gate_think" value="继续" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="c_agent" source="n_gate" target="n_think" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="80" y="645"/>
+                            <mxPoint x="80" y="418"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_gate_finalize" value="通过" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="c_agent" source="n_gate" target="n_finalize" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="225" y="740"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_finalize_reflect" value="可选（同步/异步）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="c_agent" source="n_finalize" target="n_reflect" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_act_tools" value="工具调用" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="c_agent" source="n_act" target="c_tools" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="510" y="430"/>
+                            <mxPoint x="580" y="430"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_hypo_kb" value="初始检索" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="c_agent" source="n_hypo" target="t_kb_ret" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="580" y="297"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_metrics_triage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="in_metrics" target="n_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="255" y="252"/>
+                            <mxPoint x="255" y="98"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_jobs_triage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="in_jobinfo" target="n_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="255" y="320"/>
+                            <mxPoint x="255" y="98"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_finalize_out" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=1;" parent="1" source="n_finalize" target="out_report" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="420" y="783"/>
+                            <mxPoint x="420" y="870"/>
+                            <mxPoint x="147" y="870"/>
+                            <mxPoint x="147" y="535"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_base_triage" value="基线参考" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_base" target="n_triage" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1040" y="285"/>
+                            <mxPoint x="770" y="285"/>
+                            <mxPoint x="770" y="80"/>
+                            <mxPoint x="690" y="80"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_metrickb_tool" value="指标语义" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_metric" target="t_kb_ret" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1040" y="165"/>
+                            <mxPoint x="980" y="165"/>
+                            <mxPoint x="980" y="440"/>
+                            <mxPoint x="1015" y="440"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_fpl_hypo" value="规则先验" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#777777;strokeWidth=1;dashed=1;dashPattern=4 4;" parent="1" source="kb_fpl" target="n_hypo" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1040" y="485"/>
+                            <mxPoint x="800" y="485"/>
+                            <mxPoint x="800" y="297"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_reflect_fpl" value="规则回写" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeColor=#333333;strokeWidth=2;dashed=1;dashPattern=6 4;" parent="1" source="n_reflect" target="kb_fpl" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1020" y="737"/>
+                            <mxPoint x="1152" y="737"/>
+                            <mxPoint x="1152" y="490"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="c_eval" value="评估与消融（论文 Artifact）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fbfbfb;strokeColor=#888888;strokeWidth=1;verticalAlign=top;fontStyle=1;fontColor=#444444;fontSize=11;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="640" width="215" height="175" as="geometry"/>
+                </mxCell>
+                <mxCell id="eval_metrics" value="评估指标&#10;• Hit@1 / Hit@3（单/复合故障）&#10;• 端到端诊断时间&#10;• token 消耗（in/out）&#10;• 缺失指标鲁棒性" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#444444;fontSize=10;align=left;" parent="c_eval" vertex="1">
+                    <mxGeometry x="10" y="35" width="195" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="eval_ablation" value="消融维度（A-E）&#10;A: 无分诊  B: 无门控&#10;C: 无 KB  D: 无因果先验★&#10;E: 无 Reflect&#10;BL1: one-shot  BL2: 纯规则" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f2f2f2;strokeColor=#aaaaaa;strokeWidth=1;size=13;fontColor=#444444;fontSize=10;align=left;" parent="c_eval" vertex="1">
+                    <mxGeometry x="10" y="108" width="195" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="edgeStyle=none;html=1;" parent="1" source="state_fields" target="title" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
