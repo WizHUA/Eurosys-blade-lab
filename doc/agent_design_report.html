@@ -414,59 +414,47 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
       <path d="M0 0 L10 5 L0 10 z" fill="#059669"/>
     </marker>
   </defs>
-  <rect width="680" height="340" fill="#f8fafc"/>
-  <!-- Budget Check -->
-  <rect x="10" y="20" width="180" height="40" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-  <text x="100" y="36" text-anchor="middle" font-size="11" fill="#78350f" font-weight="700">BUDGET CHECK</text>
-  <text x="100" y="50" text-anchor="middle" font-size="10" fill="#92400e">（确定性，每轮 THINK 前）</text>
-  <!-- budget ok arrow -->
-  <line x1="190" y1="40" x2="240" y2="40" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
-  <text x="215" y="34" text-anchor="middle" font-size="9.5" fill="#64748b">ok</text>
-  <!-- budget exhausted arrow to GATE -->
-  <line x1="100" y1="60" x2="100" y2="170" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5)"/>
-  <text x="60" y="120" font-size="9.5" fill="#d97706">耗尽 → 强制</text>
+  <rect width="680" height="280" fill="#f8fafc"/>
   <!-- THINK -->
-  <rect x="240" y="16" width="180" height="48" rx="6" fill="#7c3aed"/>
-  <text x="330" y="36" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
-  <text x="330" y="52" text-anchor="middle" fill="white" font-size="10">输出 action.type</text>
-  <!-- tool_call arrow -->
-  <line x1="420" y1="30" x2="490" y2="30" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
-  <text x="455" y="24" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
-  <!-- conclude arrow -->
-  <line x1="330" y1="64" x2="330" y2="160" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
-  <text x="345" y="115" font-size="9.5" fill="#7c3aed">conclude</text>
+  <rect x="20" y="20" width="180" height="48" rx="6" fill="#7c3aed"/>
+  <text x="110" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
+  <text x="110" y="58" text-anchor="middle" fill="white" font-size="10">输出 action.type</text>
+  <!-- tool_call arrow right -->
+  <line x1="200" y1="34" x2="260" y2="34" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
+  <text x="230" y="28" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
   <!-- ACT -->
-  <rect x="490" y="16" width="80" height="30" rx="5" fill="#6d28d9"/>
-  <text x="530" y="36" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <rect x="260" y="20" width="90" height="30" rx="5" fill="#6d28d9"/>
+  <text x="305" y="40" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <!-- ACT → OBSERVE -->
+  <line x1="350" y1="35" x2="390" y2="35" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#arv5p)"/>
   <!-- OBSERVE -->
-  <line x1="570" y1="31" x2="600" y2="31" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#arv5p)"/>
-  <rect x="600" y="16" width="70" height="30" rx="5" fill="#6d28d9"/>
-  <text x="635" y="36" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
-  <!-- Return arc -->
-  <path d="M635 46 Q635 90 100 90 Q10 90 10 65" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arv5p)"/>
-  <text x="360" y="86" text-anchor="middle" fill="#6d28d9" font-size="9.5">→ BUDGET CHECK → 下一轮 THINK</text>
+  <rect x="390" y="20" width="90" height="30" rx="5" fill="#6d28d9"/>
+  <text x="435" y="40" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
+  <!-- Return arc: OBSERVE → THINK -->
+  <path d="M480 35 Q570 35 570 120 Q570 200 110 200 Q20 200 20 68" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arv5p)"/>
+  <text x="400" y="195" text-anchor="middle" fill="#6d28d9" font-size="9.5">→ 下一轮 THINK</text>
+  <!-- conclude arrow down -->
+  <line x1="110" y1="68" x2="110" y2="140" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
+  <text x="125" y="108" font-size="9.5" fill="#7c3aed">conclude</text>
   <!-- GATE -->
-  <rect x="60" y="160" width="540" height="48" rx="6" fill="rgba(5,150,105,0.08)" stroke="#059669" stroke-width="1.5"/>
-  <rect x="260" y="168" width="140" height="32" rx="5" fill="#059669"/>
-  <text x="330" y="189" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE (规则)</text>
-  <!-- pass arrow -->
-  <line x1="330" y1="208" x2="330" y2="260" stroke="#059669" stroke-width="1.5" marker-end="url(#arv5g)"/>
-  <text x="345" y="238" font-size="10" fill="#059669">pass</text>
-  <!-- continue arrow -->
-  <path d="M400 184 Q540 184 540 90 Q540 65 420 50" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5)"/>
-  <text x="510" y="140" font-size="9.5" fill="#d97706">continue → THINK</text>
+  <rect x="20" y="140" width="540" height="42" rx="6" fill="rgba(5,150,105,0.08)" stroke="#059669" stroke-width="1.5"/>
+  <rect x="230" y="148" width="120" height="28" rx="5" fill="#059669"/>
+  <text x="290" y="167" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE (规则)</text>
+  <!-- pass arrow down -->
+  <line x1="290" y1="182" x2="290" y2="230" stroke="#059669" stroke-width="1.5" marker-end="url(#arv5g)"/>
+  <text x="304" y="212" font-size="10" fill="#059669">pass</text>
+  <!-- continue arc back to THINK -->
+  <path d="M360 162 Q450 162 450 100 Q450 44 200 44" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5)"/>
+  <text x="440" y="100" font-size="9.5" fill="#d97706">continue → THINK</text>
   <!-- FINALIZE -->
-  <rect x="260" y="260" width="140" height="32" rx="5" fill="#4c1d95"/>
-  <text x="330" y="281" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
+  <rect x="220" y="230" width="140" height="30" rx="5" fill="#4c1d95"/>
+  <text x="290" y="250" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
   <!-- Reflect arrow -->
-  <line x1="330" y1="292" x2="330" y2="320" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
-  <text x="365" y="312" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
+  <line x1="290" y1="260" x2="290" y2="278" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
+  <text x="330" y="274" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
   </svg>
   </div>
-  <p><strong>权责分离：</strong>THINK（LLM）回答"我是否准备好下结论了"——通过 <code>action.type = "tool_call" | "conclude"</code> 表达意图。GATE（规则）验证"你给出的结论证据够不够"——通过确定性规则判断。两者分离，防止 LLM 在证据不足时自信地下结论。</p>
-  <div class="info">
-    <strong>Budget 强制路由：</strong>每次进入 THINK 前，确定性检查 budget。若 budget 耗尽，无论 THINK 想做什么，强制路由到 GATE（带 <code>remaining_budget=0</code> 标记），GATE 据此输出 degrade 决策。
-  </div>
+  <p><strong>权责分离：</strong>THINK（LLM）回答"我是否准备好下结论了"——通过 <code>action.type = "tool_call" | "conclude"</code> 表达意图。GATE（规则）验证"你给出的结论证据够不够"——通过确定性规则判断。两者分离，防止 LLM 在证据不足时自信地下结论。最大迭代轮数由实现层控制，不是设计贡献点。</p>
 
   <h4>3.3.3 Pydantic Schema 结构（部分核心类）</h4>
   <pre><code>class Hypothesis(BaseModel):
@@ -495,8 +483,8 @@ class Evidence(BaseModel):
   <ul>
     <li><code>single_fault</code>：恰好 1 个 confirmed 假设，无 active</li>
     <li><code>composite_fault</code>：≥ 2 个独立 confirmed 假设，均通过 cascade 甄别</li>
-    <li><code>partial</code>：≥ 1 个 confirmed，仍有 active（budget 耗尽时）</li>
-    <li><code>inconclusive</code>：所有假设均 refuted 或 budget 耗尽且无 confirmed</li>
+    <li><code>partial</code>：≥ 1 个 confirmed，仍有 active（迭代耗尽时）</li>
+    <li><code>inconclusive</code>：所有假设均 refuted 或迭代耗尽且无 confirmed</li>
   </ul>
 
   <h4>3.3.5 工具摘要机制（防 token 爆炸）</h4>
@@ -504,30 +492,30 @@ class Evidence(BaseModel):
 
   <!-- 3.4 Evidence Gating -->
   <h3 id="s34">3.4 Evidence Gating（核心贡献）</h3>
-  <p>Evidence Gating 是防止"LLM 编故事"的核心机制。GATE 节点是纯 Python 规则，不消耗 LLM token。结论必须满足量化证据条件才能通过，否则继续收集证据或输出降级报告。</p>
+  <p>Evidence Gating 是防止"LLM 编故事"的核心机制。GATE 节点是纯 Python 规则，不消耗 LLM token。GATE 依次回答两个问题：<strong>(1) 每个假设的证据是否独立、充分、无强反驳？(2) 多个已确认假设之间是否彼此独立，还是存在因果从属？</strong></p>
 
   <h4>三项核心原理</h4>
   <table>
-    <thead><tr><th>原理</th><th>内容</th><th>设计意图</th></tr></thead>
+    <thead><tr><th>原理</th><th>含义</th><th>设计意图</th></tr></thead>
     <tbody>
-      <tr><td><strong>证据独立性要求</strong></td><td>结论必须有来自不同来源（不同工具、不同指标）的独立支持证据，单一信息源不足以确认假设</td><td>防止 LLM 把同一现象反复包装成多条"证据"</td></tr>
+      <tr><td><strong>证据独立性</strong></td><td>支持证据须来自不同工具或不同指标；单一信息源不足以确认假设</td><td>防止 LLM 把同一现象反复包装成多条"证据"</td></tr>
       <tr><td><strong>反驳优先</strong></td><td>强反驳证据可直接否定假设，无论支持证据有多少</td><td>体现科学推理"证伪优先"原则</td></tr>
-      <tr><td><strong>复合故障甄别</strong></td><td>当多个假设通过时，基于时序同步性、因果链可达性和异常幅度区分独立故障与继发症状链</td><td>防止将继发效应误判为复合故障</td></tr>
+      <tr><td><strong>复合故障甄别</strong></td><td>多假设同时通过时，依据时序同步性和因果链可达性区分独立故障与继发症状链</td><td>防止将继发效应误判为独立的复合故障</td></tr>
     </tbody>
   </table>
 
-  <h4>三阶段 Gate 决策框架</h4>
+  <h4>三阶段决策流程</h4>
   <table>
-    <thead><tr><th>阶段</th><th>内容</th><th>关键逻辑</th></tr></thead>
+    <thead><tr><th>阶段</th><th>问题</th><th>输出</th></tr></thead>
     <tbody>
-      <tr><td><strong>Stage A</strong></td><td>单假设评估</td><td>基于独立证据数量、证据强度和 verification 完成状态，判定每个假设为 confirmed / refuted / active</td></tr>
-      <tr><td><strong>Stage B</strong></td><td>继发症状甄别</td><td>对 ≥2 confirmed 假设，检查时序同步性（近乎同时 → 独立注入）、因果链可达性（Metric KB downstream_effects）和异常幅度</td></tr>
-      <tr><td><strong>Stage C</strong></td><td>全局决策</td><td>输出 pass / continue / degrade 和最终 diagnosis_type（single_fault / composite_fault / partial / inconclusive）</td></tr>
+      <tr><td><strong>Stage A</strong> — 单假设评估</td><td>每个假设：证据独立吗？有 strong 证据吗？有强反驳吗？</td><td>每个假设 → confirmed / refuted / active</td></tr>
+      <tr><td><strong>Stage B</strong> — 症状甄别</td><td>≥2 个 confirmed 假设：∆t_onset 小 / Metric KB 因果链不可达 → 独立故障；否则 → 继发症状（降为 derived）</td><td>composite_fault 或 single_fault</td></tr>
+      <tr><td><strong>Stage C</strong> — 全局决策</td><td>所有假设收敛了吗？还是需要继续收集？</td><td>pass / continue / degrade + diagnosis_type</td></tr>
     </tbody>
   </table>
 
   <div class="info">
-    具体阈值（独立证据来源数量、FPL 先验置信度要求等）作为可配置参数，不在设计文档中暴露，见 <code>config/gate_config.yaml</code>。
+    具体阈值（独立证据来源数、FPL 先验置信度要求等）作为可配置参数，见 <code>config/gate_config.yaml</code>，不在设计文档中暴露。
   </div>
 
   <!-- 3.5 Reflect -->
