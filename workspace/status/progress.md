@@ -88,6 +88,23 @@ Phase 3: Agent 升级 — **设计阶段**
 - [ ] Step 2: 时序因果排序 (causal_order + subsystem_scores + leading_subsystem)
 - [ ] Step 3: FocusContext 构建 (聚合 + jobinfo 关联 + triage_confidence)
 
+---
+
+## 2026-03-20: Re-hypothesis 纠错机制设计 + 路由架构统一
+- 完成:
+  1. 发现并修复核心架构缺陷：GATE 缺少"重新假设"出路，所有初始假设 refuted 时只能 degrade
+  2. 新增 GATE → HYPOTHESIZE 的 `rehypothesize` 路由分支（GATE 四路输出：pass/continue/rehypothesize/degrade）
+  3. 增加 §4.4 HYPOTHESIZE 重新进入行为：refuted 假设作为负例、已有证据延续、新假设不重复 fault_type
+  4. 防无限循环：`max_rehyp = 1`（最多 1 次重新假设）+ `min_budget_for_rehyp = 4`
+  5. 消融表新增 Sup-C（禁用 rehypothesize，验证纠错机制贡献）
+  6. 统一 HTML §2.2 SVG / HTML §3.3.2 SVG / v5.md 三处路由图的一致性
+- 产出:
+  - `design/v5.md`（架构图 + §4.3 路由表 + §4.4 新增 + §6.2 Stage C + 消融 Sup-C）
+  - `doc/agent_design_report.html`（§2.2 SVG + §3.3.2 SVG + §3.3.3 Schema + §3.3.4/5 + §3.4 + §5 消融）
+  - `design/changelog.md`（v5 变更第 8 条）
+  - `design/evidence_gating.md`（Stage C 伪代码更新）
+- 下一步: Phase B Triage 实现
+
 ### Phase C: Diagnosis Agent (LangGraph) — 按 v5 设计
 - [ ] AgentState + Schema 更新 (清空 FPL、删除 Baseline Profile 依赖)
 - [ ] LangGraph StateGraph 定义 (含 v5 路由决策机制)

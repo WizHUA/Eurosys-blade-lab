@@ -259,11 +259,15 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
 
   <!-- pass arrow down -->
   <line x1="515" y1="226" x2="515" y2="302" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
-  <text x="525" y="266" fill="#4c1d95" font-size="10">pass</text>
+  <text x="525" y="266" fill="#4c1d95" font-size="10">pass / degrade</text>
 
   <!-- continue arc back to THINK -->
-  <path d="M465 205 Q307 185 255 222" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahp)"/>
-  <text x="307" y="194" text-anchor="middle" fill="#4c1d95" font-size="9.5">continue → THINK</text>
+  <path d="M465 205 Q380 185 255 222" fill="none" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahp)"/>
+  <text x="350" y="194" text-anchor="middle" fill="#d97706" font-size="9.5">continue → THINK</text>
+
+  <!-- rehypothesize arc back to HYPOTHESIZE -->
+  <path d="M465 220 Q400 280 86 240" fill="none" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahp)"/>
+  <text x="268" y="270" text-anchor="middle" fill="#dc2626" font-size="9.5">rehypothesize → HYPOTHESIZE</text>
 
   <!-- FINALIZE -->
   <rect x="444" y="302" width="142" height="30" rx="5" fill="#4c1d95"/>
@@ -400,7 +404,7 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
   </table>
 
   <h4>3.3.2 路由决策机制</h4>
-  <p>THINK 节点通过 <code>action.type</code> 表达意图，GATE 节点负责规则验证，Budget Check 提供确定性兜底：</p>
+  <p>THINK 节点通过 <code>action.type</code> 表达意图，GATE 节点负责规则验证（4 路输出）：</p>
   <div class="svg-wrap">
   <svg width="680" height="340" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
@@ -413,52 +417,99 @@ p code,li code,td code{background:#eef2f7;color:#c0392b;padding:2px 6px;border-r
     <marker id="arv5g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M0 0 L10 5 L0 10 z" fill="#059669"/>
     </marker>
+    <marker id="arv5r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#dc2626"/>
+    </marker>
   </defs>
-  <rect width="680" height="280" fill="#f8fafc"/>
+  <rect width="680" height="340" fill="#f8fafc"/>
+
+  <!-- HYPOTHESIZE -->
+  <rect x="20" y="10" width="160" height="30" rx="5" fill="#4c1d95"/>
+  <text x="100" y="30" text-anchor="middle" fill="white" font-size="11" font-weight="700">HYPOTHESIZE (LLM)</text>
+  <!-- HYPO → THINK -->
+  <line x1="100" y1="40" x2="100" y2="58" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
+
   <!-- THINK -->
-  <rect x="20" y="20" width="180" height="48" rx="6" fill="#7c3aed"/>
-  <text x="110" y="40" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
-  <text x="110" y="58" text-anchor="middle" fill="white" font-size="10">输出 action.type</text>
+  <rect x="20" y="58" width="180" height="48" rx="6" fill="#7c3aed"/>
+  <text x="110" y="78" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
+  <text x="110" y="96" text-anchor="middle" fill="white" font-size="10">输出 action.type</text>
   <!-- tool_call arrow right -->
-  <line x1="200" y1="34" x2="260" y2="34" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
-  <text x="230" y="28" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
+  <line x1="200" y1="72" x2="260" y2="72" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
+  <text x="230" y="66" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
   <!-- ACT -->
-  <rect x="260" y="20" width="90" height="30" rx="5" fill="#6d28d9"/>
-  <text x="305" y="40" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <rect x="260" y="58" width="90" height="30" rx="5" fill="#6d28d9"/>
+  <text x="305" y="78" text-anchor="middle" fill="white" font-size="11">ACT</text>
   <!-- ACT → OBSERVE -->
-  <line x1="350" y1="35" x2="390" y2="35" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#arv5p)"/>
+  <line x1="350" y1="73" x2="390" y2="73" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#arv5p)"/>
   <!-- OBSERVE -->
-  <rect x="390" y="20" width="90" height="30" rx="5" fill="#6d28d9"/>
-  <text x="435" y="40" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
+  <rect x="390" y="58" width="90" height="30" rx="5" fill="#6d28d9"/>
+  <text x="435" y="78" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
   <!-- Return arc: OBSERVE → THINK -->
-  <path d="M480 35 Q570 35 570 120 Q570 200 110 200 Q20 200 20 68" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arv5p)"/>
-  <text x="400" y="195" text-anchor="middle" fill="#6d28d9" font-size="9.5">→ 下一轮 THINK</text>
+  <path d="M480 73 Q560 73 560 140 Q560 210 110 210 Q20 210 20 106" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arv5p)"/>
+  <text x="420" y="205" text-anchor="middle" fill="#6d28d9" font-size="9.5">→ 下一轮 THINK</text>
+
   <!-- conclude arrow down -->
-  <line x1="110" y1="68" x2="110" y2="140" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
-  <text x="125" y="108" font-size="9.5" fill="#7c3aed">conclude</text>
+  <line x1="110" y1="106" x2="110" y2="155" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arv5p)"/>
+  <text x="125" y="134" font-size="9.5" fill="#7c3aed">conclude</text>
+
   <!-- GATE -->
-  <rect x="20" y="140" width="540" height="42" rx="6" fill="rgba(5,150,105,0.08)" stroke="#059669" stroke-width="1.5"/>
-  <rect x="230" y="148" width="120" height="28" rx="5" fill="#059669"/>
-  <text x="290" y="167" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE (规则)</text>
-  <!-- pass arrow down -->
-  <line x1="290" y1="182" x2="290" y2="230" stroke="#059669" stroke-width="1.5" marker-end="url(#arv5g)"/>
-  <text x="304" y="212" font-size="10" fill="#059669">pass</text>
+  <rect x="20" y="155" width="540" height="42" rx="6" fill="rgba(5,150,105,0.08)" stroke="#059669" stroke-width="1.5"/>
+  <rect x="230" y="163" width="120" height="28" rx="5" fill="#059669"/>
+  <text x="290" y="182" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE (规则)</text>
+
+  <!-- pass arrow down to FINALIZE -->
+  <line x1="250" y1="197" x2="250" y2="258" stroke="#059669" stroke-width="1.5" marker-end="url(#arv5g)"/>
+  <text x="230" y="230" font-size="10" fill="#059669">pass</text>
+
+  <!-- degrade arrow down to FINALIZE -->
+  <line x1="330" y1="197" x2="330" y2="258" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
+  <text x="345" y="230" font-size="10" fill="#64748b">degrade</text>
+
   <!-- continue arc back to THINK -->
-  <path d="M360 162 Q450 162 450 100 Q450 44 200 44" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5)"/>
-  <text x="440" y="100" font-size="9.5" fill="#d97706">continue → THINK</text>
+  <path d="M380 175 Q470 175 470 120 Q470 72 200 72" fill="none" stroke="#d97706" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5)"/>
+  <text x="470" y="140" font-size="9.5" fill="#d97706">continue</text>
+
+  <!-- rehypothesize arc back to HYPOTHESIZE -->
+  <path d="M130 175 Q60 175 60 100 Q60 25 80 25" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arv5r)"/>
+  <text x="10" y="100" font-size="9" fill="#dc2626" writing-mode="tb">rehypothesize</text>
+
   <!-- FINALIZE -->
-  <rect x="220" y="230" width="140" height="30" rx="5" fill="#4c1d95"/>
-  <text x="290" y="250" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
+  <rect x="220" y="258" width="140" height="30" rx="5" fill="#4c1d95"/>
+  <text x="290" y="278" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
   <!-- Reflect arrow -->
-  <line x1="290" y1="260" x2="290" y2="278" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
-  <text x="330" y="274" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
+  <line x1="290" y1="288" x2="290" y2="310" stroke="#64748b" stroke-width="1.5" marker-end="url(#arv5)"/>
+  <text x="330" y="306" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
   </svg>
   </div>
-  <p><strong>权责分离：</strong>THINK（LLM）回答"我是否准备好下结论了"——通过 <code>action.type = "tool_call" | "conclude"</code> 表达意图。GATE（规则）验证"你给出的结论证据够不够"——通过确定性规则判断。两者分离，防止 LLM 在证据不足时自信地下结论。最大迭代轮数由实现层控制，不是设计贡献点。</p>
+
+  <table>
+    <thead><tr><th>来源</th><th>条件</th><th>目标</th></tr></thead>
+    <tbody>
+      <tr><td>HYPOTHESIZE</td><td>完成</td><td>→ THINK</td></tr>
+      <tr><td>THINK</td><td><code>action.type = "tool_call"</code></td><td>→ ACT</td></tr>
+      <tr><td>THINK</td><td><code>action.type = "conclude"</code></td><td>→ GATE</td></tr>
+      <tr><td>ACT</td><td>完成</td><td>→ OBSERVE</td></tr>
+      <tr><td>OBSERVE</td><td>完成</td><td>→ THINK</td></tr>
+      <tr><td>GATE</td><td><code>decision = "pass"</code></td><td>→ FINALIZE</td></tr>
+      <tr><td>GATE</td><td><code>decision = "continue"</code></td><td>→ THINK</td></tr>
+      <tr><td>GATE</td><td><code>decision = "rehypothesize"</code></td><td>→ HYPOTHESIZE</td></tr>
+      <tr><td>GATE</td><td><code>decision = "degrade"</code></td><td>→ FINALIZE（降级报告）</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>权责分离：</strong>THINK（LLM）回答"我是否准备好下结论了"——通过 <code>action.type = "tool_call" | "conclude"</code> 表达意图。GATE（规则）验证"你给出的结论证据够不够"——通过确定性规则判断，有 4 种决策输出：<code>pass</code>（通过）、<code>continue</code>（证据不足回 THINK）、<code>rehypothesize</code>（全部 refuted 时回 HYPOTHESIZE 重新生成假设）、<code>degrade</code>（迭代耗尽时降级报告）。最大迭代轮数由实现层控制，不是设计贡献点。</p>
 
   <h4>3.3.3 Pydantic Schema 结构（部分核心类）</h4>
-  <pre><code>class Hypothesis(BaseModel):
-    id: str                         # h1, h2, h3...
+  <pre><code>class AgentState(TypedDict):
+    # ... 其他字段省略
+    hypotheses: list[Hypothesis]    # 多假设并行
+    evidence: list[Evidence]        # 工具返回的摘要化证据
+    rehyp_count: int                # 已执行的 rehypothesize 次数，初始 0
+    budget: dict                    # {tool_calls_used, tool_calls_limit, ...}
+    gate_result: dict               # {decision, reason, diagnosis_type, ...}
+
+class Hypothesis(BaseModel):
+    id: str                         # h1, h2, h3...（rehyp 后续编如 h5, h6）
     root_cause: str                 # 自然语言描述
     fault_type: str                 # 对应 FPL fault_type，用于 KB 检索
     subsystem: str                  # cpu | memory | network | disk
@@ -477,7 +528,7 @@ class Evidence(BaseModel):
     raw_stats: dict                 # 统计量，不进入 context，用于 Gate 规则判断
     strength: Literal["strong", "medium", "weak"]   # 由 Metric KB 规则确定，非 LLM 主观</code></pre>
 
-  <h4>3.3.4 多假设并行（复合故障支持）</h4>
+  <h4>3.3.4 多假设并行与纠错机制</h4>
   <p><code>AgentState.hypotheses</code> 是一个列表，可同时维护多个互不排斥的假设（如 h1=CPU故障, h2=内存故障）。THINK 节点在每轮决策时综合所有 active 假设的证据状态，决定优先验证哪个假设。</p>
   <p>复合故障的 <code>diagnosis_type</code> 由 GATE 节点在 Stage C 根据 confirmed 假设数量确定：</p>
   <ul>
@@ -487,7 +538,26 @@ class Evidence(BaseModel):
     <li><code>inconclusive</code>：所有假设均 refuted 或迭代耗尽且无 confirmed</li>
   </ul>
 
-  <h4>3.3.5 工具摘要机制（防 token 爆炸）</h4>
+  <h4>3.3.5 Re-hypothesis 纠错机制</h4>
+  <p>当所有初始假设均被 GATE Stage A 判定为 <code>refuted</code> 时，系统需要<strong>重新生成假设</strong>，而非直接降级报告。GATE 触发 <code>rehypothesize</code> 决策，将控制权返回 HYPOTHESIZE 节点。</p>
+  <p><strong>触发条件</strong>（三者同时满足）：</p>
+  <ol>
+    <li>所有假设 status 均为 <code>refuted</code></li>
+    <li><code>rehyp_count &lt; max_rehyp</code>（默认 <code>max_rehyp = 1</code>，即最多重新假设 1 次，总共 2 轮）</li>
+    <li>剩余 budget ≥ <code>min_budget_for_rehyp</code>（默认 4 次工具调用）</li>
+  </ol>
+  <p><strong>HYPOTHESIZE 第二次进入时的行为：</strong></p>
+  <ul>
+    <li>State 中包含 refuted 假设列表及其否定原因 + 前一轮已收集的全部证据</li>
+    <li>Prompt 指令要求：基于已有证据和 FocusContext 中尚未被解释的异常指标，生成与前述假设<strong>不同 fault_type</strong> 的新候选</li>
+    <li>新假设 ID 从上轮之后续编（如 h5, h6），refuted 假设保留（确保 ExecutionTrace 完整可审计）</li>
+    <li>Budget 与第一轮共享，不额外分配</li>
+  </ul>
+  <div class="info">
+    <strong>消融对应</strong>：Sup-C（禁用 rehypothesize 分支，全部 refuted 时直接 degrade），验证纠错机制对初始假设偏差场景的恢复能力。
+  </div>
+
+  <h4>3.3.6 工具摘要机制（防 token 爆炸）</h4>
   <p>OBSERVE 节点对工具原始输出执行摘要压缩：只保留统计量（p95/mean/max/duration 等）和 1-2 句文字摘要，写入 <code>Evidence.result_digest</code>；原始时序序列不进入 LLM context，仅用于离线调试。这保证了 10 次工具调用后 context 仍在 token 预算内。</p>
 
   <!-- 3.4 Evidence Gating -->
@@ -510,7 +580,7 @@ class Evidence(BaseModel):
     <tbody>
       <tr><td><strong>Stage A</strong> — 单假设评估</td><td>每个假设：证据独立吗？有 strong 证据吗？有强反驳吗？</td><td>每个假设 → confirmed / refuted / active</td></tr>
       <tr><td><strong>Stage B</strong> — 症状甄别</td><td>≥2 个 confirmed 假设：∆t_onset 小 / Metric KB 因果链不可达 → 独立故障；否则 → 继发症状（降为 derived）</td><td>composite_fault 或 single_fault</td></tr>
-      <tr><td><strong>Stage C</strong> — 全局决策</td><td>所有假设收敛了吗？还是需要继续收集？</td><td>pass / continue / degrade + diagnosis_type</td></tr>
+      <tr><td><strong>Stage C</strong> — 全局决策</td><td>所有假设收敛了吗？还是需要继续收集？全部 refuted 时是否需要重新假设？</td><td>pass / continue / rehypothesize / degrade + diagnosis_type</td></tr>
     </tbody>
   </table>
 
@@ -674,6 +744,7 @@ class Evidence(BaseModel):
     <ul style="margin:8px 0 0 18px">
       <li><strong>Sup-A</strong>：无时序因果先验 — FocusContext 的 causal_order 打乱顺序，验证时序排序的贡献</li>
       <li><strong>Sup-B</strong>：无 Reflect — FPL 在诊断间不更新，保持初始空状态，验证 Reflect 积累效果</li>
+      <li><strong>Sup-C</strong>：无 Re-hypothesis — GATE 的 <code>rehypothesize</code> 分支禁用，全部 refuted 时直接 degrade，验证纠错机制对初始假设偏差场景的恢复能力</li>
     </ul>
   </div>
 

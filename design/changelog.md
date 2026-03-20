@@ -17,6 +17,7 @@
 | 5 | **Evidence Gating 精简**：收敛为三项核心原理（证据独立性、反驳优先、复合故障甄别），具体阈值移入 `config/gate_config.yaml` | 论文写作友好；阈值细节为可配置实现参数 |
 | 6 | **Reflect 不依赖 Ground Truth**，GT 比对移入独立评估框架（`eval/evaluate.py`） | 真实环境无法实时获取 chaos.csv；Reflect 应为无监督积累 |
 | 7 | **消融实验精简为 4 ablation + 2 baseline**，小粒度消融降为 supplementary | 聚焦大块设计贡献；避免审稿人质疑消融粒度不一致 |
+| 8 | **新增 RE-HYPOTHESIZE 纠错机制**：GATE Stage C 新增 `rehypothesize` 决策分支，当所有假设被 refuted 时回跳 HYPOTHESIZE 重新生成假设（最多 1 次），修复了初始假设全部偏差时系统无纠错路径的架构缺陷 | 初始假设可能因 Triage 初判偏差或 FPL 冷启动而全部错误，需要纠错闭环 |
 
 ---
 

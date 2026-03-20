@@ -355,16 +355,41 @@ def gate(state: AgentState, metric_kb: dict) -> dict:
                 "diagnosis_type": "inconclusive"
             }
 
-    # ---- 情况 4：所有假设均 refuted，没有 confirmed ----
+    # ---- 情况 4：所有假设均 refuted → 尝试 rehypothesize 或降级 ----
     if len(confirmed_independent) == 0 and len(still_active) == 0:
-        return {
-            "decision": "degrade",
-            "reason": "all hypotheses refuted; diagnosis inconclusive",
-            "triggered_rule": None,
-            "active_hypothesis_ids": [],
-            "confirmed_hypothesis_ids": [],
-            "diagnosis_type": "inconclusive"
-        }
+        rehyp_count = state.get("rehyp_count", 0)
+        remaining = budget["tool_calls_limit"] - budget["tool_calls_used"]
+        can_rehyp = (
+            rehyp_count < GATE_CONFIG["max_rehyp"]                    # 默认 1
+            and remaining >= GATE_CONFIG["min_budget_for_rehyp"]      # 默认 4
+        )
+        if can_rehyp:
+            return {
+                "decision": "rehypothesize",
+                "reason": (
+                    f"all hypotheses refuted; triggering re-hypothesis "
+                    f"(attempt {rehyp_count + 1}/{GATE_CONFIG['max_rehyp']}; "
+                    f"budget remaining: {remaining})"
+                ),
+                "triggered_rule": None,
+                "active_hypothesis_ids": [],
+                "confirmed_hypothesis_ids": [],
+                "diagnosis_type": "inconclusive"  # 临时，rehyp 后重新评估
+            }
+        else:
+            reason = (
+                "all hypotheses refuted; "
+                + ("max re-hypothesis attempts reached" if rehyp_count >= GATE_CONFIG["max_rehyp"]
+                   else f"insufficient budget ({remaining} calls) for re-hypothesis")
+            )
+            return {
+                "decision": "degrade",
+                "reason": reason,
+                "triggered_rule": None,
+                "active_hypothesis_ids": [],
+                "confirmed_hypothesis_ids": [],
+                "diagnosis_type": "inconclusive"
+            }
 
     # ---- 默认：继续循环 ----
     return {
