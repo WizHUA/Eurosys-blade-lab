@@ -590,11 +590,34 @@ class Evidence(BaseModel):
 
   <!-- 3.5 Reflect -->
   <h3 id="s35">3.5 Reflect &amp; 知识积累（Stage 3）</h3>
-  <p>每次 FINALIZE 完成后触发 Reflect 节点（可同步或异步）。核心职责：将本次诊断经验提炼为 FPL 规则，实现<strong>无监督知识积累</strong>。</p>
+  <p>FINALIZE 完成后<strong>按条件</strong>触发 Reflect 节点（可同步或异步）。核心职责：将本次 confirmed 诊断经验提炼为 FPL 规则，实现<strong>无监督知识积累</strong>。</p>
+
+  <h4>触发前置条件</h4>
+  <p>Reflect 不是无条件触发——仅在有可信 confirmed 根因时才有信号可提炼：</p>
+  <table>
+    <thead><tr><th>diagnosis_type</th><th>Reflect 策略</th></tr></thead>
+    <tbody>
+      <tr><td><code>single_fault</code> / <code>composite_fault</code></td><td>完整触发，所有 confirmed 假设均提炼为规则</td></tr>
+      <tr><td><code>partial</code></td><td>部分触发，只提炼 confirmed 假设，<code>verification_steps</code> 标记 <code>incomplete=true</code></td></tr>
+      <tr><td><code>inconclusive</code></td><td>跳过，无 confirmed 根因，强行提炼只会引入噪声规则</td></tr>
+    </tbody>
+  </table>
+
+  <h4>FPL 冷启动行为</h4>
+  <p>FPL 初始为空时系统<strong>降级但仍可运行</strong>，依赖 Metric KB 和 Triage 输出作为诊断基础：</p>
+  <table>
+    <thead><tr><th>字段</th><th>有 FPL 规则时</th><th>FPL 为空时</th></tr></thead>
+    <tbody>
+      <tr><td><code>prior_confidence</code></td><td>FPL 规则 confidence（如 0.9）</td><td>默认 0.30</td></tr>
+      <tr><td><code>required_verifications</code></td><td>结构化验证路线图</td><td><code>[]</code>（THINK 自行探索）</td></tr>
+      <tr><td>THINK 效率</td><td>按路线图逐步验证，平均更少轮次</td><td>自行决定查什么，可能多 2–4 轮迭代</td></tr>
+    </tbody>
+  </table>
+  <p>冷启动时始终可用的信号：<strong>Triage FocusContext</strong>（leading_subsystem / top_metrics / causal_order）、<strong>Metric KB related_faults 字段</strong>（指标→故障类型映射）、<strong>Metric KB downstream_effects</strong>（GATE cascade 甄别始终有据可查）。随着诊断积累，首次成功诊断 → 候选规则 → ≥2 次确认 → confirmed 规则 → 后续同类故障效率显著提升。</p>
 
   <h4>执行步骤</h4>
   <ol>
-    <li><strong>规则提炼</strong>：LLM 分析本次诊断的有效症状签名（leading_subsystem + anomaly metrics + temporal_pattern）和有效验证路径，按 FPL Schema 生成候选规则条目</li>
+    <li><strong>规则提炼</strong>：LLM 分析 confirmed 假设的症状签名（leading_subsystem + anomaly metrics + temporal_pattern）和已完成的验证路径，按 FPL Schema 生成候选规则条目</li>
     <li><strong>去重写入</strong>：计算 <code>symptom_signature</code> 与已有规则的相似度，高相似度 → 版本号 +1（更新），否则 → 新增。新规则初始 <code>status: "candidate"</code>，<code>confidence: 0.5</code></li>
     <li><strong>规则升级 / 衰减</strong>：候选规则被后续诊断成功匹配确认 ≥2 次 → 升为 <code>"confirmed"</code>；最近若干次表现不佳 → <code>confidence</code> 降低，标记 <code>"deprecated"</code></li>
   </ol>
