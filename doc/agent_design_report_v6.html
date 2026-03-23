@@ -312,9 +312,9 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   </div>
 
   <h4>节点路由决策</h4>
-  <p>THINK 通过 <code>action.type</code> 表达意图，GATE 四路输出决定下一步走向：</p>
+  <p>THINK 通过 <code>action.type</code> 表达意图，LangGraph 根据路由函数决定下一节点；GATE 四路输出决定结论走向：</p>
   <div class="svg-wrap">
-  <svg width="700" height="360" viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
+  <svg width="720" height="400" viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
     <marker id="r6a"  viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
     <marker id="r6p"  viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker>
@@ -322,76 +322,86 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <marker id="r6o"  viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#d97706"/></marker>
     <marker id="r6r"  viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#dc2626"/></marker>
   </defs>
-  <rect width="700" height="360" fill="#f8fafc"/>
+  <rect width="720" height="400" fill="#f8fafc"/>
 
-  <!-- HYPOTHESIZE -->
-  <rect x="20" y="10" width="168" height="30" rx="5" fill="#4c1d95"/>
-  <text x="104" y="30" text-anchor="middle" fill="white" font-size="11" font-weight="700">HYPOTHESIZE (LLM)</text>
-  <line x1="104" y1="40" x2="104" y2="58" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
+  <!-- ── Row 1: HYPOTHESIZE ── -->
+  <rect x="260" y="14" width="200" height="32" rx="6" fill="#4c1d95"/>
+  <text x="360" y="34" text-anchor="middle" fill="white" font-size="12" font-weight="700">HYPOTHESIZE (LLM)</text>
+  <line x1="360" y1="46" x2="360" y2="68" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
 
-  <!-- THINK -->
-  <rect x="20" y="58" width="188" height="48" rx="6" fill="#7c3aed"/>
-  <text x="114" y="78" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
-  <text x="114" y="96" text-anchor="middle" fill="white" font-size="10">输出 action.type + gate_hint 感知</text>
+  <!-- ── Row 2: THINK ── -->
+  <rect x="240" y="68" width="240" height="44" rx="6" fill="#7c3aed"/>
+  <text x="360" y="88" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK (LLM)</text>
+  <text x="360" y="103" text-anchor="middle" fill="white" font-size="10">action.type: tool_call | conclude</text>
 
-  <!-- tool_call → ACT -->
-  <line x1="208" y1="72" x2="270" y2="72" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
-  <text x="239" y="66" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
-  <rect x="270" y="58" width="80" height="28" rx="5" fill="#6d28d9"/>
-  <text x="310" y="77" text-anchor="middle" fill="white" font-size="11">ACT</text>
-  <line x1="350" y1="72" x2="390" y2="72" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#r6p)"/>
-  <rect x="390" y="58" width="90" height="28" rx="5" fill="#6d28d9"/>
-  <text x="435" y="77" text-anchor="middle" fill="white" font-size="11">OBSERVE</text>
-  <!-- iterate arc -->
-  <path d="M480 72 Q570 72 570 148 Q570 220 114 220 Q20 220 20 106" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#r6p)"/>
-  <text x="450" y="215" text-anchor="middle" fill="#6d28d9" font-size="9.5">→ 下一轮 THINK</text>
+  <!-- THINK → ACT (tool_call branch, goes right) -->
+  <line x1="480" y1="88" x2="524" y2="88" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
+  <text x="502" y="82" text-anchor="middle" font-size="9.5" fill="#7c3aed">tool_call</text>
 
-  <!-- conclude → GATE -->
-  <line x1="114" y1="106" x2="114" y2="156" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
-  <text x="130" y="134" font-size="9.5" fill="#7c3aed">conclude</text>
+  <!-- ── Row 2 right: ACT + OBSERVE ── -->
+  <rect x="524" y="72" width="88" height="32" rx="5" fill="#6d28d9"/>
+  <text x="568" y="92" text-anchor="middle" fill="white" font-size="11">ACT</text>
+  <line x1="612" y1="88" x2="648" y2="88" stroke="#6d28d9" stroke-width="1.5" marker-end="url(#r6p)"/>
+  <rect x="648" y="72" width="62" height="32" rx="5" fill="#6d28d9"/>
+  <text x="679" y="92" text-anchor="middle" fill="white" font-size="10.5">OBSERVE</text>
 
-  <!-- GATE Sub-Agent box -->
-  <rect x="20" y="156" width="570" height="46" rx="6" fill="rgba(220,38,38,.07)" stroke="#dc2626" stroke-width="1.5"/>
-  <rect x="230" y="164" width="150" height="30" rx="5" fill="#7f1d1d"/>
-  <text x="305" y="183" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">GATE Sub-Agent</text>
+  <!-- OBSERVE → THINK back arc (iterate) -->
+  <path d="M679 104 Q679 148 360 148 Q240 148 240 112" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#r6p)"/>
+  <text x="490" y="163" text-anchor="middle" fill="#6d28d9" font-size="9.5">iterate → 下一轮 THINK</text>
 
-  <!-- 4 output arrows -->
-  <line x1="250" y1="202" x2="130" y2="252" stroke="#059669" stroke-width="1.5" marker-end="url(#r6g)"/>
-  <line x1="280" y1="202" x2="280" y2="252" stroke="#d97706" stroke-width="1.5" marker-end="url(#r6o)"/>
-  <line x1="330" y1="202" x2="420" y2="252" stroke="#dc2626" stroke-width="1.5" marker-end="url(#r6r)"/>
-  <line x1="360" y1="202" x2="530" y2="252" stroke="#64748b" stroke-width="1.5" marker-end="url(#r6a)"/>
+  <!-- THINK → GATE (conclude branch, goes down) -->
+  <line x1="360" y1="112" x2="360" y2="180" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
+  <text x="378" y="150" font-size="9.5" fill="#7c3aed">conclude</text>
+
+  <!-- ── Row 3: GATE Sub-Agent ── -->
+  <rect x="60" y="180" width="600" height="44" rx="6" fill="rgba(220,38,38,.07)" stroke="#dc2626" stroke-width="1.5"/>
+  <rect x="240" y="188" width="240" height="28" rx="5" fill="#7f1d1d"/>
+  <text x="360" y="207" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE Sub-Agent (Adversarial LLM)</text>
+
+  <!-- ── Row 4: 4 output decision boxes ── evenly spaced at x=90, 240, 400, 560 -->
+  <!-- Arrows from GATE bottom to each box top -->
+  <line x1="175" y1="224" x2="104" y2="262" stroke="#059669" stroke-width="1.4" marker-end="url(#r6g)"/>
+  <line x1="300" y1="224" x2="274" y2="262" stroke="#d97706" stroke-width="1.4" marker-end="url(#r6o)"/>
+  <line x1="420" y1="224" x2="440" y2="262" stroke="#dc2626" stroke-width="1.4" marker-end="url(#r6r)"/>
+  <line x1="545" y1="224" x2="570" y2="262" stroke="#64748b" stroke-width="1.4" marker-end="url(#r6a)"/>
 
   <!-- pass -->
-  <rect x="70" y="252" width="110" height="28" rx="5" fill="#059669"/>
-  <text x="125" y="271" text-anchor="middle" fill="white" font-size="11" font-weight="700">pass</text>
-  <!-- continue -->
-  <rect x="210" y="252" width="136" height="28" rx="5" fill="#d97706"/>
-  <text x="278" y="271" text-anchor="middle" fill="white" font-size="11" font-weight="700">continue + hint</text>
+  <rect x="46" y="262" width="116" height="30" rx="5" fill="#059669"/>
+  <text x="104" y="282" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">pass</text>
+  <!-- continue+hint -->
+  <rect x="196" y="262" width="156" height="30" rx="5" fill="#d97706"/>
+  <text x="274" y="282" text-anchor="middle" fill="white" font-size="11" font-weight="700">continue + hint</text>
   <!-- rehypothesize -->
-  <rect x="368" y="252" width="140" height="28" rx="5" fill="#dc2626"/>
-  <text x="438" y="271" text-anchor="middle" fill="white" font-size="11" font-weight="700">rehypothesize</text>
+  <rect x="376" y="262" width="156" height="30" rx="5" fill="#dc2626"/>
+  <text x="454" y="282" text-anchor="middle" fill="white" font-size="11" font-weight="700">rehypothesize</text>
   <!-- degrade -->
-  <rect x="530" y="252" width="100" height="28" rx="5" fill="#64748b"/>
-  <text x="580" y="271" text-anchor="middle" fill="white" font-size="11" font-weight="700">degrade</text>
+  <rect x="548" y="262" width="116" height="30" rx="5" fill="#64748b"/>
+  <text x="606" y="282" text-anchor="middle" fill="white" font-size="11" font-weight="700">degrade</text>
 
-  <!-- pass → FINALIZE -->
-  <line x1="125" y1="280" x2="290" y2="310" stroke="#059669" stroke-width="1.3" marker-end="url(#r6g)"/>
-  <!-- degrade → FINALIZE -->
-  <line x1="580" y1="280" x2="360" y2="310" stroke="#64748b" stroke-width="1.3" marker-end="url(#r6a)"/>
-  <!-- continue → THINK arc -->
-  <path d="M278 280 Q278 340 620 240 Q660 170 214 100" fill="none" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#r6o)"/>
-  <text x="580" y="180" font-size="9.5" fill="#d97706">→ THINK</text>
-  <!-- rehypothesize → HYPOTHESIZE arc -->
-  <path d="M438 280 Q438 330 60 300 Q20 260 20 50 Q20 25 30 20" fill="none" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#r6r)"/>
+  <!-- pass + degrade → FINALIZE (center bottom) -->
+  <line x1="104" y1="292" x2="310" y2="334" stroke="#059669" stroke-width="1.3" marker-end="url(#r6g)"/>
+  <line x1="606" y1="292" x2="420" y2="334" stroke="#64748b" stroke-width="1.3" marker-end="url(#r6a)"/>
+
+  <!-- continue → THINK: left side arc going back up -->
+  <path d="M220 292 Q160 360 160 240 Q160 110 240 90" fill="none" stroke="#d97706" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#r6o)"/>
+  <text x="76" y="230" text-anchor="middle" fill="#d97706" font-size="9.5">→ THINK</text>
+
+  <!-- rehypothesize → HYPOTHESIZE: right side arc going back up -->
+  <path d="M500 292 Q560 350 560 200 Q560 50 480 30" fill="none" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#r6r)"/>
+  <text x="634" y="130" text-anchor="middle" fill="#dc2626" font-size="9.5">→ HYPOTHESIZE</text>
 
   <!-- FINALIZE -->
-  <rect x="250" y="310" width="140" height="30" rx="5" fill="#4c1d95"/>
-  <text x="320" y="330" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
-  <!-- → Reflect -->
-  <line x1="320" y1="340" x2="320" y2="352" stroke="#64748b" stroke-width="1.5" marker-end="url(#r6a)"/>
-  <text x="360" y="352" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
+  <rect x="280" y="334" width="160" height="32" rx="5" fill="#4c1d95"/>
+  <text x="360" y="355" text-anchor="middle" fill="white" font-size="12">FINALIZE (LLM)</text>
+
+  <!-- FINALIZE → Stage 3 -->
+  <line x1="360" y1="366" x2="360" y2="382" stroke="#64748b" stroke-width="1.5" marker-end="url(#r6a)"/>
+  <text x="360" y="395" text-anchor="middle" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
   </svg>
   </div>
+  <p style="font-size:13px;color:#475569;margin-top:6px">THINK 在 <code>action.type=conclude</code> 时触发 GATE 审查；<code>continue+hint</code> 将 hint 写入 state 后回到 THINK；<code>rehypothesize</code> 回到 HYPOTHESIZE 生成新假设；<code>pass / degrade</code> 进入 FINALIZE。</p>
+  <p style="font-size:12px;color:#7c2d12"><strong>THINK 输出示例（conclude 分支）：</strong></p>
+  <pre style="font-size:12px;margin-top:4px">{
   "thought": "当前 h1 仍未排除 memory 替代解释，需要检查 swap 与时间先后关系",
   "action": {
     "type": "tool_call",
@@ -404,62 +414,86 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <h3 id="s33">3.3 GATE Sub-Agent</h3>
   <p>GATE 是一个具备有限 ReAct 循环和受限工具集的 Adversarial Sub-Agent，而不是纯规则节点。它不负责生成诊断，只负责从反方视角寻找漏洞、补查关键空白，并决定是否允许结论进入 FINALIZE。</p>
   <div class="svg-wrap">
-    <svg width="700" height="330" viewBox="0 0 700 330" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block;background:#f8fafc">
+    <svg width="700" height="380" viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block;background:#f8fafc">
       <defs>
-        <marker id="v6arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
-        </marker>
-        <marker id="v6purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/>
-        </marker>
-        <marker id="v6green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0 0 L10 5 L0 10 z" fill="#059669"/>
-        </marker>
+        <marker id="v6arr"    viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+        <marker id="v6purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker>
+        <marker id="v6green"  viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#059669"/></marker>
+        <marker id="v6orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#d97706"/></marker>
+        <marker id="v6red"    viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#dc2626"/></marker>
       </defs>
-      <rect x="20" y="18" width="150" height="34" rx="6" fill="#7c3aed"/>
-      <text x="95" y="39" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK conclude</text>
-      <line x1="170" y1="35" x2="220" y2="35" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#v6purple)"/>
 
-      <rect x="220" y="18" width="180" height="40" rx="6" fill="#4c1d95"/>
-      <text x="310" y="38" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_THINK</text>
-      <text x="310" y="52" text-anchor="middle" fill="white" font-size="9.5">先做零工具逻辑审查</text>
+      <!-- ─── Row 1: Input (THINK conclude) ─── -->
+      <rect x="20" y="14" width="160" height="34" rx="6" fill="#7c3aed"/>
+      <text x="100" y="35" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK conclude</text>
+      <line x1="180" y1="31" x2="224" y2="31" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#v6purple)"/>
 
-      <line x1="400" y1="38" x2="455" y2="38" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
-      <rect x="455" y="18" width="120" height="40" rx="6" fill="#f97316"/>
-      <text x="515" y="37" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_ACT</text>
-      <text x="515" y="51" text-anchor="middle" fill="white" font-size="9.5">受限工具调用</text>
+      <!-- ─── Row 1: GATE_THINK ─── -->
+      <rect x="224" y="14" width="180" height="40" rx="6" fill="#4c1d95"/>
+      <text x="314" y="33" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_THINK</text>
+      <text x="314" y="47" text-anchor="middle" fill="white" font-size="9.5">先做零工具逻辑审查</text>
 
-      <line x1="515" y1="58" x2="515" y2="96" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
-      <rect x="445" y="96" width="140" height="40" rx="6" fill="#f97316"/>
-      <text x="515" y="116" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_OBSERVE</text>
-      <text x="515" y="130" text-anchor="middle" fill="white" font-size="9.5">生成 gate_evidence</text>
+      <!-- GATE_THINK → GATE_ACT -->
+      <line x1="404" y1="34" x2="454" y2="34" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
+      <text x="429" y="26" text-anchor="middle" font-size="9.5" fill="#475569">需要工具</text>
 
-      <path d="M445 116 Q340 170 260 76" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#v6purple)"/>
-      <text x="360" y="148" text-anchor="middle" fill="#6d28d9" font-size="9.5">必要时回到 GATE_THINK</text>
+      <!-- ─── Row 1: GATE_ACT ─── -->
+      <rect x="454" y="14" width="120" height="40" rx="6" fill="#f97316"/>
+      <text x="514" y="33" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_ACT</text>
+      <text x="514" y="47" text-anchor="middle" fill="white" font-size="9.5">受限工具调用</text>
 
-      <rect x="40" y="180" width="120" height="34" rx="6" fill="#059669"/>
-      <text x="100" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">pass</text>
-      <rect x="190" y="180" width="140" height="34" rx="6" fill="#d97706"/>
-      <text x="260" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">continue + hint</text>
-      <rect x="370" y="180" width="150" height="34" rx="6" fill="#dc2626"/>
-      <text x="445" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">rehypothesize</text>
-      <rect x="550" y="180" width="110" height="34" rx="6" fill="#64748b"/>
-      <text x="605" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">degrade</text>
+      <!-- GATE_ACT → GATE_OBSERVE (down) -->
+      <line x1="514" y1="54" x2="514" y2="90" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
 
-      <line x1="310" y1="58" x2="100" y2="180" stroke="#059669" stroke-width="1.3" marker-end="url(#v6green)"/>
-      <line x1="310" y1="58" x2="260" y2="180" stroke="#d97706" stroke-width="1.3" marker-end="url(#v6arr)"/>
-      <line x1="310" y1="58" x2="445" y2="180" stroke="#dc2626" stroke-width="1.3" marker-end="url(#v6arr)"/>
-      <line x1="310" y1="58" x2="605" y2="180" stroke="#64748b" stroke-width="1.3" marker-end="url(#v6arr)"/>
+      <!-- ─── Row 2: GATE_OBSERVE ─── -->
+      <rect x="454" y="90" width="120" height="40" rx="6" fill="#f97316"/>
+      <text x="514" y="109" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_OBSERVE</text>
+      <text x="514" y="123" text-anchor="middle" fill="white" font-size="9.5">生成 gate_evidence</text>
 
-      <text x="90" y="244" text-anchor="middle" fill="#475569" font-size="10">→ FINALIZE</text>
-      <text x="260" y="244" text-anchor="middle" fill="#475569" font-size="10">→ THINK</text>
-      <text x="445" y="244" text-anchor="middle" fill="#475569" font-size="10">→ HYPOTHESIZE</text>
-      <text x="605" y="244" text-anchor="middle" fill="#475569" font-size="10">→ FINALIZE</text>
+      <!-- GATE_OBSERVE → GATE_THINK loop arc （有时需要再审查） -->
+      <path d="M454 110 Q380 160 314 54" fill="none" stroke="#c4b5fd" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#v6purple)"/>
+      <text x="372" y="156" text-anchor="middle" fill="#6d28d9" font-size="9">必要时回到 GATE_THINK</text>
 
-      <text x="24" y="286" fill="#475569" font-size="10.5" font-weight="700">设计要点</text>
-      <text x="24" y="304" fill="#475569" font-size="10.5">1. 先逻辑审查，后决定是否需要工具</text>
-      <text x="250" y="304" fill="#475569" font-size="10.5">2. GATE 有独立 budget，不与 THINK 共享</text>
-      <text x="24" y="320" fill="#475569" font-size="10.5">3. continue 只返回下一步问题，不直接替 THINK 下结论</text>
+      <!-- ─── Decision bar: GATE 最终输出决策 ─── -->
+      <rect x="80" y="176" width="480" height="32" rx="6" fill="#7f1d1d"/>
+      <text x="320" y="197" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">GATE 决策输出（decision + reason + hint + diagnosis_type）</text>
+
+      <!-- GATE_THINK / GATE_OBSERVE → Decision bar: two inputs -->
+      <line x1="314" y1="54" x2="314" y2="176" stroke="#7f1d1d" stroke-width="1.4" stroke-dasharray="3,2" marker-end="url(#v6arr)"/>
+      <text x="330" y="120" font-size="9.5" fill="#7f1d1d">零工具直接决策</text>
+      <line x1="514" y1="130" x2="440" y2="176" stroke="#7f1d1d" stroke-width="1.4" stroke-dasharray="3,2" marker-end="url(#v6arr)"/>
+
+      <!-- ─── Row 3: 4 output boxes ─── at x=60, 210, 380, 550 -->
+      <!-- Arrows from decision bar bottom to each box -->
+      <line x1="130" y1="208" x2="103" y2="236" stroke="#059669" stroke-width="1.5" marker-end="url(#v6green)"/>
+      <line x1="240" y1="208" x2="252" y2="236" stroke="#d97706" stroke-width="1.5" marker-end="url(#v6orange)"/>
+      <line x1="380" y1="208" x2="418" y2="236" stroke="#dc2626" stroke-width="1.5" marker-end="url(#v6red)"/>
+      <line x1="500" y1="208" x2="562" y2="236" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
+
+      <!-- pass -->
+      <rect x="36" y="236" width="134" height="32" rx="6" fill="#059669"/>
+      <text x="103" y="257" text-anchor="middle" fill="white" font-size="12" font-weight="700">pass</text>
+      <!-- continue+hint -->
+      <rect x="182" y="236" width="152" height="32" rx="6" fill="#d97706"/>
+      <text x="258" y="257" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">continue + hint</text>
+      <!-- rehypothesize -->
+      <rect x="350" y="236" width="156" height="32" rx="6" fill="#dc2626"/>
+      <text x="428" y="257" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">rehypothesize</text>
+      <!-- degrade -->
+      <rect x="520" y="236" width="150" height="32" rx="6" fill="#64748b"/>
+      <text x="595" y="257" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">degrade</text>
+
+      <!-- Row 4: destinations -->
+      <text x="103" y="290" text-anchor="middle" fill="#059669" font-size="10.5">→ FINALIZE</text>
+      <text x="258" y="290" text-anchor="middle" fill="#d97706" font-size="10.5">→ THINK（携带 hint）</text>
+      <text x="428" y="290" text-anchor="middle" fill="#dc2626" font-size="10.5">→ HYPOTHESIZE</text>
+      <text x="595" y="290" text-anchor="middle" fill="#64748b" font-size="10.5">→ FINALIZE (partial)</text>
+
+      <!-- ─── Design notes ─── -->
+      <text x="20" y="324" fill="#475569" font-size="10.5" font-weight="700">设计要点</text>
+      <text x="20" y="342" fill="#475569" font-size="10.5">① GATE 先零工具逻辑审查，只在必要时才调用工具</text>
+      <text x="20" y="358" fill="#475569" font-size="10.5">② GATE 有独立 gate_budget，不与主 Agent THINK 共享</text>
+      <text x="20" y="374" fill="#475569" font-size="10.5">③ continue 只传递"下一步该查什么"的问题，不直接替 THINK 下结论</text>
     </svg>
   </div>
   <table>
@@ -541,32 +575,46 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
 <section id="s4">
   <h2>4. 评估与消融</h2>
-  <p>评估重点除了准确率与成本，还要回答 GATE Sub-Agent 是否值得其额外复杂度，因此消融实验必须覆盖“无 GATE”和“单次审查 GATE”两个对照。</p>
-  <div class="grid">
-    <div class="card"><h4>证据独立性</h4><p>防止同一现象被重复包装成多条支持证据。</p></div>
-    <div class="card"><h4>反驳优先</h4><p>一条强反驳可阻止通过，即使支持性证据很多。</p></div>
-    <div class="card"><h4>复合故障甄别</h4><p>区分独立根因与 derived symptoms。</p></div>
-  </div>
-  <pre>GATE 的内部思考框架：
-Stage A: 单假设是否已排除替代解释？
-Stage B: 多假设是独立根因还是因果链？
-Stage C: 应输出 pass / continue / rehypothesize / degrade？</pre>
+  <p>消融矩阵对应三项核心贡献：<strong>Hybrid Control</strong>（确定性 Triage 压缩输入空间）、<strong>Adversarial Evidence Gating</strong>（对抗式审查防止 LLM 编故事）、<strong>Fault Pattern Library</strong>（跨实验知识积累）。每条消融彼此独立，可逐一解释一个核心贡献是否有效。</p>
+
+  <h3>4.1 主消融矩阵（必做 · 直接支撑三大贡献）</h3>
   <table>
-    <thead><tr><th>实验</th><th>作用</th><th>验证对象</th></tr></thead>
+    <thead><tr><th>编号</th><th>名称</th><th>消融方式</th><th>验证的核心贡献</th></tr></thead>
     <tbody>
-      <tr><td>Abl-A</td><td>去掉 Triage，验证 Hybrid Control</td><td>Triage 的 context 压缩与 causal_order 价值</td></tr>
-      <tr><td>Abl-B</td><td>去掉 GATE，验证独立审查必要性</td><td>Adversarial Evidence Gating</td></tr>
-      <tr><td>Abl-C</td><td>去掉 FPL，验证知识积累收益</td><td>Fault Pattern Library</td></tr>
-      <tr><td>Sup-C</td><td>禁用 rehypothesize，验证纠错机制</td><td>初始假设偏差下的恢复能力</td></tr>
-      <tr><td>Sup-D</td><td>GATE 降级为单次 LLM call，验证主动调查贡献</td><td>GATE 的工具调用与循环价值</td></tr>
-      <tr><td>Sup-E</td><td>恢复 Evidence.strength 打分公式</td><td>v6 移除 strength 标签的必要性</td></tr>
-      <tr><td>Sup-F</td><td>禁用 hint 协议（GATE 不返回 hint）</td><td>hint 驱动 THINK 验证的贡献</td></tr>
-      <tr><td>Sup-G</td><td>GATE 降级为 v5 式纯规则节点</td><td>LLM 审查 vs 规则审查的差距</td></tr>
+      <tr><td><strong>Full</strong></td><td>完整系统</td><td>无消融</td><td>性能上限</td></tr>
+      <tr><td><strong>Abl-A</strong></td><td>无 Triage</td><td>去掉 Stage 1，全量指标直接输入 LLM</td><td><strong>Hybrid Control</strong>：Triage 的 context 压缩与 causal_order 价值</td></tr>
+      <tr><td><strong>Abl-B</strong></td><td>无 GATE</td><td>THINK conclude 后直接 FINALIZE，跳过审查</td><td><strong>Adversarial Evidence Gating</strong>：独立审查对诊断准确率的影响</td></tr>
+      <tr><td><strong>Abl-C</strong></td><td>无 FPL</td><td>pattern_match 恒为空，Reflect 不写回</td><td><strong>Fault Pattern Library</strong>：跨实验知识积累的效率增益</td></tr>
+      <tr><td><strong>BL-1</strong></td><td>单次 LLM（Phase 2 基线）</td><td>使用现有 Phase 2 baseline</td><td>Agent 整体框架 vs 单次 LLM 调用的价值</td></tr>
+      <tr><td><strong>BL-2</strong></td><td>纯统计规则</td><td>只保留 Triage + 规则匹配，无 LLM</td><td>LLM 推理在诊断链路中的必要性</td></tr>
     </tbody>
   </table>
-  <div class="contrib">Sup-D 是本版最关键的补充实验之一。它能直接回答：真正有效的是"独立审查者角色"，还是"GATE 拥有受限工具和循环后的主动调查能力"。</div>
-  <div class="info"><strong>GATE 决策质量评估：</strong>统计 True Pass / False Pass / False Reject，比较 GATE 放行后诊断正确率与 GATE 拦截后最终诊断正确率。</div>
-  <h3>4.1 跨模型评估</h3>
+  <div class="info">Abl-A / Abl-B / Abl-C 三条一一映射到论文 Ablation Study 的三个小节；BL-1 / BL-2 映射到 Baseline Comparison。</div>
+
+  <h3>4.2 深挖 GATE 机制（选做 · 回答"Adversarial GATE 为何有效"）</h3>
+  <p>以下三条补充实验专门针对 GATE 的三个关键设计选择，层层递进地拆解 GATE 贡献来源。</p>
+  <table>
+    <thead><tr><th>编号</th><th>名称</th><th>消融方式</th><th>回答的问题</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sup-D</strong></td><td>GATE 降级为单次 LLM call</td><td>GATE 无工具无循环，仅一次 LLM 审查</td><td>有效的是"审查者角色"还是"主动调查（工具+循环）"？</td></tr>
+      <tr><td><strong>Sup-F</strong></td><td>禁用 hint 协议</td><td>GATE 仅返回 pass/continue，不传 hint 给 THINK</td><td>hint 驱动定向补查 vs THINK 自主探索：效率差距多大？</td></tr>
+      <tr><td><strong>Sup-G</strong></td><td>GATE 降级为 v5 规则节点</td><td>用确定性 Python 规则替代 GATE LLM</td><td>LLM 审查 vs 规则审查：差距多大？规则在什么场景下失效？</td></tr>
+    </tbody>
+  </table>
+  <div class="contrib"><strong>Sup-D 是最关键的补充实验</strong>：将 GATE 的贡献拆分为"对抗角色贡献"与"主动调查贡献"，是论文中 Adversarial GATE 设计有效性的核心论据。</div>
+
+  <h3>4.3 GATE 决策质量评估</h3>
+  <p>需专门评估 GATE 自身决策可靠性——GATE 放行的结论和拦截的结论，各自最终诊断正确率如何。</p>
+  <table>
+    <thead><tr><th>指标</th><th>含义</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>True Pass Rate</td><td>GATE 放行且最终诊断正确</td><td>Pass 决策可靠性，越高越好</td></tr>
+      <tr><td>False Pass Rate</td><td>GATE 放行但最终诊断错误</td><td>越低越好；反映 GATE 失察</td></tr>
+      <tr><td>False Reject Rate</td><td>GATE 拦截但原始结论本来正确</td><td>GATE 误判成本；影响平均效率</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.4 跨模型评估</h3>
   <p>至少使用 3 个 LLM（DeepSeek-Chat、GPT-4o-mini、Qwen 系列）做全量评测，特别关注 THINK 和 GATE 使用同一模型 vs 不同模型时的诊断差异。</p>
 </section>
 
