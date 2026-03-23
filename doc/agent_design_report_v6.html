@@ -5,83 +5,79 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HPC-Diagnosis Agent v6 — 设计报告</title>
 <style>
-:root{--primary:#153b67;--accent:#1f7a8c;--bg:#f3f5f7;--card:#fff;--text:#243447;--code-bg:#17202a;--code-text:#d6e2f0;--border:#d9e0e7;--green:#1f8a70;--orange:#d97706;--red:#b91c1c;--teal:#0f766e}
+:root{--primary:#1a4c8b;--accent:#2e86de;--bg:#f4f6f9;--card:#fff;--text:#2c3e50;--code-bg:#1e1e2e;--code-text:#cdd6f4;--border:#dce1e7;--green:#059669;--purple:#7c3aed;--orange:#f97316;--yellow:#d97706}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Segoe UI",Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.72}
-nav{position:fixed;left:0;top:0;width:224px;height:100vh;background:var(--primary);overflow-y:auto;padding:0 0 24px;z-index:100}
+body{font-family:-apple-system,"Segoe UI",Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.75}
+nav{position:fixed;left:0;top:0;width:210px;height:100vh;background:var(--primary);overflow-y:auto;padding:0 0 24px;z-index:100}
 .nav-logo{color:#fff;font-size:13px;font-weight:700;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.4}
-.nav-logo span{display:block;font-weight:400;font-size:11px;opacity:.72;margin-top:4px}
+.nav-logo span{display:block;font-weight:400;font-size:11px;opacity:.7;margin-top:4px}
 nav ul{list-style:none;padding:8px 0}
-nav li a{display:block;color:rgba(255,255,255,.74);text-decoration:none;padding:7px 18px;font-size:12.5px;transition:all .18s}
+nav li a{display:block;color:rgba(255,255,255,.72);text-decoration:none;padding:7px 18px;font-size:12.5px;transition:all .18s}
 nav li a:hover{color:#fff;background:rgba(255,255,255,.1)}
-nav li.sub a{padding-left:30px;font-size:12px;color:rgba(255,255,255,.58)}
-main{margin-left:224px;min-height:100vh}
-.hero{background:linear-gradient(135deg,#153b67 0%,#1f7a8c 100%);color:#fff;padding:56px 52px 48px}
-.hero h1{font-size:28px;font-weight:700;margin-bottom:10px}
-.hero .sub{font-size:14px;opacity:.84;margin-bottom:20px}
-.badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;margin:0 6px 6px 0}
-section{padding:46px 52px;max-width:1040px}
+nav li.sub a{padding-left:30px;font-size:12px;color:rgba(255,255,255,.55)}
+main{margin-left:210px;min-height:100vh}
+.hero{background:linear-gradient(135deg,var(--primary) 0%,#1e6ec8 100%);color:#fff;padding:60px 52px 52px}
+.hero h1{font-size:26px;font-weight:700;margin-bottom:10px}
+.hero .sub{font-size:13.5px;opacity:.82;margin-bottom:22px}
+.badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 13px;font-size:12px;margin:0 6px 6px 0}
+section{padding:48px 52px;max-width:980px}
 section+section{border-top:1px solid var(--border)}
-h2{font-size:22px;color:var(--primary);margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
-h3{font-size:17px;color:#30475e;margin:24px 0 12px;font-weight:700}
-h4{font-size:14.5px;color:#4b5563;margin:18px 0 8px;font-weight:700}
+h2{font-size:21px;color:var(--primary);margin-bottom:22px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+h3{font-size:16.5px;color:#34495e;margin:26px 0 12px;font-weight:700}
+h4{font-size:14.5px;color:#555;margin:18px 0 9px;font-weight:700}
 p{margin-bottom:14px;font-size:14.5px}
 ul,ol{padding-left:22px;margin-bottom:14px;font-size:14.5px}
 li{margin-bottom:5px}
 table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px}
-thead th{background:var(--primary);color:#fff;padding:9px 14px;text-align:left}
+thead th{background:var(--primary);color:#fff;padding:9px 14px;text-align:left;font-weight:600}
 td{padding:9px 14px;border-bottom:1px solid var(--border)}
-tr:nth-child(even) td{background:#f8fafc}
-pre{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:16px 18px;overflow-x:auto;font-size:12.5px;line-height:1.64;margin:14px 0}
-code{font-family:Consolas,"JetBrains Mono",monospace}
+tr:nth-child(even) td{background:#f8f9fb}
+pre{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:18px 20px;overflow-x:auto;font-size:12.5px;line-height:1.65;margin:14px 0}
+code{font-family:"JetBrains Mono",Consolas,monospace}
 .info,.warn,.contrib{border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;font-size:14px}
-.info{border-left:4px solid var(--accent);background:#eef9fb}
-.warn{border-left:4px solid var(--orange);background:#fff7ed}
-.contrib{border-left:4px solid var(--green);background:#eefcf6}
+.info{border-left:4px solid var(--accent);background:#eef6ff}
+.warn{border-left:4px solid var(--orange);background:#fff8f0}
+.contrib{border-left:4px solid #27ae60;background:#f0fff4}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:16px 0}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .card h4{margin:0 0 8px;font-size:14px;color:var(--primary)}
-.svg-wrap{overflow-x:auto;margin:20px 0;border-radius:8px;border:1px solid var(--border);background:#fff}
-.kpi{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;color:#fff;margin:0 4px 4px 0}
-.k-green{background:#15803d}.k-teal{background:#0f766e}.k-red{background:#b91c1c}.k-orange{background:#d97706}
-@media (max-width: 900px){nav{position:sticky;top:0;width:100%;height:auto}main{margin-left:0}.hero{padding:34px 18px 28px}section{padding:28px 18px;max-width:100%}table{display:block;overflow-x:auto}}
+.svg-wrap{overflow-x:auto;margin:20px 0;border-radius:8px;border:1px solid var(--border)}
+@media (max-width: 900px){nav{position:sticky;top:0;left:auto;width:100%;height:auto;max-height:none;padding:0;overflow-y:visible}.nav-logo{padding:14px 16px 10px}nav ul{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;-webkit-overflow-scrolling:touch}nav li{flex:0 0 auto}nav li a{padding:6px 10px;font-size:12px;border-radius:999px;background:rgba(255,255,255,.08)}nav li.sub a{padding-left:10px;font-size:11.5px}main{margin-left:0}.hero{padding:34px 18px 28px}.hero h1{font-size:20px}section{padding:28px 18px;max-width:100%}h2{font-size:18px}h3{font-size:15.5px}p,ul,ol{font-size:14px}table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}thead th,td{white-space:nowrap}pre{padding:14px 14px}.grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
 </style>
 </head>
 <body>
 <nav>
-  <div class="nav-logo">HPC-Diagnosis Agent v6<span>设计报告 · 2026-03-23</span></div>
+  <div class="nav-logo">HPC-Diagnosis<br>Agent v6<span>设计报告 · 2026-03-23</span></div>
   <ul>
-    <li><a href="#s1">1. 项目定位</a></li>
-    <li><a href="#s2">2. 总体架构</a></li>
-    <li><a href="#s3">3. Triage 设计</a></li>
-    <li><a href="#s4">4. Diagnosis Agent</a></li>
-    <li class="sub"><a href="#s41">4.1 主 Agent</a></li>
-    <li class="sub"><a href="#s42">4.2 GATE Sub-Agent</a></li>
-    <li class="sub"><a href="#s43">4.3 交互协议</a></li>
-    <li><a href="#s5">5. Knowledge Base</a></li>
-    <li><a href="#s6">6. Evidence Gating</a></li>
-    <li><a href="#s7">7. Reflect</a></li>
-    <li><a href="#s8">8. 评估与消融</a></li>
-    <li><a href="#s9">9. 实现路线</a></li>
+    <li><a href="#s1">1. 项目背景</a></li>
+    <li><a href="#s2">2. 系统总览</a></li>
+    <li><a href="#s3">3. 设计展开</a></li>
+    <li class="sub"><a href="#s31">3.1 Triage Stage</a></li>
+    <li class="sub"><a href="#s32">3.2 Diagnosis Agent</a></li>
+    <li class="sub"><a href="#s33">3.3 GATE Sub-Agent</a></li>
+    <li class="sub"><a href="#s34">3.4 Evidence Gating</a></li>
+    <li class="sub"><a href="#s35">3.5 Reflect 与 FPL</a></li>
+    <li><a href="#s4">4. 评估与消融</a></li>
+    <li><a href="#s5">5. 实现路线</a></li>
   </ul>
 </nav>
 <main>
 <div class="hero">
   <h1>HPC-Diagnosis Agent v6 — 完整设计报告</h1>
-  <div class="sub">从规则 Gate 升级为 Adversarial Sub-Agent 的完整设计稿，面向 SC'26 论文与工程实现</div>
+  <div class="sub">基于 LLM Agent 的 HPC 系统异常诊断工具 · 版本 v6 · 面向 SC'26 的完整设计方案</div>
   <div>
     <span class="badge">框架: LangGraph</span>
-    <span class="badge">核心升级: GATE Sub-Agent</span>
-    <span class="badge">论文 Claim: 零人工阈值</span>
-    <span class="badge">数据: formaltest + compositetest_backup</span>
+    <span class="badge">核心机制: Adversarial Evidence Gating</span>
+    <span class="badge">数据: 29 个 formaltest 实验</span>
+    <span class="badge">目标: SC'26</span>
   </div>
 </div>
 
 <section id="s1">
-  <h2>1. 项目定位</h2>
-  <p>v6 的核心目标是把 Evidence Gating 从人工规则工程升级为双角色 LLM 对抗审查机制。主诊断者 THINK 负责提出和推进结论，GATE Sub-Agent 负责独立找漏洞，从而更好支撑“完全自主的 HPC 故障诊断 Agent 框架”这一论文定位。</p>
+  <h2>1. 项目背景</h2>
+  <p>HPC 集群故障诊断的核心难点在于：指标维度高、异常传播具有时序链条、复合故障比例高，而且仅靠单次 LLM 调用容易出现“证据不足但仍然强行归因”的问题。当前方案在保持两阶段结构清晰的前提下，引入独立的审查者角色，使系统既能自主推理，也能主动质疑自己的结论。</p>
   <div class="contrib">
-    <strong>核心 Claim</strong><br>
+    <strong>系统定位</strong><br>
     完全自主的 HPC 故障诊断 Agent 框架：零人工阈值、零标注数据、从原始指标到根因报告全程 LLM 驱动。
   </div>
   <div class="grid">
@@ -93,7 +89,7 @@ code{font-family:Consolas,"JetBrains Mono",monospace}
 </section>
 
 <section id="s2">
-  <h2>2. 总体架构</h2>
+  <h2>2. 系统总览</h2>
   <div class="svg-wrap">
     <pre>输入 metrics.csv + jobinfo.csv
         │
@@ -135,11 +131,24 @@ Stage 2: Diagnosis Agent
       <tr><td>Reflect</td><td>LLM + schema gate</td><td>将成功诊断提炼为 FPL 规则</td></tr>
     </tbody>
   </table>
-  <div class="info">v6 与 v5 的最大差异不在于增加更多工具，而在于把“最终裁决”从外部人工规则中移除，转为受控的 LLM 审查行为。</div>
+  <h3>2.1 与 STELLAR (SC'25) 的对比定位</h3>
+  <table>
+    <thead><tr><th>维度</th><th>STELLAR (SC'25)</th><th>本系统</th></tr></thead>
+    <tbody>
+      <tr><td>应用目标</td><td>I/O 参数自动调优</td><td>故障根因诊断 + 解决建议</td></tr>
+      <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + 双角色 Agent</td></tr>
+      <tr><td>证据验证</td><td>无独立证据审查</td><td><strong>Adversarial Evidence Gating</strong></td></tr>
+      <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障</td></tr>
+      <tr><td>知识库</td><td>RAG 文档片段</td><td><strong>结构化 FPL</strong>（状态、版本、来源追踪）</td></tr>
+    </tbody>
+  </table>
+  <div class="info">本版的关键设计是将 GATE 设为具备独立审查职责的 Sub-Agent。系统不再依赖人工写死的通过阈值，而由对抗式审查过程决定结论能否放行。</div>
 </section>
 
 <section id="s3">
-  <h2>3. Triage 设计</h2>
+  <h2>3. 设计展开</h2>
+  <p>以下各节对应当前设计稿中的核心模块：Triage 负责压缩输入空间，Diagnosis Agent 负责提出和推进假设，GATE Sub-Agent 负责独立审查，Reflect 负责将成功经验写回 Fault Pattern Library。</p>
+  <h3 id="s31">3.1 Triage Stage</h3>
   <p>Triage 继续保持 v5 的三步设计，不消耗 LLM token，但为后续主 Agent 和 GATE 提供结构化起点。</p>
   <table>
     <thead><tr><th>步骤</th><th>内容</th><th>产物</th></tr></thead>
@@ -150,12 +159,19 @@ Stage 2: Diagnosis Agent
     </tbody>
   </table>
   <div class="warn">Triage 不是最终诊断器。它只负责压缩搜索空间，不能替代 THINK 或 GATE 的因果判断。</div>
-</section>
 
-<section id="s4">
-  <h2>4. Diagnosis Agent</h2>
-  <h3 id="s41">4.1 主 Agent</h3>
+  <h3 id="s32">3.2 Diagnosis Agent</h3>
   <p>主 Agent 负责提出诊断假设并逐步收集证据。它的核心状态包括 hypotheses、evidence、react_trace、budget 与 gate_hint。主 Agent 可以使用三个工具：MetricQueryTool、KBRetrievalTool、DataAnalysisTool。</p>
+  <table>
+    <thead><tr><th>状态字段</th><th>类型</th><th>作用</th></tr></thead>
+    <tbody>
+      <tr><td>hypotheses</td><td>list[Hypothesis]</td><td>显式维护多个候选根因及其状态</td></tr>
+      <tr><td>evidence</td><td>list[Evidence]</td><td>主 Agent 收集的支持/反驳/中性证据</td></tr>
+      <tr><td>react_trace</td><td>list[ReActStep]</td><td>THINK/ACT/OBSERVE 的可审计轨迹</td></tr>
+      <tr><td>gate_hint</td><td>str | null</td><td>GATE 回传的下一步验证问题</td></tr>
+      <tr><td>budget</td><td>dict</td><td>主 Agent 的工具调用与 token 消耗</td></tr>
+    </tbody>
+  </table>
   <div class="grid">
     <div class="card"><h4>HYPOTHESIZE</h4><p>输入 FocusContext 和 FPL 先验，生成 2–4 个候选假设。</p></div>
     <div class="card"><h4>THINK</h4><p>根据当前证据空白与 gate_hint 决定下一步是补查还是 conclude。</p></div>
@@ -172,10 +188,69 @@ Stage 2: Diagnosis Agent
   }
 }</pre>
 
-  <h3 id="s42">4.2 GATE Sub-Agent</h3>
-  <p>GATE 是 v6 的关键升级：它是一个具备有限 ReAct 循环和受限工具集的 Adversarial Sub-Agent，而不是纯 Python 规则节点。</p>
+  <h3 id="s33">3.3 GATE Sub-Agent</h3>
+  <p>GATE 是一个具备有限 ReAct 循环和受限工具集的 Adversarial Sub-Agent，而不是纯规则节点。它不负责生成诊断，只负责从反方视角寻找漏洞、补查关键空白，并决定是否允许结论进入 FINALIZE。</p>
+  <div class="svg-wrap">
+    <svg width="700" height="330" viewBox="0 0 700 330" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block;background:#f8fafc">
+      <defs>
+        <marker id="v6arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+        </marker>
+        <marker id="v6purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/>
+        </marker>
+        <marker id="v6green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L10 5 L0 10 z" fill="#059669"/>
+        </marker>
+      </defs>
+      <rect x="20" y="18" width="150" height="34" rx="6" fill="#7c3aed"/>
+      <text x="95" y="39" text-anchor="middle" fill="white" font-size="12" font-weight="700">THINK conclude</text>
+      <line x1="170" y1="35" x2="220" y2="35" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#v6purple)"/>
+
+      <rect x="220" y="18" width="180" height="40" rx="6" fill="#4c1d95"/>
+      <text x="310" y="38" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_THINK</text>
+      <text x="310" y="52" text-anchor="middle" fill="white" font-size="9.5">先做零工具逻辑审查</text>
+
+      <line x1="400" y1="38" x2="455" y2="38" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
+      <rect x="455" y="18" width="120" height="40" rx="6" fill="#f97316"/>
+      <text x="515" y="37" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_ACT</text>
+      <text x="515" y="51" text-anchor="middle" fill="white" font-size="9.5">受限工具调用</text>
+
+      <line x1="515" y1="58" x2="515" y2="96" stroke="#64748b" stroke-width="1.5" marker-end="url(#v6arr)"/>
+      <rect x="445" y="96" width="140" height="40" rx="6" fill="#f97316"/>
+      <text x="515" y="116" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_OBSERVE</text>
+      <text x="515" y="130" text-anchor="middle" fill="white" font-size="9.5">生成 gate_evidence</text>
+
+      <path d="M445 116 Q340 170 260 76" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#v6purple)"/>
+      <text x="360" y="148" text-anchor="middle" fill="#6d28d9" font-size="9.5">必要时回到 GATE_THINK</text>
+
+      <rect x="40" y="180" width="120" height="34" rx="6" fill="#059669"/>
+      <text x="100" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">pass</text>
+      <rect x="190" y="180" width="140" height="34" rx="6" fill="#d97706"/>
+      <text x="260" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">continue + hint</text>
+      <rect x="370" y="180" width="150" height="34" rx="6" fill="#dc2626"/>
+      <text x="445" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">rehypothesize</text>
+      <rect x="550" y="180" width="110" height="34" rx="6" fill="#64748b"/>
+      <text x="605" y="202" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">degrade</text>
+
+      <line x1="310" y1="58" x2="100" y2="180" stroke="#059669" stroke-width="1.3" marker-end="url(#v6green)"/>
+      <line x1="310" y1="58" x2="260" y2="180" stroke="#d97706" stroke-width="1.3" marker-end="url(#v6arr)"/>
+      <line x1="310" y1="58" x2="445" y2="180" stroke="#dc2626" stroke-width="1.3" marker-end="url(#v6arr)"/>
+      <line x1="310" y1="58" x2="605" y2="180" stroke="#64748b" stroke-width="1.3" marker-end="url(#v6arr)"/>
+
+      <text x="90" y="244" text-anchor="middle" fill="#475569" font-size="10">→ FINALIZE</text>
+      <text x="260" y="244" text-anchor="middle" fill="#475569" font-size="10">→ THINK</text>
+      <text x="445" y="244" text-anchor="middle" fill="#475569" font-size="10">→ HYPOTHESIZE</text>
+      <text x="605" y="244" text-anchor="middle" fill="#475569" font-size="10">→ FINALIZE</text>
+
+      <text x="24" y="286" fill="#475569" font-size="10.5" font-weight="700">设计要点</text>
+      <text x="24" y="304" fill="#475569" font-size="10.5">1. 先逻辑审查，后决定是否需要工具</text>
+      <text x="250" y="304" fill="#475569" font-size="10.5">2. GATE 有独立 budget，不与 THINK 共享</text>
+      <text x="24" y="320" fill="#475569" font-size="10.5">3. continue 只返回下一步问题，不直接替 THINK 下结论</text>
+    </svg>
+  </div>
   <table>
-    <thead><tr><th>设计项</th><th>v6 方案</th></tr></thead>
+    <thead><tr><th>设计项</th><th>当前方案</th></tr></thead>
     <tbody>
       <tr><td>角色</td><td>证据审查员，目标是寻找漏洞而不是生成诊断</td></tr>
       <tr><td>可见信息</td><td>focus_context, hypotheses, evidence；不可见 THINK 的 thought</td></tr>
@@ -191,9 +266,17 @@ Stage 2: Diagnosis Agent
 3. 替代解释未排除时不得放行
 4. 必须返回结构化 decision
 5. 只有逻辑上无法裁决时才允许工具调用</pre>
+  <table>
+    <thead><tr><th>字段</th><th>约束</th><th>设计意图</th></tr></thead>
+    <tbody>
+      <tr><td>gate_evidence</td><td>独立于主 evidence 列表</td><td>避免角色混淆，保留审计边界</td></tr>
+      <tr><td>gate_hint</td><td>仅在 continue 时非空</td><td>用“问题”驱动 THINK，而不是直接给答案</td></tr>
+      <tr><td>gate_budget</td><td>默认 3 次工具调用，2 轮循环</td><td>避免 GATE 退化成第二个 diagnosis agent</td></tr>
+    </tbody>
+  </table>
 
-  <h3 id="s43">4.3 THINK-GATE 交互协议</h3>
-  <p>v6 采用方案 C：GATE 不直接把自身查到的结果并入主 evidence，而是以 gate_hint 形式告诉 THINK 下一步需要验证什么。</p>
+  <h3 id="s34">3.4 Evidence Gating</h3>
+  <p>系统采用方案 C：GATE 不直接把自身查到的结果并入主 evidence，而是以 gate_hint 形式告诉 THINK 下一步需要验证什么。这样既保留角色边界，也避免 THINK 重复摸索同一个漏洞。</p>
   <table>
     <thead><tr><th>GATE 输出</th><th>系统行为</th></tr></thead>
     <tbody>
@@ -203,25 +286,48 @@ Stage 2: Diagnosis Agent
       <tr><td>degrade</td><td>进入 FINALIZE，输出 partial 或 inconclusive 报告</td></tr>
     </tbody>
   </table>
-  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>
-</section>
-
-<section id="s5">
-  <h2>5. Knowledge Base</h2>
-  <p>知识库仍维持两层结构：Metric KB 和 Fault Pattern Library。</p>
   <table>
-    <thead><tr><th>层次</th><th>内容</th><th>v6 角色</th></tr></thead>
+    <thead><tr><th>原理</th><th>含义</th><th>设计意图</th></tr></thead>
+    <tbody>
+      <tr><td><strong>证据独立性</strong></td><td>同一现象不能被包装成多条独立支持证据</td><td>防止模型“堆叠措辞”替代真实验证</td></tr>
+      <tr><td><strong>反驳优先</strong></td><td>一条强反驳可阻止通过</td><td>把审查重点放在漏洞而非支持分数累加</td></tr>
+      <tr><td><strong>复合故障甄别</strong></td><td>区分独立根因与继发症状链</td><td>避免把下游效应误判为第二根因</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>
+  <h3 id="s35">3.5 Reflect 与 FPL</h3>
+  <p>Reflect 负责把成功诊断提炼为 FPL 规则，形成跨实验的知识积累闭环；知识库仍维持两层结构：Metric KB 和 Fault Pattern Library。</p>
+  <table>
+    <thead><tr><th>层次</th><th>内容</th><th>作用</th></tr></thead>
     <tbody>
       <tr><td>Metric KB</td><td>指标语义、normal_range、strength_thresholds、downstream_effects</td><td>为 HYPOTHESIZE 和 GATE 提供领域参考</td></tr>
       <tr><td>FPL</td><td>结构化故障模式</td><td>冷启动后逐步提高诊断效率</td></tr>
     </tbody>
   </table>
-  <div class="info">strength_thresholds 在 v6 中降级为参考文档，不再由 OBSERVE 确定性打标。GATE 会把它当作语义背景，而不是硬性裁决条件。</div>
+  <h4>Reflect 触发前置条件</h4>
+  <table>
+    <thead><tr><th>diagnosis_type</th><th>Reflect 策略</th></tr></thead>
+    <tbody>
+      <tr><td>single_fault / composite_fault</td><td>完整触发，提炼所有 confirmed 假设</td></tr>
+      <tr><td>partial</td><td>部分触发，只提炼 confirmed 假设，并标记 incomplete</td></tr>
+      <tr><td>inconclusive</td><td>跳过，避免写入噪声规则</td></tr>
+    </tbody>
+  </table>
+  <h4>FPL 冷启动行为</h4>
+  <table>
+    <thead><tr><th>字段</th><th>有 FPL 时</th><th>FPL 为空时</th></tr></thead>
+    <tbody>
+      <tr><td>prior_confidence</td><td>使用 pattern hit 的 confidence</td><td>默认 0.30</td></tr>
+      <tr><td>required_verifications</td><td>有结构化验证路线图</td><td>由 THINK 自主探索</td></tr>
+      <tr><td>诊断效率</td><td>轮次更少，验证路径更明确</td><td>通常会多 2–4 轮迭代</td></tr>
+    </tbody>
+  </table>
+  <div class="info">Metric KB 中的 strength_thresholds 仅作为语义参考，OBSERVE 不再确定性打标签；最终证据质量由 GATE 在审查过程中综合判断。</div>
 </section>
 
-<section id="s6">
-  <h2>6. Evidence Gating</h2>
-  <p>Evidence Gating 仍遵循三条原则，但实现从规则函数转为受控 LLM 审查。</p>
+<section id="s4">
+  <h2>4. 评估与消融</h2>
+  <p>评估重点除了准确率与成本，还要回答 GATE Sub-Agent 是否值得其额外复杂度，因此消融实验必须覆盖“无 GATE”和“单次审查 GATE”两个对照。</p>
   <div class="grid">
     <div class="card"><h4>证据独立性</h4><p>防止同一现象被重复包装成多条支持证据。</p></div>
     <div class="card"><h4>反驳优先</h4><p>一条强反驳可阻止通过，即使支持性证据很多。</p></div>
@@ -231,51 +337,33 @@ Stage 2: Diagnosis Agent
 Stage A: 单假设是否已排除替代解释？
 Stage B: 多假设是独立根因还是因果链？
 Stage C: 应输出 pass / continue / rehypothesize / degrade？</pre>
-  <p>v6 的关键不在于取消数字，而在于取消“外部工程师手写 pass 条件”。raw_stats、strength_thresholds 和 downstream_effects 仍然存在，但它们服务于 GATE 的审查思考，而非直接决定结果。</p>
-</section>
-
-<section id="s7">
-  <h2>7. Reflect</h2>
-  <p>Reflect 延续 v5 设计，只在存在可信 confirmed 根因时触发。它将成功诊断提炼为 FPL 规则，实现无监督知识积累。</p>
   <table>
-    <thead><tr><th>diagnosis_type</th><th>Reflect 策略</th></tr></thead>
+    <thead><tr><th>实验</th><th>作用</th><th>验证对象</th></tr></thead>
     <tbody>
-      <tr><td>single_fault / composite_fault</td><td>完整提炼</td></tr>
-      <tr><td>partial</td><td>仅提炼 confirmed 假设，标记 incomplete</td></tr>
-      <tr><td>inconclusive</td><td>跳过</td></tr>
+      <tr><td>Abl-A</td><td>去掉 Triage，验证 Hybrid Control</td><td>Triage 的 context 压缩与 causal_order 价值</td></tr>
+      <tr><td>Abl-B</td><td>去掉 GATE，验证独立审查必要性</td><td>Adversarial Evidence Gating</td></tr>
+      <tr><td>Abl-C</td><td>去掉 FPL，验证知识积累收益</td><td>Fault Pattern Library</td></tr>
+      <tr><td>Sup-C</td><td>禁用 rehypothesize，验证纠错机制</td><td>初始假设偏差下的恢复能力</td></tr>
+      <tr><td>Sup-D</td><td>GATE 降级为单次 LLM call，验证主动调查贡献</td><td>GATE 的工具调用与循环价值</td></tr>
     </tbody>
   </table>
+  <div class="contrib">Sup-D 是本版最关键的补充实验之一。它能直接回答：真正有效的是“独立审查者角色”，还是“GATE 拥有受限工具和循环后的主动调查能力”。</div>
 </section>
 
-<section id="s8">
-  <h2>8. 评估与消融</h2>
-  <p>v6 的实验重点除了准确率和开销，还应特别回答 GATE Sub-Agent 是否真的值得其额外复杂度。</p>
-  <table>
-    <thead><tr><th>实验</th><th>含义</th></tr></thead>
-    <tbody>
-      <tr><td>Abl-A</td><td>去掉 Triage，验证 Hybrid Control 价值</td></tr>
-      <tr><td>Abl-B</td><td>去掉 GATE，验证独立审查必要性</td></tr>
-      <tr><td>Abl-C</td><td>去掉 FPL，验证知识积累收益</td></tr>
-      <tr><td>Sup-C</td><td>去掉 rehypothesize，验证纠错能力</td></tr>
-      <tr><td>Sup-D</td><td>GATE 降级为单次 LLM call，验证主动调查能力</td></tr>
-    </tbody>
-  </table>
-  <div class="contrib">Sup-D 是 v6 特有的重要补充。它能直接回答：真正有价值的是“独立审查这个角色”，还是“GATE 拥有工具和循环的主动调查能力”。</div>
-</section>
-
-<section id="s9">
-  <h2>9. 实现路线</h2>
+<section id="s5">
+  <h2>5. 实现路线</h2>
+  <p>工程实现建议沿着“先主图、再最小 GATE、最后完整 GATE Sub-Agent”的顺序推进，使控制流、消融边界和代码演进保持一致。</p>
   <table>
     <thead><tr><th>阶段</th><th>内容</th><th>关键文件</th></tr></thead>
     <tbody>
       <tr><td>Phase B</td><td>Triage 三步实现</td><td>agent/triage.py</td></tr>
       <tr><td>Phase C-1</td><td>Main Agent 最小可运行图</td><td>agent/diagnosis.py</td></tr>
-      <tr><td>Phase C-2</td><td>最小 GATE（单轮零工具）</td><td>agent/gate.py</td></tr>
+      <tr><td>Phase C-2</td><td>最小 GATE（单轮、零工具）</td><td>agent/gate.py</td></tr>
       <tr><td>Phase C-3</td><td>完整 GATE Sub-Agent + hint 协议</td><td>agent/gate.py, agent/state.py</td></tr>
       <tr><td>Phase D</td><td>Reflect + 评估框架</td><td>agent/reflect.py, eval/evaluate.py</td></tr>
     </tbody>
   </table>
-  <p>推荐先让主 Agent 路由稳定，再引入最小 GATE 验证交互协议，最后扩展到带工具调用的完整 Sub-Agent。这样实现路径与论文叙事一致，也更容易做消融。</p>
+  <div class="contrib">推荐先让主 Agent 路由稳定，再引入最小 GATE 验证交互协议，最后扩展到带工具调用的完整 Sub-Agent。这样实现路径与论文叙事一致，也更容易做消融。</div>
 </section>
 
 </main>
