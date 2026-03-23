@@ -121,4 +121,26 @@ Phase 3: Agent 升级 — **设计阶段**
 ### Phase D: Reflect & 评估
 - [ ] REFLECT 节点 (无监督规则提炼 + FPL 写回)
 - [ ] 评估框架 (GT 比对，独立于 Reflect)
-- [ ] 消融实验矩阵 (4 ablation + 2 baseline)
+- [ ] 消融实验矩阵 (4 ablation + 2 baseline + 7 supplementary)
+
+## 2026-03-23: v6 设计文档全面审阅与完善
+- 完成: SC26 评审（学术视角）+ 设计专家（技术视角）双重审阅，整合意见后完成 17 项修改
+- 核心修改:
+  1. **Claim 精确化**："零人工阈值" → "诊断结论零硬编码阈值"，区分信号抽取层与裁决层
+  2. **Schema 补全**：定义 `current_confidence` 更新机制（THINK 每轮报告 + GATE 校准）
+  3. **状态机补全**：新增 budget exhaustion 路由 + GATE budget 耗尽默认决策 + gate_hint 历史策略
+  4. **消融矩阵扩展**：新增 Sup-E/F/G（恢复 strength / 禁用 hint / GATE 降级为规则）
+  5. **失败处理补全**：新增 6 种遗漏场景（LLM API 故障、0 假设、0 异常等）
+  6. **工具契约精确化**：补充 MetricQueryTool/KBRetrievalTool/DataAnalysisTool 参数规格
+  7. **FPL Schema 补全**：新增 composite_discrimination 字段 + deprecated 可复活
+  8. **评估方案增强**：新增 GATE 决策质量指标 + §8.4 跨模型评估
+  9. **STELLAR 对比修正**：更公正描述参考工作的知识积累机制
+  10. **术语约定**：causal_order 明确为 temporal ordering as causal prior
+- 产出:
+  - `design/v6.md`（17 项修改）
+  - `doc/agent_design_report_v6.html`（7 项同步更新）
+  - `design/changelog.md`（新增 v6 条目，10 项变更记录）
+- 遗留（待 Phase C 实现时处理）:
+  - `agent/schema.py` 需适配 v6 变更（删 strength、新增 GateEvidence 等）
+  - `design/evidence_gating.md` 需标记为 superseded by v6
+- 下一步: Phase B Triage 实现 → Phase C 按 v6 拆分实现

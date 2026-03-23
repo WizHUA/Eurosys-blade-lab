@@ -78,7 +78,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <p>HPC 集群故障诊断的核心难点在于：指标维度高、异常传播具有时序链条、复合故障比例高，而且仅靠单次 LLM 调用容易出现“证据不足但仍然强行归因”的问题。当前方案在保持两阶段结构清晰的前提下，引入独立的审查者角色，使系统既能自主推理，也能主动质疑自己的结论。</p>
   <div class="contrib">
     <strong>系统定位</strong><br>
-    完全自主的 HPC 故障诊断 Agent 框架：零人工阈值、零标注数据、从原始指标到根因报告全程 LLM 驱动。
+    完全自主的 HPC 故障诊断 Agent 框架：诊断结论零硬编码阈值、零标注数据、从原始指标到根因报告全程 LLM 驱动。
   </div>
   <div class="grid">
     <div class="card"><h4>Hybrid Control</h4><p>Triage 保留确定性压缩能力，Diagnosis 保留 LLM 推理弹性。</p></div>
@@ -139,10 +139,10 @@ Stage 2: Diagnosis Agent
       <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + 双角色 Agent</td></tr>
       <tr><td>证据验证</td><td>无独立证据审查</td><td><strong>Adversarial Evidence Gating</strong></td></tr>
       <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障</td></tr>
-      <tr><td>知识库</td><td>RAG 文档片段</td><td><strong>结构化 FPL</strong>（状态、版本、来源追踪）</td></tr>
+      <tr><td>知识库</td><td>RAG 文档检索 + Rule Set 积累</td><td><strong>结构化 FPL</strong>（状态、版本、来源追踪）</td></tr>
     </tbody>
   </table>
-  <div class="info">本版的关键设计是将 GATE 设为具备独立审查职责的 Sub-Agent。系统不再依赖人工写死的通过阈值，而由对抗式审查过程决定结论能否放行。</div>
+  <div class="info">本版的关键设计是将 GATE 设为具备独立审查职责的 Sub-Agent。诊断结论零硬编码阈值，由对抗式审查过程决定结论能否放行。</div>
 </section>
 
 <section id="s3">
@@ -172,6 +172,7 @@ Stage 2: Diagnosis Agent
       <tr><td>budget</td><td>dict</td><td>主 Agent 的工具调用与 token 消耗</td></tr>
     </tbody>
   </table>
+  <div class="info"><strong>confidence 更新：</strong>v6 不再依赖 Evidence.strength 打分公式。THINK 每轮在 thought 输出中报告各假设的 confidence 估计值；GATE 若发现 confidence 与证据不符，在 hint 中指出。confidence 不允许在无新证据的情况下上升。</div>
   <div class="grid">
     <div class="card"><h4>HYPOTHESIZE</h4><p>输入 FocusContext 和 FPL 先验，生成 2–4 个候选假设。</p></div>
     <div class="card"><h4>THINK</h4><p>根据当前证据空白与 gate_hint 决定下一步是补查还是 conclude。</p></div>
@@ -274,6 +275,8 @@ Stage 2: Diagnosis Agent
       <tr><td>gate_budget</td><td>默认 3 次工具调用，2 轮循环</td><td>避免 GATE 退化成第二个 diagnosis agent</td></tr>
     </tbody>
   </table>
+  <div class="warn"><strong>GATE Budget 耗尽默认决策：</strong>若已发现强反驳证据 → continue；若未发现 → pass（审查者穷尽资源仍未推翻→默认放行）；若假设空间整体失效 → degrade。</div>
+  <div class="info"><strong>hint 历史策略：</strong>GATE 只能看到最近一次 gate_hint，历史 hint 完整记录在 gate_trace 中供审计。</div>
 
   <h3 id="s34">3.4 Evidence Gating</h3>
   <p>系统采用方案 C：GATE 不直接把自身查到的结果并入主 evidence，而是以 gate_hint 形式告诉 THINK 下一步需要验证什么。这样既保留角色边界，也避免 THINK 重复摸索同一个漏洞。</p>
@@ -294,8 +297,7 @@ Stage 2: Diagnosis Agent
       <tr><td><strong>复合故障甄别</strong></td><td>区分独立根因与继发症状链</td><td>避免把下游效应误判为第二根因</td></tr>
     </tbody>
   </table>
-  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>
-  <h3 id="s35">3.5 Reflect 与 FPL</h3>
+  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>  <div class="warn"><strong>"诊断结论零硬编码阈值"的精确含义：</strong>Triage 中的 Z-score 阈值、Top-K 等属于信号抽取层的统计超参数，不决定诊断结论。诊断裁决层不存在"满足 X 条件即通过"的人工规则，由 GATE LLM 根据证据上下文自主判断。</div>  <h3 id="s35">3.5 Reflect 与 FPL</h3>
   <p>Reflect 负责把成功诊断提炼为 FPL 规则，形成跨实验的知识积累闭环；知识库仍维持两层结构：Metric KB 和 Fault Pattern Library。</p>
   <table>
     <thead><tr><th>层次</th><th>内容</th><th>作用</th></tr></thead>
@@ -345,9 +347,15 @@ Stage C: 应输出 pass / continue / rehypothesize / degrade？</pre>
       <tr><td>Abl-C</td><td>去掉 FPL，验证知识积累收益</td><td>Fault Pattern Library</td></tr>
       <tr><td>Sup-C</td><td>禁用 rehypothesize，验证纠错机制</td><td>初始假设偏差下的恢复能力</td></tr>
       <tr><td>Sup-D</td><td>GATE 降级为单次 LLM call，验证主动调查贡献</td><td>GATE 的工具调用与循环价值</td></tr>
+      <tr><td>Sup-E</td><td>恢复 Evidence.strength 打分公式</td><td>v6 移除 strength 标签的必要性</td></tr>
+      <tr><td>Sup-F</td><td>禁用 hint 协议（GATE 不返回 hint）</td><td>hint 驱动 THINK 验证的贡献</td></tr>
+      <tr><td>Sup-G</td><td>GATE 降级为 v5 式纯规则节点</td><td>LLM 审查 vs 规则审查的差距</td></tr>
     </tbody>
   </table>
-  <div class="contrib">Sup-D 是本版最关键的补充实验之一。它能直接回答：真正有效的是“独立审查者角色”，还是“GATE 拥有受限工具和循环后的主动调查能力”。</div>
+  <div class="contrib">Sup-D 是本版最关键的补充实验之一。它能直接回答：真正有效的是"独立审查者角色"，还是"GATE 拥有受限工具和循环后的主动调查能力"。</div>
+  <div class="info"><strong>GATE 决策质量评估：</strong>统计 True Pass / False Pass / False Reject，比较 GATE 放行后诊断正确率与 GATE 拦截后最终诊断正确率。</div>
+  <h3>4.1 跨模型评估</h3>
+  <p>至少使用 3 个 LLM（DeepSeek-Chat、GPT-4o-mini、Qwen 系列）做全量评测，特别关注 THINK 和 GATE 使用同一模型 vs 不同模型时的诊断差异。</p>
 </section>
 
 <section id="s5">
