@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPC-Diagnosis Agent v6 — 设计报告</title>
+<style>
+:root{--primary:#153b67;--accent:#1f7a8c;--bg:#f3f5f7;--card:#fff;--text:#243447;--code-bg:#17202a;--code-text:#d6e2f0;--border:#d9e0e7;--green:#1f8a70;--orange:#d97706;--red:#b91c1c;--teal:#0f766e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.72}
+nav{position:fixed;left:0;top:0;width:224px;height:100vh;background:var(--primary);overflow-y:auto;padding:0 0 24px;z-index:100}
+.nav-logo{color:#fff;font-size:13px;font-weight:700;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.15);line-height:1.4}
+.nav-logo span{display:block;font-weight:400;font-size:11px;opacity:.72;margin-top:4px}
+nav ul{list-style:none;padding:8px 0}
+nav li a{display:block;color:rgba(255,255,255,.74);text-decoration:none;padding:7px 18px;font-size:12.5px;transition:all .18s}
+nav li a:hover{color:#fff;background:rgba(255,255,255,.1)}
+nav li.sub a{padding-left:30px;font-size:12px;color:rgba(255,255,255,.58)}
+main{margin-left:224px;min-height:100vh}
+.hero{background:linear-gradient(135deg,#153b67 0%,#1f7a8c 100%);color:#fff;padding:56px 52px 48px}
+.hero h1{font-size:28px;font-weight:700;margin-bottom:10px}
+.hero .sub{font-size:14px;opacity:.84;margin-bottom:20px}
+.badge{display:inline-block;background:rgba(255,255,255,.18);border-radius:20px;padding:4px 12px;font-size:12px;margin:0 6px 6px 0}
+section{padding:46px 52px;max-width:1040px}
+section+section{border-top:1px solid var(--border)}
+h2{font-size:22px;color:var(--primary);margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+h3{font-size:17px;color:#30475e;margin:24px 0 12px;font-weight:700}
+h4{font-size:14.5px;color:#4b5563;margin:18px 0 8px;font-weight:700}
+p{margin-bottom:14px;font-size:14.5px}
+ul,ol{padding-left:22px;margin-bottom:14px;font-size:14.5px}
+li{margin-bottom:5px}
+table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px}
+thead th{background:var(--primary);color:#fff;padding:9px 14px;text-align:left}
+td{padding:9px 14px;border-bottom:1px solid var(--border)}
+tr:nth-child(even) td{background:#f8fafc}
+pre{background:var(--code-bg);color:var(--code-text);border-radius:8px;padding:16px 18px;overflow-x:auto;font-size:12.5px;line-height:1.64;margin:14px 0}
+code{font-family:Consolas,"JetBrains Mono",monospace}
+.info,.warn,.contrib{border-radius:0 8px 8px 0;padding:13px 16px;margin:16px 0;font-size:14px}
+.info{border-left:4px solid var(--accent);background:#eef9fb}
+.warn{border-left:4px solid var(--orange);background:#fff7ed}
+.contrib{border-left:4px solid var(--green);background:#eefcf6}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:16px 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card h4{margin:0 0 8px;font-size:14px;color:var(--primary)}
+.svg-wrap{overflow-x:auto;margin:20px 0;border-radius:8px;border:1px solid var(--border);background:#fff}
+.kpi{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;color:#fff;margin:0 4px 4px 0}
+.k-green{background:#15803d}.k-teal{background:#0f766e}.k-red{background:#b91c1c}.k-orange{background:#d97706}
+@media (max-width: 900px){nav{position:sticky;top:0;width:100%;height:auto}main{margin-left:0}.hero{padding:34px 18px 28px}section{padding:28px 18px;max-width:100%}table{display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">HPC-Diagnosis Agent v6<span>设计报告 · 2026-03-23</span></div>
+  <ul>
+    <li><a href="#s1">1. 项目定位</a></li>
+    <li><a href="#s2">2. 总体架构</a></li>
+    <li><a href="#s3">3. Triage 设计</a></li>
+    <li><a href="#s4">4. Diagnosis Agent</a></li>
+    <li class="sub"><a href="#s41">4.1 主 Agent</a></li>
+    <li class="sub"><a href="#s42">4.2 GATE Sub-Agent</a></li>
+    <li class="sub"><a href="#s43">4.3 交互协议</a></li>
+    <li><a href="#s5">5. Knowledge Base</a></li>
+    <li><a href="#s6">6. Evidence Gating</a></li>
+    <li><a href="#s7">7. Reflect</a></li>
+    <li><a href="#s8">8. 评估与消融</a></li>
+    <li><a href="#s9">9. 实现路线</a></li>
+  </ul>
+</nav>
+<main>
+<div class="hero">
+  <h1>HPC-Diagnosis Agent v6 — 完整设计报告</h1>
+  <div class="sub">从规则 Gate 升级为 Adversarial Sub-Agent 的完整设计稿，面向 SC'26 论文与工程实现</div>
+  <div>
+    <span class="badge">框架: LangGraph</span>
+    <span class="badge">核心升级: GATE Sub-Agent</span>
+    <span class="badge">论文 Claim: 零人工阈值</span>
+    <span class="badge">数据: formaltest + compositetest_backup</span>
+  </div>
+</div>
+
+<section id="s1">
+  <h2>1. 项目定位</h2>
+  <p>v6 的核心目标是把 Evidence Gating 从人工规则工程升级为双角色 LLM 对抗审查机制。主诊断者 THINK 负责提出和推进结论，GATE Sub-Agent 负责独立找漏洞，从而更好支撑“完全自主的 HPC 故障诊断 Agent 框架”这一论文定位。</p>
+  <div class="contrib">
+    <strong>核心 Claim</strong><br>
+    完全自主的 HPC 故障诊断 Agent 框架：零人工阈值、零标注数据、从原始指标到根因报告全程 LLM 驱动。
+  </div>
+  <div class="grid">
+    <div class="card"><h4>Hybrid Control</h4><p>Triage 保留确定性压缩能力，Diagnosis 保留 LLM 推理弹性。</p></div>
+    <div class="card"><h4>Adversarial Gating</h4><p>GATE 不是被动判分器，而是主动寻找漏洞的审查子图。</p></div>
+    <div class="card"><h4>Knowledge Accumulation</h4><p>FPL 从空开始，通过 Reflect 在诊断过程中逐步成长。</p></div>
+    <div class="card"><h4>Composite Diagnosis</h4><p>显式维护多个候选根因，并区分独立故障与继发症状。</p></div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2>2. 总体架构</h2>
+  <div class="svg-wrap">
+    <pre>输入 metrics.csv + jobinfo.csv
+        │
+        ▼
+Offline KB: Metric KB + FPL
+        │
+        ▼
+Stage 1: Triage
+  Step1 异常筛选 → Step2 时序排序 → Step3 FocusContext
+        │
+        ▼
+Stage 2: Diagnosis Agent
+  HYPOTHESIZE
+      │
+      ▼
+  THINK → ACT → OBSERVE
+      │        ▲
+      └─ conclude ────────┐
+                          ▼
+                    GATE Sub-Agent
+             GATE_THINK → GATE_ACT → GATE_OBSERVE
+                    │
+        ┌───────────┼───────────────┬─────────────┐
+        ▼           ▼               ▼             ▼
+      pass      continue       rehypothesize    degrade
+        │           │               │             │
+        ▼           └─────→ THINK   └→ HYPOTHESIZE
+     FINALIZE                                  │
+        │                                      │
+        ▼                                      ▼
+                   Stage 3: Reflect → FPL 回写</pre>
+  </div>
+  <table>
+    <thead><tr><th>模块</th><th>性质</th><th>职责</th></tr></thead>
+    <tbody>
+      <tr><td>Triage</td><td>确定性 Python</td><td>生成 FocusContext 与 causal_order</td></tr>
+      <tr><td>Main Agent</td><td>LLM + tools</td><td>生成假设、收集证据、尝试下结论</td></tr>
+      <tr><td>GATE Sub-Agent</td><td>LLM + limited tools</td><td>独立审查、发现漏洞、决定放行或继续</td></tr>
+      <tr><td>Reflect</td><td>LLM + schema gate</td><td>将成功诊断提炼为 FPL 规则</td></tr>
+    </tbody>
+  </table>
+  <div class="info">v6 与 v5 的最大差异不在于增加更多工具，而在于把“最终裁决”从外部人工规则中移除，转为受控的 LLM 审查行为。</div>
+</section>
+
+<section id="s3">
+  <h2>3. Triage 设计</h2>
+  <p>Triage 继续保持 v5 的三步设计，不消耗 LLM token，但为后续主 Agent 和 GATE 提供结构化起点。</p>
+  <table>
+    <thead><tr><th>步骤</th><th>内容</th><th>产物</th></tr></thead>
+    <tbody>
+      <tr><td>Step 1</td><td>Z-score + 持久性过滤 + change point</td><td>Top-K 异常指标</td></tr>
+      <tr><td>Step 2</td><td>按 onset 排序并聚合 subsystem score</td><td>causal_order, leading_subsystem</td></tr>
+      <tr><td>Step 3</td><td>与 jobinfo 对齐并构建上下文</td><td>FocusContext</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">Triage 不是最终诊断器。它只负责压缩搜索空间，不能替代 THINK 或 GATE 的因果判断。</div>
+</section>
+
+<section id="s4">
+  <h2>4. Diagnosis Agent</h2>
+  <h3 id="s41">4.1 主 Agent</h3>
+  <p>主 Agent 负责提出诊断假设并逐步收集证据。它的核心状态包括 hypotheses、evidence、react_trace、budget 与 gate_hint。主 Agent 可以使用三个工具：MetricQueryTool、KBRetrievalTool、DataAnalysisTool。</p>
+  <div class="grid">
+    <div class="card"><h4>HYPOTHESIZE</h4><p>输入 FocusContext 和 FPL 先验，生成 2–4 个候选假设。</p></div>
+    <div class="card"><h4>THINK</h4><p>根据当前证据空白与 gate_hint 决定下一步是补查还是 conclude。</p></div>
+    <div class="card"><h4>ACT</h4><p>执行工具调用并记录 budget 消耗。</p></div>
+    <div class="card"><h4>OBSERVE</h4><p>只做摘要压缩与 raw_stats 提取，不再打 strength 标签。</p></div>
+  </div>
+  <pre>{
+  "thought": "当前 h1 仍未排除 memory 替代解释，需要检查 swap 与时间先后关系",
+  "action": {
+    "type": "tool_call",
+    "tool": "MetricQueryTool",
+    "args": {},
+    "reasoning": "验证 h1 的关键缺口"
+  }
+}</pre>
+
+  <h3 id="s42">4.2 GATE Sub-Agent</h3>
+  <p>GATE 是 v6 的关键升级：它是一个具备有限 ReAct 循环和受限工具集的 Adversarial Sub-Agent，而不是纯 Python 规则节点。</p>
+  <table>
+    <thead><tr><th>设计项</th><th>v6 方案</th></tr></thead>
+    <tbody>
+      <tr><td>角色</td><td>证据审查员，目标是寻找漏洞而不是生成诊断</td></tr>
+      <tr><td>可见信息</td><td>focus_context, hypotheses, evidence；不可见 THINK 的 thought</td></tr>
+      <tr><td>工具</td><td>MetricQueryTool, KBRetrievalTool</td></tr>
+      <tr><td>预算</td><td>独立 gate_budget，默认最多 3 次工具调用、2 轮循环</td></tr>
+      <tr><td>输出</td><td>decision + reason + hint + diagnosis_type</td></tr>
+    </tbody>
+  </table>
+  <div class="info"><strong>快路径：</strong>GATE 可以零工具结束。如果第一轮逻辑审查就发现替代假设未排除，则直接 continue；如果没有关键漏洞，也可直接 pass。</div>
+  <pre>system prompt 核心约束：
+1. 你不是诊断者，你是审查者
+2. 优先寻找逻辑缺口和反驳线索
+3. 替代解释未排除时不得放行
+4. 必须返回结构化 decision
+5. 只有逻辑上无法裁决时才允许工具调用</pre>
+
+  <h3 id="s43">4.3 THINK-GATE 交互协议</h3>
+  <p>v6 采用方案 C：GATE 不直接把自身查到的结果并入主 evidence，而是以 gate_hint 形式告诉 THINK 下一步需要验证什么。</p>
+  <table>
+    <thead><tr><th>GATE 输出</th><th>系统行为</th></tr></thead>
+    <tbody>
+      <tr><td>pass</td><td>直接进入 FINALIZE，gate_hint 置空</td></tr>
+      <tr><td>continue</td><td>将 hint 写入 state，THINK 下一轮优先处理该提示</td></tr>
+      <tr><td>rehypothesize</td><td>保留 refuted 假设，返回 HYPOTHESIZE 生成新假设</td></tr>
+      <tr><td>degrade</td><td>进入 FINALIZE，输出 partial 或 inconclusive 报告</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>
+</section>
+
+<section id="s5">
+  <h2>5. Knowledge Base</h2>
+  <p>知识库仍维持两层结构：Metric KB 和 Fault Pattern Library。</p>
+  <table>
+    <thead><tr><th>层次</th><th>内容</th><th>v6 角色</th></tr></thead>
+    <tbody>
+      <tr><td>Metric KB</td><td>指标语义、normal_range、strength_thresholds、downstream_effects</td><td>为 HYPOTHESIZE 和 GATE 提供领域参考</td></tr>
+      <tr><td>FPL</td><td>结构化故障模式</td><td>冷启动后逐步提高诊断效率</td></tr>
+    </tbody>
+  </table>
+  <div class="info">strength_thresholds 在 v6 中降级为参考文档，不再由 OBSERVE 确定性打标。GATE 会把它当作语义背景，而不是硬性裁决条件。</div>
+</section>
+
+<section id="s6">
+  <h2>6. Evidence Gating</h2>
+  <p>Evidence Gating 仍遵循三条原则，但实现从规则函数转为受控 LLM 审查。</p>
+  <div class="grid">
+    <div class="card"><h4>证据独立性</h4><p>防止同一现象被重复包装成多条支持证据。</p></div>
+    <div class="card"><h4>反驳优先</h4><p>一条强反驳可阻止通过，即使支持性证据很多。</p></div>
+    <div class="card"><h4>复合故障甄别</h4><p>区分独立根因与 derived symptoms。</p></div>
+  </div>
+  <pre>GATE 的内部思考框架：
+Stage A: 单假设是否已排除替代解释？
+Stage B: 多假设是独立根因还是因果链？
+Stage C: 应输出 pass / continue / rehypothesize / degrade？</pre>
+  <p>v6 的关键不在于取消数字，而在于取消“外部工程师手写 pass 条件”。raw_stats、strength_thresholds 和 downstream_effects 仍然存在，但它们服务于 GATE 的审查思考，而非直接决定结果。</p>
+</section>
+
+<section id="s7">
+  <h2>7. Reflect</h2>
+  <p>Reflect 延续 v5 设计，只在存在可信 confirmed 根因时触发。它将成功诊断提炼为 FPL 规则，实现无监督知识积累。</p>
+  <table>
+    <thead><tr><th>diagnosis_type</th><th>Reflect 策略</th></tr></thead>
+    <tbody>
+      <tr><td>single_fault / composite_fault</td><td>完整提炼</td></tr>
+      <tr><td>partial</td><td>仅提炼 confirmed 假设，标记 incomplete</td></tr>
+      <tr><td>inconclusive</td><td>跳过</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8. 评估与消融</h2>
+  <p>v6 的实验重点除了准确率和开销，还应特别回答 GATE Sub-Agent 是否真的值得其额外复杂度。</p>
+  <table>
+    <thead><tr><th>实验</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td>Abl-A</td><td>去掉 Triage，验证 Hybrid Control 价值</td></tr>
+      <tr><td>Abl-B</td><td>去掉 GATE，验证独立审查必要性</td></tr>
+      <tr><td>Abl-C</td><td>去掉 FPL，验证知识积累收益</td></tr>
+      <tr><td>Sup-C</td><td>去掉 rehypothesize，验证纠错能力</td></tr>
+      <tr><td>Sup-D</td><td>GATE 降级为单次 LLM call，验证主动调查能力</td></tr>
+    </tbody>
+  </table>
+  <div class="contrib">Sup-D 是 v6 特有的重要补充。它能直接回答：真正有价值的是“独立审查这个角色”，还是“GATE 拥有工具和循环的主动调查能力”。</div>
+</section>
+
+<section id="s9">
+  <h2>9. 实现路线</h2>
+  <table>
+    <thead><tr><th>阶段</th><th>内容</th><th>关键文件</th></tr></thead>
+    <tbody>
+      <tr><td>Phase B</td><td>Triage 三步实现</td><td>agent/triage.py</td></tr>
+      <tr><td>Phase C-1</td><td>Main Agent 最小可运行图</td><td>agent/diagnosis.py</td></tr>
+      <tr><td>Phase C-2</td><td>最小 GATE（单轮零工具）</td><td>agent/gate.py</td></tr>
+      <tr><td>Phase C-3</td><td>完整 GATE Sub-Agent + hint 协议</td><td>agent/gate.py, agent/state.py</td></tr>
+      <tr><td>Phase D</td><td>Reflect + 评估框架</td><td>agent/reflect.py, eval/evaluate.py</td></tr>
+    </tbody>
+  </table>
+  <p>推荐先让主 Agent 路由稳定，再引入最小 GATE 验证交互协议，最后扩展到带工具调用的完整 Sub-Agent。这样实现路径与论文叙事一致，也更容易做消融。</p>
+</section>
+
+</main>
+</body>
+</html>
