@@ -6,20 +6,20 @@
 
 ## v6（当前版本）— 2026-03-23
 
-**核心目标**：将 GATE 从纯 Python 规则节点升级为 Adversarial Sub-Agent，实现诊断结论零硬编码阈值。
+**核心目标**：将 GATE 从纯 Python 规则节点升级为独立 Audit Agent（与 Diagnosis Agent 架构级分离，由 Orchestrator 协调），实现诊断结论零硬编码阈值。
 
 | # | 变更 | 理由 |
 |---|------|------|
-| 1 | **GATE 升级为 Adversarial Sub-Agent**：具备有限 ReAct 循环（GATE_THINK → GATE_ACT → GATE_OBSERVE）、受限工具集（MetricQueryTool、KBRetrievalTool）、独立 budget | v5 的确定性 Rule A/B/C/D 需要人工编写通过规则；升级为 LLM Sub-Agent 后裁决由模型自主判断 |
-| 2 | **删除 `Evidence.strength` 字段**：OBSERVE 不再给证据打 strong/medium/weak 标签 | 半自动标签容易误导 GATE 判断；证据质量由 GATE LLM 根据 `raw_stats` 和上下文综合判断 |
+| 1 | **GATE 升级为独立 Audit Agent**：与 Diagnosis Agent 架构级分离（独立 StateGraph、独立 State），具备有限 ReAct 循环（GATE_THINK → GATE_ACT → GATE_OBSERVE）、受限工具集、独立 budget；Orchestrator 强制将 ConclusionProposal 提交给 Audit Agent | v5 的确定性 Rule A/B/C/D 需要人工编写通过规则；升级为独立 Agent 后裁决由模型自主判断，且信息隔离由架构保证 |
+| 2 | **删除 `Evidence.strength` 字段**：OBSERVE 不再给证据打 strong/medium/weak 标签 | 半自动标签容易误导 Audit Agent 判断；证据质量由 Audit Agent LLM 根据 `raw_stats` 和上下文综合判断 |
 | 3 | **OBSERVE 职责收窄**：只做压缩 + raw_stats 提取 + verification 对齐 + 异常处理，不再裁决证据强弱 | 避免 OBSERVE 变成"半个裁判"，保持上下文压缩器的单一职责 |
-| 4 | **引入方案 C hint 协议**：GATE 不直接把自身查到的结果并入主 evidence，而是以 `gate_hint` 传递给 THINK | 保留角色边界，减少 THINK 重复摸索 GATE 已发现的漏洞 |
-| 5 | **新增 `GateEvidence` Schema**：GATE 独立证据池，与主 `evidence` 严格分离 | 信息隔离 + 审计边界 |
+| 4 | **引入方案 C hint 协议**：Audit Agent 不直接把自身查到的结果并入主 evidence，而是由 Orchestrator 以 `gate_hint` 传递给 Diagnosis Agent | 保留角色边界，减少 THINK 重复摸索 Audit Agent 已发现的漏洞 |
+| 5 | **新增 `AuditEvidence` Schema**：Audit Agent 独立证据池，物理隔离在 AuditState 中 | 架构级信息隔离 + 审计边界 |
 | 6 | **Claim 精确化**："零人工阈值" → "诊断结论零硬编码阈值"；区分信号抽取层超参数与诊断裁决层 | 审稿人可能用 Z-score 阈值反驳"零人工阈值"claim；精确限定范围 |
-| 7 | **消融矩阵扩展**：新增 Sup-D（GATE 降级为单次 LLM call）、Sup-E（恢复 Evidence.strength）、Sup-F（禁用 hint 协议）、Sup-G（GATE 降级为 v5 式规则） | 覆盖 v6 所有核心设计决策的消融验证 |
+| 7 | **消融矩阵扩展**：新增 Sup-D（Audit Agent 降级为单次 LLM call）、Sup-E（恢复 Evidence.strength）、Sup-F（禁用 hint 协议）、Sup-G（Audit Agent 降级为 v5 式规则） | 覆盖 v6 所有核心设计决策的消融验证 |
 | 8 | **补充失败处理**：新增 LLM API 故障、HYPOTHESIZE 0 假设、Triage 0 异常、THINK 不 conclude 循环等 6 种场景 | 增强系统鲁棒性定义 |
 | 9 | **术语约定**：`causal_order` 明确为 temporal ordering as causal prior | 避免将时序排序等同于严格因果关系 |
-| 10 | **新增跨模型评估方案**（§8.4）+ GATE 决策质量专项指标 | 评估 LLM 依赖度 + 验证 GATE 可靠性 |
+| 10 | **新增跨模型评伊方案**（§8.4）+ Audit Agent 决策质量专项指标 | 评估 LLM 依赖度 + 验证 Audit Agent 可靠性 |
 
 ---
 

@@ -54,7 +54,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <li><a href="#s3">3. 设计展开</a></li>
     <li class="sub"><a href="#s31">3.1 Triage Stage</a></li>
     <li class="sub"><a href="#s32">3.2 Diagnosis Agent</a></li>
-    <li class="sub"><a href="#s33">3.3 GATE Sub-Agent</a></li>
+    <li class="sub"><a href="#s33">3.3 Audit Agent</a></li>
     <li class="sub"><a href="#s34">3.4 Evidence Gating</a></li>
     <li class="sub"><a href="#s35">3.5 Reflect 与 FPL</a></li>
     <li><a href="#s4">4. 评估与消融</a></li>
@@ -82,7 +82,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   </div>
   <div class="grid">
     <div class="card"><h4>Hybrid Control</h4><p>Triage 保留确定性压缩能力，Diagnosis 保留 LLM 推理弹性。</p></div>
-    <div class="card"><h4>Adversarial Gating</h4><p>GATE 不是被动判分器，而是主动寻找漏洞的审查子图。</p></div>
+    <div class="card"><h4>Adversarial Gating</h4><p>独立 Audit Agent 以对抗审查者身份主动寻找结论漏洞，与 Diagnosis Agent 架构级隔离。</p></div>
     <div class="card"><h4>Knowledge Accumulation</h4><p>FPL 从空开始，通过 Reflect 在诊断过程中逐步成长。</p></div>
     <div class="card"><h4>Composite Diagnosis</h4><p>显式维护多个候选根因，并区分独立故障与继发症状。</p></div>
   </div>
@@ -137,7 +137,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
   <!-- Stage 2: Diagnosis Agent -->
   <rect x="10" y="162" width="600" height="230" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="22" y="180" font-size="10.5" fill="#4c1d95" font-weight="700">Stage 2  Diagnosis Agent — LangGraph · 多假设并行 · Adversarial GATE</text>
+  <text x="22" y="180" font-size="10.5" fill="#4c1d95" font-weight="700">Stage 2  Orchestrator { Diagnosis Agent ↔ Audit Agent }</text>
 
   <!-- HYPOTHESIZE -->
   <rect x="22" y="186" width="130" height="30" rx="5" fill="#7c3aed"/>
@@ -164,9 +164,9 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <line x1="218" y1="228" x2="218" y2="296" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#ahp)"/>
   <text x="232" y="264" font-size="9.5" fill="#7c3aed">conclude</text>
 
-  <!-- GATE Sub-Agent box -->
+  <!-- Audit Agent box -->
   <rect x="22" y="296" width="535" height="82" rx="6" fill="rgba(220,38,38,.06)" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="34" y="311" font-size="10.5" fill="#7f1d1d" font-weight="700">GATE Sub-Agent — Adversarial LLM Reviewer（独立 budget，信息隔离）</text>
+  <text x="34" y="311" font-size="10.5" fill="#7f1d1d" font-weight="700">Audit Agent — Adversarial LLM（独立 State，架构级信息隔离）</text>
   <rect x="90" y="316" width="105" height="26" rx="4" fill="#4c1d95"/>
   <text x="142" y="334" text-anchor="middle" fill="white" font-size="10.5">GATE_THINK</text>
   <line x1="195" y1="329" x2="215" y2="329" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
@@ -219,7 +219,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
   <!-- Tools box -->
   <rect x="622" y="82" width="165" height="180" rx="7" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
-  <text x="705" y="99" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Main Agent）</text>
+  <text x="705" y="99" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Diagnosis Agent）</text>
   <rect x="632" y="104" width="145" height="26" rx="4" fill="#f97316"/>
   <text x="705" y="122" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
   <rect x="632" y="136" width="145" height="26" rx="4" fill="#f97316"/>
@@ -232,12 +232,12 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
   <!-- GATE tools box -->
   <rect x="622" y="272" width="165" height="100" rx="7" fill="#fff0f0" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="705" y="289" text-anchor="middle" font-size="10.5" fill="#7f1d1d" font-weight="700">工具（GATE）</text>
+  <text x="705" y="289" text-anchor="middle" font-size="10.5" fill="#7f1d1d" font-weight="700">工具（Audit Agent）</text>
   <rect x="632" y="294" width="145" height="26" rx="4" fill="#dc2626"/>
   <text x="705" y="312" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
   <rect x="632" y="326" width="145" height="26" rx="4" fill="#dc2626"/>
   <text x="705" y="344" text-anchor="middle" fill="white" font-size="11">KBRetrievalTool</text>
-  <text x="705" y="364" text-anchor="middle" font-size="9" fill="#7f1d1d">独立 gate_budget</text>
+  <text x="705" y="364" text-anchor="middle" font-size="9" fill="#7f1d1d">独立 audit_budget</text>
 
   <!-- ACT → Main tools -->
   <line x1="610" y1="215" x2="622" y2="215" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#aho)"/>
@@ -257,8 +257,9 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <thead><tr><th>模块</th><th>性质</th><th>职责</th></tr></thead>
     <tbody>
       <tr><td>Triage</td><td>确定性 Python</td><td>生成 FocusContext 与 causal_order</td></tr>
-      <tr><td>Main Agent</td><td>LLM + tools</td><td>生成假设、收集证据、尝试下结论</td></tr>
-      <tr><td>GATE Sub-Agent</td><td>LLM + limited tools</td><td>独立审查、发现漏洞、决定放行或继续</td></tr>
+      <tr><td>Diagnosis Agent</td><td>LLM + tools</td><td>生成假设、收集证据、提交结论提案</td></tr>
+      <tr><td>Orchestrator</td><td>确定性路由</td><td>强制提交提案给 Audit Agent，根据裁决路由</td></tr>
+      <tr><td>Audit Agent</td><td>独立 LLM + limited tools</td><td>对抗审查：独立寻找漏洞、决定放行或退回</td></tr>
       <tr><td>Reflect</td><td>LLM + schema gate</td><td>将成功诊断提炼为 FPL 规则</td></tr>
     </tbody>
   </table>
@@ -267,20 +268,20 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <thead><tr><th>维度</th><th>STELLAR (SC'25)</th><th>本系统</th></tr></thead>
     <tbody>
       <tr><td>应用目标</td><td>I/O 参数自动调优</td><td>故障根因诊断 + 解决建议</td></tr>
-      <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + 双角色 Agent</td></tr>
-      <tr><td>证据验证</td><td>无独立证据审查</td><td><strong>Adversarial Evidence Gating</strong></td></tr>
+      <tr><td>推理控制</td><td>LLM 自由生成 + 反思总结</td><td><strong>确定性 Triage</strong> + 双 Agent 对抗架构</td></tr>
+      <tr><td>证据验证</td><td>无独立证据审查</td><td><strong>独立 Audit Agent + Adversarial Evidence Gating</strong></td></tr>
       <tr><td>多故障支持</td><td>单目标优化</td><td><strong>多假设并行</strong>，支持复合故障</td></tr>
       <tr><td>知识库</td><td>RAG 文档检索 + Rule Set 积累</td><td><strong>结构化 FPL</strong>（状态、版本、来源追踪）</td></tr>
     </tbody>
   </table>
-  <div class="info">本版的关键设计是将 GATE 设为具备独立审查职责的 Sub-Agent。诊断结论零硬编码阈值，由对抗式审查过程决定结论能否放行。</div>
+  <div class="info">本版的关键设计是 Diagnosis Agent 与 Audit Agent 架构级分离。Orchestrator 强制将结论提案提交给独立的 Audit Agent 审查，Diagnosis Agent 无法绕过审查直接输出。诊断结论零硬编码阈值，由对抗式审查过程决定结论能否放行。</div>
 </section>
 
 <section id="s3">
   <h2>3. 设计展开</h2>
-  <p>以下各节对应当前设计稿中的核心模块：Triage 负责压缩输入空间，Diagnosis Agent 负责提出和推进假设，GATE Sub-Agent 负责独立审查，Reflect 负责将成功经验写回 Fault Pattern Library。</p>
+  <p>以下各节对应当前设计稿中的核心模块：Triage 负责压缩输入空间，Diagnosis Agent 负责提出和推进假设，Orchestrator 强制将结论提交给独立的 Audit Agent 审查，Reflect 负责将成功经验写回 Fault Pattern Library。</p>
   <h3 id="s31">3.1 Triage Stage</h3>
-  <p>Triage 继续保持 v5 的三步设计，不消耗 LLM token，但为后续主 Agent 和 GATE 提供结构化起点。</p>
+  <p>Triage 继续保持 v5 的三步设计，不消耗 LLM token，但为后续 Diagnosis Agent 和 Audit Agent 提供结构化起点。</p>
   <table>
     <thead><tr><th>步骤</th><th>内容</th><th>产物</th></tr></thead>
     <tbody>
@@ -289,21 +290,21 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
       <tr><td>Step 3</td><td>与 jobinfo 对齐并构建上下文</td><td>FocusContext</td></tr>
     </tbody>
   </table>
-  <div class="warn">Triage 不是最终诊断器。它只负责压缩搜索空间，不能替代 THINK 或 GATE 的因果判断。</div>
+  <div class="warn">Triage 不是最终诊断器。它只负责压缩搜索空间，不能替代 Diagnosis Agent 或 Audit Agent 的因果判断。</div>
 
   <h3 id="s32">3.2 Diagnosis Agent</h3>
-  <p>主 Agent 负责提出诊断假设并逐步收集证据。它的核心状态包括 hypotheses、evidence、react_trace、budget 与 gate_hint。主 Agent 可以使用三个工具：MetricQueryTool、KBRetrievalTool、DataAnalysisTool。</p>
+  <p>Diagnosis Agent 负责提出诊断假设并逐步收集证据。它拥有独立的 DiagnosisState，核心字段包括 hypotheses、evidence、react_trace、budget 与 gate_hint。Diagnosis Agent 可以使用三个工具：MetricQueryTool、KBRetrievalTool、DataAnalysisTool。</p>
   <table>
     <thead><tr><th>状态字段</th><th>类型</th><th>作用</th></tr></thead>
     <tbody>
       <tr><td>hypotheses</td><td>list[Hypothesis]</td><td>显式维护多个候选根因及其状态</td></tr>
       <tr><td>evidence</td><td>list[Evidence]</td><td>主 Agent 收集的支持/反驳/中性证据</td></tr>
       <tr><td>react_trace</td><td>list[ReActStep]</td><td>THINK/ACT/OBSERVE 的可审计轨迹</td></tr>
-      <tr><td>gate_hint</td><td>str | null</td><td>GATE 回传的下一步验证问题</td></tr>
+      <tr><td>gate_hint</td><td>str | null</td><td>Orchestrator 注入的 Audit Agent 反馈</td></tr>
       <tr><td>budget</td><td>dict</td><td>主 Agent 的工具调用与 token 消耗</td></tr>
     </tbody>
   </table>
-  <div class="info"><strong>confidence 更新：</strong>v6 不再依赖 Evidence.strength 打分公式。THINK 每轮在 thought 输出中报告各假设的 confidence 估计值；GATE 若发现 confidence 与证据不符，在 hint 中指出。confidence 不允许在无新证据的情况下上升。</div>
+  <div class="info"><strong>confidence 更新：</strong>v6 不再依赖 Evidence.strength 打分公式。THINK 每轮在 thought 输出中报告各假设的 confidence 估计值；Audit Agent 若发现 confidence 与证据不符，在 hint 中指出。confidence 不允许在无新证据的情况下上升。</div>
   <div class="grid">
     <div class="card"><h4>HYPOTHESIZE</h4><p>输入 FocusContext 和 FPL 先验，生成 2–4 个候选假设。</p></div>
     <div class="card"><h4>THINK</h4><p>根据当前证据空白与 gate_hint 决定下一步是补查还是 conclude。</p></div>
@@ -312,7 +313,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   </div>
 
   <h4>节点路由决策</h4>
-  <p>THINK 通过 <code>action.type</code> 表达意图，LangGraph 根据路由函数决定下一节点；GATE 四路输出决定结论走向：</p>
+  <p>THINK 通过 <code>action.type</code> 表达意图，LangGraph 根据路由函数决定下一节点；Audit Agent 四路输出决定结论走向：</p>
   <div class="svg-wrap">
   <svg width="720" height="400" viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
@@ -353,10 +354,10 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <line x1="360" y1="112" x2="360" y2="180" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
   <text x="378" y="150" font-size="9.5" fill="#7c3aed">conclude</text>
 
-  <!-- ── Row 3: GATE Sub-Agent ── -->
+  <!-- ── Row 3: Audit Agent ── -->
   <rect x="60" y="180" width="600" height="44" rx="6" fill="rgba(220,38,38,.07)" stroke="#dc2626" stroke-width="1.5"/>
   <rect x="240" y="188" width="240" height="28" rx="5" fill="#7f1d1d"/>
-  <text x="360" y="207" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE Sub-Agent (Adversarial LLM)</text>
+  <text x="360" y="207" text-anchor="middle" fill="white" font-size="12" font-weight="700">Audit Agent (独立 Adversarial LLM)</text>
 
   <!-- ── Row 4: 4 output decision boxes ── evenly spaced at x=90, 240, 400, 560 -->
   <!-- Arrows from GATE bottom to each box top -->
@@ -399,7 +400,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <text x="360" y="395" text-anchor="middle" font-size="10" fill="#64748b">→ Stage 3 Reflect</text>
   </svg>
   </div>
-  <p style="font-size:13px;color:#475569;margin-top:6px">THINK 在 <code>action.type=conclude</code> 时触发 GATE 审查；<code>continue+hint</code> 将 hint 写入 state 后回到 THINK；<code>rehypothesize</code> 回到 HYPOTHESIZE 生成新假设；<code>pass / degrade</code> 进入 FINALIZE。</p>
+  <p style="font-size:13px;color:#475569;margin-top:6px">THINK 在 <code>action.type=conclude</code> 时由 Orchestrator 强制提交给 Audit Agent；<code>continue+hint</code> 由 Orchestrator 将 hint 注入 DiagnosisState 后重启 Diagnosis Agent；<code>rehypothesize</code> 回到 HYPOTHESIZE 生成新假设；<code>pass / degrade</code> 进入 FINALIZE。</p>
   <p style="font-size:12px;color:#7c2d12"><strong>THINK 输出示例（conclude 分支）：</strong></p>
   <pre style="font-size:12px;margin-top:4px">{
   "thought": "当前 h1 仍未排除 memory 替代解释，需要检查 swap 与时间先后关系",
@@ -411,8 +412,8 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   }
 }</pre>
 
-  <h3 id="s33">3.3 GATE Sub-Agent</h3>
-  <p>GATE 是一个具备有限 ReAct 循环和受限工具集的 Adversarial Sub-Agent，而不是纯规则节点。它不负责生成诊断，只负责从反方视角寻找漏洞、补查关键空白，并决定是否允许结论进入 FINALIZE。</p>
+  <h3 id="s33">3.3 Audit Agent</h3>
+  <p>Audit Agent 是一个与 Diagnosis Agent 对等的独立 Agent（独立 StateGraph、独立 State），目标与 Diagnosis Agent 对立：它不负责生成诊断，只负责从反方视角寻找漏洞。Orchestrator 强制将 ConclusionProposal 提交给 Audit Agent，Diagnosis Agent 无法选择是否送审或何时送审。</p>
   <div class="svg-wrap">
     <svg width="700" height="380" viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block;background:#f8fafc">
       <defs>
@@ -456,7 +457,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
       <!-- ─── Decision bar: GATE 最终输出决策 ─── -->
       <rect x="80" y="176" width="480" height="32" rx="6" fill="#7f1d1d"/>
-      <text x="320" y="197" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">GATE 决策输出（decision + reason + hint + diagnosis_type）</text>
+      <text x="320" y="197" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">Audit Agent 决策输出（AuditDecision: decision + reason + hint）</text>
 
       <!-- GATE_THINK / GATE_OBSERVE → Decision bar: two inputs -->
       <line x1="314" y1="54" x2="314" y2="176" stroke="#7f1d1d" stroke-width="1.4" stroke-dasharray="3,2" marker-end="url(#v6arr)"/>
@@ -491,8 +492,8 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 
       <!-- ─── Design notes ─── -->
       <text x="20" y="324" fill="#475569" font-size="10.5" font-weight="700">设计要点</text>
-      <text x="20" y="342" fill="#475569" font-size="10.5">① GATE 先零工具逻辑审查，只在必要时才调用工具</text>
-      <text x="20" y="358" fill="#475569" font-size="10.5">② GATE 有独立 gate_budget，不与主 Agent THINK 共享</text>
+      <text x="20" y="342" fill="#475569" font-size="10.5">① Audit Agent 先零工具逻辑审查，只在必要时才调用工具</text>
+      <text x="20" y="358" fill="#475569" font-size="10.5">② Audit Agent 拥有独立 AuditState 和 audit_budget</text>
       <text x="20" y="374" fill="#475569" font-size="10.5">③ continue 只传递"下一步该查什么"的问题，不直接替 THINK 下结论</text>
     </svg>
   </div>
@@ -500,13 +501,13 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <thead><tr><th>设计项</th><th>当前方案</th></tr></thead>
     <tbody>
       <tr><td>角色</td><td>证据审查员，目标是寻找漏洞而不是生成诊断</td></tr>
-      <tr><td>可见信息</td><td>focus_context, hypotheses, evidence；不可见 THINK 的 thought</td></tr>
+      <tr><td>可见信息</td><td>ConclusionProposal（hypotheses, evidence）+ focus_context；不可见 react_trace、thought、budget</td></tr>
       <tr><td>工具</td><td>MetricQueryTool, KBRetrievalTool</td></tr>
       <tr><td>预算</td><td>独立 gate_budget，默认最多 3 次工具调用、2 轮循环</td></tr>
       <tr><td>输出</td><td>decision + reason + hint + diagnosis_type</td></tr>
     </tbody>
   </table>
-  <div class="info"><strong>快路径：</strong>GATE 可以零工具结束。如果第一轮逻辑审查就发现替代假设未排除，则直接 continue；如果没有关键漏洞，也可直接 pass。</div>
+  <div class="info"><strong>快路径：</strong>Audit Agent 可以零工具结束。如果第一轮逻辑审查就发现替代假设未排除，则直接 continue；如果没有关键漏洞，也可直接 pass。</div>
   <pre>system prompt 核心约束：
 1. 你不是诊断者，你是审查者
 2. 优先寻找逻辑缺口和反驳线索
@@ -516,16 +517,16 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <table>
     <thead><tr><th>字段</th><th>约束</th><th>设计意图</th></tr></thead>
     <tbody>
-      <tr><td>gate_evidence</td><td>独立于主 evidence 列表</td><td>避免角色混淆，保留审计边界</td></tr>
+      <tr><td>audit_evidence</td><td>独立于主 evidence 列表（物理隔离在 AuditState 中）</td><td>架构级隔离，非约定隔离</td></tr>
       <tr><td>gate_hint</td><td>仅在 continue 时非空</td><td>用“问题”驱动 THINK，而不是直接给答案</td></tr>
-      <tr><td>gate_budget</td><td>默认 3 次工具调用，2 轮循环</td><td>避免 GATE 退化成第二个 diagnosis agent</td></tr>
+      <tr><td>audit_budget</td><td>默认 3 次工具调用，2 轮循环</td><td>避免 Audit Agent 退化成第二个 Diagnosis Agent</td></tr>
     </tbody>
   </table>
-  <div class="warn"><strong>GATE Budget 耗尽默认决策：</strong>若已发现强反驳证据 → continue；若未发现 → pass（审查者穷尽资源仍未推翻→默认放行）；若假设空间整体失效 → degrade。</div>
-  <div class="info"><strong>hint 历史策略：</strong>GATE 只能看到最近一次 gate_hint，历史 hint 完整记录在 gate_trace 中供审计。</div>
+  <div class="warn"><strong>Audit Budget 耗尽默认决策：</strong>若已发现强反驳证据 → continue；若未发现 → pass（审查者穷尽资源仍未推翻→默认放行）；若假设空间整体失效 → degrade。</div>
+  <div class="info"><strong>hint 历史策略：</strong>Audit Agent 只能看到最近一次 gate_hint，历史 hint 完整记录在 gate_trace 中供审计。</div>
 
   <h3 id="s34">3.4 Evidence Gating</h3>
-  <p>系统采用方案 C：GATE 不直接把自身查到的结果并入主 evidence，而是以 gate_hint 形式告诉 THINK 下一步需要验证什么。这样既保留角色边界，也避免 THINK 重复摸索同一个漏洞。</p>
+  <p>系统采用方案 C：Audit Agent 不直接把自身查到的结果并入主 evidence，而是通过 Orchestrator 以 gate_hint 形式告诉 Diagnosis Agent 下一步需要验证什么。这样既保留角色边界，也避免 THINK 重复摸索同一个漏洞。</p>
   <table>
     <thead><tr><th>GATE 输出</th><th>系统行为</th></tr></thead>
     <tbody>
@@ -543,12 +544,12 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
       <tr><td><strong>复合故障甄别</strong></td><td>区分独立根因与继发症状链</td><td>避免把下游效应误判为第二根因</td></tr>
     </tbody>
   </table>
-  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>  <div class="warn"><strong>"诊断结论零硬编码阈值"的精确含义：</strong>Triage 中的 Z-score 阈值、Top-K 等属于信号抽取层的统计超参数，不决定诊断结论。诊断裁决层不存在"满足 X 条件即通过"的人工规则，由 GATE LLM 根据证据上下文自主判断。</div>  <h3 id="s35">3.5 Reflect 与 FPL</h3>
+  <div class="warn">hint 必须是“下一步该查什么”的具体问题，不能是抽象否定。例如“请检查 memory 异常是否早于 cpu 异常出现”是好的 hint。</div>  <div class="warn"><strong>"诊断结论零硬编码阈值"的精确含义：</strong>Triage 中的 Z-score 阈值、Top-K 等属于信号抽取层的统计超参数，不决定诊断结论。诊断裁决层不存在"满足 X 条件即通过"的人工规则，由 Audit Agent LLM 根据证据上下文自主判断。</div>  <h3 id="s35">3.5 Reflect 与 FPL</h3>
   <p>Reflect 负责把成功诊断提炼为 FPL 规则，形成跨实验的知识积累闭环；知识库仍维持两层结构：Metric KB 和 Fault Pattern Library。</p>
   <table>
     <thead><tr><th>层次</th><th>内容</th><th>作用</th></tr></thead>
     <tbody>
-      <tr><td>Metric KB</td><td>指标语义、normal_range、strength_thresholds、downstream_effects</td><td>为 HYPOTHESIZE 和 GATE 提供领域参考</td></tr>
+      <tr><td>Metric KB</td><td>指标语义、normal_range、strength_thresholds、downstream_effects</td><td>为 HYPOTHESIZE 和 Audit Agent 提供领域参考</td></tr>
       <tr><td>FPL</td><td>结构化故障模式</td><td>冷启动后逐步提高诊断效率</td></tr>
     </tbody>
   </table>
@@ -570,7 +571,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
       <tr><td>诊断效率</td><td>轮次更少，验证路径更明确</td><td>通常会多 2–4 轮迭代</td></tr>
     </tbody>
   </table>
-  <div class="info">Metric KB 中的 strength_thresholds 仅作为语义参考，OBSERVE 不再确定性打标签；最终证据质量由 GATE 在审查过程中综合判断。</div>
+  <div class="info">Metric KB 中的 strength_thresholds 仅作为语义参考，OBSERVE 不再确定性打标签；最终证据质量由 Audit Agent 在审查过程中综合判断。</div>
 </section>
 
 <section id="s4">
@@ -583,7 +584,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <tbody>
       <tr><td><strong>Full</strong></td><td>完整系统</td><td>无消融</td><td>性能上限</td></tr>
       <tr><td><strong>Abl-A</strong></td><td>无 Triage</td><td>去掉 Stage 1，全量指标直接输入 LLM</td><td><strong>Hybrid Control</strong>：Triage 的 context 压缩与 causal_order 价值</td></tr>
-      <tr><td><strong>Abl-B</strong></td><td>无 GATE</td><td>THINK conclude 后直接 FINALIZE，跳过审查</td><td><strong>Adversarial Evidence Gating</strong>：独立审查对诊断准确率的影响</td></tr>
+      <tr><td><strong>Abl-B</strong></td><td>无 Audit Agent</td><td>Diagnosis Agent conclude 后直接 FINALIZE，跳过 Orchestrator 审查</td><td><strong>Adversarial Evidence Gating</strong>：独立审查对诊断准确率的影响</td></tr>
       <tr><td><strong>Abl-C</strong></td><td>无 FPL</td><td>pattern_match 恒为空，Reflect 不写回</td><td><strong>Fault Pattern Library</strong>：跨实验知识积累的效率增益</td></tr>
       <tr><td><strong>BL-1</strong></td><td>单次 LLM（Phase 2 基线）</td><td>使用现有 Phase 2 baseline</td><td>Agent 整体框架 vs 单次 LLM 调用的价值</td></tr>
       <tr><td><strong>BL-2</strong></td><td>纯统计规则</td><td>只保留 Triage + 规则匹配，无 LLM</td><td>LLM 推理在诊断链路中的必要性</td></tr>
@@ -596,42 +597,42 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <table>
     <thead><tr><th>编号</th><th>名称</th><th>消融方式</th><th>回答的问题</th></tr></thead>
     <tbody>
-      <tr><td><strong>Sup-D</strong></td><td>GATE 降级为单次 LLM call</td><td>GATE 无工具无循环，仅一次 LLM 审查</td><td>有效的是"审查者角色"还是"主动调查（工具+循环）"？</td></tr>
+      <tr><td><strong>Sup-D</strong></td><td>Audit Agent 降级为单次 LLM call</td><td>Audit Agent 无工具无循环，仅一次 LLM 审查</td><td>有效的是"审查者角色"还是"主动调查（工具+循环）"？</td></tr>
       <tr><td><strong>Sup-F</strong></td><td>禁用 hint 协议</td><td>GATE 仅返回 pass/continue，不传 hint 给 THINK</td><td>hint 驱动定向补查 vs THINK 自主探索：效率差距多大？</td></tr>
-      <tr><td><strong>Sup-G</strong></td><td>GATE 降级为 v5 规则节点</td><td>用确定性 Python 规则替代 GATE LLM</td><td>LLM 审查 vs 规则审查：差距多大？规则在什么场景下失效？</td></tr>
+      <tr><td><strong>Sup-G</strong></td><td>Audit Agent 降级为 v5 规则节点</td><td>用确定性 Python 规则替代 Audit Agent LLM</td><td>LLM 审查 vs 规则审查：差距多大？规则在什么场景下失效？</td></tr>
     </tbody>
   </table>
-  <div class="contrib"><strong>Sup-D 是最关键的补充实验</strong>：将 GATE 的贡献拆分为"对抗角色贡献"与"主动调查贡献"，是论文中 Adversarial GATE 设计有效性的核心论据。</div>
+  <div class="contrib"><strong>Sup-D 是最关键的补充实验</strong>：将 Audit Agent 的贡献拆分为"对抗角色贡献"与"主动调查贡献"，是论文中 Adversarial GATE 设计有效性的核心论据。</div>
 
-  <h3>4.3 GATE 决策质量评估</h3>
-  <p>需专门评估 GATE 自身决策可靠性——GATE 放行的结论和拦截的结论，各自最终诊断正确率如何。</p>
+  <h3>4.3 Audit Agent 决策质量评估</h3>
+  <p>需专门评估 Audit Agent 自身决策可靠性——Audit Agent 放行的结论和拦截的结论，各自最终诊断正确率如何。</p>
   <table>
     <thead><tr><th>指标</th><th>含义</th><th>说明</th></tr></thead>
     <tbody>
-      <tr><td>True Pass Rate</td><td>GATE 放行且最终诊断正确</td><td>Pass 决策可靠性，越高越好</td></tr>
-      <tr><td>False Pass Rate</td><td>GATE 放行但最终诊断错误</td><td>越低越好；反映 GATE 失察</td></tr>
-      <tr><td>False Reject Rate</td><td>GATE 拦截但原始结论本来正确</td><td>GATE 误判成本；影响平均效率</td></tr>
+      <tr><td>True Pass Rate</td><td>Audit Agent 放行且最终诊断正确</td><td>Pass 决策可靠性，越高越好</td></tr>
+      <tr><td>False Pass Rate</td><td>Audit Agent 放行但最终诊断错误</td><td>越低越好；反映 Audit Agent 失察</td></tr>
+      <tr><td>False Reject Rate</td><td>Audit Agent 拦截但原始结论本来正确</td><td>Audit Agent 误判成本；影响平均效率</td></tr>
     </tbody>
   </table>
 
   <h3>4.4 跨模型评估</h3>
-  <p>至少使用 3 个 LLM（DeepSeek-Chat、GPT-4o-mini、Qwen 系列）做全量评测，特别关注 THINK 和 GATE 使用同一模型 vs 不同模型时的诊断差异。</p>
+  <p>至少使用 3 个 LLM（DeepSeek-Chat、GPT-4o-mini、Qwen 系列）做全量评测，特别关注 Diagnosis Agent 和 Audit Agent 使用同一模型 vs 不同模型时的诊断差异。</p>
 </section>
 
 <section id="s5">
   <h2>5. 实现路线</h2>
-  <p>工程实现建议沿着“先主图、再最小 GATE、最后完整 GATE Sub-Agent”的顺序推进，使控制流、消融边界和代码演进保持一致。</p>
+  <p>工程实现建议沿着"先 Diagnosis Agent、再最小 Audit Agent、最后完整 Orchestrator + Audit Agent"的顺序推进，使控制流、消融边界和代码演进保持一致。</p>
   <table>
     <thead><tr><th>阶段</th><th>内容</th><th>关键文件</th></tr></thead>
     <tbody>
       <tr><td>Phase B</td><td>Triage 三步实现</td><td>agent/triage.py</td></tr>
-      <tr><td>Phase C-1</td><td>Main Agent 最小可运行图</td><td>agent/diagnosis.py</td></tr>
-      <tr><td>Phase C-2</td><td>最小 GATE（单轮、零工具）</td><td>agent/gate.py</td></tr>
-      <tr><td>Phase C-3</td><td>完整 GATE Sub-Agent + hint 协议</td><td>agent/gate.py, agent/state.py</td></tr>
+      <tr><td>Phase C-1</td><td>Diagnosis Agent 最小可运行图</td><td>agent/diagnosis.py</td></tr>
+      <tr><td>Phase C-2</td><td>最小 Audit Agent（单轮、零工具）+ Orchestrator</td><td>agent/audit.py, agent/orchestrator.py</td></tr>
+      <tr><td>Phase C-3</td><td>完整 Audit Agent（工具 + 循环 + hint 协议）</td><td>agent/audit.py, agent/state.py</td></tr>
       <tr><td>Phase D</td><td>Reflect + 评估框架</td><td>agent/reflect.py, eval/evaluate.py</td></tr>
     </tbody>
   </table>
-  <div class="contrib">推荐先让主 Agent 路由稳定，再引入最小 GATE 验证交互协议，最后扩展到带工具调用的完整 Sub-Agent。这样实现路径与论文叙事一致，也更容易做消融。</div>
+  <div class="contrib">推荐先让 Diagnosis Agent 路由稳定，再引入最小 Audit Agent + Orchestrator 验证交互协议，最后扩展到带工具调用的完整 Audit Agent。三个 StateGraph 独立编译，消融时替换对应图即可。</div>
 </section>
 
 </main>

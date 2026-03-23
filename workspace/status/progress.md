@@ -113,10 +113,10 @@ Phase 3: Agent 升级 — **设计阶段**
 - [ ] 3 个 Tools 实现
 - [ ] FINALIZE 节点
 
-## 2026-03-23: v6 设计定稿（GATE 升级为 Adversarial Sub-Agent）
-- 完成: 将 GATE 从纯 Python 规则节点升级为具备有限 ReAct 循环、独立 budget、信息隔离和 hint 协议的 Adversarial Sub-Agent；同步补齐 v6 完整设计文档与展示文稿
-- 产出: `design/v6.md`, `doc/agent_design_report_v6.html`
-- 下一步: 按 v6 拆分 Phase C，实现最小 GATE → 完整 GATE Sub-Agent 的渐进式工程落地
+## 2026-03-23: v6 设计定稿（GATE 升级为独立 Audit Agent）
+- 完成: 将 GATE 从纯 Python 规则节点升级为独立 Audit Agent（与 Diagnosis Agent 架构级分离，由 Orchestrator 协调）；具备有限 ReAct 循环、独立 AuditState、audit_budget、信息隔离和 hint 协议；同步补齐 v6 完整设计文档与展示文稿
+- 产出: `design/v6.md`, `doc/agent_design_report_v6.html`, `design/changelog.md`
+- 下一步: 按 v6 拆分 Phase C，实现 Diagnosis Agent → 最小 Audit Agent + Orchestrator → 完整 Audit Agent 的渐进式工程落地
 
 ### Phase D: Reflect & 评估
 - [ ] REFLECT 节点 (无监督规则提炼 + FPL 写回)
