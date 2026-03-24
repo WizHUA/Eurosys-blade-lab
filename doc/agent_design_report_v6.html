@@ -91,7 +91,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
 <section id="s2">
   <h2>2. 系统总览</h2>
   <div class="svg-wrap">
-  <svg width="800" height="560" viewBox="0 0 800 560" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
+  <svg width="820" height="680" viewBox="0 0 820 680" xmlns="http://www.w3.org/2000/svg" style="font-family:-apple-system,sans-serif;display:block">
   <defs>
     <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
     <marker id="ahp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#7c3aed"/></marker>
@@ -99,28 +99,28 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <marker id="ahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#059669"/></marker>
     <marker id="ahr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#dc2626"/></marker>
   </defs>
-  <rect width="800" height="560" fill="#f8fafc"/>
+  <rect width="820" height="680" fill="#f8fafc"/>
 
-  <!-- Input -->
-  <rect x="622" y="8" width="165" height="56" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
-  <text x="705" y="26" text-anchor="middle" font-size="10.5" fill="#475569" font-weight="700">输入数据</text>
-  <text x="705" y="43" text-anchor="middle" font-size="11" fill="#475569">metrics.csv</text>
-  <text x="705" y="57" text-anchor="middle" font-size="11" fill="#475569">jobinfo.csv</text>
+  <!-- ═══════ Input ═══════ -->
+  <rect x="640" y="8" width="165" height="56" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="723" y="26" text-anchor="middle" font-size="10.5" fill="#475569" font-weight="700">输入数据</text>
+  <text x="723" y="43" text-anchor="middle" font-size="11" fill="#475569">metrics.csv</text>
+  <text x="723" y="57" text-anchor="middle" font-size="11" fill="#475569">jobinfo.csv</text>
 
-  <!-- Stage 0: KB -->
-  <rect x="10" y="8" width="600" height="56" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="22" y="24" font-size="10.5" fill="#1e40af" font-weight="700">Offline Knowledge Base — 离线构建（两层）</text>
+  <!-- ═══════ Stage 0: KB ═══════ -->
+  <rect x="10" y="8" width="618" height="56" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="22" y="24" font-size="10.5" fill="#1e40af" font-weight="700">Offline Knowledge Base — 离线构建</text>
   <rect x="22" y="30" width="185" height="26" rx="5" fill="#3b82f6"/>
   <text x="114" y="48" text-anchor="middle" fill="white" font-size="11">Metric KB（YAML + 向量索引）</text>
   <rect x="220" y="30" width="195" height="26" rx="5" fill="#3b82f6"/>
   <text x="317" y="48" text-anchor="middle" fill="white" font-size="11">Fault Pattern Library（初始为空）</text>
 
-  <!-- KB→Stage1 & Input arrow -->
+  <!-- KB → Triage -->
   <line x1="317" y1="64" x2="317" y2="82" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
-  <line x1="622" y1="58" x2="600" y2="92" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ah)"/>
+  <line x1="640" y1="58" x2="618" y2="92" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ah)"/>
 
-  <!-- Stage 1: Triage -->
-  <rect x="10" y="82" width="600" height="60" rx="7" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <!-- ═══════ Stage 1: Triage ═══════ -->
+  <rect x="10" y="82" width="618" height="60" rx="7" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
   <text x="22" y="98" font-size="10.5" fill="#064e3b" font-weight="700">Stage 1  Triage — 确定性分诊，纯 Python，零 LLM Token</text>
   <rect x="22" y="104" width="148" height="26" rx="5" fill="#059669"/>
   <text x="96" y="122" text-anchor="middle" fill="white" font-size="10.5">Step1 异常指标筛选</text>
@@ -131,126 +131,159 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <rect x="420" y="104" width="170" height="26" rx="5" fill="#065f46"/>
   <text x="505" y="122" text-anchor="middle" fill="white" font-size="11" font-weight="700">→ FocusContext</text>
 
-  <!-- Stage1→Stage2 -->
-  <line x1="317" y1="142" x2="317" y2="162" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
-  <text x="330" y="156" font-size="9.5" fill="#64748b">FocusContext + causal_order</text>
+  <!-- Triage → Stage 2 -->
+  <line x1="317" y1="142" x2="317" y2="168" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <text x="330" y="160" font-size="9.5" fill="#64748b">FocusContext + causal_order</text>
 
-  <!-- Stage 2: Diagnosis Agent -->
-  <rect x="10" y="162" width="600" height="230" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="22" y="180" font-size="10.5" fill="#4c1d95" font-weight="700">Stage 2  Orchestrator { Diagnosis Agent ↔ Audit Agent }</text>
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Stage 2: Orchestrator outer frame (dark border, subtle bg) -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <rect x="6" y="168" width="808" height="388" rx="10" fill="#f5f5ff" stroke="#334155" stroke-width="2.5"/>
+  <text x="20" y="186" font-size="12" fill="#1e293b" font-weight="800">Stage 2  Orchestrator（确定性协调）</text>
+  <text x="280" y="186" font-size="10" fill="#64748b">{ Diagnosis Agent ↔ Audit Agent }</text>
+
+  <!-- ─── Diagnosis Agent box ─── -->
+  <rect x="18" y="196" width="525" height="128" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="30" y="212" font-size="11" fill="#4c1d95" font-weight="700">Diagnosis Agent（diagnosis_graph · 独立 DiagnosisState）</text>
 
   <!-- HYPOTHESIZE -->
-  <rect x="22" y="186" width="130" height="30" rx="5" fill="#7c3aed"/>
-  <text x="87" y="201" text-anchor="middle" fill="white" font-size="10.5" font-weight="700">HYPOTHESIZE</text>
-  <text x="87" y="213" text-anchor="middle" fill="white" font-size="9">(LLM)</text>
-  <line x1="152" y1="200" x2="172" y2="200" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
+  <rect x="30" y="220" width="120" height="28" rx="5" fill="#7c3aed"/>
+  <text x="90" y="239" text-anchor="middle" fill="white" font-size="10.5" font-weight="700">HYPOTHESIZE</text>
+  <line x1="150" y1="234" x2="168" y2="234" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ahp)"/>
 
   <!-- ReAct Loop -->
-  <rect x="172" y="184" width="265" height="110" rx="6" fill="rgba(109,40,217,.07)" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5,3"/>
-  <text x="184" y="198" font-size="9.5" fill="#6d28d9" font-weight="700">Main ReAct Loop</text>
-  <rect x="182" y="202" width="72" height="26" rx="4" fill="#6d28d9"/>
-  <text x="218" y="220" text-anchor="middle" fill="white" font-size="10.5">THINK</text>
-  <line x1="254" y1="215" x2="270" y2="215" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
-  <rect x="270" y="202" width="65" height="26" rx="4" fill="#6d28d9"/>
-  <text x="302" y="220" text-anchor="middle" fill="white" font-size="10.5">ACT</text>
-  <line x1="335" y1="215" x2="352" y2="215" stroke="#c4b5fd" stroke-width="1.5" marker-end="url(#ahp)"/>
-  <rect x="352" y="202" width="72" height="26" rx="4" fill="#6d28d9"/>
-  <text x="388" y="220" text-anchor="middle" fill="white" font-size="10.5">OBSERVE</text>
+  <rect x="168" y="218" width="290" height="64" rx="6" fill="rgba(109,40,217,.07)" stroke="#7c3aed" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="180" y="232" font-size="9" fill="#6d28d9" font-weight="700">Main ReAct Loop</text>
+  <rect x="178" y="238" width="68" height="24" rx="4" fill="#6d28d9"/>
+  <text x="212" y="255" text-anchor="middle" fill="white" font-size="10">THINK</text>
+  <line x1="246" y1="250" x2="260" y2="250" stroke="#c4b5fd" stroke-width="1.3" marker-end="url(#ahp)"/>
+  <rect x="260" y="238" width="60" height="24" rx="4" fill="#6d28d9"/>
+  <text x="290" y="255" text-anchor="middle" fill="white" font-size="10">ACT</text>
+  <line x1="320" y1="250" x2="338" y2="250" stroke="#c4b5fd" stroke-width="1.3" marker-end="url(#ahp)"/>
+  <rect x="338" y="238" width="72" height="24" rx="4" fill="#6d28d9"/>
+  <text x="374" y="255" text-anchor="middle" fill="white" font-size="10">OBSERVE</text>
   <!-- iterate arc -->
-  <path d="M424 228 Q424 270 302 270 Q182 270 182 228" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ahp)"/>
-  <text x="302" y="284" text-anchor="middle" fill="#6d28d9" font-size="9.5">iterate</text>
+  <path d="M410 262 Q412 286 290 286 Q178 286 178 262" fill="none" stroke="#c4b5fd" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#ahp)"/>
+  <text x="290" y="298" text-anchor="middle" fill="#6d28d9" font-size="9">iterate</text>
 
-  <!-- conclude → GATE -->
-  <line x1="218" y1="228" x2="218" y2="296" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#ahp)"/>
-  <text x="232" y="264" font-size="9.5" fill="#7c3aed">conclude</text>
+  <!-- conclude output label -->
+  <rect x="470" y="234" width="62" height="20" rx="4" fill="#4c1d95"/>
+  <text x="501" y="249" text-anchor="middle" fill="white" font-size="9">conclude</text>
 
-  <!-- Audit Agent box -->
-  <rect x="22" y="296" width="535" height="82" rx="6" fill="rgba(220,38,38,.06)" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="34" y="311" font-size="10.5" fill="#7f1d1d" font-weight="700">Audit Agent — Adversarial LLM（独立 State，架构级信息隔离）</text>
-  <rect x="90" y="316" width="105" height="26" rx="4" fill="#4c1d95"/>
-  <text x="142" y="334" text-anchor="middle" fill="white" font-size="10.5">GATE_THINK</text>
-  <line x1="195" y1="329" x2="215" y2="329" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
-  <rect x="215" y="316" width="96" height="26" rx="4" fill="#f97316"/>
-  <text x="263" y="334" text-anchor="middle" fill="white" font-size="10.5">GATE_ACT</text>
-  <line x1="311" y1="329" x2="331" y2="329" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
-  <rect x="331" y="316" width="110" height="26" rx="4" fill="#f97316"/>
-  <text x="386" y="334" text-anchor="middle" fill="white" font-size="10.5">GATE_OBSERVE</text>
-  <!-- 4 outputs labels -->
-  <text x="65" y="368" text-anchor="middle" fill="#059669" font-size="9.5" font-weight="700">pass</text>
-  <text x="185" y="368" text-anchor="middle" fill="#d97706" font-size="9.5" font-weight="700">continue+hint</text>
-  <text x="330" y="368" text-anchor="middle" fill="#dc2626" font-size="9.5" font-weight="700">rehypothesize</text>
-  <text x="480" y="368" text-anchor="middle" fill="#64748b" font-size="9.5" font-weight="700">degrade</text>
+  <!-- Diagnosis Agent → ConclusionProposal -->
+  <line x1="501" y1="254" x2="501" y2="310" stroke="#4c1d95" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#ahp)"/>
 
-  <!-- 4 output arrows from GATE_THINK area -->
-  <line x1="65"  y1="342" x2="65"  y2="362" stroke="#059669" stroke-width="1.3" marker-end="url(#ahg)"/>
-  <line x1="185" y1="342" x2="185" y2="362" stroke="#d97706" stroke-width="1.3" marker-end="url(#ah)"/>
-  <line x1="330" y1="342" x2="330" y2="362" stroke="#dc2626" stroke-width="1.3" marker-end="url(#ahr)"/>
-  <line x1="480" y1="342" x2="480" y2="362" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
+  <!-- ─── Diagnosis Tools (right side) ─── -->
+  <rect x="555" y="196" width="145" height="128" rx="7" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="628" y="213" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Diagnosis Agent）</text>
+  <rect x="565" y="220" width="125" height="24" rx="4" fill="#f97316"/>
+  <text x="628" y="237" text-anchor="middle" fill="white" font-size="10.5">MetricQueryTool</text>
+  <rect x="565" y="250" width="125" height="24" rx="4" fill="#f97316"/>
+  <text x="628" y="267" text-anchor="middle" fill="white" font-size="10.5">KBRetrievalTool</text>
+  <rect x="565" y="280" width="125" height="24" rx="4" fill="#f97316"/>
+  <text x="628" y="297" text-anchor="middle" fill="white" font-size="10.5">DataAnalysisTool</text>
+  <!-- ACT → tools dashed -->
+  <line x1="543" y1="250" x2="555" y2="250" stroke="#f97316" stroke-width="1.2" stroke-dasharray="4,2"/>
 
-  <!-- continue → THINK back arc -->
-  <path d="M185 378 Q185 408 610 280 Q640 200 440 215" fill="none" stroke="#d97706" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ah)"/>
-  <text x="520" y="246" text-anchor="middle" fill="#d97706" font-size="9">continue → THINK</text>
+  <!-- ═══ Orchestrator 连接层 ═══ -->
+  <rect x="110" y="328" width="240" height="26" rx="5" fill="#334155"/>
+  <text x="230" y="345" text-anchor="middle" fill="white" font-size="11" font-weight="700">ConclusionProposal</text>
 
-  <!-- rehypothesize → HYPOTHESIZE back arc -->
-  <path d="M330 378 Q330 406 80 300 Q22 240 22 220 Q22 200 60 200" fill="none" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#ahr)"/>
+  <rect x="360" y="328" width="158" height="26" rx="5" fill="#64748b"/>
+  <text x="439" y="345" text-anchor="middle" fill="white" font-size="10.5">Orchestrator 强制提交</text>
+
+  <!-- ConclusionProposal arrow down to Audit Agent -->
+  <line x1="300" y1="354" x2="300" y2="374" stroke="#334155" stroke-width="1.8" marker-end="url(#ah)"/>
+
+  <!-- ── 信息隔离虚线 ── -->
+  <line x1="18" y1="362" x2="700" y2="362" stroke="#dc2626" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="714" y="366" font-size="9" fill="#dc2626" font-weight="700">信息隔离边界</text>
+
+  <!-- ─── Audit Agent box ─── -->
+  <rect x="18" y="374" width="525" height="82" rx="7" fill="rgba(220,38,38,.06)" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="30" y="390" font-size="11" fill="#7f1d1d" font-weight="700">Audit Agent（audit_graph · 独立 AuditState）</text>
+
+  <rect x="80" y="400" width="100" height="26" rx="4" fill="#4c1d95"/>
+  <text x="130" y="418" text-anchor="middle" fill="white" font-size="10.5">GATE_THINK</text>
+  <line x1="180" y1="413" x2="200" y2="413" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
+  <rect x="200" y="400" width="90" height="26" rx="4" fill="#f97316"/>
+  <text x="245" y="418" text-anchor="middle" fill="white" font-size="10.5">GATE_ACT</text>
+  <line x1="290" y1="413" x2="310" y2="413" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
+  <rect x="310" y="400" width="105" height="26" rx="4" fill="#f97316"/>
+  <text x="362" y="418" text-anchor="middle" fill="white" font-size="10.5">GATE_OBSERVE</text>
+
+  <!-- Audit Agent output label -->
+  <rect x="430" y="400" width="100" height="26" rx="4" fill="#7f1d1d"/>
+  <text x="480" y="418" text-anchor="middle" fill="white" font-size="10">AuditDecision</text>
+
+  <!-- Audit Agent → AuditDecision out -->
+  <line x1="480" y1="426" x2="480" y2="460" stroke="#7f1d1d" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- ─── Audit Tools (right side) ─── -->
+  <rect x="555" y="374" width="145" height="82" rx="7" fill="#fff0f0" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="628" y="391" text-anchor="middle" font-size="10.5" fill="#7f1d1d" font-weight="700">工具（Audit Agent）</text>
+  <rect x="565" y="398" width="125" height="24" rx="4" fill="#dc2626"/>
+  <text x="628" y="415" text-anchor="middle" fill="white" font-size="10.5">MetricQueryTool</text>
+  <rect x="565" y="428" width="125" height="24" rx="4" fill="#dc2626"/>
+  <text x="628" y="445" text-anchor="middle" fill="white" font-size="10.5">KBRetrievalTool</text>
+
+  <!-- GATE_ACT → Audit tools dashed -->
+  <line x1="543" y1="413" x2="555" y2="413" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- ═══ Orchestrator 路由层 ═══ -->
+  <rect x="80" y="462" width="460" height="28" rx="5" fill="#334155"/>
+  <text x="310" y="481" text-anchor="middle" fill="white" font-size="11" font-weight="700">Orchestrator 路由（确定性）</text>
+
+  <!-- 4 output arrows from Orchestrator routing -->
+  <line x1="130" y1="490" x2="100" y2="516" stroke="#059669" stroke-width="1.4" marker-end="url(#ahg)"/>
+  <line x1="240" y1="490" x2="240" y2="516" stroke="#d97706" stroke-width="1.4" marker-end="url(#ah)"/>
+  <line x1="370" y1="490" x2="400" y2="516" stroke="#dc2626" stroke-width="1.4" marker-end="url(#ahr)"/>
+  <line x1="470" y1="490" x2="502" y2="516" stroke="#64748b" stroke-width="1.4" marker-end="url(#ah)"/>
+
+  <!-- pass -->
+  <rect x="40" y="516" width="120" height="28" rx="5" fill="#059669"/>
+  <text x="100" y="535" text-anchor="middle" fill="white" font-size="11" font-weight="700">pass</text>
+  <!-- continue+hint -->
+  <rect x="170" y="516" width="140" height="28" rx="5" fill="#d97706"/>
+  <text x="240" y="535" text-anchor="middle" fill="white" font-size="10.5" font-weight="700">continue + hint</text>
+  <!-- rehypothesize -->
+  <rect x="330" y="516" width="140" height="28" rx="5" fill="#dc2626"/>
+  <text x="400" y="535" text-anchor="middle" fill="white" font-size="10.5" font-weight="700">rehypothesize</text>
+  <!-- degrade -->
+  <rect x="480" y="516" width="100" height="28" rx="5" fill="#64748b"/>
+  <text x="530" y="535" text-anchor="middle" fill="white" font-size="10.5" font-weight="700">degrade</text>
+
+  <!-- Routing back arcs -->
+  <!-- continue → back to Diagnosis Agent (left arc) -->
+  <path d="M195 544 Q10 544 10 350 Q10 230 30 230" fill="none" stroke="#d97706" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#ah)"/>
+  <text x="4" y="400" font-size="9" fill="#d97706" writing-mode="tb">hint → Diagnosis</text>
+
+  <!-- rehypothesize → back to HYPOTHESIZE -->
+  <path d="M470 544 Q780 544 780 320 Q780 220 543 220 Q530 220 530 230" fill="none" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#ahr)"/>
+  <text x="754" y="350" font-size="9" fill="#dc2626" writing-mode="tb">→ HYPOTHESIZE</text>
+
+  <!-- Outer Stage 2 frame end (Orchestrator) -->
+
+  <!-- ═══════ FINALIZE ═══════ -->
+  <rect x="245" y="558" width="140" height="28" rx="5" fill="#4c1d95"/>
+  <text x="315" y="577" text-anchor="middle" fill="white" font-size="11">FINALIZE（LLM）</text>
 
   <!-- pass + degrade → FINALIZE -->
-  <line x1="65"  y1="378" x2="295" y2="412" stroke="#059669" stroke-width="1.3" marker-end="url(#ah)"/>
-  <line x1="480" y1="378" x2="330" y2="412" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
+  <line x1="100" y1="544" x2="280" y2="558" stroke="#059669" stroke-width="1.3" marker-end="url(#ah)"/>
+  <line x1="530" y1="544" x2="350" y2="558" stroke="#64748b" stroke-width="1.3" marker-end="url(#ah)"/>
 
-  <!-- FINALIZE -->
-  <rect x="245" y="412" width="140" height="28" rx="5" fill="#4c1d95"/>
-  <text x="315" y="431" text-anchor="middle" fill="white" font-size="11">FINALIZE（LLM）</text>
-  <line x1="315" y1="440" x2="315" y2="404" stroke="none"/>
+  <!-- FINALIZE → Reflect -->
+  <line x1="315" y1="586" x2="315" y2="600" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
 
-  <!-- FINALIZE → Reflect arrow (down-left) -->
-  <path d="M315 440 L315 460 L317 460" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
-
-  <!-- Stage 3: Reflect -->
-  <rect x="10" y="460" width="600" height="52" rx="7" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-  <text x="22" y="477" font-size="10.5" fill="#78350f" font-weight="700">Stage 3  Reflect — 规则提炼 → 写回 Fault Pattern Library</text>
-  <text x="22" y="494" font-size="10.5" fill="#92400e">LLM 提炼症状签名 → 相似度去重 → fpl.jsonl 写入（candidate）→ 多次命中后升为 confirmed</text>
+  <!-- ═══════ Stage 3: Reflect ═══════ -->
+  <rect x="10" y="600" width="618" height="42" rx="7" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="22" y="617" font-size="10.5" fill="#78350f" font-weight="700">Stage 3  Reflect — 规则提炼 → 写回 Fault Pattern Library</text>
+  <text x="22" y="633" font-size="10" fill="#92400e">LLM 提炼症状签名 → 去重 → fpl.jsonl 写入</text>
 
   <!-- Reflect → output -->
-  <line x1="317" y1="512" x2="317" y2="526" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
-  <!-- Output -->
-  <rect x="80" y="526" width="480" height="28" rx="6" fill="#1e293b"/>
-  <text x="320" y="545" text-anchor="middle" fill="#e2e8f0" font-size="12">输出：DiagnosisReport (JSON) + ExecutionTrace</text>
-
-  <!-- Tools box -->
-  <rect x="622" y="82" width="165" height="180" rx="7" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
-  <text x="705" y="99" text-anchor="middle" font-size="10.5" fill="#7c2d12" font-weight="700">工具（Diagnosis Agent）</text>
-  <rect x="632" y="104" width="145" height="26" rx="4" fill="#f97316"/>
-  <text x="705" y="122" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
-  <rect x="632" y="136" width="145" height="26" rx="4" fill="#f97316"/>
-  <text x="705" y="154" text-anchor="middle" fill="white" font-size="11">KBRetrievalTool</text>
-  <rect x="632" y="168" width="145" height="26" rx="4" fill="#f97316"/>
-  <text x="705" y="186" text-anchor="middle" fill="white" font-size="11">DataAnalysisTool</text>
-  <text x="705" y="218" text-anchor="middle" font-size="9.5" fill="#7c2d12">↕ function calling</text>
-  <text x="705" y="232" text-anchor="middle" font-size="9.5" fill="#7c2d12">输出摘要压缩后</text>
-  <text x="705" y="246" text-anchor="middle" font-size="9.5" fill="#7c2d12">写入 evidence[]</text>
-
-  <!-- GATE tools box -->
-  <rect x="622" y="272" width="165" height="100" rx="7" fill="#fff0f0" stroke="#dc2626" stroke-width="1.5"/>
-  <text x="705" y="289" text-anchor="middle" font-size="10.5" fill="#7f1d1d" font-weight="700">工具（Audit Agent）</text>
-  <rect x="632" y="294" width="145" height="26" rx="4" fill="#dc2626"/>
-  <text x="705" y="312" text-anchor="middle" fill="white" font-size="11">MetricQueryTool</text>
-  <rect x="632" y="326" width="145" height="26" rx="4" fill="#dc2626"/>
-  <text x="705" y="344" text-anchor="middle" fill="white" font-size="11">KBRetrievalTool</text>
-  <text x="705" y="364" text-anchor="middle" font-size="9" fill="#7f1d1d">独立 audit_budget</text>
-
-  <!-- ACT → Main tools -->
-  <line x1="610" y1="215" x2="622" y2="215" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#aho)"/>
-  <!-- tools return → OBSERVE -->
-  <line x1="622" y1="228" x2="424" y2="228" stroke="#f97316" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#aho)"/>
-
-  <!-- GATE → GATE tools -->
-  <line x1="557" y1="329" x2="622" y2="329" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#ahr)"/>
-  <line x1="622" y1="342" x2="441" y2="342" stroke="#dc2626" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#ahr)"/>
-
-  <!-- KB dashed feeds -->
-  <line x1="405" y1="64" x2="470" y2="82" stroke="#3b82f6" stroke-width="0.9" stroke-dasharray="3,2"/>
-  <line x1="317" y1="64" x2="317" y2="80" stroke="#3b82f6" stroke-width="0.9" stroke-dasharray="2,2"/>
+  <line x1="317" y1="642" x2="317" y2="654" stroke="#64748b" stroke-width="1.5" marker-end="url(#ah)"/>
+  <rect x="80" y="654" width="480" height="24" rx="6" fill="#1e293b"/>
+  <text x="320" y="670" text-anchor="middle" fill="#e2e8f0" font-size="11">输出：DiagnosisReport (JSON) + ExecutionTrace</text>
   </svg>
   </div>
   <table>
@@ -298,10 +331,10 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     <thead><tr><th>状态字段</th><th>类型</th><th>作用</th></tr></thead>
     <tbody>
       <tr><td>hypotheses</td><td>list[Hypothesis]</td><td>显式维护多个候选根因及其状态</td></tr>
-      <tr><td>evidence</td><td>list[Evidence]</td><td>主 Agent 收集的支持/反驳/中性证据</td></tr>
+      <tr><td>evidence</td><td>list[Evidence]</td><td>Diagnosis Agent 收集的支持/反驳/中性证据</td></tr>
       <tr><td>react_trace</td><td>list[ReActStep]</td><td>THINK/ACT/OBSERVE 的可审计轨迹</td></tr>
       <tr><td>gate_hint</td><td>str | null</td><td>Orchestrator 注入的 Audit Agent 反馈</td></tr>
-      <tr><td>budget</td><td>dict</td><td>主 Agent 的工具调用与 token 消耗</td></tr>
+      <tr><td>budget</td><td>dict</td><td>Diagnosis Agent 的工具调用与 token 消耗</td></tr>
     </tbody>
   </table>
   <div class="info"><strong>confidence 更新：</strong>v6 不再依赖 Evidence.strength 打分公式。THINK 每轮在 thought 输出中报告各假设的 confidence 估计值；Audit Agent 若发现 confidence 与证据不符，在 hint 中指出。confidence 不允许在无新证据的情况下上升。</div>
@@ -350,7 +383,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <path d="M679 104 Q679 148 360 148 Q240 148 240 112" fill="none" stroke="#c4b5fd" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#r6p)"/>
   <text x="490" y="163" text-anchor="middle" fill="#6d28d9" font-size="9.5">iterate → 下一轮 THINK</text>
 
-  <!-- THINK → GATE (conclude branch, goes down) -->
+  <!-- THINK → Audit Agent (conclude branch, goes down) -->
   <line x1="360" y1="112" x2="360" y2="180" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#r6p)"/>
   <text x="378" y="150" font-size="9.5" fill="#7c3aed">conclude</text>
 
@@ -360,7 +393,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   <text x="360" y="207" text-anchor="middle" fill="white" font-size="12" font-weight="700">Audit Agent (独立 Adversarial LLM)</text>
 
   <!-- ── Row 4: 4 output decision boxes ── evenly spaced at x=90, 240, 400, 560 -->
-  <!-- Arrows from GATE bottom to each box top -->
+  <!-- Arrows from Audit Agent bottom to each box top -->
   <line x1="175" y1="224" x2="104" y2="262" stroke="#059669" stroke-width="1.4" marker-end="url(#r6g)"/>
   <line x1="300" y1="224" x2="274" y2="262" stroke="#d97706" stroke-width="1.4" marker-end="url(#r6o)"/>
   <line x1="420" y1="224" x2="440" y2="262" stroke="#dc2626" stroke-width="1.4" marker-end="url(#r6r)"/>
@@ -449,13 +482,13 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
       <!-- ─── Row 2: GATE_OBSERVE ─── -->
       <rect x="454" y="90" width="120" height="40" rx="6" fill="#f97316"/>
       <text x="514" y="109" text-anchor="middle" fill="white" font-size="12" font-weight="700">GATE_OBSERVE</text>
-      <text x="514" y="123" text-anchor="middle" fill="white" font-size="9.5">生成 gate_evidence</text>
+      <text x="514" y="123" text-anchor="middle" fill="white" font-size="9.5">生成 audit_evidence</text>
 
       <!-- GATE_OBSERVE → GATE_THINK loop arc （有时需要再审查） -->
       <path d="M454 110 Q380 160 314 54" fill="none" stroke="#c4b5fd" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#v6purple)"/>
       <text x="372" y="156" text-anchor="middle" fill="#6d28d9" font-size="9">必要时回到 GATE_THINK</text>
 
-      <!-- ─── Decision bar: GATE 最终输出决策 ─── -->
+      <!-- ─── Decision bar: Audit Agent 最终输出决策 ─── -->
       <rect x="80" y="176" width="480" height="32" rx="6" fill="#7f1d1d"/>
       <text x="320" y="197" text-anchor="middle" fill="white" font-size="11.5" font-weight="700">Audit Agent 决策输出（AuditDecision: decision + reason + hint）</text>
 
@@ -503,7 +536,7 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
       <tr><td>角色</td><td>证据审查员，目标是寻找漏洞而不是生成诊断</td></tr>
       <tr><td>可见信息</td><td>ConclusionProposal（hypotheses, evidence）+ focus_context；不可见 react_trace、thought、budget</td></tr>
       <tr><td>工具</td><td>MetricQueryTool, KBRetrievalTool</td></tr>
-      <tr><td>预算</td><td>独立 gate_budget，默认最多 3 次工具调用、2 轮循环</td></tr>
+      <tr><td>预算</td><td>独立 audit_budget，默认最多 3 次工具调用、2 轮循环</td></tr>
       <tr><td>输出</td><td>decision + reason + hint + diagnosis_type</td></tr>
     </tbody>
   </table>
@@ -523,12 +556,12 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
     </tbody>
   </table>
   <div class="warn"><strong>Audit Budget 耗尽默认决策：</strong>若已发现强反驳证据 → continue；若未发现 → pass（审查者穷尽资源仍未推翻→默认放行）；若假设空间整体失效 → degrade。</div>
-  <div class="info"><strong>hint 历史策略：</strong>Audit Agent 只能看到最近一次 gate_hint，历史 hint 完整记录在 gate_trace 中供审计。</div>
+  <div class="info"><strong>hint 历史策略：</strong>Audit Agent 只能看到最近一次 gate_hint，历史 hint 完整记录在 audit_trace 中供审计。</div>
 
   <h3 id="s34">3.4 Evidence Gating</h3>
   <p>系统采用方案 C：Audit Agent 不直接把自身查到的结果并入主 evidence，而是通过 Orchestrator 以 gate_hint 形式告诉 Diagnosis Agent 下一步需要验证什么。这样既保留角色边界，也避免 THINK 重复摸索同一个漏洞。</p>
   <table>
-    <thead><tr><th>GATE 输出</th><th>系统行为</th></tr></thead>
+    <thead><tr><th>Audit Agent 输出</th><th>系统行为</th></tr></thead>
     <tbody>
       <tr><td>pass</td><td>直接进入 FINALIZE，gate_hint 置空</td></tr>
       <tr><td>continue</td><td>将 hint 写入 state，THINK 下一轮优先处理该提示</td></tr>
@@ -592,17 +625,17 @@ code{font-family:"JetBrains Mono",Consolas,monospace}
   </table>
   <div class="info">Abl-A / Abl-B / Abl-C 三条一一映射到论文 Ablation Study 的三个小节；BL-1 / BL-2 映射到 Baseline Comparison。</div>
 
-  <h3>4.2 深挖 GATE 机制（选做 · 回答"Adversarial GATE 为何有效"）</h3>
-  <p>以下三条补充实验专门针对 GATE 的三个关键设计选择，层层递进地拆解 GATE 贡献来源。</p>
+  <h3>4.2 深挖 Audit Agent 机制（选做 · 回答"Adversarial Audit 为何有效"）</h3>
+  <p>以下三条补充实验专门针对 Audit Agent 的三个关键设计选择，层层递进地拆解 Audit Agent 贡献来源。</p>
   <table>
     <thead><tr><th>编号</th><th>名称</th><th>消融方式</th><th>回答的问题</th></tr></thead>
     <tbody>
       <tr><td><strong>Sup-D</strong></td><td>Audit Agent 降级为单次 LLM call</td><td>Audit Agent 无工具无循环，仅一次 LLM 审查</td><td>有效的是"审查者角色"还是"主动调查（工具+循环）"？</td></tr>
-      <tr><td><strong>Sup-F</strong></td><td>禁用 hint 协议</td><td>GATE 仅返回 pass/continue，不传 hint 给 THINK</td><td>hint 驱动定向补查 vs THINK 自主探索：效率差距多大？</td></tr>
+      <tr><td><strong>Sup-F</strong></td><td>禁用 hint 协议</td><td>Audit Agent 仅返回 pass/continue，不传 hint 给 THINK</td><td>hint 驱动定向补查 vs THINK 自主探索：效率差距多大？</td></tr>
       <tr><td><strong>Sup-G</strong></td><td>Audit Agent 降级为 v5 规则节点</td><td>用确定性 Python 规则替代 Audit Agent LLM</td><td>LLM 审查 vs 规则审查：差距多大？规则在什么场景下失效？</td></tr>
     </tbody>
   </table>
-  <div class="contrib"><strong>Sup-D 是最关键的补充实验</strong>：将 Audit Agent 的贡献拆分为"对抗角色贡献"与"主动调查贡献"，是论文中 Adversarial GATE 设计有效性的核心论据。</div>
+  <div class="contrib"><strong>Sup-D 是最关键的补充实验</strong>：将 Audit Agent 的贡献拆分为"对抗角色贡献"与"主动调查贡献"，是论文中 Adversarial Audit Agent 设计有效性的核心论据。</div>
 
   <h3>4.3 Audit Agent 决策质量评估</h3>
   <p>需专门评估 Audit Agent 自身决策可靠性——Audit Agent 放行的结论和拦截的结论，各自最终诊断正确率如何。</p>

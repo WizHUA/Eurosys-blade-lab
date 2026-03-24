@@ -141,6 +141,18 @@ Phase 3: Agent 升级 — **设计阶段**
   - `doc/agent_design_report_v6.html`（7 项同步更新）
   - `design/changelog.md`（新增 v6 条目，10 项变更记录）
 - 遗留（待 Phase C 实现时处理）:
-  - `agent/schema.py` 需适配 v6 变更（删 strength、新增 GateEvidence 等）
+  - `agent/schema.py` 需适配 v6 变更（删 strength、新增 AuditEvidence 等）
   - `design/evidence_gating.md` 需标记为 superseded by v6
 - 下一步: Phase B Triage 实现 → Phase C 按 v6 拆分实现
+
+## 2026-03-24: 全面落实双 Agent 独立架构
+- 完成: Stage 2 从"主 Agent 内嵌 GATE Sub-Agent"全面升级为"Diagnosis Agent + Audit Agent 架构级分离、由 Orchestrator 协调"的双 Agent 模式
+- 主要变更:
+  1. **v6.md 术语统一**：消除全部 69 处独立 "GATE" 引用 → "Audit Agent"，消除 "主 Agent" → "Diagnosis Agent"，消除 "Sub-Agent"
+  2. **v6.md 架构图重写**：§2.2 ASCII 图清晰展现 Orchestrator { Diagnosis Agent (diagnosis_graph) ↔ Audit Agent (audit_graph) } 的三图结构
+  3. **v6.md 字段名对齐**：gate_budget → audit_budget, gate_evidence → audit_evidence, gate_trace → audit_trace（与 §4.1 AuditState 定义一致）
+  4. **v6.html §2 SVG 重写**：820×680 新布局，Diagnosis Agent 和 Audit Agent 各自独立框线 + 信息隔离虚线 + Orchestrator 外层容器
+  5. **v6.html 全文术语**：消除全部 Sub-Agent / 主 Agent / 独立 GATE 引用
+  6. **消融表/实现路线**：Part X-XII 的 "无 GATE" → "无 Audit Agent"，Phase C 拆分为 diagnosis.py + audit.py + orchestrator.py
+- 产出: `design/v6.md`, `doc/agent_design_report_v6.html`, `design/changelog.md`
+- 下一步: Phase A 实现（Metric KB 构建）
