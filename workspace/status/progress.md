@@ -156,3 +156,60 @@ Phase 3: Agent 升级 — **设计阶段**
   6. **消融表/实现路线**：Part X-XII 的 "无 GATE" → "无 Audit Agent"，Phase C 拆分为 diagnosis.py + audit.py + orchestrator.py
 - 产出: `design/v6.md`, `doc/agent_design_report_v6.html`, `design/changelog.md`
 - 下一步: Phase A 实现（Metric KB 构建）
+
+## 2026-03-28: 全流程实现需求文档完成
+- 完成: 基于 v6.md 设计规格，编写完整的工程实现需求文档（15 章 + 4 附录，约 2470 行）
+- 文档结构:
+  - Ch1-4: 总体架构、Schema v4→v6 升级规格、Config 全局配置（含 13 个消融 flag）、Triage 实现
+  - Ch5-8: Diagnosis Agent（HYPOTHESIZE/THINK/ACT/OBSERVE 四节点）、Audit Agent（GATE_THINK/ACT/OBSERVE + 信息隔离）、Orchestrator 三图协调、三工具完整 API 契约
+  - Ch9-15: FINALIZE、Reflect + FPL 写回、Prompt 模板管理、LLM Client 封装（含 TokenTracker 分项计量）、评估框架（GT 比对 + 消融运行器）、run_agent.py 入口、分阶段验收标准
+  - 附录 A-D: 子系统前缀映射表、fault_info.txt 解析规范、已知风险缓解、29 实验 GT 速查表
+- 产出:
+  - `design/implementation_spec.md`（最终合并文档）
+  - `design/_impl_part_a.md`, `_impl_part_b.md`, `_impl_part_c.md`（分部草稿）
+- 下一步: Phase B — 按需求文档实现 Triage（triage.py + config.py + schema.py v6 升级）
+
+## 2026-03-28: 消融实验精简
+- 完成: 消融实验矩阵从 13 组（Full + 3 Abl + 2 BL + 7 Sup）精简为 3 组（Full + Abl-A + Abl-B）
+- 保留的消融:
+  - Full: 完整系统
+  - Abl-A: 无 Triage（验证 Hybrid Control）
+  - Abl-B: 无 Audit Agent（验证 Adversarial Evidence Gating）
+- 移除的消融: Abl-C（无FPL）、BL-1/BL-2（基线）、Sup-A~G（supplementary）
+- 同步更新文件:
+  - `design/implementation_spec.md` — AblationFlags 精简为 2 个 flag, 移除 BL-1/BL-2 基线代码段
+  - `design/_impl_part_a.md`, `_impl_part_b.md`, `_impl_part_c.md` — 同步更新
+  - `design/v6.md` — Part X 消融矩阵精简
+- 下一步: Phase B 实现
+
+## 2026-03-28: 实现文档最终审查通过 + 修复 7 处问题
+- 完成: 对 implementation_spec.md 与 v6.md 进行交叉审查，发现并修复 4 个关键问题 + 3 个重要问题
+- 修复的关键问题:
+  1. **K1** §7.1 Orchestrator graph 重复边 — 删除 `add_conditional_edges("SUBMIT_TO_AUDIT", ...)`
+  2. **K2** §9.3 `_build_trace_summary` 引用不存在的 `state["budget"]` — OrchestratorState 新增 `diagnosis_budget`/`audit_budget`，invoke_diagnosis/submit_to_audit 节点同步拷贝
+  3. **K3** §3 LLMConfig 缺失 `api_key` 字段 — 增加 `api_key: str = ""`
+  4. **K4** §5.3 THINK ConclusionProposal 放置逻辑与 §1.4 矛盾 — 明确由 orchestrator invoke_diagnosis_node 构建
+- 修复的重要问题:
+  5. **I1** FPL status 命名不一致 — v6.md `candidate/learned` → `active/reflected`，与 impl_spec 对齐
+  6. **I2** `AgentConfig.from_ablation_id()` 未定义 — §3 补充工厂方法
+  7. **I3** MetricQueryTool `nodes` 参数冗余 — 移除（单节点环境）
+- 补充澄清: OBSERVE evidence type 判断规则（M1）细化为具体启发式规则
+- 产出: `design/implementation_spec.md`, `design/v6.md` 已修复
+- 结论: **文档审查通过，可开始实现**
+- 下一步: Phase B — triage.py + config.py + schema.py v6 升级
+
+## 2026-03-28: 全部 Agent 定义升级至 v6
+- 完成: 9 个 agent 定义 + copilot-instructions.md 全部从 v4/v5 升级至 v6 架构
+- 更新内容:
+  1. **工程师** — 重写：v6+impl_spec 引用、agent/ 代码结构、三图架构、Phase B/C/D 验收标准
+  2. **主管** — 更新：v6.md 引用、项目状态表、简化工具列表
+  3. **设计专家** — 更新：v6+impl_spec 引用、当前设计状态、贡献点术语
+  4. **实验员** — 更新：impl_spec Ch13-15 引用、fault_info.txt GT 源、3 组消融矩阵
+  5. **SC26评审** — 更新：v6 架构理解、Adversarial Evidence Gating 评审维度、3 组消融评估
+  6. **论文助手** — 更新：v6 贡献点、术语一致性（Adversarial Evidence Gating）、消融映射表
+  7. **讲解员** — 更新：概念表引用至 v6.md/impl_spec、新增 Dual-Agent/ConclusionProposal/Orchestrator 概念
+  8. **DrawIO绘图** — 更新：新增 v6.md 引用
+  9. **需求沟通** — 更新：v6.md+impl_spec 引用、项目状态转为实现阶段
+  10. **copilot-instructions.md** — 全面重写：v6 三图架构、4 个贡献点、消融 3 组、agent/ 目录
+- 产出: `.github/agents/*.agent.md` × 9, `.github/copilot-instructions.md`
+- 下一步: Phase B 实现 — 分派给工程师 agent

@@ -16,7 +16,7 @@
 | 4 | **引入方案 C hint 协议**：Audit Agent 不直接把自身查到的结果并入主 evidence，而是由 Orchestrator 以 `gate_hint` 传递给 Diagnosis Agent | 保留角色边界，减少 THINK 重复摸索 Audit Agent 已发现的漏洞 |
 | 5 | **新增 `AuditEvidence` Schema**：Audit Agent 独立证据池，物理隔离在 AuditState 中 | 架构级信息隔离 + 审计边界 |
 | 6 | **Claim 精确化**："零人工阈值" → "诊断结论零硬编码阈值"；区分信号抽取层超参数与诊断裁决层 | 审稿人可能用 Z-score 阈值反驳"零人工阈值"claim；精确限定范围 |
-| 7 | **消融矩阵扩展**：新增 Sup-D（Audit Agent 降级为单次 LLM call）、Sup-E（恢复 Evidence.strength）、Sup-F（禁用 hint 协议）、Sup-G（Audit Agent 降级为 v5 式规则） | 覆盖 v6 所有核心设计决策的消融验证 |
+| 7 | **消融矩阵精简**：保留 Full / Abl-A（无 Triage）/ Abl-B（无 Audit Agent），移除 Abl-C、BL-1/BL-2、Sup-A~G | 聚焦两个核心设计贡献的消融验证 |
 | 8 | **补充失败处理**：新增 LLM API 故障、HYPOTHESIZE 0 假设、Triage 0 异常、THINK 不 conclude 循环等 6 种场景 | 增强系统鲁棒性定义 |
 | 9 | **术语约定**：`causal_order` 明确为 temporal ordering as causal prior | 避免将时序排序等同于严格因果关系 |
 | 10 | **新增跨模型评伊方案**（§8.4）+ Audit Agent 决策质量专项指标 | 评估 LLM 依赖度 + 验证 Audit Agent 可靠性 |

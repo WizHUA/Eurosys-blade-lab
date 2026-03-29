@@ -15,7 +15,8 @@ tools: [read, edit, search]
 
 **必读参考**：
 - `design/draw/principle.md` — 完整的绘图风格规范（Role/Skills/Workflow）
-- `design/draw/v4.drawio` — 最新 v4 架构图（作为风格参考）
+- `design/v6.md` — 最新 v6 Dual-Agent 架构设计
+- `design/draw/v4.drawio` — v4 架构图（作为风格参考）
 - `design/draw/*.drawio` — 历史版本图（保持风格一致性）
 
 ## 绘图规范
