@@ -1,0 +1,75 @@
+{
+  "run_id": "exp_009_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为内存资源紧张、CPU调度运行率升高以及磁盘空间持续减少，可能导致内存压力过大、CPU过载和磁盘空间不足。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存资源紧张，可能导致内存压力过大",
+      "fault_type": "mem_load",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e2",
+        "e4",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 调度运行率升高，可能导致 CPU 过载",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e3",
+        "e8"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少，可能导致磁盘空间不足",
+      "fault_type": "disk_fill",
+      "confidence": 0.05,
+      "evidence_ids": [
+        "e1"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络处理速率降低，可能导致网络性能下降",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "网络处理速率降低的证据不足，无法确认其对系统性能的影响。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "cpu",
+    "triage_confidence": 0.19409567822791315,
+    "main_tools_used": [
+      "MetricQueryTool x7",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 8,
+    "main_iterations": 9,
+    "audit_iterations": 1,
+    "total_tokens_in": 28572,
+    "total_tokens_out": 3734,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:00:15.026592"
+}

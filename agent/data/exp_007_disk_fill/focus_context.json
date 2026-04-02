@@ -1,0 +1,183 @@
+{
+  "run_id": "exp_007_Full",
+  "anomaly_window": {
+    "start": "2025-09-20T07:14:13",
+    "end": "2025-09-20T07:15:28"
+  },
+  "top_metrics": [
+    {
+      "metric": "memory_sunreclaim_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 4.24968988086942,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 1,
+      "change_point": null
+    },
+    {
+      "metric": "memory_committed_as_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 3.8238469821998566,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 2,
+      "change_point": null
+    },
+    {
+      "metric": "memory_kreclaimable_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 3.74882469450813,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 3,
+      "change_point": null
+    },
+    {
+      "metric": "memory_usage_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 3.161170841662123,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 4,
+      "change_point": null
+    },
+    {
+      "metric": "memory_available_bytes",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 3.1611708416621145,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 5,
+      "change_point": null
+    },
+    {
+      "metric": "memory_active_anon_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.393941545640032,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 6,
+      "change_point": null
+    },
+    {
+      "metric": "anon_memory_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.3939182388740523,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 7,
+      "change_point": null
+    },
+    {
+      "metric": "memory_inactive_file_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.39060856377198,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 8,
+      "change_point": null
+    },
+    {
+      "metric": "memory_cached_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.3905822640001277,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 9,
+      "change_point": null
+    },
+    {
+      "metric": "cache_usage_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.3905822640001277,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 10,
+      "change_point": null
+    },
+    {
+      "metric": "memory_free_bytes",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 2.388467851334045,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 11,
+      "change_point": null
+    },
+    {
+      "metric": "memory_writeback_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.38728884492485,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 12,
+      "change_point": null
+    },
+    {
+      "metric": "network_receive_rate_bytes_per_sec",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 2.284962266517303,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 13,
+      "change_point": null
+    },
+    {
+      "metric": "cpu_pressure_waiting_rate",
+      "subsystem": "cpu",
+      "direction": "-",
+      "score": 2.0381242909583306,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 14,
+      "change_point": null
+    },
+    {
+      "metric": "network_receive_packets_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 1.8367220270111055,
+      "t_onset": "2025-09-20T07:14:13",
+      "onset_rank": 15,
+      "change_point": null
+    }
+  ],
+  "causal_order": [
+    "memory_sunreclaim_bytes",
+    "memory_committed_as_bytes",
+    "memory_kreclaimable_bytes",
+    "memory_usage_percent",
+    "memory_available_bytes",
+    "memory_active_anon_bytes",
+    "anon_memory_percent",
+    "memory_inactive_file_bytes",
+    "memory_cached_bytes",
+    "cache_usage_percent",
+    "memory_free_bytes",
+    "memory_writeback_bytes",
+    "network_receive_rate_bytes_per_sec",
+    "cpu_pressure_waiting_rate",
+    "network_receive_packets_rate"
+  ],
+  "subsystem_scores": {
+    "memory": 2.906674401120572,
+    "network": 2.0608421467642044,
+    "cpu": 2.0381242909583306
+  },
+  "leading_subsystem": "memory",
+  "nodes": [
+    {
+      "node": "node-0",
+      "severity": "low"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "276",
+      "overlap_ratio": 0.0452,
+      "node_set": [
+        "wizhua-virtual-machine"
+      ]
+    }
+  ],
+  "triage_confidence": 0.424968988086942
+}

@@ -1,0 +1,195 @@
+{
+  "run_id": "exp_006_Full",
+  "anomaly_window": {
+    "start": "2025-09-20T07:12:13",
+    "end": "2025-09-20T07:13:28"
+  },
+  "top_metrics": [
+    {
+      "metric": "softnet_processed_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 2.062087093079016,
+      "t_onset": "2025-09-20T07:12:13",
+      "onset_rank": 1,
+      "change_point": null
+    },
+    {
+      "metric": "schedstat_running_rate",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.3263831026209276,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 6,
+      "change_point": null
+    },
+    {
+      "metric": "memory_active_file_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2686231020540761,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 7,
+      "change_point": null
+    },
+    {
+      "metric": "interrupts_rate",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.1845109301652352,
+      "t_onset": "2025-09-20T07:12:13",
+      "onset_rank": 2,
+      "change_point": null
+    },
+    {
+      "metric": "cpu_usage_percent",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.1632898966343408,
+      "t_onset": "2025-09-20T07:12:13",
+      "onset_rank": 3,
+      "change_point": null
+    },
+    {
+      "metric": "memory_buffers_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.150794379549458,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 8,
+      "change_point": null
+    },
+    {
+      "metric": "buffer_usage_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.1507943795494577,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 9,
+      "change_point": null
+    },
+    {
+      "metric": "disk_write_rate_bytes_per_sec",
+      "subsystem": "disk",
+      "direction": "+",
+      "score": 1.1188602666724174,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 10,
+      "change_point": null
+    },
+    {
+      "metric": "page_swap_out_rate",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.1188181741811798,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 11,
+      "change_point": null
+    },
+    {
+      "metric": "disk_write_iops",
+      "subsystem": "disk",
+      "direction": "+",
+      "score": 1.101929392641995,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 12,
+      "change_point": null
+    },
+    {
+      "metric": "memory_sunreclaim_bytes",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.079113473134743,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 13,
+      "change_point": null
+    },
+    {
+      "metric": "memory_inactive_file_bytes",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.0731411090670695,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 14,
+      "change_point": null
+    },
+    {
+      "metric": "load_1min",
+      "subsystem": "load",
+      "direction": "+",
+      "score": 1.069318596415162,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 15,
+      "change_point": null
+    },
+    {
+      "metric": "memory_kreclaimable_bytes",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.0620710860955331,
+      "t_onset": "2025-09-20T07:12:28",
+      "onset_rank": 16,
+      "change_point": null
+    },
+    {
+      "metric": "page_swap_in_rate",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.059160308511198,
+      "t_onset": "2025-09-20T07:12:13",
+      "onset_rank": 4,
+      "change_point": null
+    },
+    {
+      "metric": "network_transmit_rate_bytes_per_sec",
+      "subsystem": "network",
+      "direction": "+",
+      "score": 0.6707193691853502,
+      "t_onset": "2025-09-20T07:12:13",
+      "onset_rank": 5,
+      "change_point": null
+    }
+  ],
+  "causal_order": [
+    "softnet_processed_rate",
+    "interrupts_rate",
+    "cpu_usage_percent",
+    "page_swap_in_rate",
+    "network_transmit_rate_bytes_per_sec",
+    "schedstat_running_rate",
+    "memory_active_file_bytes",
+    "memory_buffers_bytes",
+    "buffer_usage_percent",
+    "disk_write_rate_bytes_per_sec",
+    "page_swap_out_rate",
+    "disk_write_iops",
+    "memory_sunreclaim_bytes",
+    "memory_inactive_file_bytes",
+    "load_1min",
+    "memory_kreclaimable_bytes"
+  ],
+  "subsystem_scores": {
+    "network": 2.062087093079016,
+    "cpu": 1.224727976473501,
+    "memory": 1.1203145015178395,
+    "disk": 1.1103948296572064,
+    "load": 1.069318596415162
+  },
+  "leading_subsystem": "network",
+  "nodes": [
+    {
+      "node": "node-0",
+      "severity": "low"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "276",
+      "overlap_ratio": 0.0452,
+      "node_set": [
+        "wizhua-virtual-machine"
+      ]
+    }
+  ],
+  "triage_confidence": 0.2062087093079016
+}

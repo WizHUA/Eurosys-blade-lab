@@ -21,12 +21,15 @@ class MetricQueryTool(BaseTool):
         aggregation = args.get("aggregation", "mean")
         threshold = args.get("threshold_value")
 
-        start = pd.to_datetime(window.get("start"), errors="coerce")
-        end = pd.to_datetime(window.get("end"), errors="coerce")
+        start = _normalize_timestamp(window.get("start"))
+        end = _normalize_timestamp(window.get("end"))
         if pd.isna(start) or pd.isna(end):
             return {"results": [], "missing": [], "window_info": {"start": None, "end": None, "n_points": 0}}
 
-        window_df = self.df[(self.df.index >= start) & (self.df.index <= end)]
+        time_index = _normalize_time_index(self.df.index)
+        valid_mask = ~time_index.isna()
+        window_mask = valid_mask & (time_index >= start) & (time_index <= end)
+        window_df = self.df.loc[window_mask]
 
         results: list[dict[str, Any]] = []
         missing: list[dict[str, str]] = []
@@ -46,7 +49,7 @@ class MetricQueryTool(BaseTool):
                 missing.append({"metric": metric, "reason": "no_data_in_window"})
                 continue
 
-            if aggregation == "mean":
+            if aggregation in ("mean", "avg", "average"):
                 value = float(series.mean())
             elif aggregation == "p95":
                 value = float(series.quantile(0.95))
@@ -114,3 +117,19 @@ class MetricQueryTool(BaseTool):
                 "required": ["metrics", "time_window", "aggregation"],
             },
         }
+
+
+def _normalize_timestamp(value: Any) -> pd.Timestamp:
+    ts = pd.to_datetime(value, errors="coerce")
+    if pd.isna(ts):
+        return ts
+    if getattr(ts, "tzinfo", None) is not None:
+        ts = ts.tz_convert(None)
+    return ts
+
+
+def _normalize_time_index(index: pd.Index) -> pd.DatetimeIndex:
+    dt_index = pd.DatetimeIndex(pd.to_datetime(index, errors="coerce"))
+    if getattr(dt_index, "tz", None) is not None:
+        dt_index = dt_index.tz_convert(None)
+    return dt_index

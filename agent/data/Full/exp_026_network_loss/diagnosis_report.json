@@ -1,0 +1,68 @@
+{
+  "run_id": "exp_026_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u9891\u7e41\u4f7f\u7528swap\u7a7a\u95f4\uff0cCPU\u4f7f\u7528\u7387\u8f83\u9ad8\u53ef\u80fd\u5bfc\u81f4\u54cd\u5e94\u7f13\u6162\uff0c\u4ee5\u53ca\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u53ef\u80fd\u5f71\u54cd\u6570\u636e\u5199\u5165\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\uff0c\u5bfc\u81f4\u7cfb\u7edf\u9891\u7e41\u4f7f\u7528swap\u7a7a\u95f4",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e2",
+        "e7",
+        "e8",
+        "e9",
+        "e10"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU\u4f7f\u7528\u7387\u8fc7\u9ad8\uff0c\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf\u54cd\u5e94\u7f13\u6162",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.5,
+      "evidence_ids": [
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\uff0c\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf\u65e0\u6cd5\u6b63\u5e38\u5199\u5165\u6570\u636e",
+      "fault_type": "disk_fill",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e1",
+        "e4",
+        "e5",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU\u4f7f\u7528\u7387\u8fc7\u9ad8\u7684\u5f71\u54cd\u5c1a\u4e0d\u660e\u786e\uff0c\u9700\u8fdb\u4e00\u6b65\u89c2\u5bdf\u5176\u5bf9\u7cfb\u7edf\u6027\u80fd\u7684\u5177\u4f53\u5f71\u54cd\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "memory",
+    "triage_confidence": 0.2727875822129121,
+    "main_tools_used": [
+      "MetricQueryTool x10",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 11,
+    "main_iterations": 12,
+    "audit_iterations": 1,
+    "total_tokens_in": 38208,
+    "total_tokens_out": 4367,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:51:28.201215"
+}

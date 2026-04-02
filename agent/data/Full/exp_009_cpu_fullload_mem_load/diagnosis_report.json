@@ -1,0 +1,75 @@
+{
+  "run_id": "exp_009_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\u3001CPU\u8c03\u5ea6\u8fd0\u884c\u7387\u5347\u9ad8\u4ee5\u53ca\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\uff0c\u53ef\u80fd\u5bfc\u81f4\u5185\u5b58\u538b\u529b\u8fc7\u5927\u3001CPU\u8fc7\u8f7d\u548c\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\uff0c\u53ef\u80fd\u5bfc\u81f4\u5185\u5b58\u538b\u529b\u8fc7\u5927",
+      "fault_type": "mem_load",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e2",
+        "e4",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU \u8c03\u5ea6\u8fd0\u884c\u7387\u5347\u9ad8\uff0c\u53ef\u80fd\u5bfc\u81f4 CPU \u8fc7\u8f7d",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e3",
+        "e8"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\uff0c\u53ef\u80fd\u5bfc\u81f4\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3",
+      "fault_type": "disk_fill",
+      "confidence": 0.05,
+      "evidence_ids": [
+        "e1"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u7f51\u7edc\u5904\u7406\u901f\u7387\u964d\u4f4e\uff0c\u53ef\u80fd\u5bfc\u81f4\u7f51\u7edc\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u7f51\u7edc\u5904\u7406\u901f\u7387\u964d\u4f4e\u7684\u8bc1\u636e\u4e0d\u8db3\uff0c\u65e0\u6cd5\u786e\u8ba4\u5176\u5bf9\u7cfb\u7edf\u6027\u80fd\u7684\u5f71\u54cd\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "cpu",
+    "triage_confidence": 0.19409567822791315,
+    "main_tools_used": [
+      "MetricQueryTool x7",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 8,
+    "main_iterations": 9,
+    "audit_iterations": 1,
+    "total_tokens_in": 28572,
+    "total_tokens_out": 3734,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:00:15.026592"
+}

@@ -1,0 +1,61 @@
+{
+  "run_id": "exp_021_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为磁盘空间不足、内存压力过大以及CPU过载，导致系统性能显著下降。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "磁盘空间不足导致系统性能下降",
+      "fault_type": "disk_fill",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "内存压力过大导致频繁换页",
+      "fault_type": "mem_load",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e3",
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 过载导致系统响应变慢",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU过载的置信度较低（0.60），可能需要进一步调查以确认其影响程度。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "memory",
+    "triage_confidence": 0.17076455764517345,
+    "main_tools_used": [
+      "MetricQueryTool x4"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 4,
+    "main_iterations": 5,
+    "audit_iterations": 1,
+    "total_tokens_in": 16485,
+    "total_tokens_out": 2141,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:37:40.812919"
+}

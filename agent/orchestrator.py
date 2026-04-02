@@ -18,6 +18,7 @@ from agent.config import AgentConfig, FORMALTEST_DIR, FPL_JSONL, METRICS_YAML
 from agent.diagnosis import build_diagnosis_graph, _build_conclusion_proposal
 from agent.finalize import finalize_node as _finalize_node
 from agent.llm_client import LLMClient
+from agent.reflect import should_reflect, run_reflect
 from agent.schema import (
     AuditDecision,
     DiagnosisReport,
@@ -148,6 +149,9 @@ def invoke_diagnosis_node(
         "current_proposal": proposal,
         "diagnosis_trace": result_state.get("react_trace", []),
         "diagnosis_budget": result_state.get("budget", {}),
+        # _prev_diagnosis_state: runtime carry-forward key (not in TypedDict schema).
+        # LangGraph accepts extra keys in non-strict mode. Used by next INVOKE_DIAGNOSIS
+        # to preserve hypotheses/evidence across continue/rehypothesize rounds.
         "_prev_diagnosis_state": result_state,
     }
 
@@ -226,7 +230,12 @@ def orchestrator_router(state: OrchestratorState, config: AgentConfig) -> str:
     if not decision:
         return "finalize"
 
-    if decision.decision in ("pass", "degrade"):
+    if decision.decision == "pass":
+        return "finalize"
+    elif decision.decision == "degrade":
+        # On round 1, degrade triggers rehypothesize to give diagnosis another chance
+        if round_count <= 1 and state.get("rehyp_count", 0) < config.budget.max_rehyp:
+            return "rehypothesize"
         return "finalize"
     elif decision.decision == "continue":
         return "continue"
@@ -325,6 +334,9 @@ def run_diagnosis(
     # Create LLM client
     llm_client = LLMClient(config.llm)
 
+    # Pre-flight: validate API key before building graphs
+    llm_client.validate_api_key()
+
     # Create tools
     tools = create_tools(
         metrics_df=metrics_df,
@@ -366,22 +378,59 @@ def run_diagnosis(
         logger.error("[Orchestrator] No report generated!")
         raise RuntimeError("Orchestrator did not produce a DiagnosisReport")
 
-    # Build execution trace
+    # Build execution trace (full serialization for hallucination audit)
+    proposal = result.get("current_proposal")
+    diag_trace_raw = result.get("diagnosis_trace", [])
+    audit_trace_raw = result.get("audit_trace", [])
     trace = {
         "run_id": run_id,
-        "diagnosis_trace_steps": len(result.get("diagnosis_trace", [])),
-        "audit_trace_steps": len(result.get("audit_trace", [])),
+        "diagnosis_trace_steps": len(diag_trace_raw),
+        "audit_trace_steps": len(audit_trace_raw),
+        "diagnosis_trace": [
+            s.model_dump(mode="json") if hasattr(s, "model_dump") else s
+            for s in diag_trace_raw
+        ],
+        "audit_trace": [
+            s.model_dump(mode="json") if hasattr(s, "model_dump") else s
+            for s in audit_trace_raw
+        ],
         "round_count": result.get("round_count", 0),
         "rehyp_count": result.get("rehyp_count", 0),
         "token_usage": llm_client.tracker.summary(),
+        "hypotheses": [
+            h.model_dump(mode="json") if hasattr(h, "model_dump") else h
+            for h in (proposal.hypotheses if proposal else [])
+        ],
+        "evidence": [
+            e.model_dump(mode="json") if hasattr(e, "model_dump") else e
+            for e in (proposal.evidence if proposal else [])
+        ],
+        "proposal": result.get("current_proposal").model_dump(mode="json")
+            if result.get("current_proposal") and hasattr(result.get("current_proposal"), "model_dump")
+            else None,
     }
 
+    # Stage 3: Reflect — FPL writeback (conditional)
+    if should_reflect(report, config):
+        logger.info("[Orchestrator] Running Reflect for %s", run_id)
+        try:
+            updated_fpl = run_reflect(
+                report=report,
+                focus_context=result.get("focus_context"),
+                existing_fpl=fpl_entries,
+                llm_client=llm_client,
+                config=config,
+            )
+            logger.info("[Orchestrator] Reflect complete: %d FPL entries", len(updated_fpl))
+        except Exception as e:
+            logger.warning("[Orchestrator] Reflect failed (non-fatal): %s", e)
+
     # Save output
-    _save_output(report, trace, config, run_id, metrics_path)
+    _save_output(report, trace, config, run_id, metrics_path, result.get("focus_context"))
 
     logger.info("[Orchestrator] Run %s complete: diagnosis_type=%s", run_id, report.diagnosis_type)
 
-    return report, trace
+    return report, trace, result.get("focus_context")
 
 
 def _save_output(
@@ -390,6 +439,7 @@ def _save_output(
     config: AgentConfig,
     run_id: str,
     metrics_path: str | Path,
+    focus_context=None,
 ) -> None:
     """Save diagnosis report and trace to output directory."""
     # Determine experiment ID from path
@@ -412,5 +462,14 @@ def _save_output(
         json.dumps(trace, indent=2, ensure_ascii=False, default=str),
         encoding="utf-8",
     )
+
+    # Save focus_context if available
+    if focus_context is not None:
+        fc_path = output_dir / "focus_context.json"
+        fc_data = focus_context.model_dump(mode="json") if hasattr(focus_context, "model_dump") else focus_context
+        fc_path.write_text(
+            json.dumps(fc_data, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8",
+        )
 
     logger.info("[Output] Saved to %s", output_dir)

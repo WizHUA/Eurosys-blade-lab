@@ -1,0 +1,71 @@
+{
+  "run_id": "exp_029_Full",
+  "anomaly_summary": "系统出现复合故障，主要由于磁盘空间持续减少、内存压力过大以及CPU过载导致进程阻塞和性能下降。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "磁盘空间持续减少导致进程阻塞和CPU调度下降",
+      "fault_type": "disk_fill",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e8",
+        "e9",
+        "e11",
+        "e12",
+        "e13",
+        "e14"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "内存压力过大导致匿名内存占用异常",
+      "fault_type": "mem_load",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e6",
+        "e10"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU过载导致CPU使用率升高",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "尽管进程阻塞现象频繁出现，但其具体影响和关联性尚不明确，需进一步调查。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "cpu",
+    "triage_confidence": 0.25492601873924964,
+    "main_tools_used": [
+      "MetricQueryTool x14"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 14,
+    "main_iterations": 15,
+    "audit_iterations": 1,
+    "total_tokens_in": 47505,
+    "total_tokens_out": 5563,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:59:32.288466"
+}

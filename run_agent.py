@@ -56,7 +56,7 @@ def run_single(
     logger.info("Running %s with %s", exp_name, ablation_id)
     logger.info("=" * 60)
 
-    report, trace = run_diagnosis(
+    report, trace, focus_context = run_diagnosis(
         metrics_path=str(metrics_path),
         jobinfo_path=str(jobinfo_path),
         config=config,
@@ -79,6 +79,11 @@ def run_single(
             trace_path = exp_output / "execution_trace.json"
             with open(trace_path, "w") as f:
                 json.dump(trace, f, indent=2, default=str)
+        if focus_context is not None:
+            fc_path = exp_output / "focus_context.json"
+            fc_data = focus_context.model_dump(mode="json") if hasattr(focus_context, "model_dump") else focus_context
+            with open(fc_path, "w") as f:
+                json.dump(fc_data, f, indent=2, ensure_ascii=False, default=str)
         logger.info("Output saved to %s", exp_output)
 
 
@@ -98,7 +103,7 @@ def run_evaluate(ablation_id: str, output_dir: Path) -> None:
     """Evaluate results against ground truth."""
     from eval.evaluate import Evaluator
 
-    evaluator = Evaluator()
+    evaluator = Evaluator(use_label_mapper=False)
     results_dir = output_dir / ablation_id
     df = evaluator.evaluate_batch(str(results_dir), str(FORMALTEST_DIR))
     if not df.empty:

@@ -1,0 +1,685 @@
+{
+  "run_id": "exp_002_Full",
+  "diagnosis_trace_steps": 9,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "首先需要验证磁盘使用率是否接近100%，这是验证 disk_fill 假设的关键证据。因此，我需要查询磁盘使用率指标。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c1"
+      },
+      "observation": "filesystem_usage_percent: max=73.3406790791855",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:07.475380",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"首先需要验证磁盘使用率是否接近100%，这是验证 disk_fill 假设的关键证据。因此，我需要查询磁盘使用率指标。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"查询磁盘使用率指标以验证 disk_fill 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设中，h1 (disk_fill) 的置信度最高，但已收集的证据显示 filesystem_usage_percent 最大值为73.34%，未达到接近100%的标准。因此需要进一步验证磁盘相关指标。同时，h2 (mem_load) 和 h3 (cpu_fullload) 也需要验证其直接指标。h4 (disk_burn) 置信度较低，可以稍后验证。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "cpu_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c2"
+      },
+      "observation": "memory_usage_percent: max=73.67918698036475; cpu_usage_percent: max=55.01818181818222",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:17.291825",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (disk_fill) 的置信度最高，但已收集的证据显示 filesystem_usage_percent 最大值为73.34%，未达到接近100%的标准。因此需要进一步验证磁盘相关指标。同时，h2 (mem_load) 和 h3 (cpu_fullload) 也需要验证其直接指标。h4 (disk_burn) 置信度较低，可以稍后验证。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.60, \"reason\": \"filesystem_usage_percent 未达到接近100%的标准\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.65, \"reason\": \"需要验证内存使用率是否过高\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.50, \"reason\": \"需要验证CPU使用率是否异常低\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"cpu_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要直接验证内存和CPU的使用率，以确认h2和h3的假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前证据显示 filesystem_usage_percent 最大值为 73.34%，memory_usage_percent 最大值为 73.68%，cpu_usage_percent 最大值为 55.02%。这些值并未达到接近 100% 的阈值，因此需要进一步验证磁盘读写速率和 CPU 使用率是否异常低。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_read_rate_bytes_per_sec",
+            "disk_write_rate_bytes_per_sec"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c3"
+      },
+      "observation": "disk_read_rate_bytes_per_sec: max=35300.07272727272; disk_write_rate_bytes_per_sec: max=173375.66137566138",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:25.740884",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示 filesystem_usage_percent 最大值为 73.34%，memory_usage_percent 最大值为 73.68%，cpu_usage_percent 最大值为 55.02%。这些值并未达到接近 100% 的阈值，因此需要进一步验证磁盘读写速率和 CPU 使用率是否异常低。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.40, \"reason\": \"filesystem_usage_percent 未接近 100%\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.50, \"reason\": \"memory_usage_percent 未接近 100%\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.60, \"reason\": \"cpu_usage_percent 未接近 100%\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_read_rate_bytes_per_sec\", \"disk_write_rate_bytes_per_sec\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要检查磁盘读写速率是否异常低，以验证 disk_burn 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前证据显示磁盘使用率为73.34%，未达到接近100%的阈值，因此可以降低disk_fill假设的置信度。内存使用率为73.68%，需要进一步验证是否过高。CPU使用率为55.02%，需要验证是否异常低。磁盘读写速率已确认异常低，支持disk_burn假设。接下来应优先验证内存使用率是否过高。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c4"
+      },
+      "observation": "memory_usage_percent: max=73.67918698036475",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:36.096522",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示磁盘使用率为73.34%，未达到接近100%的阈值，因此可以降低disk_fill假设的置信度。内存使用率为73.68%，需要进一步验证是否过高。CPU使用率为55.02%，需要验证是否异常低。磁盘读写速率已确认异常低，支持disk_burn假设。接下来应优先验证内存使用率是否过高。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.20, \"reason\": \"磁盘使用率73.34%未达到接近100%的阈值\"},\n    {\"hypothesis_id\": \"h4\", \"new_confidence\": 0.70, \"reason\": \"磁盘读写速率异常低的证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要验证内存使用率是否过高，以评估mem_load假设\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设中，h1 (disk_fill) 的置信度为 0.20，需要进一步验证磁盘使用率是否接近 100%。虽然 e1 显示 filesystem_usage_percent 的最大值为 73.34%，但还需要确认其他磁盘相关指标，如 disk_io_usage_percent 或 disk_usage_percent，以确保磁盘使用率是否接近饱和。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c5"
+      },
+      "observation": "disk_io_usage_percent: max=0.2036400661815133",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:41.455963",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (disk_fill) 的置信度为 0.20，需要进一步验证磁盘使用率是否接近 100%。虽然 e1 显示 filesystem_usage_percent 的最大值为 73.34%，但还需要确认其他磁盘相关指标，如 disk_io_usage_percent 或 disk_usage_percent，以确保磁盘使用率是否接近饱和。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"为了验证 disk_fill 假设，需要查询 disk_io_usage_percent 的最大值，以确认磁盘使用率是否接近 100%。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前假设中，h1 (disk_fill) 和 h2 (mem_load) 还未得到直接验证。h3 (cpu_fullload) 的 CPU 使用率已经通过 e2 验证为 55%，并不异常低，因此可以排除。h4 (disk_burn) 已经通过 e3 和 e5 验证为磁盘读写速率和磁盘 I/O 使用率异常低，因此可以确认。接下来需要验证 h1 和 h2。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c6"
+      },
+      "observation": "filesystem_usage_percent: max=73.3406790791855",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:48.268294",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (disk_fill) 和 h2 (mem_load) 还未得到直接验证。h3 (cpu_fullload) 的 CPU 使用率已经通过 e2 验证为 55%，并不异常低，因此可以排除。h4 (disk_burn) 已经通过 e3 和 e5 验证为磁盘读写速率和磁盘 I/O 使用率异常低，因此可以确认。接下来需要验证 h1 和 h2。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.0, \"reason\": \"CPU 使用率 55% 并不异常低，排除 cpu_fullload 假设\"},\n    {\"hypothesis_id\": \"h4\", \"new_confidence\": 1.0, \"reason\": \"磁盘读写速率和磁盘 I/O 使用率异常低，确认 disk_burn 假设\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要验证 h1 (disk_fill) 假设，检查磁盘使用率是否接近 100%。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "当前证据显示磁盘使用率(filesystem_usage_percent)为73.34%，未接近100%，因此disk_fill假设的置信度应降低。内存使用率(memory_usage_percent)为73.68%，较高，但需要进一步确认是否达到异常水平。CPU使用率(cpu_usage_percent)为55.02%，未显示异常低。磁盘读写速率(disk_read_rate_bytes_per_sec和disk_write_rate_bytes_per_sec)显示异常低，已确认disk_burn假设。接下来应优先验证内存使用率是否过高，以确认mem_load假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "KBRetrievalTool",
+        "args": {
+          "mode": "Fault Pattern Library",
+          "subsystem": "memory",
+          "anomaly_metrics": [
+            "memory_usage_percent"
+          ]
+        },
+        "call_id": "c7"
+      },
+      "observation": "Error: Unsupported mode: Fault Pattern Library",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:39:59.888518",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示磁盘使用率(filesystem_usage_percent)为73.34%，未接近100%，因此disk_fill假设的置信度应降低。内存使用率(memory_usage_percent)为73.68%，较高，但需要进一步确认是否达到异常水平。CPU使用率(cpu_usage_percent)为55.02%，未显示异常低。磁盘读写速率(disk_read_rate_bytes_per_sec和disk_write_rate_bytes_per_sec)显示异常低，已确认disk_burn假设。接下来应优先验证内存使用率是否过高，以确认mem_load假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.10, \"reason\": \"磁盘使用率未接近100%\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.70, \"reason\": \"内存使用率较高，需进一步验证\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.00, \"reason\": \"CPU使用率未显示异常低\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"KBRetrievalTool\",\n    \"args\": {\n      \"mode\": \"Fault Pattern Library\",\n      \"subsystem\": \"memory\",\n      \"anomaly_metrics\": [\"memory_usage_percent\"]\n    },\n    \"reasoning\": \"查询内存子系统的故障模式库，以确认内存使用率73.68%是否属于异常水平，从而验证mem_load假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.10，需要进一步验证磁盘使用率是否接近 100%。已有证据 e1 和 e6 显示 filesystem_usage_percent 的最大值为 73.34%，这并不支持磁盘使用率接近 100% 的假设。因此，我需要进一步查询磁盘使用率的相关指标以确认 h1 的状态。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:04:13",
+            "end": "2025-09-20T07:05:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c8"
+      },
+      "observation": "filesystem_usage_percent: max=73.3406790791855",
+      "evidence_generated": "e8",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:40:07.609740",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.10，需要进一步验证磁盘使用率是否接近 100%。已有证据 e1 和 e6 显示 filesystem_usage_percent 的最大值为 73.34%，这并不支持磁盘使用率接近 100% 的假设。因此，我需要进一步查询磁盘使用率的相关指标以确认 h1 的状态。\",\n  \"hypothesis_updates\": [\n    {\n      \"hypothesis_id\": \"h1\",\n      \"new_confidence\": 0.10,\n      \"reason\": \"已有证据显示磁盘使用率未接近 100%，需要进一步验证\"\n    }\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:04:13\",\n        \"end\": \"2025-09-20T07:05:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要进一步查询磁盘使用率的最大值，以确认磁盘是否接近满载\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 9,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.10，需要进一步验证磁盘使用率是否接近 100%。已收集的证据 e1、e6、e8 显示 filesystem_usage_percent 的最大值为 73.34%，这表明磁盘使用率并未接近 100%。因此，h1 的置信度应降低。同时，h2 (mem_load) 的置信度为 0.70，需要验证内存使用率是否过高。已收集的证据 e2 和 e4 显示 memory_usage_percent 的最大值为 73.68%，这表明内存使用率较高，但尚未达到过高的程度。h3 (cpu_fullload) 的置信度为 0.00，需要验证 CPU 使用率是否异常低。已收集的证据 e2 显示 cpu_usage_percent 的最大值为 55.02%，这表明 CPU 使用率正常。h4 (disk_burn) 的置信度为 1.00，已通过验证。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:40:15.900127",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.10，需要进一步验证磁盘使用率是否接近 100%。已收集的证据 e1、e6、e8 显示 filesystem_usage_percent 的最大值为 73.34%，这表明磁盘使用率并未接近 100%。因此，h1 的置信度应降低。同时，h2 (mem_load) 的置信度为 0.70，需要验证内存使用率是否过高。已收集的证据 e2 和 e4 显示 memory_usage_percent 的最大值为 73.68%，这表明内存使用率较高，但尚未达到过高的程度。h3 (cpu_fullload) 的置信度为 0.00，需要验证 CPU 使用率是否异常低。已收集的证据 e2 显示 cpu_usage_percent 的最大值为 55.02%，这表明 CPU 使用率正常。h4 (disk_burn) 的置信度为 1.00，已通过验证。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.05, \"reason\": \"filesystem_usage_percent 的最大值为 73.34%，未接近 100%\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.60, \"reason\": \"memory_usage_percent 的最大值为 73.68%，较高但未达到过高的程度\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.00, \"reason\": \"cpu_usage_percent 的最大值为 55.02%，正常\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"所有假设均已通过直接观测证据验证，证据充分，可以得出结论。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\n2. **子系统直接证据**: \n   - disk_burn: 有 disk_read_rate_bytes_per_sec 和 disk_write_rate_bytes_per_sec 的直接观测证据（e3），以及 disk_io_usage_percent（e5）。\n   - mem_load: 有 memory_usage_percent 的直接观测证据（e4）。\n   - disk_fill: 有 filesystem_usage_percent 的直接观测证据（e1, e6, e8）。\n   - cpu_fullload: 有 cpu_usage_percent 的直接观测证据（e2），但显示 CPU 使用率不高（max=55.01818181818222），与 'CPU使用率异常低' 的描述矛盾。\n3. **故障标签合理性**: \n   - disk_burn: 与观测到的磁盘I/O速率异常低一致。\n   - mem_load: 与观测到的内存使用率较高一致。\n   - disk_fill: 与观测到的磁盘空间使用率较高一致。\n   - cpu_fullload: 与观测到的 CPU 使用率不高矛盾。\n4. **复合故障判断**: 多个根因中，disk_burn 和 disk_fill 可能相关，mem_load 可能是独立故障，cpu_fullload 的证据矛盾。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T19:40:36.400760",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\\n2. **子系统直接证据**: \\n   - disk_burn: 有 disk_read_rate_bytes_per_sec 和 disk_write_rate_bytes_per_sec 的直接观测证据（e3），以及 disk_io_usage_percent（e5）。\\n   - mem_load: 有 memory_usage_percent 的直接观测证据（e4）。\\n   - disk_fill: 有 filesystem_usage_percent 的直接观测证据（e1, e6, e8）。\\n   - cpu_fullload: 有 cpu_usage_percent 的直接观测证据（e2），但显示 CPU 使用率不高（max=55.01818181818222），与 'CPU使用率异常低' 的描述矛盾。\\n3. **故障标签合理性**: \\n   - disk_burn: 与观测到的磁盘I/O速率异常低一致。\\n   - mem_load: 与观测到的内存使用率较高一致。\\n   - disk_fill: 与观测到的磁盘空间使用率较高一致。\\n   - cpu_fullload: 与观测到的 CPU 使用率不高矛盾。\\n4. **复合故障判断**: 多个根因中，disk_burn 和 disk_fill 可能相关，mem_load 可能是独立故障，cpu_fullload 的证据矛盾。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"degrade\",\n    \"reason\": \"cpu_fullload 的证据与描述矛盾，且其 confidence=0.00，应排除。disk_fill 的 confidence=0.05 过低，不足以确认。disk_burn 和 mem_load 的证据较为充分，但复合故障的判断不够明确。\",\n    \"hint\": \"需要进一步验证 disk_burn 和 mem_load 之间的关系，以及排除 cpu_fullload 的假设。\",\n    \"diagnosis_type\": \"partial\"\n  }\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1648,
+      "completion": 422,
+      "total": 2070
+    },
+    "diagnosis_think": {
+      "prompt": 23640,
+      "completion": 2724,
+      "total": 26364
+    },
+    "audit_think": {
+      "prompt": 1530,
+      "completion": 464,
+      "total": 1994
+    },
+    "finalize": {
+      "prompt": 608,
+      "completion": 63,
+      "total": 671
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "磁盘空间持续减少，可能导致系统无法正常写入数据",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.7,
+      "current_confidence": 0.05,
+      "required_verifications": [
+        {
+          "description": "检查磁盘使用率是否接近100%",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "filesystem_avail_bytes",
+            "filesystem_free_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "内存资源紧张，可能导致系统性能下降",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.6,
+      "current_confidence": 0.6,
+      "required_verifications": [
+        {
+          "description": "检查内存使用率是否过高",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "memory_inactive_anon_bytes",
+            "memory_inactive_file_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "CPU使用率异常低，可能表明CPU资源未被充分利用或存在调度问题",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.0,
+      "required_verifications": [
+        {
+          "description": "检查CPU使用率是否异常低",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "cpu_user_percent"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h4",
+      "root_cause": "磁盘I/O速率异常低，可能表明磁盘性能问题",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.4,
+      "current_confidence": 1.0,
+      "required_verifications": [
+        {
+          "description": "检查磁盘读写速率是否异常低",
+          "status": "verified",
+          "evidence_id": "e3",
+          "required_metrics": [
+            "disk_read_rate_bytes_per_sec",
+            "disk_read_iops"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1",
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+      "raw_stats": {
+        "filesystem_usage_percent": 73.3406790791855
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:0)",
+      "result_digest": "memory_usage_percent: max=73.67918698036475; cpu_usage_percent: max=55.01818181818222",
+      "raw_stats": {
+        "memory_usage_percent": 73.67918698036475,
+        "cpu_usage_percent": 55.01818181818222
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_rate_bytes_per_sec\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"star)",
+      "result_digest": "disk_read_rate_bytes_per_sec: max=35300.07272727272; disk_write_rate_bytes_per_sec: max=173375.66137566138",
+      "raw_stats": {
+        "disk_read_rate_bytes_per_sec": 35300.07272727272,
+        "disk_write_rate_bytes_per_sec": 173375.66137566138
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"2025-0)",
+      "result_digest": "memory_usage_percent: max=73.67918698036475",
+      "raw_stats": {
+        "memory_usage_percent": 73.67918698036475
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h1",
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"2025-)",
+      "result_digest": "disk_io_usage_percent: max=0.2036400661815133",
+      "raw_stats": {
+        "disk_io_usage_percent": 0.2036400661815133
+      },
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h1",
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+      "raw_stats": {
+        "filesystem_usage_percent": 73.3406790791855
+      },
+      "created_at_step": 6
+    },
+    {
+      "id": "e8",
+      "hypothesis_ids": [
+        "h1",
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+      "raw_stats": {
+        "filesystem_usage_percent": 73.3406790791855
+      },
+      "created_at_step": 8
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "磁盘空间持续减少，可能导致系统无法正常写入数据",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.7,
+        "current_confidence": 0.05,
+        "required_verifications": [
+          {
+            "description": "检查磁盘使用率是否接近100%",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "filesystem_avail_bytes",
+              "filesystem_free_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "内存资源紧张，可能导致系统性能下降",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.6,
+        "current_confidence": 0.6,
+        "required_verifications": [
+          {
+            "description": "检查内存使用率是否过高",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "memory_inactive_anon_bytes",
+              "memory_inactive_file_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "CPU使用率异常低，可能表明CPU资源未被充分利用或存在调度问题",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.0,
+        "required_verifications": [
+          {
+            "description": "检查CPU使用率是否异常低",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "cpu_user_percent"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h4",
+        "root_cause": "磁盘I/O速率异常低，可能表明磁盘性能问题",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.4,
+        "current_confidence": 1.0,
+        "required_verifications": [
+          {
+            "description": "检查磁盘读写速率是否异常低",
+            "status": "verified",
+            "evidence_id": "e3",
+            "required_metrics": [
+              "disk_read_rate_bytes_per_sec",
+              "disk_read_iops"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1",
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+        "raw_stats": {
+          "filesystem_usage_percent": 73.3406790791855
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:0)",
+        "result_digest": "memory_usage_percent: max=73.67918698036475; cpu_usage_percent: max=55.01818181818222",
+        "raw_stats": {
+          "memory_usage_percent": 73.67918698036475,
+          "cpu_usage_percent": 55.01818181818222
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_rate_bytes_per_sec\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"star)",
+        "result_digest": "disk_read_rate_bytes_per_sec: max=35300.07272727272; disk_write_rate_bytes_per_sec: max=173375.66137566138",
+        "raw_stats": {
+          "disk_read_rate_bytes_per_sec": 35300.07272727272,
+          "disk_write_rate_bytes_per_sec": 173375.66137566138
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"2025-0)",
+        "result_digest": "memory_usage_percent: max=73.67918698036475",
+        "raw_stats": {
+          "memory_usage_percent": 73.67918698036475
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h1",
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"2025-)",
+        "result_digest": "disk_io_usage_percent: max=0.2036400661815133",
+        "raw_stats": {
+          "disk_io_usage_percent": 0.2036400661815133
+        },
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h1",
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+        "raw_stats": {
+          "filesystem_usage_percent": 73.3406790791855
+        },
+        "created_at_step": 6
+      },
+      {
+        "id": "e8",
+        "hypothesis_ids": [
+          "h1",
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:04:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: max=73.3406790791855",
+        "raw_stats": {
+          "filesystem_usage_percent": 73.3406790791855
+        },
+        "created_at_step": 8
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "磁盘I/O速率异常低，可能表明磁盘性能问题",
+        "fault_type": "disk_burn",
+        "confidence": 1.0,
+        "evidence_ids": [
+          "e1",
+          "e3",
+          "e5",
+          "e6",
+          "e8"
+        ]
+      },
+      {
+        "cause": "内存资源紧张，可能导致系统性能下降",
+        "fault_type": "mem_load",
+        "confidence": 0.6,
+        "evidence_ids": [
+          "e4"
+        ]
+      },
+      {
+        "cause": "磁盘空间持续减少，可能导致系统无法正常写入数据",
+        "fault_type": "disk_fill",
+        "confidence": 0.05,
+        "evidence_ids": [
+          "e1",
+          "e5",
+          "e6",
+          "e8"
+        ]
+      },
+      {
+        "cause": "CPU使用率异常低，可能表明CPU资源未被充分利用或存在调度问题",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.0,
+        "evidence_ids": [
+          "e2"
+        ]
+      }
+    ]
+  }
+}

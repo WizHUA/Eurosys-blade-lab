@@ -234,6 +234,9 @@ class TestTriageAcceptance:
         # Should have cpu metrics in top_metrics
         cpu_metrics = [m for m in ctx.top_metrics if m.subsystem == "cpu"]
         assert len(cpu_metrics) > 0
+        # Must retain at least one direct CPU-full-load signal, not only side effects
+        metric_names = {m.metric for m in ctx.top_metrics}
+        assert {"cpu_usage_percent", "load_1min"} & metric_names
 
     def test_exp_005_network_loss(self, metric_kb, triage_config, ablation_full):
         """exp_005: leading_subsystem == 'network'"""

@@ -1,0 +1,64 @@
+{
+  "run_id": "exp_016_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u5185\u5b58\u4f7f\u7528\u7387\u63a5\u8fd1\u6781\u9650\uff0c\u5bfc\u81f4\u78c1\u76d8I/O\u538b\u529b\u5f02\u5e38\uff0c\u540c\u65f6CPU\u8d1f\u8f7d\u5347\u9ad8\u4e14iowait\u964d\u4f4e\uff0c\u7f51\u7edc\u63a5\u6536\u901f\u7387\u548c\u5305\u6570\u91cf\u663e\u8457\u964d\u4f4e\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u78c1\u76d8I/O\u538b\u529b\u6307\u6807\u5f02\u5e38\uff0c\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u7ee7\u53d1\u6548\u5e94",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e3",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u7f51\u7edc\u63a5\u6536\u901f\u7387\u548c\u5305\u6570\u91cf\u663e\u8457\u964d\u4f4e\uff0c\u8868\u660e\u53ef\u80fd\u5b58\u5728\u7f51\u7edc\u4e22\u5305\u6216\u8fde\u63a5\u95ee\u9898",
+      "fault_type": "network_loss",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e1",
+        "e6",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU\u8d1f\u8f7d\u5347\u9ad8\u4e14iowait\u964d\u4f4e\uff0c\u8868\u660e\u7cfb\u7edf\u5904\u4e8e\u8ba1\u7b97\u5bc6\u96c6\u578b\u8fc7\u8f7d\u72b6\u6001",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.05,
+      "evidence_ids": [
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u7f51\u7edc\u4e22\u5305\u6216\u8fde\u63a5\u95ee\u9898\u7684\u8bc1\u636e\u4e0d\u8db3\uff0c\u9700\u8fdb\u4e00\u6b65\u8c03\u67e5\u7f51\u7edc\u63a5\u6536\u901f\u7387\u548c\u5305\u6570\u91cf\u964d\u4f4e\u7684\u5177\u4f53\u539f\u56e0\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.3873303801862886,
+    "main_tools_used": [
+      "MetricQueryTool x6",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 7,
+    "main_iterations": 8,
+    "audit_iterations": 1,
+    "total_tokens_in": 25428,
+    "total_tokens_out": 3269,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:22:14.509116"
+}

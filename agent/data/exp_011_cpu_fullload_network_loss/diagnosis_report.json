@@ -1,0 +1,73 @@
+{
+  "run_id": "exp_011_Full",
+  "anomaly_summary": "系统性能下降主要由 CPU 过载引起，CPU 使用率高达 84.89%。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU 过载导致系统性能下降",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.9,
+      "evidence_ids": [
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少导致系统性能下降",
+      "fault_type": "disk_fill",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "内存压力过大导致系统性能下降",
+      "fault_type": "mem_load",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络接收速率下降导致系统性能下降",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "磁盘空间、内存压力和网络接收速率的变化对系统性能的影响尚未明确，需进一步调查。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.1828923907319258,
+    "main_tools_used": [
+      "MetricQueryTool x6"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 6,
+    "main_iterations": 7,
+    "audit_iterations": 1,
+    "total_tokens_in": 21985,
+    "total_tokens_out": 2966,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:05:21.465049"
+}

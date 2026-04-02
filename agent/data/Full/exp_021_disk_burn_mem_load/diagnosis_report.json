@@ -1,0 +1,61 @@
+{
+  "run_id": "exp_021_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u3001\u5185\u5b58\u538b\u529b\u8fc7\u5927\u4ee5\u53caCPU\u8fc7\u8f7d\uff0c\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u663e\u8457\u4e0b\u964d\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_fill",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u9891\u7e41\u6362\u9875",
+      "fault_type": "mem_load",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e3",
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u54cd\u5e94\u53d8\u6162",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU\u8fc7\u8f7d\u7684\u7f6e\u4fe1\u5ea6\u8f83\u4f4e\uff080.60\uff09\uff0c\u53ef\u80fd\u9700\u8981\u8fdb\u4e00\u6b65\u8c03\u67e5\u4ee5\u786e\u8ba4\u5176\u5f71\u54cd\u7a0b\u5ea6\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "memory",
+    "triage_confidence": 0.17076455764517345,
+    "main_tools_used": [
+      "MetricQueryTool x4"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 4,
+    "main_iterations": 5,
+    "audit_iterations": 1,
+    "total_tokens_in": 16485,
+    "total_tokens_out": 2141,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:37:40.812919"
+}

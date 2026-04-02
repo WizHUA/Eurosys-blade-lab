@@ -1,0 +1,637 @@
+{
+  "run_id": "exp_016_Full",
+  "diagnosis_trace_steps": 8,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：network_loss、cpu_fullload 和 mem_load。为了验证这些假设，我需要收集每个子系统的直接观测证据。首先，我将从 network_loss 假设开始，因为它当前的置信度最高（0.70）。我将查询网络丢包统计和TCP重传率，以验证网络是否存在丢包问题。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "network_receive_drop_rate",
+            "network_transmit_drop_rate",
+            "tcp_retransmissions_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; tcp_retransmissions_rate: mean=0.04848578514300065",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:20:47.880195",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：network_loss、cpu_fullload 和 mem_load。为了验证这些假设，我需要收集每个子系统的直接观测证据。首先，我将从 network_loss 假设开始，因为它当前的置信度最高（0.70）。我将查询网络丢包统计和TCP重传率，以验证网络是否存在丢包问题。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"tcp_retransmissions_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"为了验证 network_loss 假设，我需要查询网络丢包率和TCP重传率，这些指标直接反映了网络是否存在丢包问题。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (network_loss) 的置信度为 0.70，已收集的证据 e1 显示网络丢包率和传输丢包率均为 0，但 TCP 重传率较高（0.04848578514300065）。这可能表明网络存在延迟或丢包问题，但需要进一步验证 CPU 使用率以排除 CPU 负载过高的可能性。接下来应检查 CPU 使用率是否接近 100%，以验证 h2 (cpu_fullload) 的可能性。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "cpu_usage_percent: mean=68.67713767138457",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:20:59.056745",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (network_loss) 的置信度为 0.70，已收集的证据 e1 显示网络丢包率和传输丢包率均为 0，但 TCP 重传率较高（0.04848578514300065）。这可能表明网络存在延迟或丢包问题，但需要进一步验证 CPU 使用率以排除 CPU 负载过高的可能性。接下来应检查 CPU 使用率是否接近 100%，以验证 h2 (cpu_fullload) 的可能性。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.70, \"reason\": \"网络丢包率为 0，但 TCP 重传率较高，仍需进一步验证\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证 h2 (cpu_fullload) 的可能性，需要检查 CPU 使用率是否接近 100%。这将帮助我们确定 CPU 负载是否是导致 TCP 重传率升高的原因。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前网络丢包率(network_receive_drop_rate和network_transmit_drop_rate)均为0，不支持network_loss假设。TCP重传率(tcp_retransmissions_rate)为0.048，略高但不足以确认网络问题。CPU使用率为68.67%，未达到100%，不支持cpu_fullload假设。需要进一步验证内存相关指标以评估mem_load假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "memory_usage_percent: mean=98.85086277860877; memory_active_anon_bytes: mean=3915476309.3333335; memory_mapped_bytes: mean=78213802.66666667; memory_sunreclaim_bytes: mean=247371093.33333334",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:12.447639",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前网络丢包率(network_receive_drop_rate和network_transmit_drop_rate)均为0，不支持network_loss假设。TCP重传率(tcp_retransmissions_rate)为0.048，略高但不足以确认网络问题。CPU使用率为68.67%，未达到100%，不支持cpu_fullload假设。需要进一步验证内存相关指标以评估mem_load假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.30, \"reason\": \"丢包率为0且TCP重传率不高\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.40, \"reason\": \"CPU使用率未达100%\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.60, \"reason\": \"需要验证内存指标\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要获取内存使用率和关键内存指标来验证mem_load假设\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前假设 h1 (network_loss) 的置信度为 0.30，尚未完全验证。需要进一步检查网络接口的丢包统计和 TCP 重传率是否升高。e1 显示 tcp_retransmissions_rate 的均值为 0.04848578514300065，但需要确认这是否显著高于正常水平。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "KBRetrievalTool",
+        "args": {
+          "mode": "Fault Pattern Library",
+          "subsystem": "network",
+          "anomaly_metrics": [
+            "tcp_retransmissions_rate"
+          ]
+        },
+        "call_id": "c4"
+      },
+      "observation": "Error: Unsupported mode: Fault Pattern Library",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:18.403245",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (network_loss) 的置信度为 0.30，尚未完全验证。需要进一步检查网络接口的丢包统计和 TCP 重传率是否升高。e1 显示 tcp_retransmissions_rate 的均值为 0.04848578514300065，但需要确认这是否显著高于正常水平。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"KBRetrievalTool\",\n    \"args\": {\n      \"mode\": \"Fault Pattern Library\",\n      \"subsystem\": \"network\",\n      \"anomaly_metrics\": [\"tcp_retransmissions_rate\"]\n    },\n    \"reasoning\": \"通过查询 Fault Pattern Library，可以了解 tcp_retransmissions_rate 的正常范围，从而判断当前值是否异常。这将有助于验证 h1 的置信度。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设中，h1 (network_loss) 的置信度为 0.30，需要进一步验证网络丢包统计和 TCP 重传率。h2 (cpu_fullload) 的 CPU 使用率已验证为 68.67%，未接近 100%，因此可以降低其置信度。h3 (mem_load) 的内存使用率已接近 100%，但需要验证页面错误率是否升高。接下来，优先验证 h1 的网络丢包统计和 TCP 重传率，以及 h3 的页面错误率。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "page_faults_rate",
+            "page_major_faults_rate",
+            "page_swap_in_rate",
+            "page_swap_out_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c5"
+      },
+      "observation": "page_faults_rate: mean=9370.917667026784; page_major_faults_rate: mean=3240.642564411141; page_swap_in_rate: mean=33283.8444959725; page_swap_out_rate: mean=25753.041948416023",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:28.575598",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (network_loss) 的置信度为 0.30，需要进一步验证网络丢包统计和 TCP 重传率。h2 (cpu_fullload) 的 CPU 使用率已验证为 68.67%，未接近 100%，因此可以降低其置信度。h3 (mem_load) 的内存使用率已接近 100%，但需要验证页面错误率是否升高。接下来，优先验证 h1 的网络丢包统计和 TCP 重传率，以及 h3 的页面错误率。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.20, \"reason\": \"CPU 使用率未接近 100%\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"page_faults_rate\", \"page_major_faults_rate\", \"page_swap_in_rate\", \"page_swap_out_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要验证 h3 (mem_load) 的页面错误率是否升高，以确认内存压力是否导致页面交换活动增加。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前假设 h1 (network_loss) 的 confidence 较低，需要进一步验证网络丢包统计和 TCP 重传率。已收集的证据 e1 显示 network_receive_drop_rate 和 network_transmit_drop_rate 均为 0，但 tcp_retransmissions_rate 有轻微升高。需要进一步确认 TCP 重传率是否显著升高。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "tcp_retransmissions_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c6"
+      },
+      "observation": "tcp_retransmissions_rate: mean=0.04848578514300065",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:37.133042",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (network_loss) 的 confidence 较低，需要进一步验证网络丢包统计和 TCP 重传率。已收集的证据 e1 显示 network_receive_drop_rate 和 network_transmit_drop_rate 均为 0，但 tcp_retransmissions_rate 有轻微升高。需要进一步确认 TCP 重传率是否显著升高。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.30, \"reason\": \"network_receive_drop_rate 和 network_transmit_drop_rate 均为 0，但 tcp_retransmissions_rate 有轻微升高，需要进一步验证\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"tcp_retransmissions_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步确认 TCP 重传率是否显著升高，以验证 h1 (network_loss) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "当前假设 h1 (network_loss) 的置信度为 0.30，需要进一步验证网络丢包统计和 TCP 重传率。虽然 e1 已经显示 TCP 重传率升高，但仍需确认网络丢包统计以确认网络问题。h2 (cpu_fullload) 的 CPU 使用率已验证为 68.67%，未接近 100%，因此可以降低其置信度。h3 (mem_load) 的内存使用率和页面错误率均已验证，置信度较高。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "network_receive_drop_rate",
+            "network_transmit_drop_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:32:13",
+            "end": "2025-09-20T07:33:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c7"
+      },
+      "observation": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:49.134109",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (network_loss) 的置信度为 0.30，需要进一步验证网络丢包统计和 TCP 重传率。虽然 e1 已经显示 TCP 重传率升高，但仍需确认网络丢包统计以确认网络问题。h2 (cpu_fullload) 的 CPU 使用率已验证为 68.67%，未接近 100%，因此可以降低其置信度。h3 (mem_load) 的内存使用率和页面错误率均已验证，置信度较高。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.30, \"reason\": \"TCP 重传率升高，但网络丢包统计尚未验证\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.10, \"reason\": \"CPU 使用率未接近 100%\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.60, \"reason\": \"内存使用率和页面错误率已验证\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:32:13\",\n        \"end\": \"2025-09-20T07:33:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步验证网络丢包统计以确认 network_loss 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "当前证据显示内存使用率高达98.85%，且页面错误率和交换活动显著增加（e3, e5），这强烈支持 mem_load 假设（h3）。CPU 使用率为68.67%（e2），未达到满负荷，因此 cpu_fullload 假设（h2）的置信度应降低。网络丢包率为0（e1, e7），TCP重传率较低（e6），不支持 network_loss 假设（h1）。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:21:59.180746",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率高达98.85%，且页面错误率和交换活动显著增加（e3, e5），这强烈支持 mem_load 假设（h3）。CPU 使用率为68.67%（e2），未达到满负荷，因此 cpu_fullload 假设（h2）的置信度应降低。网络丢包率为0（e1, e7），TCP重传率较低（e6），不支持 network_loss 假设（h1）。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.1, \"reason\": \"网络丢包率为0且TCP重传率低\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.05, \"reason\": \"CPU使用率未接近100%\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.95, \"reason\": \"内存使用率高且页面错误/交换活动显著\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"证据充分支持 mem_load 假设，其他假设已被排除或置信度极低。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\n2. **子系统直接证据**: \n   - mem_load: 有内存子系统的直接观测指标（memory_usage_percent, memory_active_anon_bytes 等）。\n   - network_loss: 有网络子系统的直接观测指标（network_receive_drop_rate, network_transmit_drop_rate, tcp_retransmissions_rate）。\n   - cpu_fullload: 有 CPU 子系统的直接观测指标（cpu_usage_percent）。\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致。\n4. **复合故障判断**: 多个根因之间存在因果链关系，如网络接收速率下降可能导致后续的磁盘 I/O 压力和 CPU 负载升高。\n\n然而，network_loss 的 confidence 仅为 0.10，且证据 e1 和 e7 显示 network_receive_drop_rate 和 network_transmit_drop_rate 均为 0.0，这与 network_loss 的假设不符。此外，cpu_fullload 的 confidence 仅为 0.05，且证据 e2 显示 CPU 使用率为 68.67%，未达到满载状态。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:22:11.177001",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\\n2. **子系统直接证据**: \\n   - mem_load: 有内存子系统的直接观测指标（memory_usage_percent, memory_active_anon_bytes 等）。\\n   - network_loss: 有网络子系统的直接观测指标（network_receive_drop_rate, network_transmit_drop_rate, tcp_retransmissions_rate）。\\n   - cpu_fullload: 有 CPU 子系统的直接观测指标（cpu_usage_percent）。\\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致。\\n4. **复合故障判断**: 多个根因之间存在因果链关系，如网络接收速率下降可能导致后续的磁盘 I/O 压力和 CPU 负载升高。\\n\\n然而，network_loss 的 confidence 仅为 0.10，且证据 e1 和 e7 显示 network_receive_drop_rate 和 network_transmit_drop_rate 均为 0.0，这与 network_loss 的假设不符。此外，cpu_fullload 的 confidence 仅为 0.05，且证据 e2 显示 CPU 使用率为 68.67%，未达到满载状态。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"continue\",\n    \"reason\": \"network_loss 和 cpu_fullload 的 confidence 较低，且证据与假设不完全一致，需要进一步验证。\",\n    \"hint\": \"建议进一步验证网络丢包率和 CPU 使用率的详细数据，以确认是否存在网络丢包和 CPU 满载的情况。\",\n    \"diagnosis_type\": \"composite_fault\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1596,
+      "completion": 433,
+      "total": 2029
+    },
+    "diagnosis_think": {
+      "prompt": 21557,
+      "completion": 2343,
+      "total": 23900
+    },
+    "audit_think": {
+      "prompt": 1596,
+      "completion": 408,
+      "total": 2004
+    },
+    "finalize": {
+      "prompt": 679,
+      "completion": 85,
+      "total": 764
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "网络接收速率和包数量显著降低，表明可能存在网络丢包或连接问题",
+      "fault_type": "network_loss",
+      "subsystem": "network",
+      "prior_confidence": 0.7000000000000001,
+      "current_confidence": 0.1,
+      "required_verifications": [
+        {
+          "description": "检查网络接口的丢包统计",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_receive_dropped_packets_rate"
+          ]
+        },
+        {
+          "description": "验证TCP重传率是否升高",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "tcp_retransmit_segments_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "CPU负载升高且iowait降低，表明系统处于计算密集型过载状态",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.05,
+      "required_verifications": [
+        {
+          "description": "检查CPU使用率是否接近100%",
+          "status": "verified",
+          "evidence_id": "e2",
+          "required_metrics": [
+            "cpu_usage_percent"
+          ]
+        },
+        {
+          "description": "验证是否有进程占用过高CPU",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "process_cpu_usage_percent"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "磁盘I/O压力指标异常，可能是内存压力导致的继发效应",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.45,
+      "current_confidence": 0.95,
+      "required_verifications": [
+        {
+          "description": "检查内存使用率和交换空间使用情况",
+          "status": "verified",
+          "evidence_id": "e3",
+          "required_metrics": [
+            "memory_usage_percent",
+            "swap_usage_percent"
+          ]
+        },
+        {
+          "description": "验证页面错误率是否升高",
+          "status": "verified",
+          "evidence_id": "e5",
+          "required_metrics": [
+            "page_faults_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"tcp_retransmissions_rate\"],)",
+      "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; tcp_retransmissions_rate: mean=0.04848578514300065",
+      "raw_stats": {
+        "network_receive_drop_rate": 0.0,
+        "network_transmit_drop_rate": 0.0,
+        "tcp_retransmissions_rate": 0.04848578514300065
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:32:13\", \"end\": \"2025-09-2)",
+      "result_digest": "cpu_usage_percent: mean=68.67713767138457",
+      "raw_stats": {
+        "cpu_usage_percent": 68.67713767138457
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+      "result_digest": "memory_usage_percent: mean=98.85086277860877; memory_active_anon_bytes: mean=3915476309.3333335; memory_mapped_bytes: mean=78213802.66666667; memory_sunreclaim_bytes: mean=247371093.33333334",
+      "raw_stats": {
+        "memory_usage_percent": 98.85086277860877,
+        "memory_active_anon_bytes": 3915476309.3333335,
+        "memory_mapped_bytes": 78213802.66666667,
+        "memory_sunreclaim_bytes": 247371093.33333334
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"page_faults_rate\", \"page_major_faults_rate\", \"page_swap_in_rate\", \"page_swap_out_rate\")",
+      "result_digest": "page_faults_rate: mean=9370.917667026784; page_major_faults_rate: mean=3240.642564411141; page_swap_in_rate: mean=33283.8444959725; page_swap_out_rate: mean=25753.041948416023",
+      "raw_stats": {
+        "page_faults_rate": 9370.917667026784,
+        "page_major_faults_rate": 3240.642564411141,
+        "page_swap_in_rate": 33283.8444959725,
+        "page_swap_out_rate": 25753.041948416023
+      },
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"tcp_retransmissions_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:32:13\", \"end\": \"20)",
+      "result_digest": "tcp_retransmissions_rate: mean=0.04848578514300065",
+      "raw_stats": {
+        "tcp_retransmissions_rate": 0.04848578514300065
+      },
+      "created_at_step": 6
+    },
+    {
+      "id": "e7",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+      "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0",
+      "raw_stats": {
+        "network_receive_drop_rate": 0.0,
+        "network_transmit_drop_rate": 0.0
+      },
+      "created_at_step": 7
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "网络接收速率和包数量显著降低，表明可能存在网络丢包或连接问题",
+        "fault_type": "network_loss",
+        "subsystem": "network",
+        "prior_confidence": 0.7000000000000001,
+        "current_confidence": 0.1,
+        "required_verifications": [
+          {
+            "description": "检查网络接口的丢包统计",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_receive_dropped_packets_rate"
+            ]
+          },
+          {
+            "description": "验证TCP重传率是否升高",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "tcp_retransmit_segments_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "CPU负载升高且iowait降低，表明系统处于计算密集型过载状态",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.05,
+        "required_verifications": [
+          {
+            "description": "检查CPU使用率是否接近100%",
+            "status": "verified",
+            "evidence_id": "e2",
+            "required_metrics": [
+              "cpu_usage_percent"
+            ]
+          },
+          {
+            "description": "验证是否有进程占用过高CPU",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "process_cpu_usage_percent"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "磁盘I/O压力指标异常，可能是内存压力导致的继发效应",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.45,
+        "current_confidence": 0.95,
+        "required_verifications": [
+          {
+            "description": "检查内存使用率和交换空间使用情况",
+            "status": "verified",
+            "evidence_id": "e3",
+            "required_metrics": [
+              "memory_usage_percent",
+              "swap_usage_percent"
+            ]
+          },
+          {
+            "description": "验证页面错误率是否升高",
+            "status": "verified",
+            "evidence_id": "e5",
+            "required_metrics": [
+              "page_faults_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"tcp_retransmissions_rate\"],)",
+        "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; tcp_retransmissions_rate: mean=0.04848578514300065",
+        "raw_stats": {
+          "network_receive_drop_rate": 0.0,
+          "network_transmit_drop_rate": 0.0,
+          "tcp_retransmissions_rate": 0.04848578514300065
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:32:13\", \"end\": \"2025-09-2)",
+        "result_digest": "cpu_usage_percent: mean=68.67713767138457",
+        "raw_stats": {
+          "cpu_usage_percent": 68.67713767138457
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+        "result_digest": "memory_usage_percent: mean=98.85086277860877; memory_active_anon_bytes: mean=3915476309.3333335; memory_mapped_bytes: mean=78213802.66666667; memory_sunreclaim_bytes: mean=247371093.33333334",
+        "raw_stats": {
+          "memory_usage_percent": 98.85086277860877,
+          "memory_active_anon_bytes": 3915476309.3333335,
+          "memory_mapped_bytes": 78213802.66666667,
+          "memory_sunreclaim_bytes": 247371093.33333334
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"page_faults_rate\", \"page_major_faults_rate\", \"page_swap_in_rate\", \"page_swap_out_rate\")",
+        "result_digest": "page_faults_rate: mean=9370.917667026784; page_major_faults_rate: mean=3240.642564411141; page_swap_in_rate: mean=33283.8444959725; page_swap_out_rate: mean=25753.041948416023",
+        "raw_stats": {
+          "page_faults_rate": 9370.917667026784,
+          "page_major_faults_rate": 3240.642564411141,
+          "page_swap_in_rate": 33283.8444959725,
+          "page_swap_out_rate": 25753.041948416023
+        },
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"tcp_retransmissions_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:32:13\", \"end\": \"20)",
+        "result_digest": "tcp_retransmissions_rate: mean=0.04848578514300065",
+        "raw_stats": {
+          "tcp_retransmissions_rate": 0.04848578514300065
+        },
+        "created_at_step": 6
+      },
+      {
+        "id": "e7",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+        "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0",
+        "raw_stats": {
+          "network_receive_drop_rate": 0.0,
+          "network_transmit_drop_rate": 0.0
+        },
+        "created_at_step": 7
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "磁盘I/O压力指标异常，可能是内存压力导致的继发效应",
+        "fault_type": "mem_load",
+        "confidence": 0.95,
+        "evidence_ids": [
+          "e3",
+          "e5"
+        ]
+      },
+      {
+        "cause": "网络接收速率和包数量显著降低，表明可能存在网络丢包或连接问题",
+        "fault_type": "network_loss",
+        "confidence": 0.1,
+        "evidence_ids": [
+          "e1",
+          "e6",
+          "e7"
+        ]
+      },
+      {
+        "cause": "CPU负载升高且iowait降低，表明系统处于计算密集型过载状态",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.05,
+        "evidence_ids": [
+          "e2"
+        ]
+      }
+    ]
+  }
+}

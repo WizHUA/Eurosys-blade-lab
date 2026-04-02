@@ -1,0 +1,68 @@
+{
+  "run_id": "exp_026_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为内存压力过大导致频繁使用swap空间，CPU使用率较高可能导致响应缓慢，以及磁盘空间持续减少可能影响数据写入。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存压力过大，导致系统频繁使用swap空间",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e2",
+        "e7",
+        "e8",
+        "e9",
+        "e10"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU使用率过高，可能导致系统响应缓慢",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.5,
+      "evidence_ids": [
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少，可能导致系统无法正常写入数据",
+      "fault_type": "disk_fill",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e1",
+        "e4",
+        "e5",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU使用率过高的影响尚不明确，需进一步观察其对系统性能的具体影响。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "memory",
+    "triage_confidence": 0.2727875822129121,
+    "main_tools_used": [
+      "MetricQueryTool x10",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 11,
+    "main_iterations": 12,
+    "audit_iterations": 1,
+    "total_tokens_in": 38208,
+    "total_tokens_out": 4367,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:51:28.201215"
+}

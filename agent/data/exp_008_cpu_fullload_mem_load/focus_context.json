@@ -1,0 +1,187 @@
+{
+  "run_id": "exp_008_Full",
+  "anomaly_window": {
+    "start": "2025-09-20T07:16:13",
+    "end": "2025-09-20T07:17:28"
+  },
+  "top_metrics": [
+    {
+      "metric": "disk_write_iops",
+      "subsystem": "disk",
+      "direction": "+",
+      "score": 1.4619010286727836,
+      "t_onset": "2025-09-20T07:16:58",
+      "onset_rank": 15,
+      "change_point": null
+    },
+    {
+      "metric": "schedstat_running_rate",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.4325063489978205,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 1,
+      "change_point": null
+    },
+    {
+      "metric": "filesystem_avail_bytes",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.3388542591482144,
+      "t_onset": "2025-09-20T07:16:28",
+      "onset_rank": 8,
+      "change_point": null
+    },
+    {
+      "metric": "filesystem_free_bytes",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.3388542591482144,
+      "t_onset": "2025-09-20T07:16:28",
+      "onset_rank": 9,
+      "change_point": null
+    },
+    {
+      "metric": "cpu_system_percent",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.2383042535746438,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 2,
+      "change_point": null
+    },
+    {
+      "metric": "context_switches_rate",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.2049277791144053,
+      "t_onset": "2025-09-20T07:16:28",
+      "onset_rank": 10,
+      "change_point": null
+    },
+    {
+      "metric": "memory_inactive_anon_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2003871186912085,
+      "t_onset": "2025-09-20T07:16:43",
+      "onset_rank": 12,
+      "change_point": null
+    },
+    {
+      "metric": "page_major_faults_rate",
+      "subsystem": "vmstat",
+      "direction": "+",
+      "score": 1.1732883829709972,
+      "t_onset": "2025-09-20T07:16:43",
+      "onset_rank": 13,
+      "change_point": null
+    },
+    {
+      "metric": "network_receive_packets_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 1.1625984993990017,
+      "t_onset": "2025-09-20T07:16:28",
+      "onset_rank": 11,
+      "change_point": null
+    },
+    {
+      "metric": "page_faults_rate",
+      "subsystem": "memory",
+      "direction": "+",
+      "score": 1.1511295038128762,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 3,
+      "change_point": null
+    },
+    {
+      "metric": "disk_total_iops",
+      "subsystem": "disk",
+      "direction": "+",
+      "score": 1.1172148013531418,
+      "t_onset": "2025-09-20T07:16:43",
+      "onset_rank": 14,
+      "change_point": null
+    },
+    {
+      "metric": "load_1min",
+      "subsystem": "load",
+      "direction": "+",
+      "score": 1.0981045461828587,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 4,
+      "change_point": null
+    },
+    {
+      "metric": "load_5min",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.0658307707258021,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 5,
+      "change_point": null
+    },
+    {
+      "metric": "interrupts_rate",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.0280701524231022,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 6,
+      "change_point": null
+    },
+    {
+      "metric": "process_forks_rate",
+      "subsystem": "system",
+      "direction": "+",
+      "score": 1.0210046011035645,
+      "t_onset": "2025-09-20T07:16:13",
+      "onset_rank": 7,
+      "change_point": null
+    }
+  ],
+  "causal_order": [
+    "schedstat_running_rate",
+    "cpu_system_percent",
+    "page_faults_rate",
+    "load_1min",
+    "load_5min",
+    "interrupts_rate",
+    "process_forks_rate",
+    "filesystem_avail_bytes",
+    "filesystem_free_bytes",
+    "context_switches_rate",
+    "network_receive_packets_rate",
+    "memory_inactive_anon_bytes",
+    "page_major_faults_rate",
+    "disk_total_iops",
+    "disk_write_iops"
+  ],
+  "subsystem_scores": {
+    "disk": 1.3142060870805885,
+    "cpu": 1.1939278609671549,
+    "memory": 1.1757583112520424,
+    "vmstat": 1.1732883829709972,
+    "network": 1.1625984993990017,
+    "load": 1.0981045461828587,
+    "system": 1.0210046011035645
+  },
+  "leading_subsystem": "disk",
+  "nodes": [
+    {
+      "node": "node-0",
+      "severity": "low"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "276",
+      "overlap_ratio": 0.0452,
+      "node_set": [
+        "wizhua-virtual-machine"
+      ]
+    }
+  ],
+  "triage_confidence": 0.14619010286727835
+}

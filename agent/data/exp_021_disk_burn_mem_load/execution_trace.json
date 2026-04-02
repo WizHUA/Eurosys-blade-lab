@@ -1,0 +1,469 @@
+{
+  "run_id": "exp_021_Full",
+  "diagnosis_trace_steps": 5,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：磁盘空间不足（h1）、CPU满载（h2）和内存负载（h3）。为了验证这些假设，需要分别检查相关指标。首先，我将验证磁盘空间使用情况（h1），因为它的置信度最高（0.70）。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent",
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:42:13",
+            "end": "2025-09-20T07:43:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c1"
+      },
+      "observation": "filesystem_usage_percent: max=83.72930161013537; filesystem_free_bytes: max=25982472192.0",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:36:21.482517",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：磁盘空间不足（h1）、CPU满载（h2）和内存负载（h3）。为了验证这些假设，需要分别检查相关指标。首先，我将验证磁盘空间使用情况（h1），因为它的置信度最高（0.70）。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:42:13\",\n        \"end\": \"2025-09-20T07:43:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"为了验证磁盘空间不足的假设（h1），需要检查文件系统的使用百分比和剩余空间。这些指标直接反映了磁盘空间的使用情况。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (disk_fill) 已经通过 filesystem_usage_percent 和 filesystem_free_bytes 的直接观测证据得到了验证，置信度较高。接下来需要验证 h2 (cpu_fullload) 和 h3 (mem_load) 假设。首先，我将检查 CPU 使用率和负载的相关指标，以验证 h2。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_usage_percent",
+            "load_1min",
+            "load_5min",
+            "load_15min"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:42:13",
+            "end": "2025-09-20T07:43:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c2"
+      },
+      "observation": "cpu_usage_percent: max=77.53181818181888; load_1min: max=10.09; load_5min: max=7.09; load_15min: max=5.86",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:36:31.011231",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 已经通过 filesystem_usage_percent 和 filesystem_free_bytes 的直接观测证据得到了验证，置信度较高。接下来需要验证 h2 (cpu_fullload) 和 h3 (mem_load) 假设。首先，我将检查 CPU 使用率和负载的相关指标，以验证 h2。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"filesystem_usage_percent 和 filesystem_free_bytes 的直接观测证据支持 disk_fill 假设\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_usage_percent\", \"load_1min\", \"load_5min\", \"load_15min\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:42:13\",\n        \"end\": \"2025-09-20T07:43:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"为了验证 h2 (cpu_fullload) 假设，需要查询 CPU 使用率和负载的相关指标，以确定是否存在 CPU 满载的情况。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前需要验证内存使用情况和换页率以确认 [h3] mem_load 假设。根据内存-磁盘级联效应识别原则，需要检查 memory_usage_percent、memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes 等内存指标，以及 disk_write_iops/disk_total_iops 以判断是否存在内存压力导致的磁盘 IO 上升。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes",
+            "disk_write_iops",
+            "disk_total_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:42:13",
+            "end": "2025-09-20T07:43:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c3"
+      },
+      "observation": "memory_usage_percent: max=98.77981740803727; memory_active_anon_bytes: max=5033086976.0; memory_mapped_bytes: max=84119552.0; memory_sunreclaim_bytes: max=246726656.0; disk_write_iops: max=5018.7818181818175; disk_total_iops: max=8575.527272727271",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:37:08.780720",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前需要验证内存使用情况和换页率以确认 [h3] mem_load 假设。根据内存-磁盘级联效应识别原则，需要检查 memory_usage_percent、memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes 等内存指标，以及 disk_write_iops/disk_total_iops 以判断是否存在内存压力导致的磁盘 IO 上升。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"filesystem_usage_percent 和 filesystem_free_bytes 证据支持\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.60, \"reason\": \"cpu_usage_percent 和 load 指标支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\", \"disk_write_iops\", \"disk_total_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:42:13\",\n        \"end\": \"2025-09-20T07:43:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要直接观测内存和磁盘 IO 指标以验证内存压力假设，并判断是否存在内存-磁盘级联效应。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前假设 h3 (mem_load) 的置信度为 0.55，状态为 pending。已收集的证据 e3 显示 memory_usage_percent 高达 98.77%，同时 disk_write_iops 和 disk_total_iops 显著升高，符合内存压力导致磁盘 IO 上升的特征。根据内存-磁盘级联效应识别规则，应优先判定为 mem_load。需要进一步验证内存相关指标以确认此假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_pressure_stalled_rate",
+            "memory_pressure_waiting_rate",
+            "page_swap_out_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:42:13",
+            "end": "2025-09-20T07:43:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c4"
+      },
+      "observation": "memory_pressure_stalled_rate: max=0.148614570644172; memory_pressure_waiting_rate: max=0.1999986182069401; page_swap_out_rate: max=151123.85454545452",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:37:17.404055",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h3 (mem_load) 的置信度为 0.55，状态为 pending。已收集的证据 e3 显示 memory_usage_percent 高达 98.77%，同时 disk_write_iops 和 disk_total_iops 显著升高，符合内存压力导致磁盘 IO 上升的特征。根据内存-磁盘级联效应识别规则，应优先判定为 mem_load。需要进一步验证内存相关指标以确认此假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.75, \"reason\": \"内存使用率极高且磁盘 IO 上升，符合内存压力特征\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\", \"page_swap_out_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:42:13\",\n        \"end\": \"2025-09-20T07:43:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要查询内存压力和换页率指标以进一步确认内存负载情况\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "Based on the collected evidence, we have verified disk_fill (h1) with filesystem_usage_percent at 83.7% and filesystem_free_bytes showing limited free space. CPU usage is high (77.5%) with elevated load averages (10.09, 7.09, 5.86), supporting cpu_fullload (h2). Memory usage is critically high (98.78%) with significant active anonymous memory (5033086976.0 bytes) and high swap out rate (151123.85/s), strongly supporting mem_load (h3). The disk_write_iops and disk_total_iops are elevated, but this is likely a secondary effect of memory pressure causing swap activity, as per the memory-disk cascade effect rule.",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:37:28.796268",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"Based on the collected evidence, we have verified disk_fill (h1) with filesystem_usage_percent at 83.7% and filesystem_free_bytes showing limited free space. CPU usage is high (77.5%) with elevated load averages (10.09, 7.09, 5.86), supporting cpu_fullload (h2). Memory usage is critically high (98.78%) with significant active anonymous memory (5033086976.0 bytes) and high swap out rate (151123.85/s), strongly supporting mem_load (h3). The disk_write_iops and disk_total_iops are elevated, but this is likely a secondary effect of memory pressure causing swap activity, as per the memory-disk cascade effect rule.\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"filesystem_usage_percent and filesystem_free_bytes confirm disk space is limited\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.60, \"reason\": \"high CPU usage and load averages indicate CPU load\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.85, \"reason\": \"critical memory usage, high swap out rate, and secondary disk IO due to memory pressure\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"All hypotheses have been verified with direct subsystem metrics. The evidence is sufficient to conclude that the primary issue is mem_load, with secondary effects on CPU and disk due to memory pressure.\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中有4条证据，全部为'supporting'类型。\n2. **子系统直接证据**: \n   - disk_fill: 有filesystem_usage_percent和filesystem_free_bytes的直接观测指标，支持磁盘空间不足的假设。\n   - mem_load: 有memory_usage_percent、memory_active_anon_bytes等内存相关指标的直接观测，支持内存压力过大的假设。\n   - cpu_fullload: 有cpu_usage_percent的直接观测指标，支持CPU过载的假设。\n3. **故障标签合理性**: 诊断使用的fault_type与实际观测到的异常指标一致。\n4. **复合故障判断**: 时序因果序列显示内存压力导致频繁换页，进而可能影响CPU和磁盘性能，表明这些故障可能是因果链而非独立故障。\n\n根据以上审查，证据充分，结论可信。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:37:37.000553",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中有4条证据，全部为'supporting'类型。\\n2. **子系统直接证据**: \\n   - disk_fill: 有filesystem_usage_percent和filesystem_free_bytes的直接观测指标，支持磁盘空间不足的假设。\\n   - mem_load: 有memory_usage_percent、memory_active_anon_bytes等内存相关指标的直接观测，支持内存压力过大的假设。\\n   - cpu_fullload: 有cpu_usage_percent的直接观测指标，支持CPU过载的假设。\\n3. **故障标签合理性**: 诊断使用的fault_type与实际观测到的异常指标一致。\\n4. **复合故障判断**: 时序因果序列显示内存压力导致频繁换页，进而可能影响CPU和磁盘性能，表明这些故障可能是因果链而非独立故障。\\n\\n根据以上审查，证据充分，结论可信。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"pass\",\n    \"reason\": \"证据充分，结论可信，放行\",\n    \"diagnosis_type\": \"composite_fault\"\n  }\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1627,
+      "completion": 310,
+      "total": 1937
+    },
+    "diagnosis_think": {
+      "prompt": 12761,
+      "completion": 1493,
+      "total": 14254
+    },
+    "audit_think": {
+      "prompt": 1488,
+      "completion": 268,
+      "total": 1756
+    },
+    "finalize": {
+      "prompt": 609,
+      "completion": 70,
+      "total": 679
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "磁盘空间不足导致系统性能下降",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.7,
+      "current_confidence": 0.85,
+      "required_verifications": [
+        {
+          "description": "检查磁盘空间使用情况",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "filesystem_avail_bytes",
+            "filesystem_free_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "CPU 过载导致系统响应变慢",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.6,
+      "current_confidence": 0.6,
+      "required_verifications": [
+        {
+          "description": "检查 CPU 使用率和负载",
+          "status": "verified",
+          "evidence_id": "e2",
+          "required_metrics": [
+            "cpu_usage_percent",
+            "cpu_pressure_waiting_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "内存压力过大导致频繁换页",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.85,
+      "required_verifications": [
+        {
+          "description": "检查内存使用情况和换页率",
+          "status": "verified",
+          "evidence_id": "e4",
+          "required_metrics": [
+            "memory_committed_as_bytes",
+            "page_swap_out_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+      "result_digest": "filesystem_usage_percent: max=83.72930161013537; filesystem_free_bytes: max=25982472192.0",
+      "raw_stats": {
+        "filesystem_usage_percent": 83.72930161013537,
+        "filesystem_free_bytes": 25982472192.0
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\", \"load_1min\", \"load_5min\", \"load_15min\"], \"time_window\": {\"start\": )",
+      "result_digest": "cpu_usage_percent: max=77.53181818181888; load_1min: max=10.09; load_5min: max=7.09; load_15min: max=5.86",
+      "raw_stats": {
+        "cpu_usage_percent": 77.53181818181888,
+        "load_1min": 10.09,
+        "load_5min": 7.09,
+        "load_15min": 5.86
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+      "result_digest": "memory_usage_percent: max=98.77981740803727; memory_active_anon_bytes: max=5033086976.0; memory_mapped_bytes: max=84119552.0; memory_sunreclaim_bytes: max=246726656.0; disk_write_iops: max=5018.7818181818175; disk_total_iops: max=8575.527272727271",
+      "raw_stats": {
+        "memory_usage_percent": 98.77981740803727,
+        "memory_active_anon_bytes": 5033086976.0,
+        "memory_mapped_bytes": 84119552.0,
+        "memory_sunreclaim_bytes": 246726656.0,
+        "disk_write_iops": 5018.7818181818175,
+        "disk_total_iops": 8575.527272727271
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\", \"page_swap_out_rate\"], )",
+      "result_digest": "memory_pressure_stalled_rate: max=0.148614570644172; memory_pressure_waiting_rate: max=0.1999986182069401; page_swap_out_rate: max=151123.85454545452",
+      "raw_stats": {
+        "memory_pressure_stalled_rate": 0.148614570644172,
+        "memory_pressure_waiting_rate": 0.1999986182069401,
+        "page_swap_out_rate": 151123.85454545452
+      },
+      "created_at_step": 4
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "磁盘空间不足导致系统性能下降",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.7,
+        "current_confidence": 0.85,
+        "required_verifications": [
+          {
+            "description": "检查磁盘空间使用情况",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "filesystem_avail_bytes",
+              "filesystem_free_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "CPU 过载导致系统响应变慢",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.6,
+        "current_confidence": 0.6,
+        "required_verifications": [
+          {
+            "description": "检查 CPU 使用率和负载",
+            "status": "verified",
+            "evidence_id": "e2",
+            "required_metrics": [
+              "cpu_usage_percent",
+              "cpu_pressure_waiting_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "内存压力过大导致频繁换页",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.85,
+        "required_verifications": [
+          {
+            "description": "检查内存使用情况和换页率",
+            "status": "verified",
+            "evidence_id": "e4",
+            "required_metrics": [
+              "memory_committed_as_bytes",
+              "page_swap_out_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+        "result_digest": "filesystem_usage_percent: max=83.72930161013537; filesystem_free_bytes: max=25982472192.0",
+        "raw_stats": {
+          "filesystem_usage_percent": 83.72930161013537,
+          "filesystem_free_bytes": 25982472192.0
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\", \"load_1min\", \"load_5min\", \"load_15min\"], \"time_window\": {\"start\": )",
+        "result_digest": "cpu_usage_percent: max=77.53181818181888; load_1min: max=10.09; load_5min: max=7.09; load_15min: max=5.86",
+        "raw_stats": {
+          "cpu_usage_percent": 77.53181818181888,
+          "load_1min": 10.09,
+          "load_5min": 7.09,
+          "load_15min": 5.86
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+        "result_digest": "memory_usage_percent: max=98.77981740803727; memory_active_anon_bytes: max=5033086976.0; memory_mapped_bytes: max=84119552.0; memory_sunreclaim_bytes: max=246726656.0; disk_write_iops: max=5018.7818181818175; disk_total_iops: max=8575.527272727271",
+        "raw_stats": {
+          "memory_usage_percent": 98.77981740803727,
+          "memory_active_anon_bytes": 5033086976.0,
+          "memory_mapped_bytes": 84119552.0,
+          "memory_sunreclaim_bytes": 246726656.0,
+          "disk_write_iops": 5018.7818181818175,
+          "disk_total_iops": 8575.527272727271
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\", \"page_swap_out_rate\"], )",
+        "result_digest": "memory_pressure_stalled_rate: max=0.148614570644172; memory_pressure_waiting_rate: max=0.1999986182069401; page_swap_out_rate: max=151123.85454545452",
+        "raw_stats": {
+          "memory_pressure_stalled_rate": 0.148614570644172,
+          "memory_pressure_waiting_rate": 0.1999986182069401,
+          "page_swap_out_rate": 151123.85454545452
+        },
+        "created_at_step": 4
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "磁盘空间不足导致系统性能下降",
+        "fault_type": "disk_fill",
+        "confidence": 0.85,
+        "evidence_ids": [
+          "e1"
+        ]
+      },
+      {
+        "cause": "内存压力过大导致频繁换页",
+        "fault_type": "mem_load",
+        "confidence": 0.85,
+        "evidence_ids": [
+          "e3",
+          "e4"
+        ]
+      },
+      {
+        "cause": "CPU 过载导致系统响应变慢",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.6,
+        "evidence_ids": [
+          "e2"
+        ]
+      }
+    ]
+  }
+}

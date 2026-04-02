@@ -1,0 +1,925 @@
+{
+  "run_id": "exp_024_Full",
+  "diagnosis_trace_steps": 11,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有四个活跃假设：mem_load、cpu_fullload、disk_burn、network_loss。需要分别验证每个假设的直接证据。首先验证 mem_load 假设，检查内存使用情况和交换空间使用是否持续增长。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "swap_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "memory_usage_percent: mean=97.67405291119437; swap_usage_percent: mean=99.73613688685778",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:43:11.744331",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有四个活跃假设：mem_load、cpu_fullload、disk_burn、network_loss。需要分别验证每个假设的直接证据。首先验证 mem_load 假设，检查内存使用情况和交换空间使用是否持续增长。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"需要查询内存使用率和交换空间使用率，以验证是否存在内存泄漏或过度使用，以及交换空间使用是否持续增长。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前证据 [e1] 显示内存使用率和交换空间使用率都非常高，这强烈支持了 [h1] mem_load 假设。为了进一步验证内存泄漏或过度使用的情况，我需要查询内存相关的其他指标，如 memory_active_anon_bytes 和 memory_mapped_bytes，以确认内存压力的来源。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:43:20.955605",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据 [e1] 显示内存使用率和交换空间使用率都非常高，这强烈支持了 [h1] mem_load 假设。为了进一步验证内存泄漏或过度使用的情况，我需要查询内存相关的其他指标，如 memory_active_anon_bytes 和 memory_mapped_bytes，以确认内存压力的来源。\",\n  \"hypothesis_updates\": [\n    {\n      \"hypothesis_id\": \"h1\",\n      \"new_confidence\": 0.85,\n      \"reason\": \"内存使用率和交换空间使用率都非常高，强烈支持内存负载过高的假设。\"\n    }\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要查询内存相关的其他指标，以确认内存压力的来源，进一步验证 [h1] mem_load 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前证据显示内存使用率高达97.67%，交换空间使用率高达99.74%，且内存活跃匿名页和映射内存较高，这强烈支持内存负载过高的假设[h1]。需要进一步验证是否存在内存泄漏或过度使用。同时，CPU负载假设[h2]和磁盘负载假设[h3]的置信度较低，需要进一步验证。网络负载假设[h4]的置信度最低，可以暂时搁置。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_usage_percent",
+            "cpu_iowait_percent",
+            "context_switches_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "cpu_usage_percent: mean=73.7501400490573; cpu_iowait_percent: mean=24.429262017202007; context_switches_rate: mean=6411.267651330704",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:43:34.567063",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率高达97.67%，交换空间使用率高达99.74%，且内存活跃匿名页和映射内存较高，这强烈支持内存负载过高的假设[h1]。需要进一步验证是否存在内存泄漏或过度使用。同时，CPU负载假设[h2]和磁盘负载假设[h3]的置信度较低，需要进一步验证。网络负载假设[h4]的置信度最低，可以暂时搁置。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.90, \"reason\": \"内存和交换空间使用率极高，支持内存负载过高\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.45, \"reason\": \"缺乏直接CPU使用率证据\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.40, \"reason\": \"缺乏直接磁盘I/O证据\"},\n    {\"hypothesis_id\": \"h4\", \"new_confidence\": 0.30, \"reason\": \"缺乏直接网络指标证据\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_usage_percent\", \"cpu_iowait_percent\", \"context_switches_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要验证CPU使用率和上下文切换率以评估CPU负载假设[h2]，同时检查iowait以间接评估磁盘负载假设[h3]\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前证据显示内存使用率非常高（memory_usage_percent=97.67%，swap_usage_percent=99.74%），且CPU的iowait较高（24.43%），这可能是由于内存压力导致频繁的swap操作。需要进一步验证磁盘I/O情况以确认是否存在磁盘瓶颈或仅是内存压力的继发效应。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_total_iops",
+            "disk_write_iops",
+            "disk_read_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "disk_total_iops: mean=5415.860342184644; disk_write_iops: mean=2916.0089774726475; disk_read_iops: mean=2499.8513647119958",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:43:44.271722",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率非常高（memory_usage_percent=97.67%，swap_usage_percent=99.74%），且CPU的iowait较高（24.43%），这可能是由于内存压力导致频繁的swap操作。需要进一步验证磁盘I/O情况以确认是否存在磁盘瓶颈或仅是内存压力的继发效应。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.95, \"reason\": \"内存和交换空间使用率极高，支持内存负载假设\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.30, \"reason\": \"高iowait可能是内存压力的继发效应，需要直接磁盘指标验证\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_total_iops\", \"disk_write_iops\", \"disk_read_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要直接观测磁盘I/O指标以区分是原发磁盘问题还是内存压力导致的继发性I/O升高\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，且磁盘写操作（disk_write_iops）和总IO操作（disk_total_iops）也显著增加。根据内存-磁盘级联效应识别规则，磁盘IO的上升可能是由于内存压力导致的匿名页换出到swap，而不是磁盘本身的故障。因此，mem_load假设的置信度应进一步提高。接下来，我需要验证磁盘空间是否充足，以排除磁盘空间不足的可能性。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c5"
+      },
+      "observation": "filesystem_usage_percent: mean=78.97358365550375",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:43:55.763848",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，且磁盘写操作（disk_write_iops）和总IO操作（disk_total_iops）也显著增加。根据内存-磁盘级联效应识别规则，磁盘IO的上升可能是由于内存压力导致的匿名页换出到swap，而不是磁盘本身的故障。因此，mem_load假设的置信度应进一步提高。接下来，我需要验证磁盘空间是否充足，以排除磁盘空间不足的可能性。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.98, \"reason\": \"内存使用率和交换空间使用率极高，且磁盘IO上升可能是内存压力导致的继发性效应\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.20, \"reason\": \"磁盘IO上升可能是内存压力导致的继发性效应，而非磁盘本身故障\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"验证磁盘空间使用率，以排除磁盘空间不足的可能性\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前假设中，mem_load 的置信度已经很高（0.98），但仍需验证内存使用情况是否存在内存泄漏或过度使用。此外，disk_burn 的置信度较低（0.20），且磁盘 I/O 使用率已经验证，但磁盘空间是否充足尚未验证。network_loss 的置信度为 0.30，且网络数据包接收和处理速率尚未验证。接下来，我将优先验证内存使用情况，以确认是否存在内存泄漏或过度使用。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c6"
+      },
+      "observation": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:44:05.802079",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，mem_load 的置信度已经很高（0.98），但仍需验证内存使用情况是否存在内存泄漏或过度使用。此外，disk_burn 的置信度较低（0.20），且磁盘 I/O 使用率已经验证，但磁盘空间是否充足尚未验证。network_loss 的置信度为 0.30，且网络数据包接收和处理速率尚未验证。接下来，我将优先验证内存使用情况，以确认是否存在内存泄漏或过度使用。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证内存使用情况是否存在内存泄漏或过度使用，我需要查询 memory_active_anon_bytes、memory_mapped_bytes 和 memory_sunreclaim_bytes 的均值，以进一步分析内存使用模式。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，且磁盘写 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也显著升高。根据内存-磁盘级联效应识别规则，这更可能是内存压力导致的磁盘 IO 上升，而非磁盘原发故障。因此，mem_load 假设的置信度应进一步提高。接下来需要验证磁盘空间是否充足，以排除磁盘空间不足的可能性。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c7"
+      },
+      "observation": "filesystem_usage_percent: mean=78.97358365550375",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:44:17.257001",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，且磁盘写 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也显著升高。根据内存-磁盘级联效应识别规则，这更可能是内存压力导致的磁盘 IO 上升，而非磁盘原发故障。因此，mem_load 假设的置信度应进一步提高。接下来需要验证磁盘空间是否充足，以排除磁盘空间不足的可能性。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.99, \"reason\": \"内存使用率和交换空间使用率极高，且磁盘 IOPS 升高，符合内存压力导致的磁盘 IO 上升\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.10, \"reason\": \"磁盘 IOPS 升高更可能是内存压力导致的继发性效应\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要验证磁盘空间是否充足，以排除磁盘空间不足的可能性\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "当前证据显示内存使用率非常高（memory_usage_percent: mean=97.67），交换空间使用率接近饱和（swap_usage_percent: mean=99.74），并且 disk_write_iops 和 disk_total_iops 也显著升高。根据内存-磁盘级联效应识别原则，这些磁盘 I/O 升高很可能是由于内存压力导致操作系统将匿名页换出到 swap 所致。因此，mem_load 假设的置信度应进一步提高。同时，需要进一步验证网络相关的指标以确认是否存在网络丢包或延迟。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "network_receive_drop_rate",
+            "network_transmit_drop_rate",
+            "network_receive_packets_rate",
+            "network_transmit_packets_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c8"
+      },
+      "observation": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; network_receive_packets_rate: mean=0.08406588954486376; network_transmit_packets_rate: mean=0.0237565855010753",
+      "evidence_generated": "e8",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:44:29.366960",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率非常高（memory_usage_percent: mean=97.67），交换空间使用率接近饱和（swap_usage_percent: mean=99.74），并且 disk_write_iops 和 disk_total_iops 也显著升高。根据内存-磁盘级联效应识别原则，这些磁盘 I/O 升高很可能是由于内存压力导致操作系统将匿名页换出到 swap 所致。因此，mem_load 假设的置信度应进一步提高。同时，需要进一步验证网络相关的指标以确认是否存在网络丢包或延迟。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.99, \"reason\": \"内存使用率和交换空间使用率极高，且磁盘 I/O 升高符合内存-磁盘级联效应\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.05, \"reason\": \"磁盘 I/O 升高很可能是内存压力导致的继发性效应，而非磁盘原发故障\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"network_receive_packets_rate\", \"network_transmit_packets_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步验证网络相关的指标，以确认是否存在网络丢包或延迟，从而评估 network_loss 假设的可信度。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 9,
+      "thought": "当前假设中，h1 (mem_load) 的置信度已经很高 (0.99)，并且已经验证了交换空间使用持续增长。然而，还需要检查内存使用情况以确认是否存在内存泄漏或过度使用。h3 (disk_burn) 的置信度较低 (0.05)，但磁盘空间是否充足的验证仍待完成。h4 (network_loss) 的置信度为 0.30，网络带宽使用情况的验证也待完成。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c9"
+      },
+      "observation": "memory_usage_percent: mean=97.67405291119437; memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "evidence_generated": "e9",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:44:38.851946",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (mem_load) 的置信度已经很高 (0.99)，并且已经验证了交换空间使用持续增长。然而，还需要检查内存使用情况以确认是否存在内存泄漏或过度使用。h3 (disk_burn) 的置信度较低 (0.05)，但磁盘空间是否充足的验证仍待完成。h4 (network_loss) 的置信度为 0.30，网络带宽使用情况的验证也待完成。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了进一步确认内存使用情况，特别是是否存在内存泄漏或过度使用，需要查询内存相关指标的平均值。这将有助于验证 h1 (mem_load) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 10,
+      "thought": "当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，表明系统可能存在内存压力。此外，磁盘写入 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也较高，这可能是由于内存压力导致的操作系统将匿名页换出到交换空间的结果。因此，mem_load 假设的置信度应进一步提高。接下来，我需要进一步验证内存泄漏或过度使用的情况，以确认 mem_load 假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:48:13",
+            "end": "2025-09-20T07:49:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c10"
+      },
+      "observation": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "evidence_generated": "e10",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:44:49.871893",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率（memory_usage_percent）和交换空间使用率（swap_usage_percent）都非常高，表明系统可能存在内存压力。此外，磁盘写入 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也较高，这可能是由于内存压力导致的操作系统将匿名页换出到交换空间的结果。因此，mem_load 假设的置信度应进一步提高。接下来，我需要进一步验证内存泄漏或过度使用的情况，以确认 mem_load 假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.99, \"reason\": \"内存使用率和交换空间使用率极高，且磁盘 IOPS 升高可能是内存压力的继发性效应\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:48:13\",\n        \"end\": \"2025-09-20T07:49:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步验证内存泄漏或过度使用的情况，以确认 mem_load 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 11,
+      "thought": "当前证据显示内存使用率非常高（mean=97.67%），交换空间使用率也接近100%（mean=99.74%），同时观察到 memory_active_anon_bytes 和 memory_sunreclaim_bytes 异常高。这些指标强烈表明存在内存压力。虽然磁盘 I/O 也有一定升高（disk_total_iops: mean=5415.86），但根据内存-磁盘级联效应识别原则，这更可能是内存压力导致的继发性效应。CPU 使用率较高（mean=73.75%）但上下文切换率正常，网络指标也没有明显异常。因此，当前最可能的根因是内存问题。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:45:00.277451",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率非常高（mean=97.67%），交换空间使用率也接近100%（mean=99.74%），同时观察到 memory_active_anon_bytes 和 memory_sunreclaim_bytes 异常高。这些指标强烈表明存在内存压力。虽然磁盘 I/O 也有一定升高（disk_total_iops: mean=5415.86），但根据内存-磁盘级联效应识别原则，这更可能是内存压力导致的继发性效应。CPU 使用率较高（mean=73.75%）但上下文切换率正常，网络指标也没有明显异常。因此，当前最可能的根因是内存问题。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.99, \"reason\": \"内存使用率和交换空间使用率极高，且观察到内存相关指标异常\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.30, \"reason\": \"CPU 使用率虽高但上下文切换率正常，可能是内存压力导致的继发性效应\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.05, \"reason\": \"磁盘 I/O 升高更可能是内存压力导致的继发性效应\"},\n    {\"hypothesis_id\": \"h4\", \"new_confidence\": 0.10, \"reason\": \"网络指标无明显异常\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"已有充分证据表明内存问题是主要根因，其他假设的置信度已降至很低，可以得出结论\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\n2. **子系统直接证据**: \n   - mem_load: 有直接内存子系统的观测指标（memory_usage_percent, swap_usage_percent, memory_active_anon_bytes 等）。\n   - cpu_fullload: 有直接 CPU 子系统的观测指标（cpu_usage_percent, cpu_iowait_percent）。\n   - network_loss: 有直接网络子系统的观测指标（network_receive_drop_rate, network_transmit_drop_rate）。\n   - disk_burn: 有直接磁盘子系统的观测指标（disk_total_iops, disk_write_iops, disk_read_iops）。\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致。\n4. **复合故障判断**: 多个根因之间存在因果链关系，如 swap_free_bytes → swap_usage_percent → disk_io_usage_percent 等。\n\n根据审查原则，mem_load 的证据充分，但 cpu_fullload、network_loss 和 disk_burn 的证据较弱，尤其是 network_loss 和 disk_burn 的 confidence 较低，且存在替代假设未排除的情况。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:45:13.394924",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中所有证据均为 'supporting' 类型，没有 'neutral' 证据。\\n2. **子系统直接证据**: \\n   - mem_load: 有直接内存子系统的观测指标（memory_usage_percent, swap_usage_percent, memory_active_anon_bytes 等）。\\n   - cpu_fullload: 有直接 CPU 子系统的观测指标（cpu_usage_percent, cpu_iowait_percent）。\\n   - network_loss: 有直接网络子系统的观测指标（network_receive_drop_rate, network_transmit_drop_rate）。\\n   - disk_burn: 有直接磁盘子系统的观测指标（disk_total_iops, disk_write_iops, disk_read_iops）。\\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致。\\n4. **复合故障判断**: 多个根因之间存在因果链关系，如 swap_free_bytes → swap_usage_percent → disk_io_usage_percent 等。\\n\\n根据审查原则，mem_load 的证据充分，但 cpu_fullload、network_loss 和 disk_burn 的证据较弱，尤其是 network_loss 和 disk_burn 的 confidence 较低，且存在替代假设未排除的情况。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"continue\",\n    \"reason\": \"mem_load 的证据充分，但 cpu_fullload、network_loss 和 disk_burn 的证据较弱，尤其是 network_loss 和 disk_burn 的 confidence 较低，且存在替代假设未排除的情况。需要进一步验证这些根因。\",\n    \"hint\": \"建议进一步验证 cpu_fullload、network_loss 和 disk_burn 的根因，排除替代假设，并补充相关证据。\",\n    \"diagnosis_type\": \"composite_fault\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1663,
+      "completion": 551,
+      "total": 2214
+    },
+    "diagnosis_think": {
+      "prompt": 31712,
+      "completion": 3436,
+      "total": 35148
+    },
+    "audit_think": {
+      "prompt": 1802,
+      "completion": 439,
+      "total": 2241
+    },
+    "finalize": {
+      "prompt": 868,
+      "completion": 117,
+      "total": 985
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "内存压力过大导致频繁使用交换空间",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.65,
+      "current_confidence": 0.99,
+      "required_verifications": [
+        {
+          "description": "检查内存使用情况，确认是否存在内存泄漏或过度使用",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "memory_used_bytes",
+            "memory_available_bytes"
+          ]
+        },
+        {
+          "description": "验证交换空间使用是否持续增长",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "swap_usage_percent",
+            "swap_free_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "CPU 过载导致系统响应变慢",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.3,
+      "required_verifications": [
+        {
+          "description": "检查 CPU 使用率，确认是否存在高负载进程",
+          "status": "verified",
+          "evidence_id": "e3",
+          "required_metrics": [
+            "cpu_usage_percent",
+            "load_1min"
+          ]
+        },
+        {
+          "description": "验证上下文切换率是否异常低",
+          "status": "verified",
+          "evidence_id": "e3",
+          "required_metrics": [
+            "context_switches_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "磁盘 I/O 性能下降导致系统整体性能降低",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.05,
+      "required_verifications": [
+        {
+          "description": "检查磁盘 I/O 使用率，确认是否存在读写瓶颈",
+          "status": "verified",
+          "evidence_id": "e4",
+          "required_metrics": [
+            "disk_io_usage_percent",
+            "disk_read_iops",
+            "disk_write_iops"
+          ]
+        },
+        {
+          "description": "验证磁盘空间是否充足",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "filesystem_avail_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h4",
+      "root_cause": "网络数据处理速率异常导致网络性能问题",
+      "fault_type": "network_loss",
+      "subsystem": "network",
+      "prior_confidence": 0.45,
+      "current_confidence": 0.1,
+      "required_verifications": [
+        {
+          "description": "检查网络数据包接收和处理速率，确认是否存在丢包或延迟",
+          "status": "verified",
+          "evidence_id": "e8",
+          "required_metrics": [
+            "network_receive_packets_rate",
+            "softnet_processed_rate"
+          ]
+        },
+        {
+          "description": "验证网络带宽使用情况",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_receive_rate_bytes_per_sec"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+      "result_digest": "memory_usage_percent: mean=97.67405291119437; swap_usage_percent: mean=99.73613688685778",
+      "raw_stats": {
+        "memory_usage_percent": 97.67405291119437,
+        "swap_usage_percent": 99.73613688685778
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\"], \"time_window\": {\"start\": \"2025-09-2)",
+      "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0",
+      "raw_stats": {
+        "memory_active_anon_bytes": 4022750412.8,
+        "memory_mapped_bytes": 47538176.0
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\", \"cpu_iowait_percent\", \"context_switches_rate\"], \"time_window\": {\"s)",
+      "result_digest": "cpu_usage_percent: mean=73.7501400490573; cpu_iowait_percent: mean=24.429262017202007; context_switches_rate: mean=6411.267651330704",
+      "raw_stats": {
+        "cpu_usage_percent": 73.7501400490573,
+        "cpu_iowait_percent": 24.429262017202007,
+        "context_switches_rate": 6411.267651330704
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_total_iops\", \"disk_write_iops\", \"disk_read_iops\"], \"time_window\": {\"start\": \"2025)",
+      "result_digest": "disk_total_iops: mean=5415.860342184644; disk_write_iops: mean=2916.0089774726475; disk_read_iops: mean=2499.8513647119958",
+      "raw_stats": {
+        "disk_total_iops": 5415.860342184644,
+        "disk_write_iops": 2916.0089774726475,
+        "disk_read_iops": 2499.8513647119958
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:48:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: mean=78.97358365550375",
+      "raw_stats": {
+        "filesystem_usage_percent": 78.97358365550375
+      },
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+      "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "raw_stats": {
+        "memory_active_anon_bytes": 4022750412.8,
+        "memory_mapped_bytes": 47538176.0,
+        "memory_sunreclaim_bytes": 246678323.2
+      },
+      "created_at_step": 6
+    },
+    {
+      "id": "e7",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:48:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: mean=78.97358365550375",
+      "raw_stats": {
+        "filesystem_usage_percent": 78.97358365550375
+      },
+      "created_at_step": 7
+    },
+    {
+      "id": "e8",
+      "hypothesis_ids": [
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"network_receive_packets_rat)",
+      "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; network_receive_packets_rate: mean=0.08406588954486376; network_transmit_packets_rate: mean=0.0237565855010753",
+      "raw_stats": {
+        "network_receive_drop_rate": 0.0,
+        "network_transmit_drop_rate": 0.0,
+        "network_receive_packets_rate": 0.08406588954486376,
+        "network_transmit_packets_rate": 0.0237565855010753
+      },
+      "created_at_step": 8
+    },
+    {
+      "id": "e9",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+      "result_digest": "memory_usage_percent: mean=97.67405291119437; memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "raw_stats": {
+        "memory_usage_percent": 97.67405291119437,
+        "memory_active_anon_bytes": 4022750412.8,
+        "memory_mapped_bytes": 47538176.0,
+        "memory_sunreclaim_bytes": 246678323.2
+      },
+      "created_at_step": 9
+    },
+    {
+      "id": "e10",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+      "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+      "raw_stats": {
+        "memory_active_anon_bytes": 4022750412.8,
+        "memory_mapped_bytes": 47538176.0,
+        "memory_sunreclaim_bytes": 246678323.2
+      },
+      "created_at_step": 10
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "内存压力过大导致频繁使用交换空间",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.65,
+        "current_confidence": 0.99,
+        "required_verifications": [
+          {
+            "description": "检查内存使用情况，确认是否存在内存泄漏或过度使用",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "memory_used_bytes",
+              "memory_available_bytes"
+            ]
+          },
+          {
+            "description": "验证交换空间使用是否持续增长",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "swap_usage_percent",
+              "swap_free_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "CPU 过载导致系统响应变慢",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.3,
+        "required_verifications": [
+          {
+            "description": "检查 CPU 使用率，确认是否存在高负载进程",
+            "status": "verified",
+            "evidence_id": "e3",
+            "required_metrics": [
+              "cpu_usage_percent",
+              "load_1min"
+            ]
+          },
+          {
+            "description": "验证上下文切换率是否异常低",
+            "status": "verified",
+            "evidence_id": "e3",
+            "required_metrics": [
+              "context_switches_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "磁盘 I/O 性能下降导致系统整体性能降低",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.05,
+        "required_verifications": [
+          {
+            "description": "检查磁盘 I/O 使用率，确认是否存在读写瓶颈",
+            "status": "verified",
+            "evidence_id": "e4",
+            "required_metrics": [
+              "disk_io_usage_percent",
+              "disk_read_iops",
+              "disk_write_iops"
+            ]
+          },
+          {
+            "description": "验证磁盘空间是否充足",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "filesystem_avail_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h4",
+        "root_cause": "网络数据处理速率异常导致网络性能问题",
+        "fault_type": "network_loss",
+        "subsystem": "network",
+        "prior_confidence": 0.45,
+        "current_confidence": 0.1,
+        "required_verifications": [
+          {
+            "description": "检查网络数据包接收和处理速率，确认是否存在丢包或延迟",
+            "status": "verified",
+            "evidence_id": "e8",
+            "required_metrics": [
+              "network_receive_packets_rate",
+              "softnet_processed_rate"
+            ]
+          },
+          {
+            "description": "验证网络带宽使用情况",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_receive_rate_bytes_per_sec"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+        "result_digest": "memory_usage_percent: mean=97.67405291119437; swap_usage_percent: mean=99.73613688685778",
+        "raw_stats": {
+          "memory_usage_percent": 97.67405291119437,
+          "swap_usage_percent": 99.73613688685778
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\"], \"time_window\": {\"start\": \"2025-09-2)",
+        "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0",
+        "raw_stats": {
+          "memory_active_anon_bytes": 4022750412.8,
+          "memory_mapped_bytes": 47538176.0
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\", \"cpu_iowait_percent\", \"context_switches_rate\"], \"time_window\": {\"s)",
+        "result_digest": "cpu_usage_percent: mean=73.7501400490573; cpu_iowait_percent: mean=24.429262017202007; context_switches_rate: mean=6411.267651330704",
+        "raw_stats": {
+          "cpu_usage_percent": 73.7501400490573,
+          "cpu_iowait_percent": 24.429262017202007,
+          "context_switches_rate": 6411.267651330704
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_total_iops\", \"disk_write_iops\", \"disk_read_iops\"], \"time_window\": {\"start\": \"2025)",
+        "result_digest": "disk_total_iops: mean=5415.860342184644; disk_write_iops: mean=2916.0089774726475; disk_read_iops: mean=2499.8513647119958",
+        "raw_stats": {
+          "disk_total_iops": 5415.860342184644,
+          "disk_write_iops": 2916.0089774726475,
+          "disk_read_iops": 2499.8513647119958
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:48:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: mean=78.97358365550375",
+        "raw_stats": {
+          "filesystem_usage_percent": 78.97358365550375
+        },
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+        "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+        "raw_stats": {
+          "memory_active_anon_bytes": 4022750412.8,
+          "memory_mapped_bytes": 47538176.0,
+          "memory_sunreclaim_bytes": 246678323.2
+        },
+        "created_at_step": 6
+      },
+      {
+        "id": "e7",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:48:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: mean=78.97358365550375",
+        "raw_stats": {
+          "filesystem_usage_percent": 78.97358365550375
+        },
+        "created_at_step": 7
+      },
+      {
+        "id": "e8",
+        "hypothesis_ids": [
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\", \"network_receive_packets_rat)",
+        "result_digest": "network_receive_drop_rate: mean=0.0; network_transmit_drop_rate: mean=0.0; network_receive_packets_rate: mean=0.08406588954486376; network_transmit_packets_rate: mean=0.0237565855010753",
+        "raw_stats": {
+          "network_receive_drop_rate": 0.0,
+          "network_transmit_drop_rate": 0.0,
+          "network_receive_packets_rate": 0.08406588954486376,
+          "network_transmit_packets_rate": 0.0237565855010753
+        },
+        "created_at_step": 8
+      },
+      {
+        "id": "e9",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+        "result_digest": "memory_usage_percent: mean=97.67405291119437; memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+        "raw_stats": {
+          "memory_usage_percent": 97.67405291119437,
+          "memory_active_anon_bytes": 4022750412.8,
+          "memory_mapped_bytes": 47538176.0,
+          "memory_sunreclaim_bytes": 246678323.2
+        },
+        "created_at_step": 9
+      },
+      {
+        "id": "e10",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+        "result_digest": "memory_active_anon_bytes: mean=4022750412.8; memory_mapped_bytes: mean=47538176.0; memory_sunreclaim_bytes: mean=246678323.2",
+        "raw_stats": {
+          "memory_active_anon_bytes": 4022750412.8,
+          "memory_mapped_bytes": 47538176.0,
+          "memory_sunreclaim_bytes": 246678323.2
+        },
+        "created_at_step": 10
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "内存压力过大导致频繁使用交换空间",
+        "fault_type": "mem_load",
+        "confidence": 0.99,
+        "evidence_ids": [
+          "e1",
+          "e2",
+          "e6",
+          "e9",
+          "e10"
+        ]
+      },
+      {
+        "cause": "CPU 过载导致系统响应变慢",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.3,
+        "evidence_ids": [
+          "e3"
+        ]
+      },
+      {
+        "cause": "网络数据处理速率异常导致网络性能问题",
+        "fault_type": "network_loss",
+        "confidence": 0.1,
+        "evidence_ids": [
+          "e8"
+        ]
+      },
+      {
+        "cause": "磁盘 I/O 性能下降导致系统整体性能降低",
+        "fault_type": "disk_burn",
+        "confidence": 0.05,
+        "evidence_ids": [
+          "e4",
+          "e5",
+          "e7"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1090 @@
+{
+  "run_id": "exp_017_Full",
+  "diagnosis_trace_steps": 16,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：disk_fill、mem_load和network_loss。为了验证disk_fill假设，需要先检查磁盘空间使用情况。根据可用指标，filesystem_usage_percent是最直接的指标来验证磁盘空间是否已满。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "filesystem_usage_percent: mean=80.3850359827533",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:25:10.944796",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：disk_fill、mem_load和network_loss。为了验证disk_fill假设，需要先检查磁盘空间使用情况。根据可用指标，filesystem_usage_percent是最直接的指标来验证磁盘空间是否已满。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"filesystem_usage_percent可以直接反映磁盘空间使用情况，是验证disk_fill假设的最直接证据。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.75，已有证据 e1 显示 filesystem_usage_percent 均值为 80.385%，这支持磁盘空间使用较高的可能性。为了进一步验证 h1，需要检查磁盘空间是否持续减少以及 I/O 性能是否受限。因此，下一步应查询磁盘 I/O 相关指标。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_time_seconds_total",
+            "disk_io_usage_percent",
+            "disk_read_rate_bytes_per_sec",
+            "disk_write_rate_bytes_per_sec"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "disk_io_time_seconds_total: mean=4624.339166666668; disk_io_usage_percent: mean=71.17072727383193; disk_read_rate_bytes_per_sec: mean=181687467.65094534; disk_write_rate_bytes_per_sec: mean=105489620.41884227",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:25:21.873035",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.75，已有证据 e1 显示 filesystem_usage_percent 均值为 80.385%，这支持磁盘空间使用较高的可能性。为了进一步验证 h1，需要检查磁盘空间是否持续减少以及 I/O 性能是否受限。因此，下一步应查询磁盘 I/O 相关指标。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.80, \"reason\": \"filesystem_usage_percent 均值较高，支持磁盘空间使用异常\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_time_seconds_total\", \"disk_io_usage_percent\", \"disk_read_rate_bytes_per_sec\", \"disk_write_rate_bytes_per_sec\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询磁盘 I/O 相关指标以验证磁盘性能是否受限，进一步确认 disk_fill 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.80，已有证据显示 filesystem_usage_percent 较高，disk_io_time_seconds_total 和 disk_io_usage_percent 也较高，但还需要确认磁盘空间是否持续减少。因此，下一步应查询 filesystem_free_bytes 和 filesystem_size_bytes 以验证磁盘空间使用情况。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_size_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:25:34.292937",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.80，已有证据显示 filesystem_usage_percent 较高，disk_io_time_seconds_total 和 disk_io_usage_percent 也较高，但还需要确认磁盘空间是否持续减少。因此，下一步应查询 filesystem_free_bytes 和 filesystem_size_bytes 以验证磁盘空间使用情况。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要确认磁盘空间是否持续减少，以进一步验证 disk_fill 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前假设 h1 (disk_fill) 的 confidence 为 0.80，已有证据显示 filesystem_usage_percent 较高，disk_io_usage_percent 也较高，但尚未确认磁盘空间是否持续减少。为了进一步验证 h1，需要检查磁盘空间使用情况，确认可用空间是否持续减少。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:25:49.094716",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的 confidence 为 0.80，已有证据显示 filesystem_usage_percent 较高，disk_io_usage_percent 也较高，但尚未确认磁盘空间是否持续减少。为了进一步验证 h1，需要检查磁盘空间使用情况，确认可用空间是否持续减少。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证磁盘空间是否持续减少，需要查询 filesystem_free_bytes 的均值，以确认可用空间是否在异常时间窗口内持续减少。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.8，已有证据显示 filesystem_usage_percent 为 80.38%，filesystem_free_bytes 为 20GB，disk_io_usage_percent 为 71.17%，disk_read_rate 和 disk_write_rate 较高。这些证据支持磁盘空间使用较高且 I/O 负载较重。为了进一步验证磁盘空间是否持续减少，需要查询 filesystem_free_bytes 的时间序列数据。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "timeseries"
+        },
+        "call_id": "c5"
+      },
+      "observation": "No metric results",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:25:58.991792",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.8，已有证据显示 filesystem_usage_percent 为 80.38%，filesystem_free_bytes 为 20GB，disk_io_usage_percent 为 71.17%，disk_read_rate 和 disk_write_rate 较高。这些证据支持磁盘空间使用较高且 I/O 负载较重。为了进一步验证磁盘空间是否持续减少，需要查询 filesystem_free_bytes 的时间序列数据。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"filesystem_usage_percent 和 disk_io_usage_percent 较高，支持磁盘负载重的假设\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"timeseries\"\n    },\n    \"reasoning\": \"需要确认 filesystem_free_bytes 是否在异常时间窗口内持续减少，以验证磁盘空间是否被快速占用。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。特别是需要检查磁盘空间使用情况是否持续减少，以及磁盘 I/O 性能是否受到限制。已有证据显示 filesystem_usage_percent 较高，但需要进一步确认磁盘空间的变化趋势。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "trend"
+        },
+        "call_id": "c6"
+      },
+      "observation": "No metric results",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:26:14.038861",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。特别是需要检查磁盘空间使用情况是否持续减少，以及磁盘 I/O 性能是否受到限制。已有证据显示 filesystem_usage_percent 较高，但需要进一步确认磁盘空间的变化趋势。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"trend\"\n    },\n    \"reasoning\": \"为了验证磁盘空间是否持续减少，需要查询 filesystem_free_bytes 的趋势变化。这将有助于确认磁盘空间是否在异常时间窗口内持续下降，从而支持或否定 h1 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但仍需要进一步验证磁盘空间使用情况是否持续减少以及磁盘 I/O 性能是否受到限制。已收集的证据 [e1, e2, e3, e4] 显示磁盘使用率较高，但尚未确认磁盘空间是否持续减少。因此，下一步应查询磁盘空间使用情况的时序数据，以确认磁盘空间是否持续减少。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c7"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:26:29.859367",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但仍需要进一步验证磁盘空间使用情况是否持续减少以及磁盘 I/O 性能是否受到限制。已收集的证据 [e1, e2, e3, e4] 显示磁盘使用率较高，但尚未确认磁盘空间是否持续减少。因此，下一步应查询磁盘空间使用情况的时序数据，以确认磁盘空间是否持续减少。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"已有证据支持磁盘使用率较高\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要确认磁盘空间是否持续减少，以进一步验证 disk_fill 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "当前有三个活跃假设：disk_fill、mem_load和network_loss。根据已收集的证据，disk_fill假设的支持度最高（confidence=0.85），且有filesystem_usage_percent和disk_io_time_seconds_total等直接证据支持。接下来需要进一步验证磁盘空间是否持续减少以及I/O性能是否受限。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_size_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c8"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "evidence_generated": "e8",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:26:40.364733",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：disk_fill、mem_load和network_loss。根据已收集的证据，disk_fill假设的支持度最高（confidence=0.85），且有filesystem_usage_percent和disk_io_time_seconds_total等直接证据支持。接下来需要进一步验证磁盘空间是否持续减少以及I/O性能是否受限。\",\n  \"hypothesis_updates\": [\n    {\n      \"hypothesis_id\": \"h1\",\n      \"new_confidence\": 0.85,\n      \"reason\": \"已有filesystem_usage_percent和disk_io_time_seconds_total等直接证据支持\"\n    }\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要验证磁盘空间是否持续减少，这是disk_fill假设的关键验证点\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 9,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。特别是需要检查磁盘空间使用情况是否持续减少，以及监控磁盘读写操作是否受到限制。已有证据显示 filesystem_usage_percent 较高，但需要进一步确认磁盘空间的动态变化。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_size_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c9"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "evidence_generated": "e9",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:26:54.536041",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。特别是需要检查磁盘空间使用情况是否持续减少，以及监控磁盘读写操作是否受到限制。已有证据显示 filesystem_usage_percent 较高，但需要进一步确认磁盘空间的动态变化。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"已有证据支持磁盘空间使用率较高\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步确认磁盘空间的动态变化，以验证磁盘空间是否持续减少。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 10,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。需要进一步检查磁盘空间使用情况是否持续减少，以及监控磁盘读写操作是否受到限制。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "trend"
+        },
+        "call_id": "c10"
+      },
+      "observation": "No metric results",
+      "evidence_generated": "e10",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:27:06.865135",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。需要进一步检查磁盘空间使用情况是否持续减少，以及监控磁盘读写操作是否受到限制。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"trend\"\n    },\n    \"reasoning\": \"为了验证磁盘空间使用情况是否持续减少，需要查询 filesystem_free_bytes 的趋势变化。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 11,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。需要进一步检查磁盘空间使用情况是否持续减少，以及磁盘 I/O 性能是否受到限制。此外，h2 (mem_load) 和 h3 (network_loss) 的验证步骤也尚未完成。下一步应优先验证 h1 的剩余步骤，以确认磁盘空间和 I/O 性能的异常情况。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_read_iops",
+            "disk_write_iops",
+            "disk_total_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c11"
+      },
+      "observation": "disk_read_iops: mean=1856.6645322765592; disk_write_iops: mean=2000.908688988686; disk_total_iops: mean=3857.573221265245",
+      "evidence_generated": "e11",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:27:19.470994",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未完成所有验证步骤。需要进一步检查磁盘空间使用情况是否持续减少，以及磁盘 I/O 性能是否受到限制。此外，h2 (mem_load) 和 h3 (network_loss) 的验证步骤也尚未完成。下一步应优先验证 h1 的剩余步骤，以确认磁盘空间和 I/O 性能的异常情况。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_read_iops\", \"disk_write_iops\", \"disk_total_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证磁盘 I/O 性能是否受到限制，需要查询磁盘读写操作的指标，包括 disk_read_iops、disk_write_iops 和 disk_total_iops。这些指标将帮助我们确认磁盘 I/O 是否存在异常。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 12,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未验证磁盘空间使用情况是否持续减少。为了进一步验证 h1，我需要查询磁盘空间使用情况的相关指标。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent",
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c12"
+      },
+      "observation": "filesystem_usage_percent: mean=80.3850359827533; filesystem_free_bytes: mean=20082499584.0",
+      "evidence_generated": "e12",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:27:29.489595",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，但尚未验证磁盘空间使用情况是否持续减少。为了进一步验证 h1，我需要查询磁盘空间使用情况的相关指标。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询磁盘空间使用情况的相关指标，以验证磁盘空间是否持续减少，从而进一步确认 h1 (disk_fill) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 13,
+      "thought": "当前假设 h1 (disk_fill) 的 confidence 为 0.85，且已通过磁盘 I/O 性能受限的验证。然而，还需要确认磁盘空间使用情况是否持续减少，以进一步验证该假设。此外，h2 (mem_load) 和 h3 (network_loss) 的验证任务尚未完成，需要进一步收集证据。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_size_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c13"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "evidence_generated": "e13",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:27:41.936424",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的 confidence 为 0.85，且已通过磁盘 I/O 性能受限的验证。然而，还需要确认磁盘空间使用情况是否持续减少，以进一步验证该假设。此外，h2 (mem_load) 和 h3 (network_loss) 的验证任务尚未完成，需要进一步收集证据。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"磁盘 I/O 性能受限已验证，但磁盘空间使用情况尚未确认\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要查询磁盘空间使用情况，以确认磁盘空间是否持续减少，从而进一步验证 h1 (disk_fill) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 14,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，且已通过磁盘 I/O 性能受限的验证。然而，磁盘空间使用情况的检查尚未完成。为了确认磁盘空间是否持续减少，我需要查询 filesystem_free_bytes 和 filesystem_usage_percent 的时序数据，以观察其变化趋势。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c14"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+      "evidence_generated": "e14",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:27:51.724227",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，且已通过磁盘 I/O 性能受限的验证。然而，磁盘空间使用情况的检查尚未完成。为了确认磁盘空间是否持续减少，我需要查询 filesystem_free_bytes 和 filesystem_usage_percent 的时序数据，以观察其变化趋势。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询 filesystem_free_bytes 和 filesystem_usage_percent 的均值，以确认磁盘空间是否持续减少，从而进一步验证 h1 (disk_fill) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 15,
+      "thought": "当前假设 h1 (disk_fill) 的置信度为 0.85，且已通过磁盘 I/O 性能验证。然而，磁盘空间使用情况的验证仍为 pending。为了进一步确认磁盘空间是否持续减少，我需要查询 filesystem_free_bytes 和 filesystem_usage_percent 的变化趋势。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_free_bytes",
+            "filesystem_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:34:13",
+            "end": "2025-09-20T07:35:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c15"
+      },
+      "observation": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+      "evidence_generated": "e15",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:28:01.249408",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_fill) 的置信度为 0.85，且已通过磁盘 I/O 性能验证。然而，磁盘空间使用情况的验证仍为 pending。为了进一步确认磁盘空间是否持续减少，我需要查询 filesystem_free_bytes 和 filesystem_usage_percent 的变化趋势。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:34:13\",\n        \"end\": \"2025-09-20T07:35:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询磁盘空间使用情况的变化趋势，以确认磁盘空间是否持续减少，从而验证 h1 (disk_fill) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 16,
+      "thought": "当前证据显示磁盘使用率较高（filesystem_usage_percent=80.3850359827533），但磁盘可用空间并未持续减少（filesystem_free_bytes=20082499584.0）。磁盘 I/O 性能受限已被验证（disk_io_time_seconds_total=4624.339166666668, disk_io_usage_percent=71.17072727383193）。内存和网络假设的证据尚未收集完整，但由于工具调用预算已耗尽，无法进一步验证。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:28:11.058343",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示磁盘使用率较高（filesystem_usage_percent=80.3850359827533），但磁盘可用空间并未持续减少（filesystem_free_bytes=20082499584.0）。磁盘 I/O 性能受限已被验证（disk_io_time_seconds_total=4624.339166666668, disk_io_usage_percent=71.17072727383193）。内存和网络假设的证据尚未收集完整，但由于工具调用预算已耗尽，无法进一步验证。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"磁盘 I/O 性能受限已被验证，但磁盘空间未持续减少\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.60, \"reason\": \"内存相关指标尚未验证\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.50, \"reason\": \"网络相关指标尚未验证\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"工具调用预算已耗尽，无法进一步验证假设。基于现有证据，磁盘 I/O 性能受限已被验证，但磁盘空间未持续减少，因此 disk_fill 假设部分成立。内存和网络假设的证据不足，无法确认。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中有13条'supporting'证据和3条'neutral'证据。\n2. **子系统直接证据**: 确认的根因是disk_fill，证据池中有filesystem_usage_percent、filesystem_free_bytes、filesystem_size_bytes等磁盘子系统的直接观测指标支持。\n3. **故障标签合理性**: 诊断使用的fault_type为disk_fill，与实际观测到的异常指标（如filesystem_usage_percent、disk_io_time_seconds_total等）一致。\n4. **复合故障判断**: 当前诊断类型为single_fault，无需考虑复合故障。\n\n根据审查原则，证据充分且直接支持诊断结论，因此可以放行。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:28:19.711052",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中有13条'supporting'证据和3条'neutral'证据。\\n2. **子系统直接证据**: 确认的根因是disk_fill，证据池中有filesystem_usage_percent、filesystem_free_bytes、filesystem_size_bytes等磁盘子系统的直接观测指标支持。\\n3. **故障标签合理性**: 诊断使用的fault_type为disk_fill，与实际观测到的异常指标（如filesystem_usage_percent、disk_io_time_seconds_total等）一致。\\n4. **复合故障判断**: 当前诊断类型为single_fault，无需考虑复合故障。\\n\\n根据审查原则，证据充分且直接支持诊断结论，因此可以放行。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"pass\",\n    \"reason\": \"证据充分且直接支持诊断结论，符合审查原则。\",\n    \"hint\": \"\",\n    \"diagnosis_type\": \"single_fault\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1650,
+      "completion": 432,
+      "total": 2082
+    },
+    "diagnosis_think": {
+      "prompt": 45885,
+      "completion": 4084,
+      "total": 49969
+    },
+    "audit_think": {
+      "prompt": 1805,
+      "completion": 246,
+      "total": 2051
+    },
+    "finalize": {
+      "prompt": 826,
+      "completion": 47,
+      "total": 873
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "磁盘空间不足导致磁盘 I/O 性能下降",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.75,
+      "current_confidence": 0.85,
+      "required_verifications": [
+        {
+          "description": "检查磁盘空间使用情况，确认可用空间是否持续减少",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "filesystem_avail_bytes"
+          ]
+        },
+        {
+          "description": "监控磁盘读写操作，确认 I/O 性能是否受到限制",
+          "status": "verified",
+          "evidence_id": "e11",
+          "required_metrics": [
+            "disk_read_iops",
+            "disk_write_iops",
+            "disk_total_iops"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "内存压力过大导致频繁换页和内存交换",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.6,
+      "current_confidence": 0.6,
+      "required_verifications": [
+        {
+          "description": "检查内存使用情况，确认匿名页和缓存内存的使用是否异常",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "anon_memory_percent",
+            "swap_cached_bytes"
+          ]
+        },
+        {
+          "description": "监控页面错误率，确认是否存在频繁的页面换出",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "page_major_faults_rate",
+            "page_swap_out_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "网络接收数据包速率异常升高，可能导致网络拥塞",
+      "fault_type": "network_loss",
+      "subsystem": "network",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.5,
+      "required_verifications": [
+        {
+          "description": "检查网络数据包接收速率，确认是否存在异常升高",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_receive_packets_rate"
+          ]
+        },
+        {
+          "description": "监控网络丢包率，确认是否存在网络拥塞",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_drop_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"20)",
+      "result_digest": "filesystem_usage_percent: mean=80.3850359827533",
+      "raw_stats": {
+        "filesystem_usage_percent": 80.3850359827533
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_time_seconds_total\", \"disk_io_usage_percent\", \"disk_read_rate_bytes_per_sec\", )",
+      "result_digest": "disk_io_time_seconds_total: mean=4624.339166666668; disk_io_usage_percent: mean=71.17072727383193; disk_read_rate_bytes_per_sec: mean=181687467.65094534; disk_write_rate_bytes_per_sec: mean=105489620.41884227",
+      "raw_stats": {
+        "disk_io_time_seconds_total": 4624.339166666668,
+        "disk_io_usage_percent": 71.17072727383193,
+        "disk_read_rate_bytes_per_sec": 181687467.65094534,
+        "disk_write_rate_bytes_per_sec": 105489620.41884227
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_size_bytes": 83826114560.0
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+      "result_digest": "No metric results",
+      "raw_stats": {},
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+      "result_digest": "No metric results",
+      "raw_stats": {},
+      "created_at_step": 6
+    },
+    {
+      "id": "e7",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0
+      },
+      "created_at_step": 7
+    },
+    {
+      "id": "e8",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_size_bytes": 83826114560.0
+      },
+      "created_at_step": 8
+    },
+    {
+      "id": "e9",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_size_bytes": 83826114560.0
+      },
+      "created_at_step": 9
+    },
+    {
+      "id": "e10",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+      "result_digest": "No metric results",
+      "raw_stats": {},
+      "created_at_step": 10
+    },
+    {
+      "id": "e11",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_iops\", \"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025)",
+      "result_digest": "disk_read_iops: mean=1856.6645322765592; disk_write_iops: mean=2000.908688988686; disk_total_iops: mean=3857.573221265245",
+      "raw_stats": {
+        "disk_read_iops": 1856.6645322765592,
+        "disk_write_iops": 2000.908688988686,
+        "disk_total_iops": 3857.573221265245
+      },
+      "created_at_step": 11
+    },
+    {
+      "id": "e12",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+      "result_digest": "filesystem_usage_percent: mean=80.3850359827533; filesystem_free_bytes: mean=20082499584.0",
+      "raw_stats": {
+        "filesystem_usage_percent": 80.3850359827533,
+        "filesystem_free_bytes": 20082499584.0
+      },
+      "created_at_step": 12
+    },
+    {
+      "id": "e13",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_size_bytes": 83826114560.0
+      },
+      "created_at_step": 13
+    },
+    {
+      "id": "e14",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_usage_percent": 80.3850359827533
+      },
+      "created_at_step": 14
+    },
+    {
+      "id": "e15",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09)",
+      "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+      "raw_stats": {
+        "filesystem_free_bytes": 20082499584.0,
+        "filesystem_usage_percent": 80.3850359827533
+      },
+      "created_at_step": 15
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "磁盘空间不足导致磁盘 I/O 性能下降",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.75,
+        "current_confidence": 0.85,
+        "required_verifications": [
+          {
+            "description": "检查磁盘空间使用情况，确认可用空间是否持续减少",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "filesystem_avail_bytes"
+            ]
+          },
+          {
+            "description": "监控磁盘读写操作，确认 I/O 性能是否受到限制",
+            "status": "verified",
+            "evidence_id": "e11",
+            "required_metrics": [
+              "disk_read_iops",
+              "disk_write_iops",
+              "disk_total_iops"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "内存压力过大导致频繁换页和内存交换",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.6,
+        "current_confidence": 0.6,
+        "required_verifications": [
+          {
+            "description": "检查内存使用情况，确认匿名页和缓存内存的使用是否异常",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "anon_memory_percent",
+              "swap_cached_bytes"
+            ]
+          },
+          {
+            "description": "监控页面错误率，确认是否存在频繁的页面换出",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "page_major_faults_rate",
+              "page_swap_out_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "网络接收数据包速率异常升高，可能导致网络拥塞",
+        "fault_type": "network_loss",
+        "subsystem": "network",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.5,
+        "required_verifications": [
+          {
+            "description": "检查网络数据包接收速率，确认是否存在异常升高",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_receive_packets_rate"
+            ]
+          },
+          {
+            "description": "监控网络丢包率，确认是否存在网络拥塞",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_drop_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"20)",
+        "result_digest": "filesystem_usage_percent: mean=80.3850359827533",
+        "raw_stats": {
+          "filesystem_usage_percent": 80.3850359827533
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_time_seconds_total\", \"disk_io_usage_percent\", \"disk_read_rate_bytes_per_sec\", )",
+        "result_digest": "disk_io_time_seconds_total: mean=4624.339166666668; disk_io_usage_percent: mean=71.17072727383193; disk_read_rate_bytes_per_sec: mean=181687467.65094534; disk_write_rate_bytes_per_sec: mean=105489620.41884227",
+        "raw_stats": {
+          "disk_io_time_seconds_total": 4624.339166666668,
+          "disk_io_usage_percent": 71.17072727383193,
+          "disk_read_rate_bytes_per_sec": 181687467.65094534,
+          "disk_write_rate_bytes_per_sec": 105489620.41884227
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_size_bytes": 83826114560.0
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+        "result_digest": "No metric results",
+        "raw_stats": {},
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+        "result_digest": "No metric results",
+        "raw_stats": {},
+        "created_at_step": 6
+      },
+      {
+        "id": "e7",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0
+        },
+        "created_at_step": 7
+      },
+      {
+        "id": "e8",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_size_bytes": 83826114560.0
+        },
+        "created_at_step": 8
+      },
+      {
+        "id": "e9",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_size_bytes": 83826114560.0
+        },
+        "created_at_step": 9
+      },
+      {
+        "id": "e10",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09-20T07:34:13\", \"end\": \"2025-)",
+        "result_digest": "No metric results",
+        "raw_stats": {},
+        "created_at_step": 10
+      },
+      {
+        "id": "e11",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_iops\", \"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025)",
+        "result_digest": "disk_read_iops: mean=1856.6645322765592; disk_write_iops: mean=2000.908688988686; disk_total_iops: mean=3857.573221265245",
+        "raw_stats": {
+          "disk_read_iops": 1856.6645322765592,
+          "disk_write_iops": 2000.908688988686,
+          "disk_total_iops": 3857.573221265245
+        },
+        "created_at_step": 11
+      },
+      {
+        "id": "e12",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+        "result_digest": "filesystem_usage_percent: mean=80.3850359827533; filesystem_free_bytes: mean=20082499584.0",
+        "raw_stats": {
+          "filesystem_usage_percent": 80.3850359827533,
+          "filesystem_free_bytes": 20082499584.0
+        },
+        "created_at_step": 12
+      },
+      {
+        "id": "e13",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_size_bytes\"], \"time_window\": {\"start\": \"2025-09-20)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_size_bytes: mean=83826114560.0",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_size_bytes": 83826114560.0
+        },
+        "created_at_step": 13
+      },
+      {
+        "id": "e14",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_usage_percent": 80.3850359827533
+        },
+        "created_at_step": 14
+      },
+      {
+        "id": "e15",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_free_bytes\", \"filesystem_usage_percent\"], \"time_window\": {\"start\": \"2025-09)",
+        "result_digest": "filesystem_free_bytes: mean=20082499584.0; filesystem_usage_percent: mean=80.3850359827533",
+        "raw_stats": {
+          "filesystem_free_bytes": 20082499584.0,
+          "filesystem_usage_percent": 80.3850359827533
+        },
+        "created_at_step": 15
+      }
+    ],
+    "proposed_diagnosis_type": "single_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "磁盘空间不足导致磁盘 I/O 性能下降",
+        "fault_type": "disk_fill",
+        "confidence": 0.85,
+        "evidence_ids": [
+          "e1",
+          "e2",
+          "e3",
+          "e4",
+          "e5",
+          "e6",
+          "e7",
+          "e8",
+          "e9",
+          "e10",
+          "e11",
+          "e12",
+          "e13",
+          "e14",
+          "e15"
+        ]
+      }
+    ]
+  }
+}

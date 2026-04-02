@@ -1,0 +1,78 @@
+{
+  "run_id": "exp_023_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d\u4e3b\u8981\u7531\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\u548c\u78c1\u76d8I/O\u963b\u585e\u5f15\u8d77\uff0c\u540c\u65f6\u7f51\u7edc\u8fde\u63a5\u88ab\u52a8\u6253\u5f00\u7387\u4e0b\u964d\u4e5f\u5bf9\u7cfb\u7edf\u6027\u80fd\u4ea7\u751f\u4e86\u4e00\u5b9a\u5f71\u54cd\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e3",
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8I/O\u963b\u585e\u5bfc\u81f4CPU\u8c03\u5ea6\u7b49\u5f85",
+      "fault_type": "disk_burn",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e4",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u7f51\u7edc\u8fde\u63a5\u88ab\u52a8\u6253\u5f00\u7387\u4e0b\u964d\u5bfc\u81f4\u7f51\u7edc\u6027\u80fd\u95ee\u9898",
+      "fault_type": "network_loss",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_fill",
+      "confidence": 0.05,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e4",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u78c1\u76d8I/O\u963b\u585e\u548c\u7f51\u7edc\u8fde\u63a5\u88ab\u52a8\u6253\u5f00\u7387\u4e0b\u964d\u7684\u8bc1\u636e\u652f\u6301\u8f83\u5f31\uff0c\u9700\u8fdb\u4e00\u6b65\u8c03\u67e5\u786e\u8ba4\u5176\u5f71\u54cd\u7a0b\u5ea6\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.2397870480454908,
+    "main_tools_used": [
+      "MetricQueryTool x7"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 7,
+    "main_iterations": 8,
+    "audit_iterations": 1,
+    "total_tokens_in": 26246,
+    "total_tokens_out": 3398,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:42:35.982860"
+}

@@ -247,6 +247,7 @@ def gate_think_node(
         action_type=action_type,
         tool_call=step_tc,
         timestamp=datetime.now(),
+        llm_raw_response=content,
     )
     new_trace = audit_trace + [audit_step]
 

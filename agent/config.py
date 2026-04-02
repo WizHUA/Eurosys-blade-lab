@@ -57,6 +57,7 @@ class TriageConfig:
     persistence_ratio: float = 0.3     # 连续超阈值比例
     top_k: int = 15                    # 保留 Top-K 异常指标
     min_anomaly_duration_sec: int = 30 # 最短异常持续时间
+    low_confidence_threshold: float = 0.30  # Triage 置信度低于此值时扩展搜索范围
 
 
 # ===========================================================================

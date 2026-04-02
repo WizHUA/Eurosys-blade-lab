@@ -1,0 +1,609 @@
+{
+  "run_id": "exp_005_Full",
+  "diagnosis_trace_steps": 6,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有四个活跃假设：cpu_fullload、network_loss、disk_burn、mem_load。首先需要验证 cpu_fullload 假设，检查 CPU 使用率是否持续接近 100%。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:10:13",
+            "end": "2025-09-20T07:11:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c1"
+      },
+      "observation": "cpu_usage_percent: max=51.13636363636447",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:47:23.003145",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有四个活跃假设：cpu_fullload、network_loss、disk_burn、mem_load。首先需要验证 cpu_fullload 假设，检查 CPU 使用率是否持续接近 100%。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:10:13\",\n        \"end\": \"2025-09-20T07:11:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要查询 CPU 使用率的最大值，以验证 CPU 是否接近满载。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前证据显示 CPU 使用率最高为 51.14%，未达到接近 100% 的标准，因此 cpu_fullload 假设的置信度应降低。接下来应优先验证其他活跃假设，特别是 network_loss 和 disk_burn，因为它们当前的置信度较高且尚未验证。首先检查网络丢包率是否显著增加，这是验证 network_loss 假设的关键指标。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "network_receive_drop_rate",
+            "network_transmit_drop_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:10:13",
+            "end": "2025-09-20T07:11:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c2"
+      },
+      "observation": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:47:31.958370",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示 CPU 使用率最高为 51.14%，未达到接近 100% 的标准，因此 cpu_fullload 假设的置信度应降低。接下来应优先验证其他活跃假设，特别是 network_loss 和 disk_burn，因为它们当前的置信度较高且尚未验证。首先检查网络丢包率是否显著增加，这是验证 network_loss 假设的关键指标。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.30, \"reason\": \"CPU 使用率未接近 100%\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:10:13\",\n        \"end\": \"2025-09-20T07:11:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"验证 network_loss 假设需要检查网络丢包率是否显著增加，因此查询 network_receive_drop_rate 和 network_transmit_drop_rate 在异常时间窗口内的最大值。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前证据显示 CPU 使用率最高为 51.14%，未达到接近 100% 的水平，因此 cpu_fullload 假设的置信度应降低。网络丢包率为 0，不支持 network_loss 假设。接下来需要验证 disk_burn 和 mem_load 假设。首先检查磁盘读写速率是否持续处于高位，这可以通过查询 disk_total_iops 和 disk_write_iops 来实现。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_total_iops",
+            "disk_write_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:10:13",
+            "end": "2025-09-20T07:11:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c3"
+      },
+      "observation": "disk_total_iops: max=2.145454545454545; disk_write_iops: max=1.8545454545454545",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:47:40.568503",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示 CPU 使用率最高为 51.14%，未达到接近 100% 的水平，因此 cpu_fullload 假设的置信度应降低。网络丢包率为 0，不支持 network_loss 假设。接下来需要验证 disk_burn 和 mem_load 假设。首先检查磁盘读写速率是否持续处于高位，这可以通过查询 disk_total_iops 和 disk_write_iops 来实现。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.10, \"reason\": \"CPU 使用率未接近 100%\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_total_iops\", \"disk_write_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:10:13\",\n        \"end\": \"2025-09-20T07:11:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要验证磁盘读写速率是否持续处于高位，以评估 disk_burn 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前 CPU 使用率的最大值为 51.14%，远低于 100%，因此可以排除 CPU 满载的可能性。网络丢包率的观测值为 0，表明网络丢包的可能性较低。磁盘 IOPS 的最大值为 2.15，表明磁盘读写速率较低，磁盘 I/O 异常的可能性较低。接下来需要验证内存使用率和内存换页操作，以确认是否存在内存压力导致的磁盘 I/O 上升。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "page_swap_out_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:10:13",
+            "end": "2025-09-20T07:11:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c4"
+      },
+      "observation": "memory_usage_percent: max=32.32593224473518; page_swap_out_rate: max=169.96363636363634",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:47:51.104798",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前 CPU 使用率的最大值为 51.14%，远低于 100%，因此可以排除 CPU 满载的可能性。网络丢包率的观测值为 0，表明网络丢包的可能性较低。磁盘 IOPS 的最大值为 2.15，表明磁盘读写速率较低，磁盘 I/O 异常的可能性较低。接下来需要验证内存使用率和内存换页操作，以确认是否存在内存压力导致的磁盘 I/O 上升。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.10, \"reason\": \"CPU 使用率远低于 100%\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.30, \"reason\": \"网络丢包率为 0\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.30, \"reason\": \"磁盘 IOPS 较低\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"page_swap_out_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:10:13\",\n        \"end\": \"2025-09-20T07:11:28\"\n      },\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要验证内存使用率和内存换页操作，以确认是否存在内存压力导致的磁盘 I/O 上升。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设中，h1 (cpu_fullload) 的 CPU 使用率已经验证为 51.13%，远低于 100%，因此可以排除此假设。h2 (network_loss) 的网络丢包率尚未验证，需要进一步检查网络相关指标。h3 (disk_burn) 的磁盘读写速率和 I/O 等待时间尚未验证，需要进一步检查磁盘相关指标。h4 (mem_load) 的内存使用率和换页操作已经验证，但需要进一步确认是否存在内存-磁盘级联效应。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "network_receive_drop_rate",
+            "network_transmit_drop_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:10:13",
+            "end": "2025-09-20T07:11:28"
+          },
+          "aggregation": "max"
+        },
+        "call_id": "c5"
+      },
+      "observation": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:47:59.515098",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设中，h1 (cpu_fullload) 的 CPU 使用率已经验证为 51.13%，远低于 100%，因此可以排除此假设。h2 (network_loss) 的网络丢包率尚未验证，需要进一步检查网络相关指标。h3 (disk_burn) 的磁盘读写速率和 I/O 等待时间尚未验证，需要进一步检查磁盘相关指标。h4 (mem_load) 的内存使用率和换页操作已经验证，但需要进一步确认是否存在内存-磁盘级联效应。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.0, \"reason\": \"CPU 使用率远低于 100%，排除此假设\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"],\n      \"time_window\": {\"start\": \"2025-09-20T07:10:13\", \"end\": \"2025-09-20T07:11:28\"},\n      \"aggregation\": \"max\"\n    },\n    \"reasoning\": \"需要验证网络丢包率是否显著增加，以进一步评估 h2 (network_loss) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前证据显示内存使用率不高（32.33%），但存在显著的换页操作（page_swap_out_rate=169.96），这可能是内存压力的间接表现。磁盘 I/O 指标（disk_total_iops=2.14, disk_write_iops=1.85）略有上升，但未达到异常水平。网络丢包率为0，排除了网络问题。CPU 使用率最高51.14%，未达到满载。根据内存-磁盘级联效应识别规则，应优先考虑内存问题。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:48:09.340302",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率不高（32.33%），但存在显著的换页操作（page_swap_out_rate=169.96），这可能是内存压力的间接表现。磁盘 I/O 指标（disk_total_iops=2.14, disk_write_iops=1.85）略有上升，但未达到异常水平。网络丢包率为0，排除了网络问题。CPU 使用率最高51.14%，未达到满载。根据内存-磁盘级联效应识别规则，应优先考虑内存问题。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.0, \"reason\": \"CPU 使用率未接近100%\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.0, \"reason\": \"网络丢包率为0\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.1, \"reason\": \"磁盘 I/O 略有上升但未达异常水平\"},\n    {\"hypothesis_id\": \"h4\", \"new_confidence\": 0.8, \"reason\": \"存在显著换页操作，可能是内存压力\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"证据充分指向内存问题（mem_load），其他假设已被排除或置信度极低。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中共有5条证据，全部为 'supporting' 类型。\n2. **子系统直接证据**: \n   - mem_load: 有 memory_usage_percent 和 page_swap_out_rate 的直接观测指标支持。\n   - disk_burn: 有 disk_total_iops 和 disk_write_iops 的直接观测指标支持。\n   - cpu_fullload: 有 cpu_usage_percent 的直接观测指标支持，但最大值仅为51.13%，未达到过载标准。\n   - network_loss: 有 network_receive_drop_rate 和 network_transmit_drop_rate 的直接观测指标支持，但最大值均为0.0，未显示异常。\n3. **故障标签合理性**: \n   - mem_load 和 disk_burn 的故障标签与实际观测到的异常指标一致。\n   - cpu_fullload 和 network_loss 的故障标签与实际观测到的异常指标不一致。\n4. **复合故障判断**: 多个根因中，mem_load 和 disk_burn 可能是独立故障，cpu_fullload 和 network_loss 由于缺乏直接证据支持，不应被视为根因。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T19:48:20.944250",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中共有5条证据，全部为 'supporting' 类型。\\n2. **子系统直接证据**: \\n   - mem_load: 有 memory_usage_percent 和 page_swap_out_rate 的直接观测指标支持。\\n   - disk_burn: 有 disk_total_iops 和 disk_write_iops 的直接观测指标支持。\\n   - cpu_fullload: 有 cpu_usage_percent 的直接观测指标支持，但最大值仅为51.13%，未达到过载标准。\\n   - network_loss: 有 network_receive_drop_rate 和 network_transmit_drop_rate 的直接观测指标支持，但最大值均为0.0，未显示异常。\\n3. **故障标签合理性**: \\n   - mem_load 和 disk_burn 的故障标签与实际观测到的异常指标一致。\\n   - cpu_fullload 和 network_loss 的故障标签与实际观测到的异常指标不一致。\\n4. **复合故障判断**: 多个根因中，mem_load 和 disk_burn 可能是独立故障，cpu_fullload 和 network_loss 由于缺乏直接证据支持，不应被视为根因。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"degrade\",\n    \"reason\": \"cpu_fullload 和 network_loss 缺乏直接证据支持，不应被视为根因。mem_load 和 disk_burn 虽然有直接证据支持，但由于其他根因的不确定性，整体诊断结论不可靠。\",\n    \"hint\": \"\",\n    \"diagnosis_type\": \"partial\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1695,
+      "completion": 521,
+      "total": 2216
+    },
+    "diagnosis_think": {
+      "prompt": 16228,
+      "completion": 1686,
+      "total": 17914
+    },
+    "audit_think": {
+      "prompt": 1468,
+      "completion": 383,
+      "total": 1851
+    },
+    "finalize": {
+      "prompt": 571,
+      "completion": 72,
+      "total": 643
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "CPU 过载导致系统负载升高，进程调度效率下降",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.7,
+      "current_confidence": 0.0,
+      "required_verifications": [
+        {
+          "description": "检查 CPU 使用率是否持续接近 100%",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "cpu_usage_percent"
+          ]
+        },
+        {
+          "description": "验证是否存在大量计算密集型进程",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "processes_running"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "网络传输速率异常升高，可能导致网络拥塞或丢包",
+      "fault_type": "network_loss",
+      "subsystem": "network",
+      "prior_confidence": 0.65,
+      "current_confidence": 0.0,
+      "required_verifications": [
+        {
+          "description": "检查网络丢包率是否显著增加",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_packet_loss_rate"
+          ]
+        },
+        {
+          "description": "验证网络延迟是否异常升高",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_latency_ms"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "磁盘 I/O 操作频繁，可能导致磁盘 I/O 过载",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.1,
+      "required_verifications": [
+        {
+          "description": "检查磁盘读写速率是否持续处于高位",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "disk_read_rate_bytes_per_sec",
+            "disk_write_rate_bytes_per_sec"
+          ]
+        },
+        {
+          "description": "验证磁盘 I/O 等待时间是否显著增加",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "disk_iowait_percent"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h4",
+      "root_cause": "内存回收不足，可能导致内存压力增大",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.4,
+      "current_confidence": 0.8,
+      "required_verifications": [
+        {
+          "description": "检查内存使用率是否接近上限",
+          "status": "verified",
+          "evidence_id": "e4",
+          "required_metrics": [
+            "memory_usage_percent"
+          ]
+        },
+        {
+          "description": "验证是否存在大量内存换页操作",
+          "status": "verified",
+          "evidence_id": "e4",
+          "required_metrics": [
+            "page_swap_out_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:10:13\", \"end\": \"2025-09-2)",
+      "result_digest": "cpu_usage_percent: max=51.13636363636447",
+      "raw_stats": {
+        "cpu_usage_percent": 51.13636363636447
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+      "result_digest": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+      "raw_stats": {
+        "network_receive_drop_rate": 0.0,
+        "network_transmit_drop_rate": 0.0
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_total_iops\", \"disk_write_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:10:13\", )",
+      "result_digest": "disk_total_iops: max=2.145454545454545; disk_write_iops: max=1.8545454545454545",
+      "raw_stats": {
+        "disk_total_iops": 2.145454545454545,
+        "disk_write_iops": 1.8545454545454545
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h4"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"page_swap_out_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+      "result_digest": "memory_usage_percent: max=32.32593224473518; page_swap_out_rate: max=169.96363636363634",
+      "raw_stats": {
+        "memory_usage_percent": 32.32593224473518,
+        "page_swap_out_rate": 169.96363636363634
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+      "result_digest": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+      "raw_stats": {
+        "network_receive_drop_rate": 0.0,
+        "network_transmit_drop_rate": 0.0
+      },
+      "created_at_step": 5
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "CPU 过载导致系统负载升高，进程调度效率下降",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.7,
+        "current_confidence": 0.0,
+        "required_verifications": [
+          {
+            "description": "检查 CPU 使用率是否持续接近 100%",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "cpu_usage_percent"
+            ]
+          },
+          {
+            "description": "验证是否存在大量计算密集型进程",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "processes_running"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "网络传输速率异常升高，可能导致网络拥塞或丢包",
+        "fault_type": "network_loss",
+        "subsystem": "network",
+        "prior_confidence": 0.65,
+        "current_confidence": 0.0,
+        "required_verifications": [
+          {
+            "description": "检查网络丢包率是否显著增加",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_packet_loss_rate"
+            ]
+          },
+          {
+            "description": "验证网络延迟是否异常升高",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_latency_ms"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "磁盘 I/O 操作频繁，可能导致磁盘 I/O 过载",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.1,
+        "required_verifications": [
+          {
+            "description": "检查磁盘读写速率是否持续处于高位",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "disk_read_rate_bytes_per_sec",
+              "disk_write_rate_bytes_per_sec"
+            ]
+          },
+          {
+            "description": "验证磁盘 I/O 等待时间是否显著增加",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "disk_iowait_percent"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h4",
+        "root_cause": "内存回收不足，可能导致内存压力增大",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.4,
+        "current_confidence": 0.8,
+        "required_verifications": [
+          {
+            "description": "检查内存使用率是否接近上限",
+            "status": "verified",
+            "evidence_id": "e4",
+            "required_metrics": [
+              "memory_usage_percent"
+            ]
+          },
+          {
+            "description": "验证是否存在大量内存换页操作",
+            "status": "verified",
+            "evidence_id": "e4",
+            "required_metrics": [
+              "page_swap_out_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:10:13\", \"end\": \"2025-09-2)",
+        "result_digest": "cpu_usage_percent: max=51.13636363636447",
+        "raw_stats": {
+          "cpu_usage_percent": 51.13636363636447
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+        "result_digest": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+        "raw_stats": {
+          "network_receive_drop_rate": 0.0,
+          "network_transmit_drop_rate": 0.0
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_total_iops\", \"disk_write_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:10:13\", )",
+        "result_digest": "disk_total_iops: max=2.145454545454545; disk_write_iops: max=1.8545454545454545",
+        "raw_stats": {
+          "disk_total_iops": 2.145454545454545,
+          "disk_write_iops": 1.8545454545454545
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h4"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"page_swap_out_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+        "result_digest": "memory_usage_percent: max=32.32593224473518; page_swap_out_rate: max=169.96363636363634",
+        "raw_stats": {
+          "memory_usage_percent": 32.32593224473518,
+          "page_swap_out_rate": 169.96363636363634
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"network_receive_drop_rate\", \"network_transmit_drop_rate\"], \"time_window\": {\"start\": \"2)",
+        "result_digest": "network_receive_drop_rate: max=0.0; network_transmit_drop_rate: max=0.0",
+        "raw_stats": {
+          "network_receive_drop_rate": 0.0,
+          "network_transmit_drop_rate": 0.0
+        },
+        "created_at_step": 5
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "内存回收不足，可能导致内存压力增大",
+        "fault_type": "mem_load",
+        "confidence": 0.8,
+        "evidence_ids": [
+          "e4"
+        ]
+      },
+      {
+        "cause": "磁盘 I/O 操作频繁，可能导致磁盘 I/O 过载",
+        "fault_type": "disk_burn",
+        "confidence": 0.1,
+        "evidence_ids": [
+          "e3"
+        ]
+      },
+      {
+        "cause": "CPU 过载导致系统负载升高，进程调度效率下降",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.0,
+        "evidence_ids": [
+          "e1"
+        ]
+      },
+      {
+        "cause": "网络传输速率异常升高，可能导致网络拥塞或丢包",
+        "fault_type": "network_loss",
+        "confidence": 0.0,
+        "evidence_ids": [
+          "e2",
+          "e5"
+        ]
+      }
+    ]
+  }
+}

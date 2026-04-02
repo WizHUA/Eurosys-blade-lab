@@ -18,11 +18,14 @@ class DataAnalysisTool(BaseTool):
         self.df = metrics_df.sort_index()
 
     def _window(self, start: str, end: str) -> pd.DataFrame:
-        s = pd.to_datetime(start, errors="coerce")
-        e = pd.to_datetime(end, errors="coerce")
+        s = _normalize_timestamp(start)
+        e = _normalize_timestamp(end)
         if pd.isna(s) or pd.isna(e):
             return self.df.iloc[0:0]
-        return self.df[(self.df.index >= s) & (self.df.index <= e)]
+        time_index = _normalize_time_index(self.df.index)
+        valid_mask = ~time_index.isna()
+        window_mask = valid_mask & (time_index >= s) & (time_index <= e)
+        return self.df.loc[window_mask]
 
     def _correlation(self, args: dict[str, Any]) -> dict[str, Any]:
         a = args.get("metric_a")
@@ -212,3 +215,19 @@ def _corr_interp(v: float) -> str:
     if av >= 0.3:
         return "弱相关"
     return "几乎无相关"
+
+
+def _normalize_timestamp(value: Any) -> pd.Timestamp:
+    ts = pd.to_datetime(value, errors="coerce")
+    if pd.isna(ts):
+        return ts
+    if getattr(ts, "tzinfo", None) is not None:
+        ts = ts.tz_convert(None)
+    return ts
+
+
+def _normalize_time_index(index: pd.Index) -> pd.DatetimeIndex:
+    dt_index = pd.DatetimeIndex(pd.to_datetime(index, errors="coerce"))
+    if getattr(dt_index, "tz", None) is not None:
+        dt_index = dt_index.tz_convert(None)
+    return dt_index

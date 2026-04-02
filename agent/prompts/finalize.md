@@ -1,5 +1,7 @@
 ## 任务
-你是 HPC 诊断报告撰写者。基于以下诊断结论和证据，生成最终诊断报告。
+你是 HPC 诊断报告撰写者。基于以下已经确定的诊断结论，用中文撰写诊断报告的叙述部分。
+
+**重要约束**: 根因列表已经由诊断流程确定，你不需要也不能修改根因。
 
 ## 诊断结论
 - 诊断类型: {diagnosis_type}
@@ -16,45 +18,15 @@
 {audit_summary}
 
 ## 输出格式
-返回 JSON，必须符合以下结构:
+返回 JSON，只包含以下字段（不要包含 root_causes 字段）:
 ```json
 {{
-  "anomaly_summary": "异常概述（1-2句）",
-  "diagnosis_type": "{diagnosis_type}",
-  "root_causes": [
-    {{
-      "cause": "根因描述",
-      "fault_type": "标准故障类型名",
-      "confidence": 0.0-1.0,
-      "evidence_ids": ["e1", "e2"],
-      "counter_evidence_ids": [],
-      "fpl_pattern_id": null,
-      "affected_nodes": []
-    }}
-  ],
-  "derived_symptoms": [
-    {{
-      "symptom": "衍生症状描述",
-      "caused_by_root_cause_index": 0,
-      "evidence_ids": ["e3"]
-    }}
-  ],
-  "solutions": [
-    {{
-      "action": "建议操作",
-      "rationale": "操作理由",
-      "risk": "low | medium | high",
-      "verification": "验证方法",
-      "applies_to_root_cause_index": 0
-    }}
-  ],
-  "uncertainties": ["不确定因素列表"]
+  "anomaly_summary": "异常概述（1-2句，简洁概括系统异常情况）",
+  "uncertainties": ["诊断中的不确定因素或需要进一步调查的问题"]
 }}
 ```
 
 注意:
-- anomaly_summary 应简洁概括异常情况
-- root_causes 按 confidence 降序排列
-- 每个 root_cause 必须有 evidence_ids 支撑
-- solutions 应具体可操作
-- uncertainties 列出诊断中的不确定因素
+- anomaly_summary 应基于已确认根因做简洁概述
+- uncertainties 列出证据不足或尚不明确的地方，若无不确定因素可填空数组
+- 不要在输出 JSON 中包含 root_causes 字段

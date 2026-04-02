@@ -1,0 +1,70 @@
+{
+  "run_id": "exp_020_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为CPU计算过载、磁盘空间持续减少以及网络传输速率异常升高。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU 调度运行率异常升高，可能表明 CPU 计算过载",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "e1",
+        "e12"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少，可能导致系统无法正常写入数据",
+      "fault_type": "disk_fill",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e9",
+        "e10",
+        "e11",
+        "e13"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络传输速率异常升高，可能表明网络带宽被大量占用或存在网络风暴",
+      "fault_type": "network_loss",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e8"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "网络传输速率异常升高的具体原因尚不明确，需进一步调查是否存在网络风暴或其他带宽占用情况。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.1890295318725818,
+    "main_tools_used": [
+      "MetricQueryTool x13"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 13,
+    "main_iterations": 14,
+    "audit_iterations": 1,
+    "total_tokens_in": 42204,
+    "total_tokens_out": 4884,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:35:49.502146"
+}

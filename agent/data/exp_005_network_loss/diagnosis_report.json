@@ -1,0 +1,72 @@
+{
+  "run_id": "exp_005_Full",
+  "anomaly_summary": "系统出现内存回收不足和磁盘 I/O 操作频繁的问题，可能导致内存压力增大和磁盘 I/O 过载。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存回收不足，可能导致内存压力增大",
+      "fault_type": "mem_load",
+      "confidence": 0.8,
+      "evidence_ids": [
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘 I/O 操作频繁，可能导致磁盘 I/O 过载",
+      "fault_type": "disk_burn",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 过载导致系统负载升高，进程调度效率下降",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e1"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络传输速率异常升高，可能导致网络拥塞或丢包",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e2",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU 过载和网络传输速率异常升高的证据不足，需进一步确认是否存在相关影响。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.20424690467990736,
+    "main_tools_used": [
+      "MetricQueryTool x5"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 5,
+    "main_iterations": 6,
+    "audit_iterations": 1,
+    "total_tokens_in": 19962,
+    "total_tokens_out": 2662,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T19:48:24.612346"
+}

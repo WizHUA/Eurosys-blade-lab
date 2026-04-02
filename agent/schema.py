@@ -186,6 +186,7 @@ class AuditStep(BaseModel):
     observation: str | None = None
     audit_evidence_generated: str | None = None
     timestamp: datetime
+    llm_raw_response: str | None = None
 
 
 # ===========================================================================
@@ -202,6 +203,7 @@ class ReActStep(BaseModel):
     hypotheses_updated: list[str] = Field(default_factory=list)
     timestamp: datetime
     duration_ms: int | None = None
+    llm_raw_response: str | None = None
 
 
 # ===========================================================================
@@ -295,6 +297,7 @@ class DiagnosisState(TypedDict):
     gate_hint: str | None
     budget: dict
     rehyp_count: int
+    _tool_result: dict  # act_node passes tool execution result to observe_node
 
 
 class AuditState(TypedDict):
@@ -305,3 +308,4 @@ class AuditState(TypedDict):
     audit_trace: list[AuditStep]
     audit_budget: dict
     previous_hint: str | None
+    _audit_tool_result: dict

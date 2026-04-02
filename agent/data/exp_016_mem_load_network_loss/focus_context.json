@@ -1,0 +1,184 @@
+{
+  "run_id": "exp_016_Full",
+  "anomaly_window": {
+    "start": "2025-09-20T07:32:13",
+    "end": "2025-09-20T07:33:28"
+  },
+  "top_metrics": [
+    {
+      "metric": "network_receive_rate_bytes_per_sec",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 3.8733038018628863,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 1,
+      "change_point": null
+    },
+    {
+      "metric": "network_receive_packets_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 3.829623297537498,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 2,
+      "change_point": null
+    },
+    {
+      "metric": "tcp_segments_received_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 3.4291711259329456,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 3,
+      "change_point": null
+    },
+    {
+      "metric": "network_transmit_packets_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 3.2508496359380383,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 4,
+      "change_point": null
+    },
+    {
+      "metric": "tcp_segments_sent_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 3.2312997249385624,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 5,
+      "change_point": null
+    },
+    {
+      "metric": "network_transmit_rate_bytes_per_sec",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 2.860445359928991,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 6,
+      "change_point": null
+    },
+    {
+      "metric": "udp_receive_datagrams_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 1.7942917634180402,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 7,
+      "change_point": null
+    },
+    {
+      "metric": "load_15min",
+      "subsystem": "cpu",
+      "direction": "+",
+      "score": 1.7818052416759265,
+      "t_onset": "2025-09-20T07:32:28",
+      "onset_rank": 12,
+      "change_point": null
+    },
+    {
+      "metric": "context_switches_rate",
+      "subsystem": "cpu",
+      "direction": "-",
+      "score": 1.744186753707841,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 8,
+      "change_point": null
+    },
+    {
+      "metric": "io_pressure_stalled_rate",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.716362556070203,
+      "t_onset": "2025-09-20T07:32:28",
+      "onset_rank": 13,
+      "change_point": null
+    },
+    {
+      "metric": "page_faults_rate",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.6669315199773915,
+      "t_onset": "2025-09-20T07:32:28",
+      "onset_rank": 14,
+      "change_point": null
+    },
+    {
+      "metric": "udp_transmit_datagrams_rate",
+      "subsystem": "network",
+      "direction": "-",
+      "score": 1.6611753722324147,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 9,
+      "change_point": null
+    },
+    {
+      "metric": "cpu_iowait_percent",
+      "subsystem": "cpu",
+      "direction": "-",
+      "score": 1.60745110982706,
+      "t_onset": "2025-09-20T07:32:28",
+      "onset_rank": 15,
+      "change_point": null
+    },
+    {
+      "metric": "disk_write_rate_bytes_per_sec",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.5857187323228108,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 10,
+      "change_point": null
+    },
+    {
+      "metric": "page_swap_out_rate",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.5854551613603076,
+      "t_onset": "2025-09-20T07:32:13",
+      "onset_rank": 11,
+      "change_point": null
+    }
+  ],
+  "causal_order": [
+    "network_receive_rate_bytes_per_sec",
+    "network_receive_packets_rate",
+    "tcp_segments_received_rate",
+    "network_transmit_packets_rate",
+    "tcp_segments_sent_rate",
+    "network_transmit_rate_bytes_per_sec",
+    "udp_receive_datagrams_rate",
+    "context_switches_rate",
+    "udp_transmit_datagrams_rate",
+    "disk_write_rate_bytes_per_sec",
+    "page_swap_out_rate",
+    "load_15min",
+    "io_pressure_stalled_rate",
+    "page_faults_rate",
+    "cpu_iowait_percent"
+  ],
+  "subsystem_scores": {
+    "network": 2.9912700102236722,
+    "cpu": 1.7111477017369428,
+    "disk": 1.6510406441965069,
+    "memory": 1.6261933406688496
+  },
+  "leading_subsystem": "network",
+  "nodes": [
+    {
+      "node": "node-0",
+      "severity": "low"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "277",
+      "overlap_ratio": 0.0426,
+      "node_set": [
+        "wizhua-virtual-machine"
+      ]
+    }
+  ],
+  "triage_confidence": 0.3873303801862886
+}

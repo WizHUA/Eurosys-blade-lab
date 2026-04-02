@@ -1,0 +1,77 @@
+{
+  "run_id": "exp_010_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为 CPU 过载导致系统负载升高，同时内存压力过大引发频繁换页，磁盘 I/O 和网络接收数据包速率也存在一定问题。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU 过载导致系统负载升高",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e3",
+        "e5",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "内存压力过大导致频繁换页",
+      "fault_type": "mem_load",
+      "confidence": 0.75,
+      "evidence_ids": [
+        "e4",
+        "e8"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络接收数据包速率下降，可能存在丢包或延迟",
+      "fault_type": "network_loss",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e9"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘 I/O 过载导致读写压力增大",
+      "fault_type": "disk_burn",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e6",
+        "e10"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "网络丢包或延迟的证据不足，磁盘 I/O 过载的影响尚不明确"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.19044196967932006,
+    "main_tools_used": [
+      "MetricQueryTool x9",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 10,
+    "main_iterations": 11,
+    "audit_iterations": 1,
+    "total_tokens_in": 34468,
+    "total_tokens_out": 4312,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:02:57.292822"
+}

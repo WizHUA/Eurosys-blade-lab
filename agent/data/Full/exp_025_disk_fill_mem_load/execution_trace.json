@@ -1,0 +1,730 @@
+{
+  "run_id": "exp_025_Full",
+  "diagnosis_trace_steps": 9,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "\u5f53\u524d\u6709\u4e09\u4e2a\u6d3b\u8dc3\u5047\u8bbe\uff1adisk_fill\u3001cpu_fullload\u548cmem_load\u3002\u4e3a\u4e86\u9a8c\u8bc1\u8fd9\u4e9b\u5047\u8bbe\uff0c\u9996\u5148\u9700\u8981\u6536\u96c6\u76f4\u63a5\u7684\u5b50\u7cfb\u7edf\u6307\u6807\u8bc1\u636e\u3002\u7531\u4e8edisk_fill\u7684\u7f6e\u4fe1\u5ea6\u6700\u9ad8\uff0c\u4f18\u5148\u9a8c\u8bc1\u78c1\u76d8\u76f8\u5173\u6307\u6807\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent",
+            "disk_io_now",
+            "disk_total_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "filesystem_usage_percent: mean=90.69521702362755; disk_io_now: mean=21.5; disk_total_iops: mean=587.2844132534352",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:45:54.191477",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u6709\u4e09\u4e2a\u6d3b\u8dc3\u5047\u8bbe\uff1adisk_fill\u3001cpu_fullload\u548cmem_load\u3002\u4e3a\u4e86\u9a8c\u8bc1\u8fd9\u4e9b\u5047\u8bbe\uff0c\u9996\u5148\u9700\u8981\u6536\u96c6\u76f4\u63a5\u7684\u5b50\u7cfb\u7edf\u6307\u6807\u8bc1\u636e\u3002\u7531\u4e8edisk_fill\u7684\u7f6e\u4fe1\u5ea6\u6700\u9ad8\uff0c\u4f18\u5148\u9a8c\u8bc1\u78c1\u76d8\u76f8\u5173\u6307\u6807\u3002\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\", \"disk_io_now\", \"disk_total_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"\u9009\u62e9\u8fd9\u4e9b\u6307\u6807\u53ef\u4ee5\u76f4\u63a5\u9a8c\u8bc1\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u548cI/O\u6d3b\u52a8\uff0c\u4ee5\u786e\u8ba4\u662f\u5426\u6709\u78c1\u76d8\u586b\u5145\u6216I/O\u538b\u529b\u5f02\u5e38\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u6700\u9ad8\uff0c\u4e3a 0.70\uff0c\u4e14\u5df2\u6709\u8bc1\u636e\u652f\u6301 filesystem_usage_percent \u8f83\u9ad8\u3002\u63a5\u4e0b\u6765\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ee5\u786e\u8ba4\u78c1\u76d8\u7a7a\u95f4\u88ab\u5360\u7528\u7684\u539f\u56e0\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_write_iops",
+            "disk_write_rate_bytes_per_sec"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:46:02.370398",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u6700\u9ad8\uff0c\u4e3a 0.70\uff0c\u4e14\u5df2\u6709\u8bc1\u636e\u652f\u6301 filesystem_usage_percent \u8f83\u9ad8\u3002\u63a5\u4e0b\u6765\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ee5\u786e\u8ba4\u78c1\u76d8\u7a7a\u95f4\u88ab\u5360\u7528\u7684\u539f\u56e0\u3002\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u901a\u8fc7\u67e5\u8be2\u78c1\u76d8\u5199\u5165\u64cd\u4f5c\u7684\u76f8\u5173\u6307\u6807\uff0c\u53ef\u4ee5\u786e\u8ba4\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ece\u800c\u8fdb\u4e00\u6b65\u9a8c\u8bc1 disk_fill \u5047\u8bbe\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "\u5f53\u524d\u5047\u8bbe h1 (disk_fill) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.70\uff0c\u5df2\u6709\u8bc1\u636e\u663e\u793a filesystem_usage_percent \u9ad8\u8fbe 90.695%\uff0cdisk_write_iops \u548c disk_write_rate_bytes_per_sec \u4e5f\u663e\u8457\u5347\u9ad8\uff0c\u8fd9\u652f\u6301\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u7684\u5047\u8bbe\u3002\u7136\u800c\uff0c\u8fd8\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002\u6b64\u5916\uff0c\u5047\u8bbe h2 (cpu_fullload) \u548c h3 (mem_load) \u7684\u9a8c\u8bc1\u5c1a\u672a\u5b8c\u6210\uff0c\u7279\u522b\u662f h3 \u7684\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u9700\u8981\u8fdb\u4e00\u6b65\u8c03\u67e5\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "swap_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "memory_usage_percent: mean=96.14508561482573; swap_usage_percent: mean=96.5931509523092",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:46:14.240595",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u5047\u8bbe h1 (disk_fill) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.70\uff0c\u5df2\u6709\u8bc1\u636e\u663e\u793a filesystem_usage_percent \u9ad8\u8fbe 90.695%\uff0cdisk_write_iops \u548c disk_write_rate_bytes_per_sec \u4e5f\u663e\u8457\u5347\u9ad8\uff0c\u8fd9\u652f\u6301\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u7684\u5047\u8bbe\u3002\u7136\u800c\uff0c\u8fd8\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002\u6b64\u5916\uff0c\u5047\u8bbe h2 (cpu_fullload) \u548c h3 (mem_load) \u7684\u9a8c\u8bc1\u5c1a\u672a\u5b8c\u6210\uff0c\u7279\u522b\u662f h3 \u7684\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u9700\u8981\u8fdb\u4e00\u6b65\u8c03\u67e5\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.75, \"reason\": \"filesystem_usage_percent \u548c disk_write_iops \u7684\u5f02\u5e38\u8fdb\u4e00\u6b65\u652f\u6301 disk_fill \u5047\u8bbe\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u4e3a\u4e86\u9a8c\u8bc1 h3 (mem_load) \u5047\u8bbe\uff0c\u9700\u8981\u68c0\u67e5\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u3002\u901a\u8fc7\u67e5\u8be2 memory_usage_percent \u548c swap_usage_percent \u7684\u5747\u503c\uff0c\u53ef\u4ee5\u5224\u65ad\u662f\u5426\u5b58\u5728\u5185\u5b58\u538b\u529b\u6216\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u5f02\u5e38\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "\u5f53\u524d\u5047\u8bbe h1 (disk_fill) \u7684 confidence \u4e3a 0.75\uff0c\u5df2\u901a\u8fc7\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u9a8c\u8bc1\u3002\u4e0b\u4e00\u6b65\u9700\u8981\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ee5\u8fdb\u4e00\u6b65\u786e\u8ba4\u8be5\u5047\u8bbe\u3002\u53ef\u4ee5\u901a\u8fc7\u67e5\u8be2\u78c1\u76d8 I/O \u76f8\u5173\u7684\u6307\u6807\u6765\u9a8c\u8bc1\u8fd9\u4e00\u70b9\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_write_iops",
+            "disk_write_rate_bytes_per_sec"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:46:22.397333",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u5047\u8bbe h1 (disk_fill) \u7684 confidence \u4e3a 0.75\uff0c\u5df2\u901a\u8fc7\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u9a8c\u8bc1\u3002\u4e0b\u4e00\u6b65\u9700\u8981\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ee5\u8fdb\u4e00\u6b65\u786e\u8ba4\u8be5\u5047\u8bbe\u3002\u53ef\u4ee5\u901a\u8fc7\u67e5\u8be2\u78c1\u76d8 I/O \u76f8\u5173\u7684\u6307\u6807\u6765\u9a8c\u8bc1\u8fd9\u4e00\u70b9\u3002\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u901a\u8fc7\u67e5\u8be2\u78c1\u76d8\u5199\u5165 I/O \u548c\u5199\u5165\u901f\u7387\uff0c\u53ef\u4ee5\u786e\u8ba4\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\uff0c\u4ece\u800c\u8fdb\u4e00\u6b65\u9a8c\u8bc1 disk_fill \u5047\u8bbe\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "\u5f53\u524d\u8bc1\u636e\u663e\u793a\u78c1\u76d8\u4f7f\u7528\u7387\u9ad8\u8fbe90.69%\uff0c\u4e14\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u8f83\u9ad8\uff0c\u652f\u6301disk_fill\u5047\u8bbe\u3002\u540c\u65f6\uff0c\u5185\u5b58\u4f7f\u7528\u7387\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u5747\u8d85\u8fc796%\uff0c\u8868\u660e\u53ef\u80fd\u5b58\u5728\u5185\u5b58\u538b\u529b\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u539f\u5219\uff0c\u9ad8\u78c1\u76d8IO\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u7ee7\u53d1\u6548\u5e94\u3002\u56e0\u6b64\uff0c\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u4ee5\u533a\u5206\u662f\u539f\u53d1\u78c1\u76d8\u95ee\u9898\u8fd8\u662f\u5185\u5b58\u95ee\u9898\u5bfc\u81f4\u7684\u78c1\u76d8IO\u5347\u9ad8\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c5"
+      },
+      "observation": "memory_active_anon_bytes: mean=2535723690.6666665; memory_mapped_bytes: mean=87875584.0; memory_sunreclaim_bytes: mean=246777173.33333334",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:46:32.264783",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u8bc1\u636e\u663e\u793a\u78c1\u76d8\u4f7f\u7528\u7387\u9ad8\u8fbe90.69%\uff0c\u4e14\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u8f83\u9ad8\uff0c\u652f\u6301disk_fill\u5047\u8bbe\u3002\u540c\u65f6\uff0c\u5185\u5b58\u4f7f\u7528\u7387\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u5747\u8d85\u8fc796%\uff0c\u8868\u660e\u53ef\u80fd\u5b58\u5728\u5185\u5b58\u538b\u529b\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u539f\u5219\uff0c\u9ad8\u78c1\u76d8IO\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u7ee7\u53d1\u6548\u5e94\u3002\u56e0\u6b64\uff0c\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u4ee5\u533a\u5206\u662f\u539f\u53d1\u78c1\u76d8\u95ee\u9898\u8fd8\u662f\u5185\u5b58\u95ee\u9898\u5bfc\u81f4\u7684\u78c1\u76d8IO\u5347\u9ad8\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"\u78c1\u76d8\u4f7f\u7528\u7387\u548c\u5199\u5165IOPS\u9ad8\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.70, \"reason\": \"\u5185\u5b58\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u6781\u9ad8\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u9700\u8981\u83b7\u53d6\u5185\u5b58\u76f8\u5173\u6307\u6807\u7684\u76f4\u63a5\u8bc1\u636e\uff0c\u4ee5\u9a8c\u8bc1\u5185\u5b58\u538b\u529b\u662f\u5426\u539f\u53d1\u95ee\u9898\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.85\uff0c\u4e14\u5df2\u786e\u8ba4\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u5f02\u5e38\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002cpu_fullload (h2) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.65\uff0c\u5c1a\u672a\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b\u6216\u8ba1\u7b97\u5bc6\u96c6\u578b\u4efb\u52a1\u3002mem_load (h3) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.70\uff0c\u5df2\u786e\u8ba4\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u5f02\u5e38\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u89c4\u5219\uff0cmemory_active_anon_bytes\u3001memory_mapped_bytes\u3001memory_sunreclaim_bytes \u7b49\u5185\u5b58\u6307\u6807\u5f02\u5e38\uff0c\u540c\u65f6 disk_write_iops/disk_total_iops \u5347\u9ad8\uff0c\u5e94\u4f18\u5148\u5224\u5b9a\u4e3a mem_load\u3002\u56e0\u6b64\uff0c\u4e0b\u4e00\u6b65\u5e94\u4f18\u5148\u9a8c\u8bc1 mem_load \u5047\u8bbe\u7684\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "swap_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c6"
+      },
+      "observation": "swap_usage_percent: mean=96.5931509523092",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:46:49.416289",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.85\uff0c\u4e14\u5df2\u786e\u8ba4\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u5f02\u5e38\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002cpu_fullload (h2) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.65\uff0c\u5c1a\u672a\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b\u6216\u8ba1\u7b97\u5bc6\u96c6\u578b\u4efb\u52a1\u3002mem_load (h3) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.70\uff0c\u5df2\u786e\u8ba4\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\u5f02\u5e38\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u89c4\u5219\uff0cmemory_active_anon_bytes\u3001memory_mapped_bytes\u3001memory_sunreclaim_bytes \u7b49\u5185\u5b58\u6307\u6807\u5f02\u5e38\uff0c\u540c\u65f6 disk_write_iops/disk_total_iops \u5347\u9ad8\uff0c\u5e94\u4f18\u5148\u5224\u5b9a\u4e3a mem_load\u3002\u56e0\u6b64\uff0c\u4e0b\u4e00\u6b65\u5e94\u4f18\u5148\u9a8c\u8bc1 mem_load \u5047\u8bbe\u7684\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"\u8bc1\u636e\u652f\u6301\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.70, \"reason\": \"\u8bc1\u636e\u652f\u6301\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"swap_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u9700\u8981\u9a8c\u8bc1\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\u4ee5\u8fdb\u4e00\u6b65\u786e\u8ba4 mem_load \u5047\u8bbe\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.85\uff0c\u4e14\u5df2\u7ecf\u9a8c\u8bc1\u4e86\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002cpu_fullload (h2) \u548c mem_load (h3) \u7684\u7f6e\u4fe1\u5ea6\u5206\u522b\u4e3a 0.65 \u548c 0.70\uff0c\u4e14\u90fd\u6709\u5f85\u9a8c\u8bc1\u7684\u68c0\u67e5\u9879\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\uff0c\u5185\u5b58\u6307\u6807\u5f02\u5e38\u53ef\u80fd\u5bfc\u81f4\u78c1\u76d8 IO \u4e0a\u5347\uff0c\u56e0\u6b64\u5e94\u4f18\u5148\u5173\u6ce8 mem_load\u3002\u63a5\u4e0b\u6765\uff0c\u6211\u5c06\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b\uff0c\u4ee5\u9a8c\u8bc1 cpu_fullload \u5047\u8bbe\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c7"
+      },
+      "observation": "cpu_usage_percent: mean=64.98158189010707",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:47:02.286100",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u5047\u8bbe\u4e2d\uff0cdisk_fill (h1) \u7684\u7f6e\u4fe1\u5ea6\u4e3a 0.85\uff0c\u4e14\u5df2\u7ecf\u9a8c\u8bc1\u4e86\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\uff0c\u4f46\u5c1a\u672a\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e\u3002cpu_fullload (h2) \u548c mem_load (h3) \u7684\u7f6e\u4fe1\u5ea6\u5206\u522b\u4e3a 0.65 \u548c 0.70\uff0c\u4e14\u90fd\u6709\u5f85\u9a8c\u8bc1\u7684\u68c0\u67e5\u9879\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\uff0c\u5185\u5b58\u6307\u6807\u5f02\u5e38\u53ef\u80fd\u5bfc\u81f4\u78c1\u76d8 IO \u4e0a\u5347\uff0c\u56e0\u6b64\u5e94\u4f18\u5148\u5173\u6ce8 mem_load\u3002\u63a5\u4e0b\u6765\uff0c\u6211\u5c06\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b\uff0c\u4ee5\u9a8c\u8bc1 cpu_fullload \u5047\u8bbe\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"\u8bc1\u636e\u652f\u6301\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u4e3a\u4e86\u9a8c\u8bc1 cpu_fullload \u5047\u8bbe\uff0c\u9700\u8981\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b\u3002\u901a\u8fc7\u67e5\u8be2 cpu_usage_percent \u6307\u6807\u7684\u5e73\u5747\u503c\uff0c\u53ef\u4ee5\u786e\u5b9a CPU \u662f\u5426\u5904\u4e8e\u9ad8\u8d1f\u8f7d\u72b6\u6001\u3002\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "\u5f53\u524d\u8bc1\u636e\u663e\u793a\u5185\u5b58\u4f7f\u7528\u7387\u9ad8\u8fbe96.14%\uff0c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u4e5f\u9ad8\u8fbe96.59%\uff0c\u540c\u65f6\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u8f83\u9ad8\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u539f\u5219\uff0c\u8fd9\u66f4\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u64cd\u4f5c\u7cfb\u7edf\u5c06\u533f\u540d\u9875\u6362\u51fa\u5230swap\uff0c\u8868\u73b0\u4e3a\u78c1\u76d8IO\u4e0a\u5347\u3002\u56e0\u6b64\uff0c\u5e94\u4f18\u5148\u8003\u8651mem_load\u5047\u8bbe\u3002\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5360\u7528\u5185\u5b58\u6216CPU\u3002",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_running",
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:50:28",
+            "end": "2025-09-20T07:51:43"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c8"
+      },
+      "observation": "processes_running: mean=7.833333333333333; processes_blocked: mean=5.833333333333333",
+      "evidence_generated": "e8",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:47:14.689000",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u8bc1\u636e\u663e\u793a\u5185\u5b58\u4f7f\u7528\u7387\u9ad8\u8fbe96.14%\uff0c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u4e5f\u9ad8\u8fbe96.59%\uff0c\u540c\u65f6\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u8f83\u9ad8\u3002\u6839\u636e\u5185\u5b58-\u78c1\u76d8\u7ea7\u8054\u6548\u5e94\u8bc6\u522b\u539f\u5219\uff0c\u8fd9\u66f4\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u64cd\u4f5c\u7cfb\u7edf\u5c06\u533f\u540d\u9875\u6362\u51fa\u5230swap\uff0c\u8868\u73b0\u4e3a\u78c1\u76d8IO\u4e0a\u5347\u3002\u56e0\u6b64\uff0c\u5e94\u4f18\u5148\u8003\u8651mem_load\u5047\u8bbe\u3002\u9700\u8981\u8fdb\u4e00\u6b65\u9a8c\u8bc1\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5360\u7528\u5185\u5b58\u6216CPU\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.7, \"reason\": \"\u78c1\u76d8IO\u5347\u9ad8\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u7ee7\u53d1\u6548\u5e94\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.65, \"reason\": \"CPU\u4f7f\u7528\u738764.98%\u672a\u8fbe\u5230fullload\u6807\u51c6\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.9, \"reason\": \"\u5185\u5b58\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u6781\u9ad8\uff0c\u7b26\u5408\u5185\u5b58\u538b\u529b\u7279\u5f81\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_running\", \"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:50:28\",\n        \"end\": \"2025-09-20T07:51:43\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"\u9700\u8981\u68c0\u67e5\u8fd0\u884c\u548c\u963b\u585e\u8fdb\u7a0b\u6570\u91cf\uff0c\u786e\u8ba4\u662f\u5426\u5b58\u5728\u8fdb\u7a0b\u5f02\u5e38\u5bfc\u81f4\u7684\u5185\u5b58\u538b\u529b\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 9,
+      "thought": "\u5f53\u524d\u8bc1\u636e\u663e\u793a\u5185\u5b58\u4f7f\u7528\u7387\u9ad8\u8fbe96.14%\uff0c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u4e5f\u9ad8\u8fbe96.59%\uff0c\u4e14\u5185\u5b58\u76f8\u5173\u6307\u6807\u5982memory_active_anon_bytes\u3001memory_mapped_bytes\u3001memory_sunreclaim_bytes\u5747\u5f02\u5e38\u9ad8\u3002\u540c\u65f6\uff0c\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u4e5f\u8f83\u9ad8\uff0c\u8fd9\u53ef\u80fd\u662f\u7531\u4e8e\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u64cd\u4f5c\u7cfb\u7edf\u5c06\u533f\u540d\u9875\u6362\u51fa\u5230swap\uff0c\u8868\u73b0\u4e3a\u78c1\u76d8IO\u4e0a\u5347\u3002\u56e0\u6b64\uff0c\u5e94\u4f18\u5148\u8003\u8651\u5185\u5b58\u8d1f\u8f7d\u8fc7\u9ad8\uff08mem_load\uff09\u4f5c\u4e3a\u6839\u56e0\uff0c\u78c1\u76d8IO\u5f02\u5e38\u53ef\u80fd\u662f\u7ee7\u53d1\u6027\u6548\u5e94\u3002",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:47:24.367656",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5f53\u524d\u8bc1\u636e\u663e\u793a\u5185\u5b58\u4f7f\u7528\u7387\u9ad8\u8fbe96.14%\uff0c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u4e5f\u9ad8\u8fbe96.59%\uff0c\u4e14\u5185\u5b58\u76f8\u5173\u6307\u6807\u5982memory_active_anon_bytes\u3001memory_mapped_bytes\u3001memory_sunreclaim_bytes\u5747\u5f02\u5e38\u9ad8\u3002\u540c\u65f6\uff0c\u78c1\u76d8\u5199\u5165IOPS\u548c\u5199\u5165\u901f\u7387\u4e5f\u8f83\u9ad8\uff0c\u8fd9\u53ef\u80fd\u662f\u7531\u4e8e\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u64cd\u4f5c\u7cfb\u7edf\u5c06\u533f\u540d\u9875\u6362\u51fa\u5230swap\uff0c\u8868\u73b0\u4e3a\u78c1\u76d8IO\u4e0a\u5347\u3002\u56e0\u6b64\uff0c\u5e94\u4f18\u5148\u8003\u8651\u5185\u5b58\u8d1f\u8f7d\u8fc7\u9ad8\uff08mem_load\uff09\u4f5c\u4e3a\u6839\u56e0\uff0c\u78c1\u76d8IO\u5f02\u5e38\u53ef\u80fd\u662f\u7ee7\u53d1\u6027\u6548\u5e94\u3002\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.50, \"reason\": \"\u78c1\u76d8IO\u5f02\u5e38\u53ef\u80fd\u662f\u5185\u5b58\u538b\u529b\u5bfc\u81f4\u7684\u7ee7\u53d1\u6027\u6548\u5e94\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.50, \"reason\": \"CPU\u4f7f\u7528\u7387\u4e2d\u7b49\uff0c\u672a\u8fbe\u5230\u6ee1\u8f7d\u6c34\u5e73\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.95, \"reason\": \"\u5185\u5b58\u548c\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u7387\u6781\u9ad8\uff0c\u4e14\u76f8\u5173\u5185\u5b58\u6307\u6807\u5f02\u5e38\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"\u8bc1\u636e\u5145\u5206\u8868\u660e\u5185\u5b58\u8d1f\u8f7d\u8fc7\u9ad8\u662f\u4e3b\u8981\u95ee\u9898\uff0c\u78c1\u76d8IO\u5f02\u5e38\u662f\u7ee7\u53d1\u6027\u6548\u5e94\u3002CPU\u8d1f\u8f7d\u4e2d\u7b49\uff0c\u4e0d\u662f\u4e3b\u8981\u95ee\u9898\u3002\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "\u5ba1\u67e5\u63a8\u7406\u8fc7\u7a0b\u5982\u4e0b\uff1a\n1. **\u8bc1\u636e\u7c7b\u578b\u5ba1\u67e5**: \u8bc1\u636e\u6c60\u4e2d\u67097\u6761\u8bc1\u636e\u7c7b\u578b\u4e3a 'supporting'\uff0c1\u6761\u4e3a 'neutral'\u3002\n2. **\u5b50\u7cfb\u7edf\u76f4\u63a5\u8bc1\u636e**: \n   - mem_load: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 memory_usage_percent \u548c swap_usage_percent \u652f\u6301\u3002\n   - disk_fill: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 filesystem_usage_percent \u548c disk_write_iops \u652f\u6301\u3002\n   - cpu_fullload: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 cpu_usage_percent \u652f\u6301\u3002\n3. **\u6545\u969c\u6807\u7b7e\u5408\u7406\u6027**: \u8bca\u65ad\u4f7f\u7528\u7684 fault_type \u4e0e\u5b9e\u9645\u89c2\u6d4b\u5230\u7684\u5f02\u5e38\u6307\u6807\u4e00\u81f4\u3002\n4. **\u590d\u5408\u6545\u969c\u5224\u65ad**: \u591a\u4e2a\u6839\u56e0\u4e4b\u95f4\u5b58\u5728\u56e0\u679c\u94fe\u5173\u7cfb\uff0c\u5982 cpu_user_percent \u2192 load_15min \u2192 filesystem_avail_bytes \u2192 filesystem_free_bytes \u2192 filesystem_usage_percent \u2192 memory_active_anon_bytes \u2192 memory_inactive_anon_bytes \u2192 memory_mapped_bytes \u2192 memory_buffers_bytes \u2192 softnet_processed_rate \u2192 swap_cached_bytes \u2192 swap_free_bytes \u2192 load_1min \u2192 network_transmit_packets_rate \u2192 memory_inactive_file_bytes\u3002\n\u7efc\u4e0a\uff0c\u8bc1\u636e\u5145\u5206\uff0c\u7ed3\u8bba\u53ef\u4fe1\u3002",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:47:36.487479",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"\u5ba1\u67e5\u63a8\u7406\u8fc7\u7a0b\u5982\u4e0b\uff1a\\n1. **\u8bc1\u636e\u7c7b\u578b\u5ba1\u67e5**: \u8bc1\u636e\u6c60\u4e2d\u67097\u6761\u8bc1\u636e\u7c7b\u578b\u4e3a 'supporting'\uff0c1\u6761\u4e3a 'neutral'\u3002\\n2. **\u5b50\u7cfb\u7edf\u76f4\u63a5\u8bc1\u636e**: \\n   - mem_load: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 memory_usage_percent \u548c swap_usage_percent \u652f\u6301\u3002\\n   - disk_fill: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 filesystem_usage_percent \u548c disk_write_iops \u652f\u6301\u3002\\n   - cpu_fullload: \u6709\u76f4\u63a5\u89c2\u6d4b\u6307\u6807 cpu_usage_percent \u652f\u6301\u3002\\n3. **\u6545\u969c\u6807\u7b7e\u5408\u7406\u6027**: \u8bca\u65ad\u4f7f\u7528\u7684 fault_type \u4e0e\u5b9e\u9645\u89c2\u6d4b\u5230\u7684\u5f02\u5e38\u6307\u6807\u4e00\u81f4\u3002\\n4. **\u590d\u5408\u6545\u969c\u5224\u65ad**: \u591a\u4e2a\u6839\u56e0\u4e4b\u95f4\u5b58\u5728\u56e0\u679c\u94fe\u5173\u7cfb\uff0c\u5982 cpu_user_percent \u2192 load_15min \u2192 filesystem_avail_bytes \u2192 filesystem_free_bytes \u2192 filesystem_usage_percent \u2192 memory_active_anon_bytes \u2192 memory_inactive_anon_bytes \u2192 memory_mapped_bytes \u2192 memory_buffers_bytes \u2192 softnet_processed_rate \u2192 swap_cached_bytes \u2192 swap_free_bytes \u2192 load_1min \u2192 network_transmit_packets_rate \u2192 memory_inactive_file_bytes\u3002\\n\u7efc\u4e0a\uff0c\u8bc1\u636e\u5145\u5206\uff0c\u7ed3\u8bba\u53ef\u4fe1\u3002\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"pass\",\n    \"reason\": \"\u8bc1\u636e\u5145\u5206\uff0c\u7ed3\u8bba\u53ef\u4fe1\uff0c\u653e\u884c\",\n    \"diagnosis_type\": \"composite_fault\"\n  }\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1712,
+      "completion": 420,
+      "total": 2132
+    },
+    "diagnosis_think": {
+      "prompt": 24594,
+      "completion": 2574,
+      "total": 27168
+    },
+    "audit_think": {
+      "prompt": 1585,
+      "completion": 322,
+      "total": 1907
+    },
+    "finalize": {
+      "prompt": 674,
+      "completion": 80,
+      "total": 754
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.7,
+      "current_confidence": 0.5,
+      "required_verifications": [
+        {
+          "description": "\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\uff0c\u786e\u8ba4\u662f\u5426\u6709\u5927\u6587\u4ef6\u6216\u65e5\u5fd7\u6587\u4ef6\u5360\u7528\u8fc7\u591a\u7a7a\u95f4",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "filesystem_avail_bytes",
+            "filesystem_free_bytes",
+            "filesystem_usage_percent"
+          ]
+        },
+        {
+          "description": "\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "disk_write_bytes_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u8d1f\u8f7d\u5347\u9ad8",
+      "fault_type": "cpu_fullload",
+      "subsystem": "cpu",
+      "prior_confidence": 0.65,
+      "current_confidence": 0.5,
+      "required_verifications": [
+        {
+          "description": "\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "cpu_user_percent",
+            "load_15min"
+          ]
+        },
+        {
+          "description": "\u68c0\u67e5\u662f\u5426\u6709\u8ba1\u7b97\u5bc6\u96c6\u578b\u4efb\u52a1\u5f02\u5e38\u8fd0\u884c",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "process_cpu_seconds_total"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u533f\u540d\u9875\u548c\u7f13\u51b2\u533a\u5360\u7528\u5f02\u5e38",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.95,
+      "required_verifications": [
+        {
+          "description": "\u68c0\u67e5\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\uff0c\u786e\u8ba4\u662f\u5426\u6709\u5185\u5b58\u6cc4\u6f0f\u6216\u5f02\u5e38\u5360\u7528",
+          "status": "verified",
+          "evidence_id": "e5",
+          "required_metrics": [
+            "memory_active_anon_bytes",
+            "memory_inactive_anon_bytes",
+            "memory_mapped_bytes"
+          ]
+        },
+        {
+          "description": "\u68c0\u67e5\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "swap_cached_bytes",
+            "swap_free_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"disk_io_now\", \"disk_total_iops\"], \"time_window\": {\"start\":)",
+      "result_digest": "filesystem_usage_percent: mean=90.69521702362755; disk_io_now: mean=21.5; disk_total_iops: mean=587.2844132534352",
+      "raw_stats": {
+        "filesystem_usage_percent": 90.69521702362755,
+        "disk_io_now": 21.5,
+        "disk_total_iops": 587.2844132534352
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"start\": \"2025-09-)",
+      "result_digest": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+      "raw_stats": {
+        "disk_write_iops": 254.34097433186705,
+        "disk_write_rate_bytes_per_sec": 47951607.53867975
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+      "result_digest": "memory_usage_percent: mean=96.14508561482573; swap_usage_percent: mean=96.5931509523092",
+      "raw_stats": {
+        "memory_usage_percent": 96.14508561482573,
+        "swap_usage_percent": 96.5931509523092
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"start\": \"2025-09-)",
+      "result_digest": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+      "raw_stats": {
+        "disk_write_iops": 254.34097433186705,
+        "disk_write_rate_bytes_per_sec": 47951607.53867975
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+      "result_digest": "memory_active_anon_bytes: mean=2535723690.6666665; memory_mapped_bytes: mean=87875584.0; memory_sunreclaim_bytes: mean=246777173.33333334",
+      "raw_stats": {
+        "memory_active_anon_bytes": 2535723690.6666665,
+        "memory_mapped_bytes": 87875584.0,
+        "memory_sunreclaim_bytes": 246777173.33333334
+      },
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:50:28\", \"end\": \"2025-09-)",
+      "result_digest": "swap_usage_percent: mean=96.5931509523092",
+      "raw_stats": {
+        "swap_usage_percent": 96.5931509523092
+      },
+      "created_at_step": 6
+    },
+    {
+      "id": "e7",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:50:28\", \"end\": \"2025-09-2)",
+      "result_digest": "cpu_usage_percent: mean=64.98158189010707",
+      "raw_stats": {
+        "cpu_usage_percent": 64.98158189010707
+      },
+      "created_at_step": 7
+    },
+    {
+      "id": "e8",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_running\", \"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:50:2)",
+      "result_digest": "processes_running: mean=7.833333333333333; processes_blocked: mean=5.833333333333333",
+      "raw_stats": {
+        "processes_running": 7.833333333333333,
+        "processes_blocked": 5.833333333333333
+      },
+      "created_at_step": 8
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.7,
+        "current_confidence": 0.5,
+        "required_verifications": [
+          {
+            "description": "\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5\uff0c\u786e\u8ba4\u662f\u5426\u6709\u5927\u6587\u4ef6\u6216\u65e5\u5fd7\u6587\u4ef6\u5360\u7528\u8fc7\u591a\u7a7a\u95f4",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "filesystem_avail_bytes",
+              "filesystem_free_bytes",
+              "filesystem_usage_percent"
+            ]
+          },
+          {
+            "description": "\u68c0\u67e5\u662f\u5426\u6709\u8fdb\u7a0b\u5f02\u5e38\u5199\u5165\u5927\u91cf\u6570\u636e",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "disk_write_bytes_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u8d1f\u8f7d\u5347\u9ad8",
+        "fault_type": "cpu_fullload",
+        "subsystem": "cpu",
+        "prior_confidence": 0.65,
+        "current_confidence": 0.5,
+        "required_verifications": [
+          {
+            "description": "\u68c0\u67e5 CPU \u4f7f\u7528\u7387\u9ad8\u7684\u8fdb\u7a0b",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "cpu_user_percent",
+              "load_15min"
+            ]
+          },
+          {
+            "description": "\u68c0\u67e5\u662f\u5426\u6709\u8ba1\u7b97\u5bc6\u96c6\u578b\u4efb\u52a1\u5f02\u5e38\u8fd0\u884c",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "process_cpu_seconds_total"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u533f\u540d\u9875\u548c\u7f13\u51b2\u533a\u5360\u7528\u5f02\u5e38",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.95,
+        "required_verifications": [
+          {
+            "description": "\u68c0\u67e5\u5185\u5b58\u4f7f\u7528\u60c5\u51b5\uff0c\u786e\u8ba4\u662f\u5426\u6709\u5185\u5b58\u6cc4\u6f0f\u6216\u5f02\u5e38\u5360\u7528",
+            "status": "verified",
+            "evidence_id": "e5",
+            "required_metrics": [
+              "memory_active_anon_bytes",
+              "memory_inactive_anon_bytes",
+              "memory_mapped_bytes"
+            ]
+          },
+          {
+            "description": "\u68c0\u67e5\u4ea4\u6362\u7a7a\u95f4\u4f7f\u7528\u60c5\u51b5",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "swap_cached_bytes",
+              "swap_free_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"disk_io_now\", \"disk_total_iops\"], \"time_window\": {\"start\":)",
+        "result_digest": "filesystem_usage_percent: mean=90.69521702362755; disk_io_now: mean=21.5; disk_total_iops: mean=587.2844132534352",
+        "raw_stats": {
+          "filesystem_usage_percent": 90.69521702362755,
+          "disk_io_now": 21.5,
+          "disk_total_iops": 587.2844132534352
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"start\": \"2025-09-)",
+        "result_digest": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+        "raw_stats": {
+          "disk_write_iops": 254.34097433186705,
+          "disk_write_rate_bytes_per_sec": 47951607.53867975
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+        "result_digest": "memory_usage_percent: mean=96.14508561482573; swap_usage_percent: mean=96.5931509523092",
+        "raw_stats": {
+          "memory_usage_percent": 96.14508561482573,
+          "swap_usage_percent": 96.5931509523092
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_write_rate_bytes_per_sec\"], \"time_window\": {\"start\": \"2025-09-)",
+        "result_digest": "disk_write_iops: mean=254.34097433186705; disk_write_rate_bytes_per_sec: mean=47951607.53867975",
+        "raw_stats": {
+          "disk_write_iops": 254.34097433186705,
+          "disk_write_rate_bytes_per_sec": 47951607.53867975
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+        "result_digest": "memory_active_anon_bytes: mean=2535723690.6666665; memory_mapped_bytes: mean=87875584.0; memory_sunreclaim_bytes: mean=246777173.33333334",
+        "raw_stats": {
+          "memory_active_anon_bytes": 2535723690.6666665,
+          "memory_mapped_bytes": 87875584.0,
+          "memory_sunreclaim_bytes": 246777173.33333334
+        },
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"swap_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:50:28\", \"end\": \"2025-09-)",
+        "result_digest": "swap_usage_percent: mean=96.5931509523092",
+        "raw_stats": {
+          "swap_usage_percent": 96.5931509523092
+        },
+        "created_at_step": 6
+      },
+      {
+        "id": "e7",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:50:28\", \"end\": \"2025-09-2)",
+        "result_digest": "cpu_usage_percent: mean=64.98158189010707",
+        "raw_stats": {
+          "cpu_usage_percent": 64.98158189010707
+        },
+        "created_at_step": 7
+      },
+      {
+        "id": "e8",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_running\", \"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:50:2)",
+        "result_digest": "processes_running: mean=7.833333333333333; processes_blocked: mean=5.833333333333333",
+        "raw_stats": {
+          "processes_running": 7.833333333333333,
+          "processes_blocked": 5.833333333333333
+        },
+        "created_at_step": 8
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u533f\u540d\u9875\u548c\u7f13\u51b2\u533a\u5360\u7528\u5f02\u5e38",
+        "fault_type": "mem_load",
+        "confidence": 0.95,
+        "evidence_ids": [
+          "e3",
+          "e5",
+          "e6"
+        ]
+      },
+      {
+        "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+        "fault_type": "disk_fill",
+        "confidence": 0.5,
+        "evidence_ids": [
+          "e1",
+          "e2",
+          "e4"
+        ]
+      },
+      {
+        "cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u8d1f\u8f7d\u5347\u9ad8",
+        "fault_type": "cpu_fullload",
+        "confidence": 0.5,
+        "evidence_ids": [
+          "e7",
+          "e8"
+        ]
+      }
+    ]
+  }
+}

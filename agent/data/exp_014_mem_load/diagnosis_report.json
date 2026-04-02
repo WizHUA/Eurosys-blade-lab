@@ -1,0 +1,65 @@
+{
+  "run_id": "exp_014_Full",
+  "anomaly_summary": "系统性能下降主要由内存压力过大和CPU过载引起，同时磁盘空间持续减少也对系统性能产生了一定影响。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存压力过大导致系统性能下降",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 过载导致系统负载升高",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e6",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少导致系统性能问题",
+      "fault_type": "disk_fill",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e3",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "CPU过载的置信度较低（0.30），可能需要进一步调查确认其影响程度。",
+    "磁盘空间减少的置信度较低（0.10），需进一步分析其对系统性能的具体影响。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.14393603987065776,
+    "main_tools_used": [
+      "MetricQueryTool x7"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 7,
+    "main_iterations": 8,
+    "audit_iterations": 1,
+    "total_tokens_in": 26912,
+    "total_tokens_out": 3475,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:13:11.199769"
+}

@@ -1,0 +1,551 @@
+{
+  "run_id": "exp_007_Full",
+  "diagnosis_trace_steps": 6,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：mem_load、disk_burn和network_delay。根据内存-磁盘级联效应识别原则，应该优先验证内存相关指标，因为内存压力可能导致磁盘I/O上升。因此，首先检查内存使用情况。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:14:13",
+            "end": "2025-09-20T07:15:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "memory_usage_percent: mean=31.588140709252983; memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:52:02.652774",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：mem_load、disk_burn和network_delay。根据内存-磁盘级联效应识别原则，应该优先验证内存相关指标，因为内存压力可能导致磁盘I/O上升。因此，首先检查内存使用情况。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:14:13\",\n        \"end\": \"2025-09-20T07:15:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"通过查询内存使用率和关键内存指标，可以验证内存压力是否存在，这是验证mem_load假设的直接证据。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (mem_load) 的置信度为 0.75，已有证据显示内存使用率较高，且内存相关指标（memory_active_anon_bytes, memory_mapped_bytes, memory_sunreclaim_bytes）异常。为了进一步验证 h1，需要检查是否有进程占用大量内存，以及内存回收机制是否正常工作。同时，h2 (disk_burn) 的置信度为 0.50，需要验证磁盘 I/O 是否主要由交换操作引起。因此，下一步应查询磁盘 I/O 相关指标，以验证是否存在内存压力导致的磁盘 I/O 上升。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_write_iops",
+            "disk_total_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:14:13",
+            "end": "2025-09-20T07:15:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "disk_write_iops: mean=61.436557974356184; disk_total_iops: mean=61.754739737486666",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:52:14.456980",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (mem_load) 的置信度为 0.75，已有证据显示内存使用率较高，且内存相关指标（memory_active_anon_bytes, memory_mapped_bytes, memory_sunreclaim_bytes）异常。为了进一步验证 h1，需要检查是否有进程占用大量内存，以及内存回收机制是否正常工作。同时，h2 (disk_burn) 的置信度为 0.50，需要验证磁盘 I/O 是否主要由交换操作引起。因此，下一步应查询磁盘 I/O 相关指标，以验证是否存在内存压力导致的磁盘 I/O 上升。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_write_iops\", \"disk_total_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:14:13\",\n        \"end\": \"2025-09-20T07:15:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询磁盘 I/O 相关指标（disk_write_iops, disk_total_iops）以验证是否存在内存压力导致的磁盘 I/O 上升，从而进一步支持或排除 h1 (mem_load) 和 h2 (disk_burn) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前证据显示内存使用率较高（memory_usage_percent=31.58%），并且存在大量匿名内存（memory_active_anon_bytes=1484584277.33）和未回收内存（memory_sunreclaim_bytes=251206997.33）。同时，磁盘写IOPS（disk_write_iops=61.44）和总IOPS（disk_total_iops=61.75）也有所升高。根据内存-磁盘级联效应识别规则，磁盘IO升高可能是内存压力导致的继发性效应。因此，mem_load假设的置信度应进一步提高。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "swap_usage_percent",
+            "page_swap_out_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:14:13",
+            "end": "2025-09-20T07:15:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "swap_usage_percent: mean=46.609776706269656; page_swap_out_rate: mean=59319.264514846844",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:52:28.422108",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率较高（memory_usage_percent=31.58%），并且存在大量匿名内存（memory_active_anon_bytes=1484584277.33）和未回收内存（memory_sunreclaim_bytes=251206997.33）。同时，磁盘写IOPS（disk_write_iops=61.44）和总IOPS（disk_total_iops=61.75）也有所升高。根据内存-磁盘级联效应识别规则，磁盘IO升高可能是内存压力导致的继发性效应。因此，mem_load假设的置信度应进一步提高。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"内存指标异常且磁盘IO升高，符合内存压力导致的继发性效应\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"swap_usage_percent\", \"page_swap_out_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:14:13\",\n        \"end\": \"2025-09-20T07:15:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了进一步验证mem_load假设，需要检查交换空间使用情况和页面换出率，以确认是否存在内存压力导致的交换操作。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前证据显示内存使用率较高（memory_usage_percent=31.59%），且内存相关指标如 memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes 均异常。同时，磁盘写 IOPS（disk_write_iops=61.44）和总 IOPS（disk_total_iops=61.75）也有所上升，这可能与内存压力导致的交换操作有关。根据内存-磁盘级联效应识别规则，应优先考虑 mem_load 假设。接下来需要验证内存回收机制是否正常工作，以确认内存压力的根本原因。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_pressure_stalled_rate",
+            "memory_pressure_waiting_rate"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:14:13",
+            "end": "2025-09-20T07:15:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "memory_pressure_stalled_rate: mean=0.0005208734241855924; memory_pressure_waiting_rate: mean=0.0005454946434755998",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:52:40.520219",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率较高（memory_usage_percent=31.59%），且内存相关指标如 memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes 均异常。同时，磁盘写 IOPS（disk_write_iops=61.44）和总 IOPS（disk_total_iops=61.75）也有所上升，这可能与内存压力导致的交换操作有关。根据内存-磁盘级联效应识别规则，应优先考虑 mem_load 假设。接下来需要验证内存回收机制是否正常工作，以确认内存压力的根本原因。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.90, \"reason\": \"内存相关指标异常且磁盘 IOPS 上升，符合内存压力导致的交换操作\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.30, \"reason\": \"磁盘 IOPS 上升可能是内存压力导致的继发性效应，而非磁盘原发故障\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:14:13\",\n        \"end\": \"2025-09-20T07:15:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"查询内存压力相关指标，以验证内存回收机制是否正常工作，进一步确认 mem_load 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前证据显示内存使用率较高（memory_usage_percent=31.59%），且内存压力指标（memory_pressure_stalled_rate, memory_pressure_waiting_rate）较低，表明系统内存压力尚未达到严重程度。同时，swap_usage_percent=46.61%和page_swap_out_rate较高，表明系统正在进行内存换出操作。磁盘I/O指标（disk_write_iops, disk_total_iops）也较高，这可能是由于内存压力导致的swap操作引起的。因此，需要进一步验证内存回收机制是否正常工作，以及是否有进程占用大量内存。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:14:13",
+            "end": "2025-09-20T07:15:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c5"
+      },
+      "observation": "memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:52:53.731912",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率较高（memory_usage_percent=31.59%），且内存压力指标（memory_pressure_stalled_rate, memory_pressure_waiting_rate）较低，表明系统内存压力尚未达到严重程度。同时，swap_usage_percent=46.61%和page_swap_out_rate较高，表明系统正在进行内存换出操作。磁盘I/O指标（disk_write_iops, disk_total_iops）也较高，这可能是由于内存压力导致的swap操作引起的。因此，需要进一步验证内存回收机制是否正常工作，以及是否有进程占用大量内存。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.95, \"reason\": \"内存使用率和swap操作指标支持内存负载假设\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.20, \"reason\": \"磁盘I/O升高可能是内存压力导致的swap操作，而非磁盘本身的问题\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:14:13\",\n        \"end\": \"2025-09-20T07:15:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要进一步验证内存回收机制是否正常工作，以及是否有进程占用大量内存。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前证据显示内存使用率较高（memory_usage_percent=31.59%），且存在活跃匿名内存（memory_active_anon_bytes=1.48GB）和未回收内存（memory_sunreclaim_bytes=251MB）。同时，交换空间使用率较高（swap_usage_percent=46.61%）且页面交换率较高（page_swap_out_rate=59319.26/s），这表明系统正在频繁进行页面交换。磁盘写入IOPS（disk_write_iops=61.44）和总IOPS（disk_total_iops=61.75）也较高，这可能是由于内存压力导致的交换操作引起的。因此，mem_load假设的置信度应进一步提高，而disk_burn假设的置信度应降低，因为磁盘活动可能是内存压力的继发效应。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T19:53:05.895676",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率较高（memory_usage_percent=31.59%），且存在活跃匿名内存（memory_active_anon_bytes=1.48GB）和未回收内存（memory_sunreclaim_bytes=251MB）。同时，交换空间使用率较高（swap_usage_percent=46.61%）且页面交换率较高（page_swap_out_rate=59319.26/s），这表明系统正在频繁进行页面交换。磁盘写入IOPS（disk_write_iops=61.44）和总IOPS（disk_total_iops=61.75）也较高，这可能是由于内存压力导致的交换操作引起的。因此，mem_load假设的置信度应进一步提高，而disk_burn假设的置信度应降低，因为磁盘活动可能是内存压力的继发效应。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.98, \"reason\": \"内存和交换空间使用率高，且磁盘活动可能是内存压力的继发效应\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.10, \"reason\": \"磁盘活动可能是内存压力的继发效应，缺乏直接证据支持磁盘原发故障\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"证据充分支持mem_load假设，且disk_burn和network_delay假设缺乏直接证据支持。根据内存-磁盘级联效应识别规则，应判定为mem_load。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中有5条证据，全部为supporting类型，没有neutral证据。\n2. **子系统直接证据**: \n   - 对于mem_load根因，有e1、e3、e4、e5作为直接观测证据，涉及memory_usage_percent、memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes等内存指标，符合要求。\n   - 对于disk_burn根因，仅有e2作为直接观测证据，涉及disk_write_iops、disk_total_iops等磁盘指标，但confidence仅为0.10，且缺乏更多直接证据支持。\n3. **故障标签合理性**: 诊断使用的fault_type与实际观测到的异常指标一致，异常指标主要集中在memory子系统。\n4. **复合故障判断**: 两个根因mem_load和disk_burn之间存在因果链关系，即内存压力导致交换空间使用增加，进而引发磁盘I/O升高。\n\n根据审查原则5，disk_burn根因的confidence过低，且缺乏足够直接证据支持，应予以降级。mem_load根因证据充分，可以放行。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T19:53:17.428232",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中有5条证据，全部为supporting类型，没有neutral证据。\\n2. **子系统直接证据**: \\n   - 对于mem_load根因，有e1、e3、e4、e5作为直接观测证据，涉及memory_usage_percent、memory_active_anon_bytes、memory_mapped_bytes、memory_sunreclaim_bytes等内存指标，符合要求。\\n   - 对于disk_burn根因，仅有e2作为直接观测证据，涉及disk_write_iops、disk_total_iops等磁盘指标，但confidence仅为0.10，且缺乏更多直接证据支持。\\n3. **故障标签合理性**: 诊断使用的fault_type与实际观测到的异常指标一致，异常指标主要集中在memory子系统。\\n4. **复合故障判断**: 两个根因mem_load和disk_burn之间存在因果链关系，即内存压力导致交换空间使用增加，进而引发磁盘I/O升高。\\n\\n根据审查原则5，disk_burn根因的confidence过低，且缺乏足够直接证据支持，应予以降级。mem_load根因证据充分，可以放行。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"degrade\",\n    \"reason\": \"disk_burn根因的confidence过低（0.10），且缺乏足够直接证据支持，不符合审查原则5。mem_load根因证据充分，可以放行。\",\n    \"hint\": \"建议增加disk_burn根因的直接观测证据，如swap_usage_percent、disk_write_bytes等指标的异常情况。\",\n    \"diagnosis_type\": \"partial\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1518,
+      "completion": 409,
+      "total": 1927
+    },
+    "diagnosis_think": {
+      "prompt": 15965,
+      "completion": 1886,
+      "total": 17851
+    },
+    "audit_think": {
+      "prompt": 1498,
+      "completion": 383,
+      "total": 1881
+    },
+    "finalize": {
+      "prompt": 606,
+      "completion": 82,
+      "total": 688
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "内存压力过大导致不可回收内存减少，系统可用内存增加",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.75,
+      "current_confidence": 0.98,
+      "required_verifications": [
+        {
+          "description": "检查系统中是否有进程占用大量内存",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "process_resident_memory_bytes"
+          ]
+        },
+        {
+          "description": "验证内存回收机制是否正常工作",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "memory_pressure_stall_seconds"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "内存压力导致系统开始使用交换空间，引发磁盘I/O升高",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.1,
+      "required_verifications": [
+        {
+          "description": "检查交换空间使用情况",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "swap_used_bytes"
+          ]
+        },
+        {
+          "description": "验证磁盘I/O是否主要由交换操作引起",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "disk_write_bytes",
+            "disk_read_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "网络接收速率异常可能是内存压力导致的处理延迟",
+      "fault_type": "network_delay",
+      "subsystem": "network",
+      "prior_confidence": 0.3,
+      "current_confidence": 0.3,
+      "required_verifications": [
+        {
+          "description": "检查网络延迟是否与内存压力事件相关",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_latency_seconds"
+          ]
+        },
+        {
+          "description": "验证网络接收缓冲区是否溢出",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "network_receive_buffer_bytes"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+      "result_digest": "memory_usage_percent: mean=31.588140709252983; memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+      "raw_stats": {
+        "memory_usage_percent": 31.588140709252983,
+        "memory_active_anon_bytes": 1484584277.3333333,
+        "memory_mapped_bytes": 248502954.66666666,
+        "memory_sunreclaim_bytes": 251206997.33333334
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h2"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:14:13\", )",
+      "result_digest": "disk_write_iops: mean=61.436557974356184; disk_total_iops: mean=61.754739737486666",
+      "raw_stats": {
+        "disk_write_iops": 61.436557974356184,
+        "disk_total_iops": 61.754739737486666
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"swap_usage_percent\", \"page_swap_out_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:14)",
+      "result_digest": "swap_usage_percent: mean=46.609776706269656; page_swap_out_rate: mean=59319.264514846844",
+      "raw_stats": {
+        "swap_usage_percent": 46.609776706269656,
+        "page_swap_out_rate": 59319.264514846844
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\"], \"time_window\": {\"start)",
+      "result_digest": "memory_pressure_stalled_rate: mean=0.0005208734241855924; memory_pressure_waiting_rate: mean=0.0005454946434755998",
+      "raw_stats": {
+        "memory_pressure_stalled_rate": 0.0005208734241855924,
+        "memory_pressure_waiting_rate": 0.0005454946434755998
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+      "result_digest": "memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+      "raw_stats": {
+        "memory_active_anon_bytes": 1484584277.3333333,
+        "memory_mapped_bytes": 248502954.66666666,
+        "memory_sunreclaim_bytes": 251206997.33333334
+      },
+      "created_at_step": 5
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "内存压力过大导致不可回收内存减少，系统可用内存增加",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.75,
+        "current_confidence": 0.98,
+        "required_verifications": [
+          {
+            "description": "检查系统中是否有进程占用大量内存",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "process_resident_memory_bytes"
+            ]
+          },
+          {
+            "description": "验证内存回收机制是否正常工作",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "memory_pressure_stall_seconds"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "内存压力导致系统开始使用交换空间，引发磁盘I/O升高",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.1,
+        "required_verifications": [
+          {
+            "description": "检查交换空间使用情况",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "swap_used_bytes"
+            ]
+          },
+          {
+            "description": "验证磁盘I/O是否主要由交换操作引起",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "disk_write_bytes",
+              "disk_read_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "网络接收速率异常可能是内存压力导致的处理延迟",
+        "fault_type": "network_delay",
+        "subsystem": "network",
+        "prior_confidence": 0.3,
+        "current_confidence": 0.3,
+        "required_verifications": [
+          {
+            "description": "检查网络延迟是否与内存压力事件相关",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_latency_seconds"
+            ]
+          },
+          {
+            "description": "验证网络接收缓冲区是否溢出",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "network_receive_buffer_bytes"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+        "result_digest": "memory_usage_percent: mean=31.588140709252983; memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+        "raw_stats": {
+          "memory_usage_percent": 31.588140709252983,
+          "memory_active_anon_bytes": 1484584277.3333333,
+          "memory_mapped_bytes": 248502954.66666666,
+          "memory_sunreclaim_bytes": 251206997.33333334
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h2"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:14:13\", )",
+        "result_digest": "disk_write_iops: mean=61.436557974356184; disk_total_iops: mean=61.754739737486666",
+        "raw_stats": {
+          "disk_write_iops": 61.436557974356184,
+          "disk_total_iops": 61.754739737486666
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"swap_usage_percent\", \"page_swap_out_rate\"], \"time_window\": {\"start\": \"2025-09-20T07:14)",
+        "result_digest": "swap_usage_percent: mean=46.609776706269656; page_swap_out_rate: mean=59319.264514846844",
+        "raw_stats": {
+          "swap_usage_percent": 46.609776706269656,
+          "page_swap_out_rate": 59319.264514846844
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_pressure_stalled_rate\", \"memory_pressure_waiting_rate\"], \"time_window\": {\"start)",
+        "result_digest": "memory_pressure_stalled_rate: mean=0.0005208734241855924; memory_pressure_waiting_rate: mean=0.0005454946434755998",
+        "raw_stats": {
+          "memory_pressure_stalled_rate": 0.0005208734241855924,
+          "memory_pressure_waiting_rate": 0.0005454946434755998
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"], \"time_wi)",
+        "result_digest": "memory_active_anon_bytes: mean=1484584277.3333333; memory_mapped_bytes: mean=248502954.66666666; memory_sunreclaim_bytes: mean=251206997.33333334",
+        "raw_stats": {
+          "memory_active_anon_bytes": 1484584277.3333333,
+          "memory_mapped_bytes": 248502954.66666666,
+          "memory_sunreclaim_bytes": 251206997.33333334
+        },
+        "created_at_step": 5
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "内存压力过大导致不可回收内存减少，系统可用内存增加",
+        "fault_type": "mem_load",
+        "confidence": 0.98,
+        "evidence_ids": [
+          "e1",
+          "e3",
+          "e4",
+          "e5"
+        ]
+      },
+      {
+        "cause": "内存压力导致系统开始使用交换空间，引发磁盘I/O升高",
+        "fault_type": "disk_burn",
+        "confidence": 0.1,
+        "evidence_ids": [
+          "e2"
+        ]
+      }
+    ]
+  }
+}

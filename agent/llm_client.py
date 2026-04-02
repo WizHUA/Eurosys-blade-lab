@@ -12,6 +12,8 @@ import time
 from collections import defaultdict
 from typing import Any
 
+import urllib.request
+
 from dotenv import load_dotenv
 from openai import APIConnectionError, APITimeoutError, OpenAI, RateLimitError
 from pydantic import BaseModel
@@ -249,3 +251,50 @@ class LLMClient:
 
         json_str = _extract_json_from_text(content)
         return json.loads(json_str), usage
+
+    def validate_api_key(self) -> None:
+        """Validate the API key against OpenRouter /auth/key endpoint.
+
+        Raises LLMCallError with a clear message if the key is invalid,
+        so the user gets actionable feedback before the pipeline starts.
+        """
+        api_key = self.config.api_key or os.getenv("OPENROUTER_API_KEY", "")
+        if not api_key:
+            raise LLMCallError(
+                "OPENROUTER_API_KEY is not set. "
+                "Please add it to your .env file: OPENROUTER_API_KEY=sk-or-v1-..."
+            )
+
+        base = self.config.base_url.rstrip("/")
+        url = f"{base}/auth/key"
+        req = urllib.request.Request(
+            url,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode())
+                if "error" in data:
+                    code = data["error"].get("code", 0)
+                    msg = data["error"].get("message", "Unknown error")
+                    raise LLMCallError(
+                        f"OpenRouter API key validation failed ({code}): {msg}. "
+                        "Please generate a new API key at https://openrouter.ai/keys "
+                        "and update your .env file."
+                    )
+        except urllib.error.HTTPError as e:
+            body = e.read().decode()
+            try:
+                err = json.loads(body).get("error", {})
+                msg = err.get("message", body)
+                code = err.get("code", e.code)
+            except Exception:
+                msg, code = body, e.code
+            raise LLMCallError(
+                f"OpenRouter API key validation failed ({code}): {msg}. "
+                "Please generate a new API key at https://openrouter.ai/keys "
+                "and update your .env file."
+            ) from e
+        except Exception as e:
+            # Network error or other transient issue — warn but don't block
+            logger.warning("[LLM] API key pre-check skipped due to network error: %s", e)

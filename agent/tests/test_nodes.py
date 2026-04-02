@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
+import pandas as pd
 import pytest
 
 from agent.config import AgentConfig, BudgetConfig
@@ -88,6 +89,7 @@ def _make_hypothesis(
     subsystem: str = "cpu",
     confidence: float = 0.8,
     status: str = "active",
+    required_verifications: list[VerificationItem] | None = None,
 ) -> Hypothesis:
     return Hypothesis(
         id=id,
@@ -97,6 +99,7 @@ def _make_hypothesis(
         prior_confidence=confidence,
         current_confidence=confidence,
         status=status,
+        required_verifications=required_verifications or [],
     )
 
 
@@ -104,12 +107,13 @@ def _make_evidence(
     id: str = "e1",
     hyp_ids: list[str] | None = None,
     ev_type: str = "supporting",
+    source_tool: str = "MetricQueryTool",
 ) -> Evidence:
     return Evidence(
         id=id,
         hypothesis_ids=hyp_ids or ["h1"],
         type=ev_type,
-        source_tool="MetricQueryTool",
+        source_tool=source_tool,
         query_summary="cpu_usage_percent mean",
         result_digest="cpu_usage_percent: mean=95.2%",
         raw_stats={"mean": 95.2},
@@ -200,6 +204,34 @@ class TestHypothesizeNode:
         assert "cpu_fullload" in fault_types  # refuted preserved
         assert "network_loss" in fault_types  # new added
 
+    def test_normalizes_metrics_field_in_required_verifications(self):
+        """LLM may emit metrics instead of required_metrics; parser should normalize it."""
+        from agent.diagnosis import hypothesize_node
+
+        state = _make_diagnosis_state()
+        mock_llm = MagicMock()
+        mock_tools = {"KBRetrievalTool": MagicMock()}
+        mock_tools["KBRetrievalTool"].execute.return_value = {"pattern_hits": []}
+        config = _make_config()
+
+        llm_response = json.dumps([
+            {
+                "id": "h1",
+                "root_cause": "CPU overload due to stress test",
+                "fault_type": "cpu_fullload",
+                "subsystem": "cpu",
+                "prior_confidence": 0.8,
+                "required_verifications": [
+                    {"description": "Check CPU usage > 90%", "metrics": ["cpu_usage_percent"]}
+                ],
+            }
+        ])
+        mock_llm.call.return_value = (llm_response, {"prompt_tokens": 100, "completion_tokens": 50})
+
+        result = hypothesize_node(state, mock_llm, mock_tools, config)
+
+        assert result["hypotheses"][0].required_verifications[0].required_metrics == ["cpu_usage_percent"]
+
 
 # =====================================================================
 # THINK node tests
@@ -271,9 +303,10 @@ class TestThinkNode:
 
         assert len(result["react_trace"]) == 1
         assert result["react_trace"][0].action_type == "conclude"
-        # Check confirmed status on high-confidence hypotheses
-        confirmed = [h for h in result["hypotheses"] if h.status == "confirmed"]
-        assert len(confirmed) >= 1
+        # v6: THINK conclude does NOT mark confirmed — Audit Agent is the gate
+        # All hypotheses should remain "active" after conclude
+        for h in result["hypotheses"]:
+            assert h.status == "active", f"Hypothesis {h.id} should remain active after conclude, got {h.status}"
 
     def test_force_conclude_when_budget_exhausted(self):
         """When budget is exhausted, system should inject force-conclude instruction."""
@@ -301,6 +334,40 @@ class TestThinkNode:
         result = think_node(state, mock_llm, config)
 
         assert result["react_trace"][0].action_type == "conclude"
+
+    def test_injects_tool_descriptions_into_system_prompt(self):
+        """THINK prompt should include concrete tool schema so the LLM knows required args."""
+        from agent.diagnosis import think_node
+
+        state = _make_diagnosis_state(hypotheses=[_make_hypothesis()])
+        config = _make_config()
+        mock_llm = MagicMock()
+        mock_llm.call.return_value = (
+            json.dumps({
+                "thought": "Need evidence",
+                "hypothesis_updates": [],
+                "action": {"type": "conclude", "reasoning": "stop"},
+            }),
+            {"prompt_tokens": 100, "completion_tokens": 50},
+        )
+
+        mock_tool = MagicMock()
+        mock_tool.get_schema.return_value = {
+            "description": "查询指定指标",
+            "parameters": {
+                "properties": {
+                    "metrics": {"type": "array", "description": "指标名"},
+                    "time_window": {"type": "object", "description": "时间窗口"},
+                },
+                "required": ["metrics", "time_window"],
+            },
+        }
+
+        think_node(state, mock_llm, config, {"MetricQueryTool": mock_tool})
+
+        messages = mock_llm.call.call_args.args[0]
+        assert "MetricQueryTool" in messages[0]["content"]
+        assert "time_window" in messages[0]["content"]
 
 
 # =====================================================================
@@ -342,6 +409,42 @@ class TestActNode:
         assert result["budget"]["tool_calls_used"] == 1
         assert "_tool_result" in result
 
+    def test_fills_metric_query_defaults_from_focus_context(self):
+        """ACT should fill missing MetricQueryTool window/aggregation and fallback metric."""
+        from agent.diagnosis import act_node
+        from agent.schema import ReActStep, ToolCall
+
+        h1 = _make_hypothesis(
+            required_verifications=[
+                VerificationItem(
+                    description="Check CPU usage > 90%",
+                    required_metrics=["cpu_usage_percent"],
+                )
+            ]
+        )
+        state = _make_diagnosis_state(hypotheses=[h1])
+        step = ReActStep(
+            step_id=1,
+            thought="Check CPU",
+            action_type="tool_call",
+            tool_call=ToolCall(tool="MetricQueryTool", args={}, call_id="c1"),
+            timestamp=datetime.now(),
+        )
+        state["react_trace"] = [step]
+
+        mock_tool = MagicMock()
+        mock_tool.df = pd.DataFrame(columns=["cpu_usage_percent"])
+        mock_tool.execute.return_value = {"results": [], "missing": []}
+        config = _make_config()
+
+        act_node(state, {"MetricQueryTool": mock_tool}, config)
+
+        execute_args = mock_tool.execute.call_args.args[0]
+        assert execute_args["metrics"] == ["cpu_usage_percent"]
+        assert execute_args["aggregation"] == "mean"
+        assert execute_args["time_window"]["start"] == "2025-09-20T07:00:00"
+        assert execute_args["time_window"]["end"] == "2025-09-20T07:02:00"
+
 
 # =====================================================================
 # OBSERVE node tests
@@ -381,6 +484,128 @@ class TestObserveNode:
         ev = result["evidence"][0]
         assert ev.source_tool == "MetricQueryTool"
         assert "cpu_usage_percent" in ev.result_digest
+
+    def test_metric_evidence_is_not_broadcast_to_all_hypotheses(self):
+        """Metric evidence should only attach to hypotheses whose verification metrics match."""
+        from agent.diagnosis import observe_node
+        from agent.schema import ReActStep, ToolCall
+
+        h1 = _make_hypothesis(
+            id="h1",
+            fault_type="cpu_fullload",
+            subsystem="cpu",
+            required_verifications=[
+                VerificationItem(
+                    description="Check CPU usage > 90%",
+                    required_metrics=["cpu_usage_percent"],
+                )
+            ],
+        )
+        h2 = _make_hypothesis(
+            id="h2",
+            fault_type="mem_load_ram",
+            subsystem="memory",
+            required_verifications=[
+                VerificationItem(
+                    description="Check memory usage",
+                    required_metrics=["memory_usage_percent"],
+                )
+            ],
+        )
+        state = _make_diagnosis_state(hypotheses=[h1, h2])
+        step = ReActStep(
+            step_id=1,
+            thought="Check CPU",
+            action_type="tool_call",
+            tool_call=ToolCall(tool="MetricQueryTool", args={
+                "metrics": ["cpu_usage_percent"],
+                "time_window": {"start": "2025-09-20T07:00:00", "end": "2025-09-20T07:02:00"},
+                "aggregation": "mean",
+            }, call_id="c1"),
+            timestamp=datetime.now(),
+        )
+        state["react_trace"] = [step]
+        state["_tool_result"] = {
+            "results": [{"metric": "cpu_usage_percent", "value": 95.2, "aggregation": "mean"}],
+            "missing": [],
+        }
+
+        result = observe_node(state)
+
+        ev = result["evidence"][0]
+        assert ev.hypothesis_ids == ["h1"]
+
+    def test_kb_retrieval_is_neutral_and_unbound(self):
+        """KB hits provide prior context only and must not directly support a hypothesis."""
+        from agent.diagnosis import observe_node
+        from agent.schema import ReActStep, ToolCall
+
+        h1 = _make_hypothesis(id="h1", fault_type="cpu_fullload", subsystem="cpu")
+        h2 = _make_hypothesis(id="h2", fault_type="disk_burn", subsystem="disk")
+        state = _make_diagnosis_state(hypotheses=[h1, h2])
+        step = ReActStep(
+            step_id=1,
+            thought="Check FPL matches",
+            action_type="tool_call",
+            tool_call=ToolCall(tool="KBRetrievalTool", args={
+                "mode": "pattern_match",
+                "subsystem": "disk",
+                "anomaly_metrics": ["cpu_usage_percent"],
+            }, call_id="c1"),
+            timestamp=datetime.now(),
+        )
+        state["react_trace"] = [step]
+        state["_tool_result"] = {
+            "pattern_hits": [
+                {"pattern_id": "p1", "fault_type": "disk_burn", "confidence": 0.8, "match_score": 0.7}
+            ]
+        }
+
+        result = observe_node(state)
+
+        ev = result["evidence"][0]
+        assert ev.type == "neutral"
+        assert ev.hypothesis_ids == []
+
+    def test_metric_query_on_triage_anomaly_is_supporting(self):
+        """Queries hitting triage top metrics should count as direct supporting evidence."""
+        from agent.diagnosis import observe_node
+        from agent.schema import ReActStep, ToolCall
+
+        h1 = _make_hypothesis(
+            id="h1",
+            fault_type="cpu_fullload",
+            subsystem="cpu",
+            required_verifications=[
+                VerificationItem(
+                    description="Check CPU usage > 90%",
+                    required_metrics=["cpu_usage_percent"],
+                )
+            ],
+        )
+        state = _make_diagnosis_state(hypotheses=[h1])
+        step = ReActStep(
+            step_id=1,
+            thought="Check CPU anomaly directly",
+            action_type="tool_call",
+            tool_call=ToolCall(tool="MetricQueryTool", args={
+                "metrics": ["cpu_usage_percent"],
+                "time_window": {"start": "2025-09-20T07:00:00", "end": "2025-09-20T07:02:00"},
+                "aggregation": "mean",
+            }, call_id="c1"),
+            timestamp=datetime.now(),
+        )
+        state["react_trace"] = [step]
+        state["_tool_result"] = {
+            "results": [{"metric": "cpu_usage_percent", "value": 12.0, "aggregation": "mean"}],
+            "missing": [],
+        }
+
+        result = observe_node(state)
+
+        ev = result["evidence"][0]
+        assert ev.type == "supporting"
+        assert ev.hypothesis_ids == ["h1"]
 
 
 # =====================================================================
@@ -502,7 +727,7 @@ class TestFinalizeNode:
     """Test FINALIZE node report generation."""
 
     def test_generates_diagnosis_report(self):
-        """FINALIZE should produce a DiagnosisReport from LLM output."""
+        """FINALIZE uses proposal root_causes (not LLM output) for root_causes."""
         from agent.finalize import finalize_node
 
         fc = _make_focus_context()
@@ -540,30 +765,9 @@ class TestFinalizeNode:
         mock_llm = MagicMock()
         config = _make_config()
 
+        # LLM only returns narrative fields now (no root_causes)
         llm_response = json.dumps({
             "anomaly_summary": "CPU overload detected",
-            "diagnosis_type": "single_fault",
-            "root_causes": [
-                {
-                    "cause": "CPU overload due to stress test",
-                    "fault_type": "cpu_fullload",
-                    "confidence": 0.9,
-                    "evidence_ids": ["e1"],
-                    "counter_evidence_ids": [],
-                    "fpl_pattern_id": None,
-                    "affected_nodes": [],
-                }
-            ],
-            "derived_symptoms": [],
-            "solutions": [
-                {
-                    "action": "Reduce CPU load",
-                    "rationale": "High CPU utilization",
-                    "risk": "low",
-                    "verification": "Check CPU usage drops below 80%",
-                    "applies_to_root_cause_index": 0,
-                }
-            ],
             "uncertainties": [],
         })
         mock_llm.call.return_value = (llm_response, {"prompt_tokens": 300, "completion_tokens": 200})
@@ -573,9 +777,62 @@ class TestFinalizeNode:
         assert "report" in result
         report = result["report"]
         assert report.diagnosis_type == "single_fault"
+        # root_causes must come from proposal, not LLM output
         assert len(report.root_causes) == 1
         assert report.root_causes[0].fault_type == "cpu_fullload"
+        assert report.root_causes[0].confidence == 0.9
         assert report.trace_summary is not None
+
+    def test_root_causes_not_from_llm(self):
+        """root_causes must come from proposal even if LLM returns different ones."""
+        from agent.finalize import finalize_node
+
+        fc = _make_focus_context()
+        proposal = ConclusionProposal(
+            hypotheses=[_make_hypothesis(status="confirmed", confidence=0.9)],
+            evidence=[_make_evidence()],
+            proposed_diagnosis_type="single_fault",
+            proposed_root_causes=[
+                ProposedRootCause(
+                    cause="CPU overload",
+                    fault_type="cpu_fullload",
+                    confidence=0.9,
+                    evidence_ids=["e1"],
+                )
+            ],
+        )
+        state = OrchestratorState(
+            run_id="no_hallucination",
+            inputs={},
+            focus_context=fc,
+            current_proposal=proposal,
+            audit_decision=None,
+            rehyp_count=0,
+            round_count=1,
+            diagnosis_trace=[],
+            audit_trace=[],
+            diagnosis_budget={},
+            audit_budget={},
+            report=None,
+        )
+        mock_llm = MagicMock()
+        # LLM tries to add extra hallucinated root cause — should be ignored
+        llm_response = json.dumps({
+            "anomaly_summary": "CPU and network issue",
+            "root_causes": [
+                {"cause": "...", "fault_type": "network_loss", "confidence": 0.7,
+                 "evidence_ids": [], "counter_evidence_ids": [], "fpl_pattern_id": None, "affected_nodes": []},
+            ],
+            "uncertainties": ["some uncertainty"],
+        })
+        mock_llm.call.return_value = (llm_response, {"prompt_tokens": 200, "completion_tokens": 100})
+
+        result = finalize_node(state, mock_llm, _make_config())
+        report = result["report"]
+
+        # Must only contain cpu_fullload from proposal, not the hallucinated network_loss
+        assert len(report.root_causes) == 1
+        assert report.root_causes[0].fault_type == "cpu_fullload"
 
 
 # =====================================================================
@@ -612,7 +869,8 @@ class TestConclusionProposalBuilder:
         assert proposal.proposed_diagnosis_type == "composite_fault"
         assert len(proposal.proposed_root_causes) == 2
 
-    def test_no_confirmed_gives_partial(self):
+    def test_no_confirmed_uses_third_fallback(self):
+        """Active hypothesis with no evidence triggers third fallback (all non-refuted)."""
         from agent.diagnosis import _build_conclusion_proposal
 
         h1 = _make_hypothesis(id="h1", status="active", confidence=0.6)
@@ -620,4 +878,134 @@ class TestConclusionProposalBuilder:
 
         proposal = _build_conclusion_proposal(state)
 
+        # Third fallback: all non-refuted hypotheses become candidates
+        assert proposal.proposed_diagnosis_type == "single_fault"
+        assert len(proposal.proposed_root_causes) == 1
+
+    def test_proposal_excludes_non_refuted_hypotheses_without_evidence(self):
+        """Only supported or otherwise investigated hypotheses should enter the proposal."""
+        from agent.diagnosis import _build_conclusion_proposal
+
+        h1 = _make_hypothesis(id="h1", confidence=0.8)
+        h2 = _make_hypothesis(id="h2", fault_type="mem_load_ram", subsystem="memory", confidence=0.3)
+        h3 = _make_hypothesis(id="h3", fault_type="disk_burn", subsystem="disk", status="refuted", confidence=0.1)
+        e1 = _make_evidence(id="e1", hyp_ids=["h1"])
+        state = _make_diagnosis_state(hypotheses=[h1, h2, h3], evidence=[e1])
+
+        proposal = _build_conclusion_proposal(state)
+
+        assert len(proposal.proposed_root_causes) == 1
+        fault_types = [rc.fault_type for rc in proposal.proposed_root_causes]
+        assert "cpu_fullload" in fault_types
+        assert "mem_load_ram" not in fault_types
+        assert "disk_burn" not in fault_types
+        assert proposal.proposed_diagnosis_type == "single_fault"
+
+    def test_all_refuted_gives_partial(self):
+        """When all hypotheses are refuted, should give partial."""
+        from agent.diagnosis import _build_conclusion_proposal
+
+        h1 = _make_hypothesis(id="h1", status="refuted", confidence=0.1)
+        state = _make_diagnosis_state(hypotheses=[h1])
+
+        proposal = _build_conclusion_proposal(state)
+
         assert proposal.proposed_diagnosis_type == "partial"
+        assert len(proposal.proposed_root_causes) == 0
+
+    def test_kb_only_evidence_uses_third_fallback(self):
+        """KB retrieval alone does not qualify via Tier 1/2, but third fallback includes non-refuted."""
+        from agent.diagnosis import _build_conclusion_proposal
+
+        h1 = _make_hypothesis(id="h1", confidence=0.8)
+        e1 = _make_evidence(id="e1", hyp_ids=["h1"], ev_type="supporting", source_tool="KBRetrievalTool")
+        state = _make_diagnosis_state(hypotheses=[h1], evidence=[e1])
+
+        proposal = _build_conclusion_proposal(state)
+
+        # KB-only doesn't qualify via Tier 1/2, but third fallback picks it up
+        assert proposal.proposed_diagnosis_type == "single_fault"
+        assert len(proposal.proposed_root_causes) == 1
+
+    def test_leading_subsystem_observational_fallback_is_allowed(self):
+        """With neutral evidence only, second-tier fallback includes all investigated hypotheses."""
+        from agent.diagnosis import _build_conclusion_proposal
+
+        h1 = _make_hypothesis(id="h1", fault_type="cpu_fullload", subsystem="cpu", confidence=0.8)
+        h2 = _make_hypothesis(id="h2", fault_type="disk_burn", subsystem="disk", confidence=0.9)
+        e1 = _make_evidence(id="e1", hyp_ids=["h1"], ev_type="neutral", source_tool="MetricQueryTool")
+        e2 = _make_evidence(id="e2", hyp_ids=["h2"], ev_type="neutral", source_tool="MetricQueryTool")
+        state = _make_diagnosis_state(hypotheses=[h1, h2], evidence=[e1, e2])
+
+        proposal = _build_conclusion_proposal(state)
+
+        # Both investigated non-refuted hypotheses qualify (subsystem-agnostic fallback)
+        assert proposal.proposed_diagnosis_type == "composite_fault"
+        fault_types = [rc.fault_type for rc in proposal.proposed_root_causes]
+        assert "disk_burn" in fault_types
+        assert "cpu_fullload" in fault_types
+
+
+# =====================================================================
+# Reflect integration tests
+# =====================================================================
+
+class TestReflectIntegration:
+    """Test that Reflect is properly integrated into orchestrator."""
+
+    def test_should_reflect_triggers(self):
+        """should_reflect returns True for confirmed diagnoses."""
+        from agent.reflect import should_reflect
+        from agent.schema import DiagnosisReport, RootCause, TraceSummary
+
+        report = DiagnosisReport(
+            run_id="test",
+            anomaly_summary="test",
+            diagnosis_type="single_fault",
+            root_causes=[RootCause(
+                cause="CPU overload",
+                fault_type="cpu_fullload",
+                confidence=0.9,
+                evidence_ids=["e1"],
+            )],
+            trace_summary=TraceSummary(
+                triage_leading_subsystem="cpu",
+                triage_confidence=0.8,
+                main_tools_used=["MetricQueryTool x1"],
+                audit_tools_used=[],
+                total_tool_calls=1,
+                main_iterations=2,
+                audit_iterations=1,
+                total_tokens_in=100,
+                total_tokens_out=50,
+            ),
+            generated_at=datetime.now(),
+        )
+        config = AgentConfig()
+        assert should_reflect(report, config) is True
+
+    def test_should_reflect_skips_inconclusive(self):
+        """should_reflect returns False for inconclusive diagnoses."""
+        from agent.reflect import should_reflect
+        from agent.schema import DiagnosisReport, RootCause, TraceSummary
+
+        report = DiagnosisReport(
+            run_id="test",
+            anomaly_summary="test",
+            diagnosis_type="inconclusive",
+            root_causes=[],
+            trace_summary=TraceSummary(
+                triage_leading_subsystem="cpu",
+                triage_confidence=0.8,
+                main_tools_used=[],
+                audit_tools_used=[],
+                total_tool_calls=0,
+                main_iterations=0,
+                audit_iterations=0,
+                total_tokens_in=0,
+                total_tokens_out=0,
+            ),
+            generated_at=datetime.now(),
+        )
+        config = AgentConfig()
+        assert should_reflect(report, config) is False

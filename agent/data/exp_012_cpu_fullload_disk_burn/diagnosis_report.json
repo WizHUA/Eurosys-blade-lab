@@ -1,0 +1,67 @@
+{
+  "run_id": "exp_012_Full",
+  "anomaly_summary": "系统出现内存压力过大和磁盘I/O阻塞问题，内存使用率上升伴随页面错误增加，同时CPU调度等待I/O操作。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存使用率上升伴随页面错误增加，表明内存压力过大",
+      "fault_type": "mem_load",
+      "confidence": 0.9,
+      "evidence_ids": [
+        "e2",
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU调度等待I/O，可能是由于磁盘I/O阻塞导致",
+      "fault_type": "disk_burn",
+      "confidence": 0.2,
+      "evidence_ids": [
+        "e3",
+        "e4",
+        "e8",
+        "e9"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络接收速率下降同时UDP传输速率上升，可能由于网络丢包导致重传",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e1",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "网络丢包导致重传的可能性较低（confidence=0.00），需要进一步确认网络接收速率下降的具体原因",
+    "磁盘I/O阻塞的置信度较低（confidence=0.20），建议检查磁盘健康状况和I/O负载情况"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.15269084143170403,
+    "main_tools_used": [
+      "MetricQueryTool x8",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 9,
+    "main_iterations": 10,
+    "audit_iterations": 1,
+    "total_tokens_in": 32285,
+    "total_tokens_out": 4085,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:08:00.702273"
+}

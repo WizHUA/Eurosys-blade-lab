@@ -14,8 +14,10 @@ from agent.config import AgentConfig
 from agent.llm_client import LLMClient, _extract_json_from_text
 from agent.prompt_utils import render_prompt
 from agent.schema import (
+    ConclusionProposal,
     DiagnosisReport,
     OrchestratorState,
+    ProposedRootCause,
     ReActStep,
     AuditStep,
     RootCause,
@@ -139,8 +141,8 @@ def finalize_node(
         data = json.loads(json_str)
     except Exception as e:
         logger.error("Failed to parse FINALIZE response: %s", e)
-        # Fallback: build minimal report from proposal
-        data = _build_fallback_report(state, diagnosis_type)
+        # Fallback: use empty narrative
+        data = {"anomaly_summary": "诊断报告（LLM 输出解析失败）", "uncertainties": ["LLM 输出解析失败"]}
 
     # Build TraceSummary (deterministic)
     trace_summary = _build_trace_summary(state)
@@ -153,13 +155,23 @@ def finalize_node(
             "total_tokens_out": totals.get("completion_tokens", 0),
         })
 
+    # root_causes are sourced from proposal directly (never from LLM output).
+    # FINALIZE LLM only writes narrative fields: anomaly_summary / uncertainties.
+    # This prevents the LLM from hallucinating or inflating confidence.
+    root_causes = _root_causes_from_proposal(proposal)
+
+    # Prevent schema violation: partial/single_fault/composite_fault require root_causes
+    if not root_causes and diagnosis_type != "inconclusive":
+        logger.warning("No root_causes for diagnosis_type='%s', downgrading to inconclusive", diagnosis_type)
+        diagnosis_type = "inconclusive"
+
     # Build DiagnosisReport
     try:
         report = DiagnosisReport(
             run_id=state["run_id"],
             anomaly_summary=data.get("anomaly_summary", "异常诊断完成"),
             diagnosis_type=diagnosis_type,
-            root_causes=[RootCause(**rc) for rc in data.get("root_causes", [])],
+            root_causes=root_causes,
             derived_symptoms=[],
             solutions=[],
             uncertainties=data.get("uncertainties", []),
@@ -171,6 +183,62 @@ def finalize_node(
         report = _build_fallback_diagnosis_report(state, diagnosis_type, trace_summary)
 
     return {"report": report}
+
+
+# Chinese → English fault_type normalization map (fallback for model language switch)
+_CN_FAULT_TYPE_MAP: dict[str, str] = {
+    "磁盘空间不足": "disk_fill",
+    "磁盘IO过载": "disk_burn",
+    "内存负载过高": "mem_load",
+    "内存压力": "mem_load",
+    "网络丢包": "network_loss",
+    "网络延迟": "network_delay",
+    "网络损坏": "network_corrupt",
+    "CPU满载": "cpu_fullload",
+    "CPU过载": "cpu_fullload",
+}
+
+
+def _normalize_fault_type(fault_type: str) -> str:
+    """Normalize fault_type to English standard label."""
+    if fault_type in _CN_FAULT_TYPE_MAP:
+        logger.warning("[Finalize] Chinese fault_type '%s' normalized to '%s'", fault_type, _CN_FAULT_TYPE_MAP[fault_type])
+        return _CN_FAULT_TYPE_MAP[fault_type]
+    return fault_type
+
+
+def _root_causes_from_proposal(proposal: ConclusionProposal | None) -> list[RootCause]:
+    """Convert proposed_root_causes to RootCause list (no LLM, deterministic).
+
+    root_causes 必须严格来自 proposal，FINALIZE LLM 不能修改或增删。
+    """
+    if not proposal:
+        return []
+    result = []
+    for prc in proposal.proposed_root_causes:
+        # Find the matching hypothesis for metadata
+        hyp = next(
+            (h for h in proposal.hypotheses if h.fault_type == prc.fault_type),
+            None,
+        )
+        # Collect counter-evidence IDs for this hypothesis
+        counter_ids: list[str] = []
+        if hyp:
+            counter_ids = [
+                e.id
+                for e in proposal.evidence
+                if hyp.id in e.hypothesis_ids and e.type == "refuting"
+            ]
+        result.append(RootCause(
+            cause=prc.cause,
+            fault_type=_normalize_fault_type(prc.fault_type),
+            confidence=prc.confidence,
+            evidence_ids=prc.evidence_ids,
+            counter_evidence_ids=counter_ids,
+            fpl_pattern_id=hyp.fpl_pattern_id if hyp else None,
+            affected_nodes=[],
+        ))
+    return result
 
 
 def _build_fallback_report(state: OrchestratorState, diagnosis_type: str) -> dict:
@@ -205,15 +273,7 @@ def _build_fallback_diagnosis_report(
 ) -> DiagnosisReport:
     """Build minimal DiagnosisReport when parsing fails."""
     proposal = state.get("current_proposal")
-    root_causes = []
-    if proposal:
-        for rc in proposal.proposed_root_causes:
-            root_causes.append(RootCause(
-                cause=rc.cause,
-                fault_type=rc.fault_type,
-                confidence=rc.confidence,
-                evidence_ids=rc.evidence_ids,
-            ))
+    root_causes = _root_causes_from_proposal(proposal)
 
     return DiagnosisReport(
         run_id=state["run_id"],

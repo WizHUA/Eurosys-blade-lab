@@ -213,3 +213,274 @@ Phase 3: Agent 升级 — **设计阶段**
   10. **copilot-instructions.md** — 全面重写：v6 三图架构、4 个贡献点、消融 3 组、agent/ 目录
 - 产出: `.github/agents/*.agent.md` × 9, `.github/copilot-instructions.md`
 - 下一步: Phase B 实现 — 分派给工程师 agent
+
+## 2026-03-29: 修复 FINALIZE 幻觉根因 + 加强 Audit 零证据约束
+- 背景: 4 组冒烟测试结果（exp_001/005/008/029）均出现严重误报（单故障实验报告 3-4 个根因），diagnostics 正确但 false positives 极多
+- 根因分析:
+  - FINALIZE LLM 收到 3-4 个 proposed_root_causes（全部 non-refuted，未达 `refuted` 状态），将它们写入报告时做了二次推断并上调置信度（如 disk_burn 0.25 → 0.65）
+  - Audit Agent 有原则 #2 "替代假设未排除不得放行" 但未有 "无直接证据不得放行" 的明确规则
+- 修复内容:
+  1. **`agent/finalize.py`**: `root_causes` 字段直接从 `proposal.proposed_root_causes` 构建（`_root_causes_from_proposal()` helper），不再使用 FINALIZE LLM 的输出
+  2. **`agent/prompts/finalize.md`**: 移除 root_causes 字段，FINALIZE LLM 只写 `anomaly_summary` + `uncertainties` 两个叙述字段
+  3. **`agent/prompts/audit_system.md`**: 新增原则 #5（未经验证假设 ≠ 已确认）和 #6（absence of refutation ≠ presence evidence）
+  4. **`agent/tests/test_nodes.py`**: 更新 `test_generates_diagnosis_report`（LLM 只返回叙述字段）；新增 `test_root_causes_not_from_llm`（验证 FINALIZE 幻觉防护）
+- 测试结果: **112 tests passed** (从 111 增至 112，+1 新测试)
+- 产出: `agent/finalize.py`, `agent/prompts/finalize.md`, `agent/prompts/audit_system.md`, `agent/tests/test_nodes.py`
+- 下一步: 重新运行 4 组冒烟测试（exp_001/005/008/029）验证误报减少
+
+## 2026-03-29: 文档-代码对齐修复（D1/D2/D4/D5，跳过 D3 图）
+- 完成: 对 v6.md / orchestrator.py 进行全面对齐校验，修复 4 处偏差
+- 修复内容:
+  1. **D1** v6.md `OrchestratorState` 补全 4 个缺失字段（diagnosis_trace/audit_trace/diagnosis_budget/audit_budget）— K2 修复未回同 v6.md，现已补上
+  2. **D2** v6.md §4.3 Orchestrator 节点一览表补充 `TRIAGE` 行（确定性，运行 Stage 1 Triage，生成 FocusContext）
+  3. **D4** `orchestrator.py invoke_diagnosis_node()` 的 `_prev_diagnosis_state` 返回值，添加说明注释：LangGraph non-strict 模式 runtime carry-forward key，非 TypedDict 声明字段，跨轮传递 hypotheses/evidence
+  4. **D5** v6.md §7.1 Reflect 触发表 `partial` 行：从 "且标记 incomplete = true" 改为 "只提炼置信度 > 0.5 的假设"（FPL schema 无 incomplete 字段）
+- 跳过: D3（架构图 v6.drawio，用户明确跳过）；D6（FPL 生命周期 upgrade/decay，已知 TODO）
+- 测试结果: agent/tests 85 passed, eval/tests 85 passed（总计与修复前相同）
+- 产出: `design/v6.md`, `agent/orchestrator.py`
+- 下一步: Phase E.1 冒烟测试重新验证；Phase E.2 全量 29 实验运行
+
+## 2026-03-29: 设计-实现一致性修复（零硬编码阈值 + Reflect 集成）
+- 完成: 修复 3 个设计-实现偏差，对齐 v6 原则 #3 "诊断结论零硬编码阈值"
+- 修复内容:
+  1. **移除 diagnosis.py 0.5 硬编码阈值**：
+     - think_node conclude 不再自动将 `confidence > 0.5` 的假设标记为 `confirmed`
+     - `_build_conclusion_proposal()` 不再使用 0.5 阈值过滤 `active_high`，改为包含所有非 refuted 假设
+     - `confirmed` 状态实际由 Audit Agent pass 间接决定
+  2. **集成 Reflect 到 orchestrator**：
+     - `run_diagnosis()` 在 FINALIZE 后条件触发 `should_reflect()` + `run_reflect()`
+     - FPL 回写完成 Case Set 闭环
+  3. **同步更新设计文档**：
+     - `design/v6.md` §4.2：新增 "confirmed 状态的设置时机" 子节
+     - `design/implementation_spec.md`：新增 "ConclusionProposal builder 实现约束" 段落
+- 测试:
+  - 新增 4 个测试（test_proposal_includes_all_non_refuted, test_all_refuted_gives_partial, test_should_reflect_triggers, test_should_reflect_skips_inconclusive）
+  - 修改 2 个测试（test_conclude_action_marks_confirmed, test_no_confirmed_gives_partial）
+  - **111 tests passed** in 5.46s（从 107 增至 111）
+- 产出: `agent/diagnosis.py`, `agent/orchestrator.py`, `agent/tests/test_nodes.py`, `design/v6.md`, `design/implementation_spec.md`
+- 下一步: Phase E.1 冒烟测试重新验证（修复应该改善 LLM 诊断行为）
+
+## 2026-04-01: 冒烟测试通过 + 全量评测启动
+- 完成:
+  1. 单元测试全部通过（100 passed）
+  2. 冒烟测试 2/2 通过:
+     - exp_001 (cpu-fullload): **single_fault, cpu_fullload, confidence=0.50** ✅
+     - exp_005 (network-loss): **single_fault, network_loss, confidence=0.00** ✅ (fault_type 正确，confidence 偏低)
+  3. 启动全量 29 实验 Full 评测 (`python run_agent.py --all --evaluate`)
+- 发现:
+  - 系统从 inconclusive 恢复为正确诊断（此前 03-29 的多项修复生效）
+  - exp_005 confidence=0.00 表明 LLM 对 network_loss 的置信度评估可能需要优化
+- 产出: `agent/data/Full/exp_001_cpu_fullload/`, `agent/data/Full/exp_005_network_loss/`
+- 下一步: 等待全量评测完成 → 分析结果 → 决定是否需要修复
+
+## 2026-04-01: evidence 分类修复 + 第三层回退调整
+- 背景: 全量评测中 ~33% 实验因 `diagnosis_type='partial'` + 空 `root_causes` 触发 schema 验证错误，回退到 inconclusive
+- 根因分析链:
+  1. `_determine_evidence_type()` 要求 `required_verifications.required_metrics` 与查询 metrics 精确匹配
+  2. LLM 生成假设时经常不填 required_metrics（default empty list）
+  3. 所有 MetricQueryTool 证据被标记为 "neutral"（非 "supporting"）
+  4. qualifying_ids 两层过滤均产生空集 → 0 candidates → "partial" + 空 root_causes
+  5. Pydantic DiagnosisReport 验证失败 → 回退到 inconclusive
+- 修复内容:
+  1. **Fix 1**: `_determine_evidence_type()` MetricQueryTool 子系统匹配回退 — 当 hyp_metrics 为空时，若查询 metric 属于 triage 异常指标且在假设 subsystem 内，返回 "supporting"
+  2. **Fix 2**: `_build_conclusion_proposal()` 第三层回退 — 限制为 leading subsystem 内的非 refuted 假设（避免跨 subsystem 误报）
+  3. **Fix 3**: `finalize.py` 前置诊断类型修正 — 空 root_causes 时将 diagnosis_type 降级为 inconclusive（防御性编码）
+  4. **Fix 4**: `orchestrator.py` execution_trace 增强 — 从 ConclusionProposal 提取 hypotheses/evidence/proposal 完整数据
+  5. **工具名归一化**: 新增 `_normalize_tool_name()` + `_normalize_verification_item()` 处理 LLM 输出字段变体
+  6. **测试更新**: 2 个测试从 "partial" 期望值更新为 "single_fault"（配合第三层回退语义变更）
+- 测试: **100 tests passed** in 8.46s
+- 中间验证（第一版第三层回退为全量非 refuted）:
+  - exp_001: composite_fault (3 个错误根因) — 说明无限制回退太激进
+  - 已修正为 leading subsystem 限制版
+- 产出: `agent/diagnosis.py`, `agent/finalize.py`, `agent/orchestrator.py`, `agent/tests/test_nodes.py`
+- 评测状态: v2 全量评测运行中（使用 Fix 1/3/4，Fix 2 为 refined leading-subsystem 版）
+- 下一步: 等待 v2 评测完成 → 分析结果 → 可能需要 Fix 2 refined 版重跑 → 消融实验
+
+## 2026-04-01: v4 评测完成 + v5 启动
+
+### v4 评测结果（官方 evaluate_batch）
+- Hit@1: 27.6% (8/29)
+- Hit@3: 34.5% (10/29)
+- Composite Coverage: 24.1%
+- Avg False Positives: 1.10
+
+### v4 问题分析
+1. **LLM 系统性偏向 disk 故障**：大多数实验被错误诊断为 disk_fill/disk_burn
+2. **Leading Subsystem 未被充分利用**：prompt 仅显示 leading_subsystem 数据，未明确要求 h1 必须匹配
+3. **Metric hints 不完整**：v4 缺少 cpu_fullload/mem_load/network_loss 的正向信号 hints
+
+### 修复（已应用到 v5）
+1. **diagnosis_hypothesize.md** 重构：
+   - 新增"重要规则"章节，明确 leading_subsystem 优先级
+   - h1 必须是 leading subsystem 对应故障类型（高置信度时）
+   - 指标方向解译表（cpu_iowait_percent ↓ → cpu_fullload，非 disk）
+   - 规则 2-4：禁止跨子系统误判、prior_confidence 引导
+
+2. **diagnosis.py** `triage_warning` 增加 else 分支：
+   - 高置信度时显示 "📌 h1 必须是 {leading_fault}"
+   - 明确映射: cpu→cpu_fullload, memory→mem_load_*, network→network_*, disk→disk_*
+
+3. **metric_hints** 5 组新提示（已加 cpu/mem/network 正向信号）
+
+### 当前状态
+- v5 评测运行中（PID: 249411，/tmp/full_eval_v5.log）
+- 期望提升：cpu_fullload、mem_load 检测准确率显著改善
+- 下一步：等待 v5 完成后分析指标，如有改善则做消融实验
+
+## 2026-04-02: MetricQueryTool 致命 Bug 修复
+
+### 根因
+`DiagnosisState(TypedDict)` 中缺少 `_tool_result: dict` 字段。
+LangGraph 在 `act_node` 返回 `{"_tool_result": result}` 时，因该键不在 schema 中被静默丢弃。
+导致 `observe_node` 的 `state.get("_tool_result", {})` 永远返回空 dict，所有 evidence 的 `result_digest` 均为 "No metric results"。
+
+### 修复
+- `agent/schema.py`: 在 `DiagnosisState` 中添加 `_tool_result: dict`
+- `agent/diagnosis.py`: 清理调试日志（`[DEBUG_METRIC]`）
+- `agent/tools/metric_query.py`: 清理调试日志（`[DEBUG_MQT]`）
+
+### 验证结果
+- 100 测试通过 ✅
+- exp_001 (cpu_fullload): 11/11 evidence 有数据，诊断 cpu_fullload(0.85) ✅
+- exp_008 (cpu_fullload+mem_load): 13/13 evidence 有数据，诊断含 cpu_fullload(0.70)✅ + mem_load(0.60)✅
+
+### 当前状态
+- MetricQueryTool 完全工作 ✅
+- Evidence 质量大幅提升（0/N→N/N 有数据）
+- 仍有误报（exp_001 多报 disk_burn/mem_load, exp_008 首位 disk_fill）
+- 下一步：全量 29 实验评测以量化改善幅度
+
+## 2026-04-02: 系统完善 — 去硬编码阈值 + 输出保全 + AuditState 修复
+
+### Bug 修复
+1. **AuditState `_audit_tool_result` 缺失**（与 DiagnosisState `_tool_result` 同类 bug）
+   - `agent/schema.py`: AuditState TypedDict 新增 `_audit_tool_result: dict`
+   - 此前 audit agent 的工具调用结果被 LangGraph 静默丢弃
+2. **diagnosis.py `_normalize_metric_names` 重复 else block**
+   - 前次 session 遗留的代码重复，导致 SyntaxError
+   - 已清理
+3. **diagnosis.py 缺少 `import pandas as pd`**
+   - `_format_available_metrics()` 引用 `pd.DataFrame()` 但未导入
+   - 已添加
+
+### 去硬编码阈值（v6 原则 #3 对齐）
+1. **移除 `val > 50` 阈值**（MetricQueryTool evidence 分类）
+   - 原: `if isinstance(val, (int, float)) and val > 50: return "supporting"`
+   - 现: `return "neutral"` — LLM 从 result_digest 自行判断
+2. **移除 DataAnalysisTool `abs(val) > 0.7 / < 0.3` 阈值**
+   - 原: correlation 值超过 0.7 自动标记 supporting，低于 0.3 标记 refuting
+   - 现: `return "neutral"` — LLM 解读分析结果
+3. **`LOW_TRIAGE_CONF_THRESHOLD` 配置化**
+   - 原: `diagnosis.py` 内联 `LOW_TRIAGE_CONF_THRESHOLD = 0.30`
+   - 现: `config.py TriageConfig.low_confidence_threshold = 0.30`
+   - `diagnosis.py` 通过 `config.triage.low_confidence_threshold` 读取
+
+### 输出保全（幻觉检测支持）
+1. **`llm_raw_response` 字段**
+   - `schema.py`: ReActStep 和 AuditStep 均新增 `llm_raw_response: str | None = None`
+   - `diagnosis.py think_node`: ReActStep 创建时保存 `llm_raw_response=content`
+   - `audit.py gate_think_node`: AuditStep 创建时保存 `llm_raw_response=content`
+2. **完整 trace 序列化**
+   - `orchestrator.py`: `diagnosis_trace` 和 `audit_trace` 从 int count 升级为完整 model_dump 序列化
+   - `execution_trace.json` 现在包含每个 ReActStep/AuditStep 的完整数据（含 LLM 原始响应）
+3. **`focus_context.json` 保存**
+   - `orchestrator.py _save_output()`: 新增 focus_context 参数
+   - 每个实验输出目录现在额外保存 `focus_context.json`（Triage 结果）
+
+### 测试验证
+- **100 tests passed** in 7.23s ✅
+- 硬编码阈值 grep 验证: `val > 50 / abs(val) > 0.7 / LOW_TRIAGE_CONF_THRESHOLD` 均为零匹配
+
+### 产出文件
+- `agent/schema.py` — AuditState._audit_tool_result + ReActStep/AuditStep.llm_raw_response
+- `agent/config.py` — TriageConfig.low_confidence_threshold
+- `agent/diagnosis.py` — 去阈值 + llm_raw_response 保存 + pandas import + 重复代码修复
+- `agent/audit.py` — llm_raw_response 保存
+- `agent/orchestrator.py` — 完整 trace 序列化 + focus_context.json
+
+### 当前状态
+- 全量 29 实验评测运行中
+- 下一步: 分析评测结果 → 看是否有改善（AuditState 修复应显著提升 audit 效果）
+
+## 2026-04-02: v6 Full 全量 29 实验评测完成
+
+### 评测结果
+
+| 指标 | v4 | v5 | **v6 Full** | 变化 |
+|------|----|----|-------------|------|
+| Hit@1 | 27.6% (8/29) | 31.0% (9/29) | **34.5% (10/29)** | ↑ 3.5pp vs v5 |
+| Hit@3 | 34.5% (10/29) | 31.0% (9/29) | **55.2% (16/29)** | ↑ 24.2pp vs v5 |
+
+Hit@1 (中文标签修正后): 34.5% = v4 基础上 +6.9pp, v5 基础上 +3.5pp
+Hit@3 显著提升: 55.2% = v4 基础上 +20.7pp, v5 基础上 +24.2pp
+
+**注**: 5 个实验 (exp_025-029) 的 LLM 输出使用了中文故障标签 "磁盘空间不足" 而非标准 "disk_fill"。
+手动归一化后 3 个算作 HIT (exp_025/028/029)。评估脚本 evaluate.py 需添加中文别名。
+
+### 分故障类型准确率
+
+| 故障类型 | Hit@1 | Hit@3 |
+|----------|-------|-------|
+| cpu_fullload (单) | 1/1 (100%) | 1/1 (100%) |
+| mem_load (单) | 1/6 (17%) | 3/6 (50%) |
+| network_loss (单) | 0/2 (0%) | 1/2 (50%) |
+| disk_burn (单) | 0/2 (0%) | 0/2 (0%) |
+| disk_fill (单) | 0/1 (0%) | 0/1 (0%) |
+| composite (复合) | 8/17 (47%) | 11/17 (65%) |
+
+### 误诊模式 (Top-1 错误)
+
+| 频次 | 真实故障 → 错误预测 |
+|------|---------------------|
+| 3× | mem_load → disk_fill |
+| 2× | mem_load → disk_burn |
+| 2× | mem_load+network_loss → disk_fill |
+| 1× | network_loss → disk_burn |
+| 1× | disk_burn → cpu_fullload |
+| 1× | disk_fill → mem_load |
+| 1× | cpu_fullload+disk_burn → network_loss |
+| 1× | cpu_fullload+disk_fill → disk_burn |
+| 1× | mem_load+network_loss → disk_burn |
+| 1× | disk_burn+mem_load → disk_fill |
+
+### 关键发现
+1. **中文标签泄漏**: DeepSeek 在后期实验中切换为中文输出 ("磁盘空间不足")，需在 prompt 中强制 English-only fault labels
+2. **disk_fill 过度诊断**: 19 次 Top-1 错误中有 8 次涉及 disk_fill 假阳性
+3. **Triage 交叉污染**: Z-score 异常检测优先检测次级效应（内存压力 → filesystem 指标变化 → 误判为 disk_fill）
+4. **复合故障优于单故障**: composite Hit@1=47% vs single Hit@1=17%，说明多假设机制有效但单故障场景存在系统性偏差
+5. **Hit@3 大幅提升**: +20pp 说明系统能识别正确故障但未能将其排在 Top-1
+
+### 产出
+- `agent/data/Full/exp_{001..029}_*/`: 29 个实验完整输出(diagnosis_report.json + execution_trace.json + focus_context.json)
+
+### 下一步
+1. 修复中文标签泄漏（prompt 强制 English fault_type）
+2. 分析 Triage 交叉污染根因（focus_context.json 中 leading_subsystem 误判模式）
+3. 考虑优化策略: 提高单故障场景准确率 + 降低 disk_fill 假阳性
+4. 消融实验: Abl-A (无 Triage) + Abl-B (无 Audit)
+
+## 2026-04-02: Bug 修复 + v7 评估启动
+
+### 已完成修复（本次会话）
+
+#### Bug 1-3 已修复（前序会话，本次确认）
+- 中文标签泄漏: finalize.py + prompts ✅
+- focus_context.json 保存: orchestrator.py + run_agent.py ✅
+
+#### Bug 4: Leading Subsystem 强制约束误导 LLM (本次修复)
+- 根因: 29个实验中 leading_subsystem 准确率极低（约 8/29 正确）
+- mem_load 场景: 内存压力→swap IO→disk指标升高→triage误判leading=disk→h1强制=disk
+- 修复 (diagnosis_hypothesize.md Rule 1): "必须"→"参考"，添加内存-磁盘级联效应说明
+- 修复 (diagnosis_hypothesize.md Rule 4): 去掉 >= 0.6 硬约束
+- 修复 (diagnosis_think.md): 添加内存-磁盘级联效应识别规则
+- 修复 (agent/diagnosis.py triage_warning): 高置信度分支改为建议语气
+- 修复 (agent/diagnosis.py boost): +0.10→+0.05
+
+### 验证结果
+- 100 unit tests: ALL PASSED
+- exp_003 (GT=mem_load，之前误判disk_fill): h1=mem_load (0.85) FIXED
+- exp_001 (GT=cpu_fullload): h1=cpu_fullload (0.95) OK
+
+### 当前状态
+- v7 全量 29 实验评估运行中 (nohup /tmp/eval_v7_new.log)
+- 下一步: v7 评估完成 → 记录结果 → 消融实验

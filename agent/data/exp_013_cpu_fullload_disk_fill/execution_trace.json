@@ -1,0 +1,524 @@
+{
+  "run_id": "exp_013_Full",
+  "diagnosis_trace_steps": 5,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：mem_load、disk_burn 和 disk_fill。需要首先验证 mem_load 假设，因为它的置信度最高，且内存压力可能导致磁盘 I/O 升高。因此，第一步应检查内存使用情况，确认是否存在内存资源紧张。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "memory_usage_percent",
+            "memory_active_anon_bytes",
+            "memory_mapped_bytes",
+            "memory_sunreclaim_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:26:13",
+            "end": "2025-09-20T07:27:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "memory_usage_percent: mean=32.07185123866346; memory_active_anon_bytes: mean=1516698965.3333333; memory_mapped_bytes: mean=252909568.0; memory_sunreclaim_bytes: mean=254309717.33333334",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:08:40.249283",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：mem_load、disk_burn 和 disk_fill。需要首先验证 mem_load 假设，因为它的置信度最高，且内存压力可能导致磁盘 I/O 升高。因此，第一步应检查内存使用情况，确认是否存在内存资源紧张。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunreclaim_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:26:13\",\n        \"end\": \"2025-09-20T07:27:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"为了验证 mem_load 假设，需要查询内存相关指标，特别是内存使用率、活跃匿名内存、映射内存和不可回收内存，以确认是否存在内存资源紧张的情况。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (mem_load) 的置信度为 0.70，已通过内存使用情况的验证。接下来需要验证磁盘 I/O 是否因内存换页操作而升高，以进一步支持 h1。同时，h2 (disk_burn) 和 h3 (disk_fill) 的验证任务仍待完成。优先验证 h1 的磁盘 I/O 相关指标，因为内存压力可能导致磁盘 I/O 上升。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_write_iops",
+            "disk_total_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:26:13",
+            "end": "2025-09-20T07:27:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "disk_write_iops: mean=59.645448815531175; disk_total_iops: mean=59.77272137751765",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:08:48.997620",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (mem_load) 的置信度为 0.70，已通过内存使用情况的验证。接下来需要验证磁盘 I/O 是否因内存换页操作而升高，以进一步支持 h1。同时，h2 (disk_burn) 和 h3 (disk_fill) 的验证任务仍待完成。优先验证 h1 的磁盘 I/O 相关指标，因为内存压力可能导致磁盘 I/O 上升。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_write_iops\", \"disk_total_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:26:13\",\n        \"end\": \"2025-09-20T07:27:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"验证磁盘 I/O 是否因内存换页操作而升高，以支持 h1 (mem_load) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前证据显示内存使用率较低（memory_usage_percent=32.07%），但内存活动匿名页（memory_active_anon_bytes）和映射内存（memory_mapped_bytes）较高，同时磁盘写 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也较高。这符合内存压力导致操作系统将匿名页换出到 swap，表现为磁盘 IO 上升的继发性效应。因此，mem_load 假设的置信度应进一步提高。接下来需要验证磁盘空间使用情况，以确认是否存在磁盘空间不足，从而进一步验证 disk_fill 假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "filesystem_usage_percent",
+            "filesystem_free_bytes"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:26:13",
+            "end": "2025-09-20T07:27:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "filesystem_usage_percent: mean=77.98136216514149; filesystem_free_bytes: mean=22097405952.0",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:08:59.763787",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据显示内存使用率较低（memory_usage_percent=32.07%），但内存活动匿名页（memory_active_anon_bytes）和映射内存（memory_mapped_bytes）较高，同时磁盘写 IOPS（disk_write_iops）和总 IOPS（disk_total_iops）也较高。这符合内存压力导致操作系统将匿名页换出到 swap，表现为磁盘 IO 上升的继发性效应。因此，mem_load 假设的置信度应进一步提高。接下来需要验证磁盘空间使用情况，以确认是否存在磁盘空间不足，从而进一步验证 disk_fill 假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"内存活动匿名页和映射内存较高，且磁盘 IOPS 升高，支持内存压力导致换页的假设\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:26:13\",\n        \"end\": \"2025-09-20T07:27:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要验证磁盘空间使用情况，以确认是否存在磁盘空间不足，从而进一步验证 disk_fill 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前假设 h1 (mem_load) 已经通过内存使用情况和磁盘 I/O 因内存换页操作而升高的验证，置信度较高。假设 h2 (disk_burn) 和 h3 (disk_fill) 的验证尚未完成，特别是 h2 的 CPU 调度下降是否与磁盘 I/O 阻塞相关，以及 h3 的磁盘空间使用情况。为了进一步验证 h2 和 h3，需要查询 CPU 和磁盘的相关指标。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "cpu_iowait_percent",
+            "cpu_usage_percent",
+            "disk_io_time_seconds_total",
+            "disk_io_weighted_time_seconds_total"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:26:13",
+            "end": "2025-09-20T07:27:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "cpu_iowait_percent: mean=3.0034090840221705; cpu_usage_percent: mean=66.99215626520235; disk_io_time_seconds_total: mean=4358.474666666667; disk_io_weighted_time_seconds_total: mean=107096.33783333334",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:09:13.288113",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (mem_load) 已经通过内存使用情况和磁盘 I/O 因内存换页操作而升高的验证，置信度较高。假设 h2 (disk_burn) 和 h3 (disk_fill) 的验证尚未完成，特别是 h2 的 CPU 调度下降是否与磁盘 I/O 阻塞相关，以及 h3 的磁盘空间使用情况。为了进一步验证 h2 和 h3，需要查询 CPU 和磁盘的相关指标。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"证据支持\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"cpu_iowait_percent\", \"cpu_usage_percent\", \"disk_io_time_seconds_total\", \"disk_io_weighted_time_seconds_total\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:26:13\",\n        \"end\": \"2025-09-20T07:27:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证 h2 (disk_burn) 和 h3 (disk_fill)，需要查询 CPU 的 iowait 和 usage 百分比，以及磁盘的 I/O 时间和加权时间，以确认是否存在磁盘 I/O 阻塞和 CPU 调度下降的情况。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设 h1 (mem_load) 的置信度较高，且已通过直接观测证据验证。假设 h2 (disk_burn) 和 h3 (disk_fill) 的置信度较低，且部分验证尚未完成。根据内存-磁盘级联效应识别原则，disk_write_iops 和 disk_total_iops 的升高可能是内存压力导致的继发性效应，而非磁盘原发故障。因此，优先考虑 mem_load 假设。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:09:22.288758",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (mem_load) 的置信度较高，且已通过直接观测证据验证。假设 h2 (disk_burn) 和 h3 (disk_fill) 的置信度较低，且部分验证尚未完成。根据内存-磁盘级联效应识别原则，disk_write_iops 和 disk_total_iops 的升高可能是内存压力导致的继发性效应，而非磁盘原发故障。因此，优先考虑 mem_load 假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.9, \"reason\": \"直接观测证据支持内存压力导致的磁盘 IO 升高\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.4, \"reason\": \"磁盘 IO 升高可能是内存压力导致的继发性效应\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.3, \"reason\": \"磁盘空间使用情况尚未验证\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"证据充分支持 mem_load 假设，且磁盘 IO 升高可能是内存压力导致的继发性效应。因此，可以得出结论。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中有4条证据，全部为 'supporting' 类型。\n2. **子系统直接证据**: \n   - mem_load: 有内存子系统的直接观测指标（e1）。\n   - disk_burn: 有磁盘子系统的直接观测指标（e2, e4）。\n   - disk_fill: 有磁盘子系统的直接观测指标（e3）。\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致，disk_io_now、memory_writeback_bytes等指标与诊断结论相符。\n4. **复合故障判断**: 多个根因之间存在因果链关系，mem_load导致disk_burn，disk_burn和disk_fill共同导致系统性能下降。\n\n根据审查原则，所有证据均为supporting类型，且每个根因都有来自其子系统的直接观测指标，故障标签合理，复合故障判断正确。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:09:33.344428",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中有4条证据，全部为 'supporting' 类型。\\n2. **子系统直接证据**: \\n   - mem_load: 有内存子系统的直接观测指标（e1）。\\n   - disk_burn: 有磁盘子系统的直接观测指标（e2, e4）。\\n   - disk_fill: 有磁盘子系统的直接观测指标（e3）。\\n3. **故障标签合理性**: 诊断使用的 fault_type 与实际观测到的异常指标一致，disk_io_now、memory_writeback_bytes等指标与诊断结论相符。\\n4. **复合故障判断**: 多个根因之间存在因果链关系，mem_load导致disk_burn，disk_burn和disk_fill共同导致系统性能下降。\\n\\n根据审查原则，所有证据均为supporting类型，且每个根因都有来自其子系统的直接观测指标，故障标签合理，复合故障判断正确。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"pass\",\n    \"reason\": \"证据充分，结论可信，放行\",\n    \"hint\": \"\",\n    \"diagnosis_type\": \"composite_fault\"\n  },\n  \"tool_call\": null\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1580,
+      "completion": 447,
+      "total": 2027
+    },
+    "diagnosis_think": {
+      "prompt": 13429,
+      "completion": 1422,
+      "total": 14851
+    },
+    "audit_think": {
+      "prompt": 1496,
+      "completion": 288,
+      "total": 1784
+    },
+    "finalize": {
+      "prompt": 611,
+      "completion": 119,
+      "total": 730
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "内存压力过大导致操作系统频繁进行内存换页操作，进而引发磁盘 I/O 阻塞",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.7,
+      "current_confidence": 0.9,
+      "required_verifications": [
+        {
+          "description": "检查内存使用情况，确认是否存在内存资源紧张",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "memory_usage_percent",
+            "memory_available_bytes"
+          ]
+        },
+        {
+          "description": "验证磁盘 I/O 是否因内存换页操作而升高",
+          "status": "verified",
+          "evidence_id": "e2",
+          "required_metrics": [
+            "disk_total_iops",
+            "disk_io_now"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "磁盘 I/O 阻塞导致进程等待磁盘操作，进而引发 CPU 调度下降",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.4,
+      "required_verifications": [
+        {
+          "description": "检查磁盘 I/O 是否异常升高",
+          "status": "verified",
+          "evidence_id": "e2",
+          "required_metrics": [
+            "disk_total_iops",
+            "disk_io_now"
+          ]
+        },
+        {
+          "description": "验证 CPU 调度下降是否与磁盘 I/O 阻塞相关",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "schedstat_running_rate",
+            "processes_blocked"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "磁盘空间不足导致磁盘 I/O 操作受限，进而引发系统性能下降",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.45,
+      "current_confidence": 0.3,
+      "required_verifications": [
+        {
+          "description": "检查磁盘空间使用情况，确认是否存在磁盘空间不足",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "filesystem_avail_bytes"
+          ]
+        },
+        {
+          "description": "验证磁盘 I/O 是否因空间不足而受限",
+          "status": "verified",
+          "evidence_id": "e2",
+          "required_metrics": [
+            "disk_total_iops",
+            "disk_io_now"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+      "result_digest": "memory_usage_percent: mean=32.07185123866346; memory_active_anon_bytes: mean=1516698965.3333333; memory_mapped_bytes: mean=252909568.0; memory_sunreclaim_bytes: mean=254309717.33333334",
+      "raw_stats": {
+        "memory_usage_percent": 32.07185123866346,
+        "memory_active_anon_bytes": 1516698965.3333333,
+        "memory_mapped_bytes": 252909568.0,
+        "memory_sunreclaim_bytes": 254309717.33333334
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h1",
+        "h2",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:26:13\", )",
+      "result_digest": "disk_write_iops: mean=59.645448815531175; disk_total_iops: mean=59.77272137751765",
+      "raw_stats": {
+        "disk_write_iops": 59.645448815531175,
+        "disk_total_iops": 59.77272137751765
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h2",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+      "result_digest": "filesystem_usage_percent: mean=77.98136216514149; filesystem_free_bytes: mean=22097405952.0",
+      "raw_stats": {
+        "filesystem_usage_percent": 77.98136216514149,
+        "filesystem_free_bytes": 22097405952.0
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h2",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_iowait_percent\", \"cpu_usage_percent\", \"disk_io_time_seconds_total\", \"disk_io_weigh)",
+      "result_digest": "cpu_iowait_percent: mean=3.0034090840221705; cpu_usage_percent: mean=66.99215626520235; disk_io_time_seconds_total: mean=4358.474666666667; disk_io_weighted_time_seconds_total: mean=107096.33783333334",
+      "raw_stats": {
+        "cpu_iowait_percent": 3.0034090840221705,
+        "cpu_usage_percent": 66.99215626520235,
+        "disk_io_time_seconds_total": 4358.474666666667,
+        "disk_io_weighted_time_seconds_total": 107096.33783333334
+      },
+      "created_at_step": 4
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "内存压力过大导致操作系统频繁进行内存换页操作，进而引发磁盘 I/O 阻塞",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.7,
+        "current_confidence": 0.9,
+        "required_verifications": [
+          {
+            "description": "检查内存使用情况，确认是否存在内存资源紧张",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "memory_usage_percent",
+              "memory_available_bytes"
+            ]
+          },
+          {
+            "description": "验证磁盘 I/O 是否因内存换页操作而升高",
+            "status": "verified",
+            "evidence_id": "e2",
+            "required_metrics": [
+              "disk_total_iops",
+              "disk_io_now"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "磁盘 I/O 阻塞导致进程等待磁盘操作，进而引发 CPU 调度下降",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.4,
+        "required_verifications": [
+          {
+            "description": "检查磁盘 I/O 是否异常升高",
+            "status": "verified",
+            "evidence_id": "e2",
+            "required_metrics": [
+              "disk_total_iops",
+              "disk_io_now"
+            ]
+          },
+          {
+            "description": "验证 CPU 调度下降是否与磁盘 I/O 阻塞相关",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "schedstat_running_rate",
+              "processes_blocked"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "磁盘空间不足导致磁盘 I/O 操作受限，进而引发系统性能下降",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.45,
+        "current_confidence": 0.3,
+        "required_verifications": [
+          {
+            "description": "检查磁盘空间使用情况，确认是否存在磁盘空间不足",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "filesystem_avail_bytes"
+            ]
+          },
+          {
+            "description": "验证磁盘 I/O 是否因空间不足而受限",
+            "status": "verified",
+            "evidence_id": "e2",
+            "required_metrics": [
+              "disk_total_iops",
+              "disk_io_now"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"memory_usage_percent\", \"memory_active_anon_bytes\", \"memory_mapped_bytes\", \"memory_sunr)",
+        "result_digest": "memory_usage_percent: mean=32.07185123866346; memory_active_anon_bytes: mean=1516698965.3333333; memory_mapped_bytes: mean=252909568.0; memory_sunreclaim_bytes: mean=254309717.33333334",
+        "raw_stats": {
+          "memory_usage_percent": 32.07185123866346,
+          "memory_active_anon_bytes": 1516698965.3333333,
+          "memory_mapped_bytes": 252909568.0,
+          "memory_sunreclaim_bytes": 254309717.33333334
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h1",
+          "h2",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_write_iops\", \"disk_total_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:26:13\", )",
+        "result_digest": "disk_write_iops: mean=59.645448815531175; disk_total_iops: mean=59.77272137751765",
+        "raw_stats": {
+          "disk_write_iops": 59.645448815531175,
+          "disk_total_iops": 59.77272137751765
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h2",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"filesystem_usage_percent\", \"filesystem_free_bytes\"], \"time_window\": {\"start\": \"2025-09)",
+        "result_digest": "filesystem_usage_percent: mean=77.98136216514149; filesystem_free_bytes: mean=22097405952.0",
+        "raw_stats": {
+          "filesystem_usage_percent": 77.98136216514149,
+          "filesystem_free_bytes": 22097405952.0
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h2",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"cpu_iowait_percent\", \"cpu_usage_percent\", \"disk_io_time_seconds_total\", \"disk_io_weigh)",
+        "result_digest": "cpu_iowait_percent: mean=3.0034090840221705; cpu_usage_percent: mean=66.99215626520235; disk_io_time_seconds_total: mean=4358.474666666667; disk_io_weighted_time_seconds_total: mean=107096.33783333334",
+        "raw_stats": {
+          "cpu_iowait_percent": 3.0034090840221705,
+          "cpu_usage_percent": 66.99215626520235,
+          "disk_io_time_seconds_total": 4358.474666666667,
+          "disk_io_weighted_time_seconds_total": 107096.33783333334
+        },
+        "created_at_step": 4
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "内存压力过大导致操作系统频繁进行内存换页操作，进而引发磁盘 I/O 阻塞",
+        "fault_type": "mem_load",
+        "confidence": 0.9,
+        "evidence_ids": [
+          "e1",
+          "e2"
+        ]
+      },
+      {
+        "cause": "磁盘 I/O 阻塞导致进程等待磁盘操作，进而引发 CPU 调度下降",
+        "fault_type": "disk_burn",
+        "confidence": 0.4,
+        "evidence_ids": [
+          "e2",
+          "e3",
+          "e4"
+        ]
+      },
+      {
+        "cause": "磁盘空间不足导致磁盘 I/O 操作受限，进而引发系统性能下降",
+        "fault_type": "disk_fill",
+        "confidence": 0.3,
+        "evidence_ids": [
+          "e2",
+          "e3",
+          "e4"
+        ]
+      }
+    ]
+  }
+}

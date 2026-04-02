@@ -1,0 +1,77 @@
+{
+  "run_id": "exp_010_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u8d1f\u8f7d\u5347\u9ad8\uff0c\u540c\u65f6\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5f15\u53d1\u9891\u7e41\u6362\u9875\uff0c\u78c1\u76d8 I/O \u548c\u7f51\u7edc\u63a5\u6536\u6570\u636e\u5305\u901f\u7387\u4e5f\u5b58\u5728\u4e00\u5b9a\u95ee\u9898\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u8d1f\u8f7d\u5347\u9ad8",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e3",
+        "e5",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u9891\u7e41\u6362\u9875",
+      "fault_type": "mem_load",
+      "confidence": 0.75,
+      "evidence_ids": [
+        "e4",
+        "e8"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u7f51\u7edc\u63a5\u6536\u6570\u636e\u5305\u901f\u7387\u4e0b\u964d\uff0c\u53ef\u80fd\u5b58\u5728\u4e22\u5305\u6216\u5ef6\u8fdf",
+      "fault_type": "network_loss",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e9"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8 I/O \u8fc7\u8f7d\u5bfc\u81f4\u8bfb\u5199\u538b\u529b\u589e\u5927",
+      "fault_type": "disk_burn",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e6",
+        "e10"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u7f51\u7edc\u4e22\u5305\u6216\u5ef6\u8fdf\u7684\u8bc1\u636e\u4e0d\u8db3\uff0c\u78c1\u76d8 I/O \u8fc7\u8f7d\u7684\u5f71\u54cd\u5c1a\u4e0d\u660e\u786e"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "network",
+    "triage_confidence": 0.19044196967932006,
+    "main_tools_used": [
+      "MetricQueryTool x9",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 10,
+    "main_iterations": 11,
+    "audit_iterations": 1,
+    "total_tokens_in": 34468,
+    "total_tokens_out": 4312,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:02:57.292822"
+}

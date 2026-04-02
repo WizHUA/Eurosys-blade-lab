@@ -1,0 +1,78 @@
+{
+  "run_id": "exp_003_Full",
+  "anomaly_summary": "系统出现复合型故障，主要表现为CPU满载运行（置信度0.80）和内存压力过大（置信度0.70），同时伴随磁盘空间持续减少（置信度0.10）和网络接收数据包速率异常升高（置信度0.05）。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU 满载运行，忙于计算而非等待 I/O",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.8,
+      "evidence_ids": [
+        "e3",
+        "e4",
+        "e5",
+        "e13"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "内存压力过大导致内存资源紧张",
+      "fault_type": "mem_load",
+      "confidence": 0.7,
+      "evidence_ids": [
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少导致可用空间不足",
+      "fault_type": "disk_fill",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e1",
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "网络接收数据包速率异常升高",
+      "fault_type": "network_loss",
+      "confidence": 0.05,
+      "evidence_ids": [
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "磁盘空间减少的置信度较低（0.10），需要进一步确认是否为主要问题",
+    "网络接收数据包速率升高的置信度很低（0.05），其影响程度尚不明确",
+    "内存压力大的具体原因需要进一步分析"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.13085017244888528,
+    "main_tools_used": [
+      "MetricQueryTool x7",
+      "KBRetrievalTool x7"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 14,
+    "main_iterations": 15,
+    "audit_iterations": 1,
+    "total_tokens_in": 49502,
+    "total_tokens_out": 4989,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T19:44:04.563809"
+}

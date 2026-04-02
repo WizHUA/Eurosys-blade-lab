@@ -8,6 +8,10 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 
+from agent.config import AgentConfig, FORMALTEST_DIR
+from agent.orchestrator import _load_metric_kb, _load_metrics_df
+from agent.triage import run_triage
+
 # ===========================================================================
 # Shared fixtures
 # ===========================================================================
@@ -135,6 +139,50 @@ class TestMetricQueryTool:
         assert "window_info" in result
         assert result["window_info"]["n_points"] > 0
 
+    def test_handles_datetime64_us_index(self, sample_df):
+        from agent.tools.metric_query import MetricQueryTool
+
+        df = sample_df.copy()
+        df.index = pd.Index(df.index.to_numpy(dtype="datetime64[us]"))
+
+        tool = MetricQueryTool(df)
+        result = tool.execute({
+            "metrics": ["cpu_usage_percent"],
+            "time_window": {"start": "2025-01-01T00:00:00", "end": "2025-01-01T00:02:00"},
+            "aggregation": "mean",
+        })
+
+        assert len(result["results"]) == 1
+        assert result["window_info"]["n_points"] > 0
+
+    def test_real_exp001_window_returns_observations(self):
+        from agent.tools.metric_query import MetricQueryTool
+
+        config = AgentConfig()
+        exp_dir = FORMALTEST_DIR / "exp_001_cpu_fullload"
+        focus_context = run_triage(
+            metrics_path=exp_dir / "metrics.csv",
+            jobinfo_path=exp_dir / "jobinfo.csv",
+            metric_kb=_load_metric_kb(),
+            config=config.triage,
+            ablation=config.ablation,
+            run_id="test_exp001_metric_query",
+        )
+        tool = MetricQueryTool(_load_metrics_df(exp_dir / "metrics.csv"))
+
+        result = tool.execute({
+            "metrics": ["cpu_usage_percent"],
+            "time_window": {
+                "start": focus_context.anomaly_window.start.isoformat(),
+                "end": focus_context.anomaly_window.end.isoformat(),
+            },
+            "aggregation": "mean",
+        })
+
+        assert len(result["results"]) == 1
+        assert result["window_info"]["n_points"] > 0
+        assert result["results"][0]["metric"] == "cpu_usage_percent"
+
 
 # ===========================================================================
 # KBRetrievalTool tests
@@ -251,3 +299,19 @@ class TestDataAnalysisTool:
             "analysis_type": "invalid_type",
         })
         assert "error" in result
+
+    def test_handles_datetime64_us_index(self, sample_df):
+        from agent.tools.data_analysis import DataAnalysisTool
+
+        df = sample_df.copy()
+        df.index = pd.Index(df.index.to_numpy(dtype="datetime64[us]"))
+
+        tool = DataAnalysisTool(df)
+        result = tool.execute({
+            "analysis_type": "correlation",
+            "metric_a": "cpu_usage_percent",
+            "metric_b": "memory_usage_percent",
+            "time_window": {"start": "2025-01-01T00:00:00", "end": "2025-01-01T00:02:00"},
+        })
+
+        assert "findings" in result

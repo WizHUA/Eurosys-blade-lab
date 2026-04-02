@@ -1,667 +1,577 @@
-# agent/kb/metrics.yaml
-# HPC-Diagnosis Agent v4 — Metric Knowledge Base
-# 覆盖关键子系统：CPU / Memory / Network / Disk / System
-# 格式遵循 design/kb_schema.md §1.1
-
-# ===========================================================================
-# CPU 子系统（5 个核心条目）
-# ===========================================================================
-
-- name: "cpu_usage_percent"
-  subsystem: "cpu"
-  description: "CPU 总使用率（100 - idle%）。正常 HPC 计算任务会跑到 80-95%；
-    若持续 ≥ 95% 超过 5 分钟且 load1 > num_cpus，强烈提示 cpu_fullload 故障。"
-  prometheus_query: '100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)'
-  metric_type: "derived_rate"
-  unit: "%"
+- name: cpu_usage_percent
+  subsystem: cpu
+  description: CPU 总使用率（100 - idle%）。正常 HPC 计算任务会跑到 80-95%； 若持续 ≥ 95% 超过 5 分钟且 load1 > num_cpus，强烈提示 CPU 过载 故障。
+  prometheus_query: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 20.0
     max: 95.0
-    unit: "%"
-    note: "NPB-BT/SP/CG 等 MPI 类 workload 正常运行时 70-95% 均属正常；idle > 5% 表示未满载"
+    unit: '%'
+    note: NPB-BT/SP/CG 等 MPI 类 workload 正常运行时 70-95% 均属正常；idle > 5% 表示未满载
   strength_thresholds:
     weak:
-      condition: "> 90"
+      condition: '> 90'
       min_duration_sec: 30
     medium:
-      condition: "> 95"
+      condition: '> 95'
       min_duration_sec: 60
     strong:
-      condition: "> 97"
+      condition: '> 97'
       min_duration_sec: 300
-  related_faults: ["cpu_fullload"]
   downstream_effects:
-    - metric: "memory_usage_percent"
-      lag_range_sec: [120, 600]
-      condition: "if_sustained"
-    - metric: "cpu_iowait_percent"
-      lag_range_sec: [60, 300]
-      condition: "only_if_extreme"
-  common_misconceptions: "单节点高 CPU 不代表故障；需结合 load1 > num_cpus 和 job 分配情况判断。
-    若只有 1 个 CPU 核心跑到 100%（多核平均后 < 20%），不应认定为 cpu_fullload。"
-
-- name: "cpu_iowait_percent"
-  subsystem: "cpu"
-  description: "CPU 等待 IO 的时间比例。高 iowait 通常是磁盘或网络 IO 瓶颈的继发症状，
-    也可在内存严重不足触发 swap 时出现。单独高 iowait 首先排查 disk_burn / disk_fill。"
-  prometheus_query: 'avg(rate(node_cpu_seconds_total{mode="iowait"}[1m])) * 100'
-  metric_type: "derived_rate"
-  unit: "%"
+  - metric: memory_usage_percent
+    lag_range_sec:
+    - 120
+    - 600
+    condition: if_sustained
+  - metric: cpu_iowait_percent
+    lag_range_sec:
+    - 60
+    - 300
+    condition: only_if_extreme
+  common_misconceptions: 单节点高 CPU 不代表故障；需结合 load1 > num_cpus 和 job 分配情况判断。 若只有 1 个 CPU 核心跑到 100%（多核平均后 < 20%），不应认定为 CPU 过载。
+- name: cpu_iowait_percent
+  subsystem: cpu
+  description: CPU 等待 IO 的时间比例。高 iowait 通常是磁盘或网络 IO 瓶颈的继发症状， 也可在内存严重不足触发 swap 时出现。单独高 iowait 首先排查 磁盘 I/O 压力 / 磁盘空间不足。
+  prometheus_query: avg(rate(node_cpu_seconds_total{mode="iowait"}[1m])) * 100
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 0.0
     max: 10.0
-    unit: "%"
-    note: "MPI 密集型计算任务的 iowait 通常 < 5%；> 15% 即可关注"
+    unit: '%'
+    note: MPI 密集型计算任务的 iowait 通常 < 5%；> 15% 即可关注
   strength_thresholds:
     weak:
-      condition: "> 15"
+      condition: '> 15'
       min_duration_sec: 30
     medium:
-      condition: "> 25"
+      condition: '> 25'
       min_duration_sec: 60
     strong:
-      condition: "> 40"
+      condition: '> 40'
       min_duration_sec: 120
-  related_faults: ["disk_burn", "disk_fill", "mem_load_ram"]
   downstream_effects: []
-  common_misconceptions: "iowait 高不等于 CPU 故障；它是下游症状，根因通常在磁盘或内存。
-    不要将 iowait 计入 cpu_fullload 的支持证据。"
-
-- name: "context_switches_rate"
-  subsystem: "cpu"
-  description: "每秒上下文切换次数（rate 后的速率值）。CPU 满载时进程频繁争抢 CPU，
-    上下文切换率会显著高于 baseline。此指标变化是 cpu_fullload 的辅助确认证据。"
-  prometheus_query: "rate(node_context_switches_total[1m])"
-  metric_type: "derived_rate"
-  unit: "switches/s"
+  common_misconceptions: iowait 高不等于 CPU 故障；它是下游症状，根因通常在磁盘或内存。 不要将 iowait 计入 CPU 过载 的支持证据。
+- name: context_switches_rate
+  subsystem: cpu
+  description: 每秒上下文切换次数（rate 后的速率值）。CPU 满载时进程频繁争抢 CPU， 上下文切换率会显著高于 baseline。此指标变化是 CPU 过载 的辅助确认证据。
+  prometheus_query: rate(node_context_switches_total[1m])
+  metric_type: derived_rate
+  unit: switches/s
   normal_range:
     min: 1000.0
     max: 50000.0
-    unit: "switches/s"
-    note: "依赖节点 CPU 核心数和 workload 进程数；应参照 Baseline Profile 的倍数，而非绝对值"
+    unit: switches/s
+    note: 依赖节点 CPU 核心数和 workload 进程数；应参照 Baseline Profile 的倍数，而非绝对值
   strength_thresholds:
     weak:
-      condition: "> baseline * 2.0"
+      condition: '> baseline * 2.0'
       min_duration_sec: 60
     medium:
-      condition: "> baseline * 3.0"
+      condition: '> baseline * 3.0'
       min_duration_sec: 60
     strong:
-      condition: "> baseline * 5.0"
+      condition: '> baseline * 5.0'
       min_duration_sec: 120
-  related_faults: ["cpu_fullload"]
   downstream_effects: []
-  common_misconceptions: "绝对值意义不大，必须与 Baseline Profile 对比；
-    不同 workload 的 baseline 差异可达 10x，不能用固定阈值。"
-
-- name: "load_1min"
-  subsystem: "load"
-  description: "系统 1 分钟平均负载（运行+等待队列进程数）。
-    load1 > num_vcpus 表示系统存在过载；cpu_fullload 故障会导致 load1 急剧上升。"
-  prometheus_query: "node_load1"
-  metric_type: "gauge"
-  unit: "dimensionless"
+  common_misconceptions: 绝对值意义不大，必须与 Baseline Profile 对比； 不同 workload 的 baseline 差异可达 10x，不能用固定阈值。
+- name: load_1min
+  subsystem: load
+  description: 系统 1 分钟平均负载（运行+等待队列进程数）。 load1 > num_vcpus 表示系统存在过载；CPU 过载 故障会导致 load1 急剧上升。
+  prometheus_query: node_load1
+  metric_type: gauge
+  unit: dimensionless
   normal_range:
     min: 0.1
     max: 4.0
-    unit: "dimensionless"
-    note: "阈值应为 num_vcpus（从节点信息动态获取）；此处默认值仅供参考（假设 4 核节点）"
+    unit: dimensionless
+    note: 阈值应为 num_vcpus（从节点信息动态获取）；此处默认值仅供参考（假设 4 核节点）
   strength_thresholds:
     weak:
-      condition: "> num_vcpus * 0.9"
+      condition: '> num_vcpus * 0.9'
       min_duration_sec: 30
     medium:
-      condition: "> num_vcpus * 1.2"
+      condition: '> num_vcpus * 1.2'
       min_duration_sec: 60
     strong:
-      condition: "> num_vcpus * 1.5"
+      condition: '> num_vcpus * 1.5'
       min_duration_sec: 180
-  related_faults: ["cpu_fullload"]
   downstream_effects: []
-  common_misconceptions: "load1 是滑动平均，故障注入后有 ~1 分钟延迟才会充分体现；
-    不要用 load1 极值作为 onset_time，应用 cpu_usage 的 onset_time。"
-
-- name: "processes_blocked"
-  subsystem: "processes"
-  description: "D 状态（不可中断睡眠，通常等待 IO）进程数。
-    disk_burn 或 disk_fill 导致磁盘 IO 阻塞时，此值会上升；严重内存换页时也会上涨。"
-  prometheus_query: "node_procs_blocked"
-  metric_type: "gauge"
-  unit: "count"
+  common_misconceptions: load1 是滑动平均，故障注入后有 ~1 分钟延迟才会充分体现； 不要用 load1 极值作为 onset_time，应用 cpu_usage 的 onset_time。
+- name: processes_blocked
+  subsystem: processes
+  description: D 状态（不可中断睡眠，通常等待 IO）进程数。 磁盘 I/O 压力 或 磁盘空间不足 导致磁盘 IO 阻塞时，此值会上升；严重内存换页时也会上涨。
+  prometheus_query: node_procs_blocked
+  metric_type: gauge
+  unit: count
   normal_range:
     min: 0
     max: 5
-    unit: "count"
-    note: "HPC 集群正常运行时应 ≤ 2；持续 > 10 是异常信号"
+    unit: count
+    note: HPC 集群正常运行时应 ≤ 2；持续 > 10 是异常信号
   strength_thresholds:
     weak:
-      condition: "> 5"
+      condition: '> 5'
       min_duration_sec: 30
     medium:
-      condition: "> 15"
+      condition: '> 15'
       min_duration_sec: 60
     strong:
-      condition: "> 30"
+      condition: '> 30'
       min_duration_sec: 120
-  related_faults: ["disk_burn", "disk_fill", "mem_load_ram"]
   downstream_effects: []
-  common_misconceptions: "blocked 进程增加是症状，不是根因；需配合 disk / memory 指标联合判断。"
-
-# ===========================================================================
-# Memory 子系统（5 个核心条目）
-# ===========================================================================
-
-- name: "memory_usage_percent"
-  subsystem: "memory"
-  description: "物理内存使用率（1 - MemAvailable / MemTotal）。
-    mem_load_ram 故障会将此值快速推高至注入参数设定的目标百分比（默认 70%）。"
-  prometheus_query: "(1 - node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes) * 100"
-  metric_type: "derived_rate"
-  unit: "%"
+  common_misconceptions: blocked 进程增加是症状，不是根因；需配合 disk / memory 指标联合判断。
+- name: memory_usage_percent
+  subsystem: memory
+  description: 物理内存使用率（1 - MemAvailable / MemTotal）。 内存过载（RAM） 故障会将此值快速推高至注入参数设定的目标百分比（默认 70%）。
+  prometheus_query: (1 - node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes) * 100
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 20.0
     max: 75.0
-    unit: "%"
-    note: "NPB workload 正常运行内存占用约 30-60%；超过 80% 开始进入高风险区"
+    unit: '%'
+    note: NPB workload 正常运行内存占用约 30-60%；超过 80% 开始进入高风险区
   strength_thresholds:
     weak:
-      condition: "> 80"
+      condition: '> 80'
       min_duration_sec: 30
     medium:
-      condition: "> 88"
+      condition: '> 88'
       min_duration_sec: 60
     strong:
-      condition: "> 93"
+      condition: '> 93'
       min_duration_sec: 180
-  related_faults: ["mem_load_ram", "mem_load_buffer", "mem_load_stack"]
   downstream_effects:
-    - metric: "swap_usage_percent"
-      lag_range_sec: [30, 180]
-      condition: "only_if_extreme"
-    - metric: "page_major_faults_rate"
-      lag_range_sec: [30, 300]
-      condition: "only_if_extreme"
-    - metric: "cpu_iowait_percent"
-      lag_range_sec: [60, 300]
-      condition: "only_if_extreme"
-  common_misconceptions: "Linux 的 page cache 会占用大量内存，但属可回收内存，
-    MemAvailable 已排除可回收部分；直接用 MemFree 会误报大量 false positive。"
-
-- name: "swap_usage_percent"
-  subsystem: "swap"
-  description: "Swap 使用率（1 - SwapFree / SwapTotal）。
-    任何 Swap 使用在 HPC 环境都是严重信号（正常计算任务不应使用 Swap）；
-    mem_load 故障超出物理内存上限时会触发此指标。"
-  prometheus_query: "(1 - node_memory_SwapFree_bytes/node_memory_SwapTotal_bytes) * 100"
-  metric_type: "derived_rate"
-  unit: "%"
+  - metric: swap_usage_percent
+    lag_range_sec:
+    - 30
+    - 180
+    condition: only_if_extreme
+  - metric: page_major_faults_rate
+    lag_range_sec:
+    - 30
+    - 300
+    condition: only_if_extreme
+  - metric: cpu_iowait_percent
+    lag_range_sec:
+    - 60
+    - 300
+    condition: only_if_extreme
+  common_misconceptions: Linux 的 page cache 会占用大量内存，但属可回收内存， MemAvailable 已排除可回收部分；直接用 MemFree 会误报大量 false positive。
+- name: swap_usage_percent
+  subsystem: swap
+  description: Swap 使用率（1 - SwapFree / SwapTotal）。 任何 Swap 使用在 HPC 环境都是严重信号（正常计算任务不应使用 Swap）； 内存负载异常 故障超出物理内存上限时会触发此指标。
+  prometheus_query: (1 - node_memory_SwapFree_bytes/node_memory_SwapTotal_bytes) * 100
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 0.0
     max: 1.0
-    unit: "%"
-    note: "HPC 场景 Swap > 1% 即视为异常；>10% 表示已发生显著的内存换出"
+    unit: '%'
+    note: HPC 场景 Swap > 1% 即视为异常；>10% 表示已发生显著的内存换出
   strength_thresholds:
     weak:
-      condition: "> 1"
+      condition: '> 1'
       min_duration_sec: 30
     medium:
-      condition: "> 10"
+      condition: '> 10'
       min_duration_sec: 60
     strong:
-      condition: "> 30"
+      condition: '> 30'
       min_duration_sec: 120
-  related_faults: ["mem_load_ram", "mem_load_stack"]
   downstream_effects:
-    - metric: "disk_io_usage_percent"
-      lag_range_sec: [10, 60]
-      condition: "always"
-    - metric: "cpu_iowait_percent"
-      lag_range_sec: [10, 60]
-      condition: "always"
-  common_misconceptions: "swap_usage_percent=0 不代表完全没有内存压力；
-    page_major_faults_rate 更能反映实时换页活动。"
-
-- name: "page_major_faults_rate"
-  subsystem: "vmstat"
-  description: "每秒主缺页异常次数（rate 后）。主缺页表示进程访问了不在物理内存中的页面，
-    需要从磁盘（Swap）读取，直接导致进程阻塞。mem_load 重度场景会出现此指标飙升。"
-  prometheus_query: "rate(node_vmstat_pgmajfault[1m])"
-  metric_type: "derived_rate"
-  unit: "faults/s"
+  - metric: disk_io_usage_percent
+    lag_range_sec:
+    - 10
+    - 60
+    condition: always
+  - metric: cpu_iowait_percent
+    lag_range_sec:
+    - 10
+    - 60
+    condition: always
+  common_misconceptions: swap_usage_percent=0 不代表完全没有内存压力； page_major_faults_rate 更能反映实时换页活动。
+- name: page_major_faults_rate
+  subsystem: vmstat
+  description: 每秒主缺页异常次数（rate 后）。主缺页表示进程访问了不在物理内存中的页面， 需要从磁盘（Swap）读取，直接导致进程阻塞。内存负载异常 重度场景会出现此指标飙升。
+  prometheus_query: rate(node_vmstat_pgmajfault[1m])
+  metric_type: derived_rate
+  unit: faults/s
   normal_range:
     min: 0.0
     max: 5.0
-    unit: "faults/s"
-    note: "HPC 作业稳定运行后应接近 0；启动阶段可能有短暂的 minor faults，不用关注"
+    unit: faults/s
+    note: HPC 作业稳定运行后应接近 0；启动阶段可能有短暂的 minor faults，不用关注
   strength_thresholds:
     weak:
-      condition: "> 5"
+      condition: '> 5'
       min_duration_sec: 30
     medium:
-      condition: "> 50"
+      condition: '> 50'
       min_duration_sec: 30
     strong:
-      condition: "> 200"
+      condition: '> 200'
       min_duration_sec: 60
-  related_faults: ["mem_load_ram", "mem_load_stack"]
   downstream_effects: []
-  common_misconceptions: "与 page_faults_rate（pgfault）区分：pgfault 包含 minor fault
-    （仅需页表更新，无磁盘 IO），在正常程序启动时大量出现；pgmajfault 才是真正的 swap 活动。"
+  common_misconceptions: 与 page_faults_rate（pgfault）区分：pgfault 包含 minor fault （仅需页表更新，无磁盘 IO），在正常程序启动时大量出现；pgmajfault 才是真正的
+    swap 活动。
+- name: anon_memory_percent
+  subsystem: memory
+  description: 匿名内存（进程堆和 mmap 分配的用户空间内存）占物理内存的比例。 内存过载（RAM） (ChaosBlade) 会创建大量匿名内存（mmap + madvise）， 此指标是区分 ram 模式与 buffer
+    模式内存故障的关键。
+  prometheus_query: '((node_memory_Active_anon_bytes + node_memory_Inactive_anon_bytes) /node_memory_MemTotal_bytes) * 100
 
-- name: "anon_memory_percent"
-  subsystem: "memory"
-  description: "匿名内存（进程堆和 mmap 分配的用户空间内存）占物理内存的比例。
-    mem_load_ram (ChaosBlade) 会创建大量匿名内存（mmap + madvise），
-    此指标是区分 ram 模式与 buffer 模式内存故障的关键。"
-  prometheus_query: >
-    ((node_memory_Active_anon_bytes + node_memory_Inactive_anon_bytes)
-    /node_memory_MemTotal_bytes) * 100
-  metric_type: "derived_rate"
-  unit: "%"
+    '
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 5.0
     max: 40.0
-    unit: "%"
-    note: "NPB 作业运行中匿名内存约 20-40%；mem_load_ram 会将其推至 60%+"
+    unit: '%'
+    note: NPB 作业运行中匿名内存约 20-40%；内存过载（RAM） 会将其推至 60%+
   strength_thresholds:
     weak:
-      condition: "> 50"
+      condition: '> 50'
       min_duration_sec: 30
     medium:
-      condition: "> 65"
+      condition: '> 65'
       min_duration_sec: 60
     strong:
-      condition: "> 80"
+      condition: '> 80'
       min_duration_sec: 120
-  related_faults: ["mem_load_ram"]
   downstream_effects: []
-  common_misconceptions: "buffer_usage_percent 高但 anon_memory_percent 正常，
-    更可能是 mem_load_buffer 故障而非 mem_load_ram。"
-
-- name: "memory_dirty_bytes"
-  subsystem: "memory"
-  description: "内核脏页大小（已修改但未写回磁盘）。mem_load_buffer 故障会分配大量
-    buffer cache（page cache），间接推高脏页；disk_burn 写压力也会使此值波动。"
-  prometheus_query: "node_memory_Dirty_bytes"
-  metric_type: "gauge"
-  unit: "bytes"
+  common_misconceptions: buffer_usage_percent 高但 anon_memory_percent 正常， 更可能是 内存过载（buffer/cache） 故障而非 内存过载（RAM）。
+- name: memory_dirty_bytes
+  subsystem: memory
+  description: 内核脏页大小（已修改但未写回磁盘）。内存过载（buffer/cache） 故障会分配大量 buffer cache（page cache），间接推高脏页；磁盘 I/O 压力 写压力也会使此值波动。
+  prometheus_query: node_memory_Dirty_bytes
+  metric_type: gauge
+  unit: bytes
   normal_range:
     min: 0
     max: 104857600
-    unit: "bytes"
-    note: "正常应 < 100MB；持续 > 500MB 表示 writeback 压力"
+    unit: bytes
+    note: 正常应 < 100MB；持续 > 500MB 表示 writeback 压力
   strength_thresholds:
     weak:
-      condition: "> 524288000"
+      condition: '> 524288000'
       min_duration_sec: 30
     medium:
-      condition: "> 1073741824"
+      condition: '> 1073741824'
       min_duration_sec: 60
     strong:
-      condition: "> 2147483648"
+      condition: '> 2147483648'
       min_duration_sec: 120
-  related_faults: ["mem_load_buffer", "disk_burn"]
   downstream_effects:
-    - metric: "disk_write_rate_bytes_per_sec"
-      lag_range_sec: [30, 120]
-      condition: "if_sustained"
-  common_misconceptions: "脏页高不一定是故障，写密集型应用本就会有大量脏页；
-    配合 disk_write_rate 趋势和 Baseline Profile 来判断。"
-
-# ===========================================================================
-# Network 子系统（4 个核心条目）
-# ===========================================================================
-
-- name: "network_receive_drop_rate"
-  subsystem: "network"
-  description: "网络接收方向丢包速率（每秒）。ChaosBlade network-loss 使用 tc-netem 注入丢包，
-    丢掉的包会计入 kernel 的 drop 计数器，此指标会在故障注入后立即上升。
-    HPC MPI 通信对丢包极其敏感，任何持续丢包都是严重故障信号。"
-  prometheus_query: 'rate(node_network_receive_drop_total{device="ens33"}[1m])'
-  metric_type: "derived_rate"
-  unit: "packets/s"
+  - metric: disk_write_rate_bytes_per_sec
+    lag_range_sec:
+    - 30
+    - 120
+    condition: if_sustained
+  common_misconceptions: 脏页高不一定是故障，写密集型应用本就会有大量脏页； 配合 disk_write_rate 趋势和 Baseline Profile 来判断。
+- name: network_receive_drop_rate
+  subsystem: network
+  description: 网络接收方向丢包速率（每秒）。ChaosBlade network-loss 使用 tc-netem 注入丢包， 丢掉的包会计入 kernel 的 drop 计数器，此指标会在故障注入后立即上升。 HPC MPI
+    通信对丢包极其敏感，任何持续丢包都是严重故障信号。
+  prometheus_query: rate(node_network_receive_drop_total{device="ens33"}[1m])
+  metric_type: derived_rate
+  unit: packets/s
   normal_range:
     min: 0.0
     max: 0.5
-    unit: "packets/s"
-    note: "正常 HPC 集群网络丢包应趋近 0；任何 > 1 packets/s 持续出现均需关注"
+    unit: packets/s
+    note: 正常 HPC 集群网络丢包应趋近 0；任何 > 1 packets/s 持续出现均需关注
   strength_thresholds:
     weak:
-      condition: "> 1"
+      condition: '> 1'
       min_duration_sec: 15
     medium:
-      condition: "> 50"
+      condition: '> 50'
       min_duration_sec: 30
     strong:
-      condition: "> 200"
+      condition: '> 200'
       min_duration_sec: 60
-  related_faults: ["network_loss"]
   downstream_effects:
-    - metric: "network_receive_packets_rate"
-      lag_range_sec: [0, 30]
-      condition: "always"
-  common_misconceptions: "tc-netem 的 network-loss 可能主要体现在发送方向丢包，
-    也可能是接收方向，取决于 ChaosBlade 的配置参数；应同时检查 transmit_drop_rate。"
-
-- name: "network_transmit_drop_rate"
-  subsystem: "network"
-  description: "网络发送方向丢包速率（每秒）。ChaosBlade 默认注入出向（egress）丢包，
-    此指标是 network_loss 故障的主要信号；与 receive_drop_rate 联合判断故障方向。"
-  prometheus_query: 'rate(node_network_transmit_drop_total{device="ens33"}[1m])'
-  metric_type: "derived_rate"
-  unit: "packets/s"
+  - metric: network_receive_packets_rate
+    lag_range_sec:
+    - 0
+    - 30
+    condition: always
+  common_misconceptions: tc-netem 的 network-loss 可能主要体现在发送方向丢包， 也可能是接收方向，取决于 ChaosBlade 的配置参数；应同时检查 transmit_drop_rate。
+- name: network_transmit_drop_rate
+  subsystem: network
+  description: 网络发送方向丢包速率（每秒）。ChaosBlade 默认注入出向（egress）丢包， 此指标是 网络丢包 故障的主要信号；与 receive_drop_rate 联合判断故障方向。
+  prometheus_query: rate(node_network_transmit_drop_total{device="ens33"}[1m])
+  metric_type: derived_rate
+  unit: packets/s
   normal_range:
     min: 0.0
     max: 0.5
-    unit: "packets/s"
-    note: "与 receive_drop_rate 相同，任何持续丢包均为严重异常"
+    unit: packets/s
+    note: 与 receive_drop_rate 相同，任何持续丢包均为严重异常
   strength_thresholds:
     weak:
-      condition: "> 1"
+      condition: '> 1'
       min_duration_sec: 15
     medium:
-      condition: "> 50"
+      condition: '> 50'
       min_duration_sec: 30
     strong:
-      condition: "> 200"
+      condition: '> 200'
       min_duration_sec: 60
-  related_faults: ["network_loss"]
   downstream_effects: []
-  common_misconceptions: "与 receive_drop_rate 的区别：发送方向丢包通常由本地 tc 规则造成，
-    接收方向丢包由对端或中间设备造成。ChaosBlade 注入的是本地 tc 规则，因此
-    transmit_drop_rate 更直接反映故障。"
-
-- name: "network_receive_errors_rate"
-  subsystem: "network"
-  description: "网络接收错误速率（CRC、帧错误等）。与丢包不同，errors 表示物理层问题。
-    在 network_loss 故障注入场景下此指标通常不变；若升高，提示真实硬件问题。"
-  prometheus_query: 'rate(node_network_receive_errs_total{device="ens33"}[1m])'
-  metric_type: "derived_rate"
-  unit: "errors/s"
+  common_misconceptions: 与 receive_drop_rate 的区别：发送方向丢包通常由本地 tc 规则造成， 接收方向丢包由对端或中间设备造成。ChaosBlade 注入的是本地 tc 规则，因此 transmit_drop_rate
+    更直接反映故障。
+- name: network_receive_errors_rate
+  subsystem: network
+  description: 网络接收错误速率（CRC、帧错误等）。与丢包不同，errors 表示物理层问题。 在 网络丢包 故障注入场景下此指标通常不变；若升高，提示真实硬件问题。
+  prometheus_query: rate(node_network_receive_errs_total{device="ens33"}[1m])
+  metric_type: derived_rate
+  unit: errors/s
   normal_range:
     min: 0.0
     max: 0.1
-    unit: "errors/s"
-    note: "正常应为 0；任何持续 errors 均是硬件级问题信号"
+    unit: errors/s
+    note: 正常应为 0；任何持续 errors 均是硬件级问题信号
   strength_thresholds:
     weak:
-      condition: "> 0.1"
+      condition: '> 0.1'
       min_duration_sec: 15
     medium:
-      condition: "> 5"
+      condition: '> 5'
       min_duration_sec: 30
     strong:
-      condition: "> 20"
+      condition: '> 20'
       min_duration_sec: 60
-  related_faults: []
   downstream_effects: []
-  common_misconceptions: "network_loss 故障（软件注入）不会产生 network errors；
-    errors 上升提示物理链路问题，需要排查网线和交换机端口。"
-
-- name: "network_receive_rate_bytes_per_sec"
-  subsystem: "network"
-  description: "网络接收吞吐量（字节/秒）。network_loss 故障注入时，MPI 重传会稍微升高带宽，
-    但更显著的是吞吐量的不稳定性（方差增大）；正常 MPI 通信的吞吐应相对稳定。"
-  prometheus_query: 'rate(node_network_receive_bytes_total{device="ens33"}[1m])'
-  metric_type: "derived_rate"
-  unit: "bytes/s"
+  common_misconceptions: 网络丢包 故障（软件注入）不会产生 network errors； errors 上升提示物理链路问题，需要排查网线和交换机端口。
+- name: network_receive_rate_bytes_per_sec
+  subsystem: network
+  description: 网络接收吞吐量（字节/秒）。网络丢包 故障注入时，MPI 重传会稍微升高带宽， 但更显著的是吞吐量的不稳定性（方差增大）；正常 MPI 通信的吞吐应相对稳定。
+  prometheus_query: rate(node_network_receive_bytes_total{device="ens33"}[1m])
+  metric_type: derived_rate
+  unit: bytes/s
   normal_range:
     min: 1000000.0
     max: 100000000.0
-    unit: "bytes/s"
-    note: "阈值高度依赖 workload 和节点数；主要用 Baseline Profile 比较，而非绝对值"
+    unit: bytes/s
+    note: 阈值高度依赖 workload 和节点数；主要用 Baseline Profile 比较，而非绝对值
   strength_thresholds:
     weak:
-      condition: "< baseline * 0.7 OR > baseline * 3.0"
+      condition: < baseline * 0.7 OR > baseline * 3.0
       min_duration_sec: 30
     medium:
-      condition: "< baseline * 0.5 OR > baseline * 5.0"
+      condition: < baseline * 0.5 OR > baseline * 5.0
       min_duration_sec: 30
     strong:
-      condition: "< baseline * 0.2"
+      condition: < baseline * 0.2
       min_duration_sec: 60
-  related_faults: ["network_loss"]
   downstream_effects: []
-  common_misconceptions: "吞吐量下降与吞吐量上升都可以是 network_loss 的表现（取决于重传量）；
-    单独使用此指标不如 drop_rate 可靠；应作为辅助证据。"
-
-# ===========================================================================
-# Disk/IO 子系统（5 个核心条目）
-# ===========================================================================
-
-- name: "disk_io_usage_percent"
-  subsystem: "disk"
-  description: "磁盘 IO 利用率（设备忙碌时间百分比）。disk_burn 故障（持续读写）会将此值
-    推至接近 100%；区分于 disk_fill（disk_fill 期间此值也高，但会在填充完成后下降）。"
-  prometheus_query: 'rate(node_disk_io_time_seconds_total{device="sda"}[1m]) * 100'
-  metric_type: "derived_rate"
-  unit: "%"
+  common_misconceptions: 吞吐量下降与吞吐量上升都可以是 网络丢包 的表现（取决于重传量）； 单独使用此指标不如 drop_rate 可靠；应作为辅助证据。
+- name: disk_io_usage_percent
+  subsystem: disk
+  description: 磁盘 IO 利用率（设备忙碌时间百分比）。磁盘 I/O 压力 故障（持续读写）会将此值 推至接近 100%；区分于 磁盘空间不足（磁盘空间不足 期间此值也高，但会在填充完成后下降）。
+  prometheus_query: rate(node_disk_io_time_seconds_total{device="sda"}[1m]) * 100
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 0.0
     max: 30.0
-    unit: "%"
-    note: "NPB 作业运行时磁盘 IO 通常 < 20%（多数计算在内存中进行）"
+    unit: '%'
+    note: NPB 作业运行时磁盘 IO 通常 < 20%（多数计算在内存中进行）
   strength_thresholds:
     weak:
-      condition: "> 60"
+      condition: '> 60'
       min_duration_sec: 30
     medium:
-      condition: "> 80"
+      condition: '> 80'
       min_duration_sec: 60
     strong:
-      condition: "> 95"
+      condition: '> 95'
       min_duration_sec: 120
-  related_faults: ["disk_burn", "disk_fill"]
   downstream_effects:
-    - metric: "cpu_iowait_percent"
-      lag_range_sec: [5, 30]
-      condition: "always"
-    - metric: "processes_blocked"
-      lag_range_sec: [5, 60]
-      condition: "if_sustained"
-  common_misconceptions: "disk_io_usage_percent=100% 不等于磁盘坏了，仅表示设备已饱和。
-    区分 disk_burn 和 disk_fill：disk_burn 是持续高 IO 直到故障结束；
-    disk_fill 的 IO 在填满后会骤降而文件系统占用率持续高。"
-
-- name: "disk_write_rate_bytes_per_sec"
-  subsystem: "disk"
-  description: "磁盘写入吞吐量（字节/秒，1 分钟滑动速率）。
-    disk_fill 阶段此值持续高（约 50-200 MB/s）；disk_burn write 模式此值也高；
-    通过时序变化区分：disk_fill 在写完后骤降，disk_burn 持续稳定高位。"
-  prometheus_query: 'rate(node_disk_written_bytes_total{device="sda"}[1m])'
-  metric_type: "derived_rate"
-  unit: "bytes/s"
+  - metric: cpu_iowait_percent
+    lag_range_sec:
+    - 5
+    - 30
+    condition: always
+  - metric: processes_blocked
+    lag_range_sec:
+    - 5
+    - 60
+    condition: if_sustained
+  common_misconceptions: disk_io_usage_percent=100% 不等于磁盘坏了，仅表示设备已饱和。 区分 磁盘 I/O 压力 和 磁盘空间不足：磁盘 I/O 压力 是持续高 IO 直到故障结束； 磁盘空间不足
+    的 IO 在填满后会骤降而文件系统占用率持续高。
+- name: disk_write_rate_bytes_per_sec
+  subsystem: disk
+  description: 磁盘写入吞吐量（字节/秒，1 分钟滑动速率）。 磁盘空间不足 阶段此值持续高（约 50-200 MB/s）；磁盘 I/O 压力 write 模式此值也高； 通过时序变化区分：磁盘空间不足 在写完后骤降，磁盘 I/O
+    压力 持续稳定高位。
+  prometheus_query: rate(node_disk_written_bytes_total{device="sda"}[1m])
+  metric_type: derived_rate
+  unit: bytes/s
   normal_range:
     min: 0.0
     max: 10000000.0
-    unit: "bytes/s"
-    note: "NPB 在 /tmp 写检查点文件；正常写出 < 10 MB/s，持续 > 50 MB/s 为异常"
+    unit: bytes/s
+    note: NPB 在 /tmp 写检查点文件；正常写出 < 10 MB/s，持续 > 50 MB/s 为异常
   strength_thresholds:
     weak:
-      condition: "> 52428800"
+      condition: '> 52428800'
       min_duration_sec: 30
     medium:
-      condition: "> 104857600"
+      condition: '> 104857600'
       min_duration_sec: 60
     strong:
-      condition: "> 157286400"
+      condition: '> 157286400'
       min_duration_sec: 120
-  related_faults: ["disk_burn", "disk_fill"]
   downstream_effects: []
-  common_misconceptions: "100 MB/s 的写入速率是否合理取决于硬件规格（HDD ~100-200 MB/s,
-    SSD ~500 MB/s+）；阈值应根据实际硬件测试的 peak write bandwidth 设置。"
+  common_misconceptions: 100 MB/s 的写入速率是否合理取决于硬件规格（HDD ~100-200 MB/s, SSD ~500 MB/s+）；阈值应根据实际硬件测试的 peak write bandwidth 设置。
+- name: filesystem_usage_percent
+  subsystem: filesystem
+  description: 根文件系统（/）使用率。磁盘空间不足 故障的核心信号： ChaosBlade 向 /tmp 写入数据，与根文件系统位于同一分区时，此值会持续增长直至达到 注入时设定的 percent 目标（默认 90%）。
+  prometheus_query: '(1 - node_filesystem_avail_bytes{mountpoint="/"} /node_filesystem_size_bytes{mountpoint="/"}) * 100
 
-- name: "filesystem_usage_percent"
-  subsystem: "filesystem"
-  description: "根文件系统（/）使用率。disk_fill 故障的核心信号：
-    ChaosBlade 向 /tmp 写入数据，与根文件系统位于同一分区时，此值会持续增长直至达到
-    注入时设定的 percent 目标（默认 90%）。"
-  prometheus_query: >
-    (1 - node_filesystem_avail_bytes{mountpoint="/"}
-    /node_filesystem_size_bytes{mountpoint="/"}) * 100
-  metric_type: "derived_rate"
-  unit: "%"
+    '
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 10.0
     max: 65.0
-    unit: "%"
-    note: "HPC 节点根分区正常使用 < 60%；/tmp 写入会体现在此指标上（若同一分区）"
+    unit: '%'
+    note: HPC 节点根分区正常使用 < 60%；/tmp 写入会体现在此指标上（若同一分区）
   strength_thresholds:
     weak:
-      condition: "> 75"
+      condition: '> 75'
       min_duration_sec: 30
     medium:
-      condition: "> 85"
+      condition: '> 85'
       min_duration_sec: 60
     strong:
-      condition: "> 92"
+      condition: '> 92'
       min_duration_sec: 60
-  related_faults: ["disk_fill"]
   downstream_effects:
-    - metric: "disk_io_usage_percent"
-      lag_range_sec: [0, 10]
-      condition: "if_sustained"
-  common_misconceptions: "filesystem_usage_percent 上升速度取决于 ChaosBlade 的写入速率；
-    slow fill 可能在数分钟后才明显；不要因为短时间内变化不大就忽略此指标。"
-
-- name: "disk_read_rate_bytes_per_sec"
-  subsystem: "disk"
-  description: "磁盘读取吞吐量（字节/秒）。disk_burn read 模式的主要信号。
-    配合 disk_write_rate 可以判断 burn 方向（read-only / write-only / bidirectional）。"
-  prometheus_query: 'rate(node_disk_read_bytes_total{device="sda"}[1m])'
-  metric_type: "derived_rate"
-  unit: "bytes/s"
+  - metric: disk_io_usage_percent
+    lag_range_sec:
+    - 0
+    - 10
+    condition: if_sustained
+  common_misconceptions: filesystem_usage_percent 上升速度取决于 ChaosBlade 的写入速率； slow fill 可能在数分钟后才明显；不要因为短时间内变化不大就忽略此指标。
+- name: disk_read_rate_bytes_per_sec
+  subsystem: disk
+  description: 磁盘读取吞吐量（字节/秒）。磁盘 I/O 压力 read 模式的主要信号。 配合 disk_write_rate 可以判断 burn 方向（read-only / write-only / bidirectional）。
+  prometheus_query: rate(node_disk_read_bytes_total{device="sda"}[1m])
+  metric_type: derived_rate
+  unit: bytes/s
   normal_range:
     min: 0.0
     max: 10000000.0
-    unit: "bytes/s"
-    note: "NPB 正常读盘 < 10 MB/s；disk_burn 默认 read+write，读写均会飙升"
+    unit: bytes/s
+    note: NPB 正常读盘 < 10 MB/s；磁盘 I/O 压力 默认 read+write，读写均会飙升
   strength_thresholds:
     weak:
-      condition: "> 52428800"
+      condition: '> 52428800'
       min_duration_sec: 30
     medium:
-      condition: "> 104857600"
+      condition: '> 104857600'
       min_duration_sec: 60
     strong:
-      condition: "> 157286400"
+      condition: '> 157286400'
       min_duration_sec: 120
-  related_faults: ["disk_burn"]
   downstream_effects: []
-  common_misconceptions: "disk_fill 主要是写操作（write large file）；读速率高主要指向 disk_burn。
-    若读写都高，优先考虑 disk_burn（bidirectional mode）。"
-
-- name: "filesystem_files_free"
-  subsystem: "filesystem"
-  description: "根文件系统可用 inode 数量。disk_fill 写入大量小文件时 inode 会被耗尽，
-    此时 filesystem_usage_percent 可能还未达到容量上限但系统已无法创建新文件。
-    对于大文件 fill，inode 影响不大，但此指标是异常排查的重要辅助。"
-  prometheus_query: 'node_filesystem_files_free{mountpoint="/"}'
-  metric_type: "gauge"
-  unit: "count"
+  common_misconceptions: 磁盘空间不足 主要是写操作（write large file）；读速率高主要指向 磁盘 I/O 压力。 若读写都高，优先考虑 磁盘 I/O 压力（bidirectional mode）。
+- name: filesystem_files_free
+  subsystem: filesystem
+  description: 根文件系统可用 inode 数量。磁盘空间不足 写入大量小文件时 inode 会被耗尽， 此时 filesystem_usage_percent 可能还未达到容量上限但系统已无法创建新文件。 对于大文件 fill，inode
+    影响不大，但此指标是异常排查的重要辅助。
+  prometheus_query: node_filesystem_files_free{mountpoint="/"}
+  metric_type: gauge
+  unit: count
   normal_range:
     min: 100000
     max: 5000000
-    unit: "count"
-    note: "正常应远大于 10 万；< 1000 时系统无法创建新文件"
+    unit: count
+    note: 正常应远大于 10 万；< 1000 时系统无法创建新文件
   strength_thresholds:
     weak:
-      condition: "< 50000"
+      condition: < 50000
       min_duration_sec: 30
     medium:
-      condition: "< 10000"
+      condition: < 10000
       min_duration_sec: 30
     strong:
-      condition: "< 1000"
+      condition: < 1000
       min_duration_sec: 30
-  related_faults: ["disk_fill"]
   downstream_effects: []
-  common_misconceptions: "inode 耗尽与磁盘空间耗尽是两个独立问题；
-    创建大量小文件（如日志）会耗尽 inode 而磁盘空间仍充足。"
-
-# ===========================================================================
-# System 子系统（3 个辅助条目）
-# ===========================================================================
-
-- name: "vm_oom_kills_total"
-  subsystem: "system"
-  description: "OOM Killer 终止进程的累计次数（gauge，递增）。
-    mem_load_ram 极端场景下（内存全满）OOM Killer 会激活，终止用户进程甚至 MPI 进程。
-    任何 OOM 事件都是内存故障的强确认证据。"
-  prometheus_query: "node_vmstat_oom_kill"
-  metric_type: "gauge"
-  unit: "count"
+  common_misconceptions: inode 耗尽与磁盘空间耗尽是两个独立问题； 创建大量小文件（如日志）会耗尽 inode 而磁盘空间仍充足。
+- name: vm_oom_kills_total
+  subsystem: system
+  description: OOM Killer 终止进程的累计次数（gauge，递增）。 内存过载（RAM） 极端场景下（内存全满）OOM Killer 会激活，终止用户进程甚至 MPI 进程。 任何 OOM 事件都是内存故障的强确认证据。
+  prometheus_query: node_vmstat_oom_kill
+  metric_type: gauge
+  unit: count
   normal_range:
     min: 0
     max: 0
-    unit: "count"
-    note: "正常应始终为 0；任何递增均是严重内存不足信号"
+    unit: count
+    note: 正常应始终为 0；任何递增均是严重内存不足信号
   strength_thresholds:
     weak:
-      condition: "> 0"
+      condition: '> 0'
       min_duration_sec: 0
     medium:
-      condition: "> 2"
+      condition: '> 2'
       min_duration_sec: 0
     strong:
-      condition: "> 5"
+      condition: '> 5'
       min_duration_sec: 0
-  related_faults: ["mem_load_ram", "mem_load_stack"]
   downstream_effects: []
-  common_misconceptions: "此指标是累计计数器，不是速率；需跟踪 delta 值（相邻采样点之差）
-    来识别 OOM 事件的发生时刻。"
-
-- name: "filefd_usage_percent"
-  subsystem: "system"
-  description: "文件描述符使用率（已分配/最大值）。接近 100% 时新进程无法创建 socket，
-    MPI 进程无法建立通信连接，会导致作业失败。disk_fill 或网络压力下可能间接升高。"
-  prometheus_query: "(node_filefd_allocated / node_filefd_maximum) * 100"
-  metric_type: "derived_rate"
-  unit: "%"
+  common_misconceptions: 此指标是累计计数器，不是速率；需跟踪 delta 值（相邻采样点之差） 来识别 OOM 事件的发生时刻。
+- name: filefd_usage_percent
+  subsystem: system
+  description: 文件描述符使用率（已分配/最大值）。接近 100% 时新进程无法创建 socket， MPI 进程无法建立通信连接，会导致作业失败。磁盘空间不足 或网络压力下可能间接升高。
+  prometheus_query: (node_filefd_allocated / node_filefd_maximum) * 100
+  metric_type: derived_rate
+  unit: '%'
   normal_range:
     min: 0.0
     max: 30.0
-    unit: "%"
-    note: "正常 HPC 集群 fd 使用率 < 20%；> 80% 开始影响 MPI 连接建立"
+    unit: '%'
+    note: 正常 HPC 集群 fd 使用率 < 20%；> 80% 开始影响 MPI 连接建立
   strength_thresholds:
     weak:
-      condition: "> 60"
+      condition: '> 60'
       min_duration_sec: 30
     medium:
-      condition: "> 80"
+      condition: '> 80'
       min_duration_sec: 30
     strong:
-      condition: "> 95"
+      condition: '> 95'
       min_duration_sec: 30
-  related_faults: []
   downstream_effects: []
-  common_misconceptions: "fd 耗尽通常由进程泄露文件描述符引起，不直接对应任何 ChaosBlade 故障类型；
-    更多用于排除性诊断。"
-
-- name: "network_up"
-  subsystem: "network"
-  description: "网卡接口是否处于 UP 状态（1=正常，0=down）。
-    此指标用于排除性诊断：若 network_up=0，则所有网络指标异常均应归因于物理/驱动故障，
-    而非 ChaosBlade 软件注入。"
-  prometheus_query: 'node_network_up{device="ens33"}'
-  metric_type: "gauge"
-  unit: "boolean"
+  common_misconceptions: fd 耗尽通常由进程泄露文件描述符引起，不直接对应任何 ChaosBlade 故障类型； 更多用于排除性诊断。
+- name: network_up
+  subsystem: network
+  description: 网卡接口是否处于 UP 状态（1=正常，0=down）。 此指标用于排除性诊断：若 network_up=0，则所有网络指标异常均应归因于物理/驱动故障， 而非 ChaosBlade 软件注入。
+  prometheus_query: node_network_up{device="ens33"}
+  metric_type: gauge
+  unit: boolean
   normal_range:
     min: 1
     max: 1
-    unit: "boolean"
-    note: "正常应始终为 1；= 0 表示物理链路故障，需立即排查"
+    unit: boolean
+    note: 正常应始终为 1；= 0 表示物理链路故障，需立即排查
   strength_thresholds:
     weak:
-      condition: "== 0"
+      condition: == 0
       min_duration_sec: 5
     medium:
-      condition: "== 0"
+      condition: == 0
       min_duration_sec: 15
     strong:
-      condition: "== 0"
+      condition: == 0
       min_duration_sec: 30
-  related_faults: []
   downstream_effects: []
-  common_misconceptions: "ChaosBlade network-loss 不会触发 network_up=0（它使用 tc-netem
-    软件层丢包，不关闭网卡）；若 network_up=0，排除软件注入，优先检查物理链路。"
+  common_misconceptions: ChaosBlade network-loss 不会触发 network_up=0（它使用 tc-netem 软件层丢包，不关闭网卡）；若 network_up=0，排除软件注入，优先检查物理链路。

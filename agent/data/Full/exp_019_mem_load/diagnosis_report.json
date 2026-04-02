@@ -1,0 +1,78 @@
+{
+  "run_id": "exp_019_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u9891\u7e41\u9875\u9762\u4ea4\u6362\u548c\u9875\u9762\u9519\u8bef\uff0c\u540c\u65f6CPU\u8d1f\u8f7d\u8fc7\u9ad8\u548c\u78c1\u76d8I/O\u8fc7\u8f7d\u8fdb\u4e00\u6b65\u52a0\u5267\u4e86\u7cfb\u7edf\u6027\u80fd\u95ee\u9898\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\uff0c\u5bfc\u81f4\u9891\u7e41\u7684\u9875\u9762\u4ea4\u6362\u548c\u9875\u9762\u9519\u8bef",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e2",
+        "e3",
+        "e5",
+        "e8",
+        "e9"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU \u8d1f\u8f7d\u8fc7\u9ad8\uff0c\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf\u54cd\u5e94\u7f13\u6162",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.5,
+      "evidence_ids": [
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8 I/O \u8fc7\u8f7d\uff0c\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf I/O \u963b\u585e",
+      "fault_type": "disk_burn",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e1",
+        "e4",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\uff0c\u53ef\u80fd\u5bfc\u81f4\u7cfb\u7edf\u65e0\u6cd5\u5199\u5165\u65b0\u6570\u636e",
+      "fault_type": "disk_fill",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e1",
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u7684\u5f71\u54cd\u5c1a\u4e0d\u660e\u786e\uff0c\u9700\u8fdb\u4e00\u6b65\u76d1\u63a7\u78c1\u76d8\u4f7f\u7528\u60c5\u51b5\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.14452365825997895,
+    "main_tools_used": [
+      "MetricQueryTool x9"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 9,
+    "main_iterations": 10,
+    "audit_iterations": 1,
+    "total_tokens_in": 31823,
+    "total_tokens_out": 3948,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:32:36.244707"
+}

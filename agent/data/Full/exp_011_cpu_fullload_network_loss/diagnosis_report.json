@@ -1,0 +1,73 @@
+{
+  "run_id": "exp_011_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d\u4e3b\u8981\u7531 CPU \u8fc7\u8f7d\u5f15\u8d77\uff0cCPU \u4f7f\u7528\u7387\u9ad8\u8fbe 84.89%\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.9,
+      "evidence_ids": [
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u6301\u7eed\u51cf\u5c11\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_fill",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u5185\u5b58\u538b\u529b\u8fc7\u5927\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "mem_load",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u7f51\u7edc\u63a5\u6536\u901f\u7387\u4e0b\u964d\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "network_loss",
+      "confidence": 0.0,
+      "evidence_ids": [
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u78c1\u76d8\u7a7a\u95f4\u3001\u5185\u5b58\u538b\u529b\u548c\u7f51\u7edc\u63a5\u6536\u901f\u7387\u7684\u53d8\u5316\u5bf9\u7cfb\u7edf\u6027\u80fd\u7684\u5f71\u54cd\u5c1a\u672a\u660e\u786e\uff0c\u9700\u8fdb\u4e00\u6b65\u8c03\u67e5\u3002"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.1828923907319258,
+    "main_tools_used": [
+      "MetricQueryTool x6"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 6,
+    "main_iterations": 7,
+    "audit_iterations": 1,
+    "total_tokens_in": 21985,
+    "total_tokens_out": 2966,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:05:21.465049"
+}

@@ -983,19 +983,29 @@ def _generate_digest(tool_name: str, args: dict, result: dict) -> str:
 ```python
 def _build_conclusion_proposal(state: DiagnosisState) -> ConclusionProposal:
     """
-    1. 从 hypotheses 中选取:
-       - confirmed: status == "confirmed"
-       - active 且 confidence > 0.5: 视为候选
-    2. 确定 proposed_diagnosis_type:
-       - 恰好 1 个 confirmed → single_fault
-       - >=2 个 confirmed → composite_fault
-       - 有 confirmed 但还有 active → partial
-       - 无 confirmed → partial (由 Audit 判定降级)
-    3. 构建 proposed_root_causes:
-       按 confidence 降序排列
-    4. evidence: 只包含与 confirmed/active 假设相关的 evidence
+    1. candidates = 所有非 refuted 假设（不使用 confidence 阈值过滤）
+    2. 按 confidence 降序排列，全部纳入 proposed_root_causes
+    3. 确定 proposed_diagnosis_type:
+       - 0 个 candidates → partial
+       - 1 个 → single_fault
+       - >=2 个 → composite_fault
+    4. evidence: 只包含与 candidates 相关的 evidence
     """
 ```
+
+#### ConclusionProposal builder 实现约束
+
+`_build_conclusion_proposal()` 遵循零硬编码阈值原则：
+
+- **candidates = 所有非 refuted 假设**（不使用 confidence 阈值过滤）
+- **按 confidence 降序排列**，全部纳入 `proposed_root_causes`
+- **proposed_diagnosis_type** 基于 candidates 数量：
+  - 0 个 → `"partial"`
+  - 1 个 → `"single_fault"`
+  - ≥2 个 → `"composite_fault"`
+- 不在 builder 内做 confirmed/active_high 分类
+
+这使得 ConclusionProposal 是一个**完整的候选列表**，由 Audit Agent 而非硬编码规则决定哪些候选被最终采纳。
 
 ### 5.7 路由函数
 
@@ -1333,10 +1343,15 @@ def run_diagnosis(
     3. 初始化 OrchestratorState
     4. 调用 orchestrator_graph.invoke()
     5. 提取 DiagnosisReport
-    6. 有条件触发 Reflect
+    6. 有条件触发 Reflect (should_reflect → run_reflect)
     7. 保存输出到 output_dir/<exp_id>/
     
     返回: (DiagnosisReport, execution_trace_dict)
+
+    Reflect 集成:
+      在 _save_output() 之前执行:
+      - if should_reflect(report, config): run_reflect(...)
+      - Reflect 失败不阻塞主流程 (try-except, non-fatal warning)
     """
 ```
 

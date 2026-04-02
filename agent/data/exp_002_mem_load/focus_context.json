@@ -1,0 +1,184 @@
+{
+  "run_id": "exp_002_Full",
+  "anomaly_window": {
+    "start": "2025-09-20T07:04:13",
+    "end": "2025-09-20T07:05:28"
+  },
+  "top_metrics": [
+    {
+      "metric": "load_1min",
+      "subsystem": "load",
+      "direction": "-",
+      "score": 2.2178771911389124,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 1,
+      "change_point": null
+    },
+    {
+      "metric": "memory_sunreclaim_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 2.07481915466884,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 2,
+      "change_point": null
+    },
+    {
+      "metric": "cpu_user_percent",
+      "subsystem": "cpu",
+      "direction": "-",
+      "score": 1.8359712878987713,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 3,
+      "change_point": null
+    },
+    {
+      "metric": "page_swap_in_rate",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.701161305913394,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 7,
+      "change_point": null
+    },
+    {
+      "metric": "disk_read_rate_bytes_per_sec",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.701161305913394,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 8,
+      "change_point": null
+    },
+    {
+      "metric": "disk_read_iops",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.483503522582361,
+      "t_onset": "2025-09-20T07:04:58",
+      "onset_rank": 15,
+      "change_point": null
+    },
+    {
+      "metric": "filesystem_avail_bytes",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.2992829841302609,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 9,
+      "change_point": null
+    },
+    {
+      "metric": "filesystem_free_bytes",
+      "subsystem": "disk",
+      "direction": "-",
+      "score": 1.2992829841302609,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 10,
+      "change_point": null
+    },
+    {
+      "metric": "memory_inactive_anon_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2706260687938862,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 11,
+      "change_point": null
+    },
+    {
+      "metric": "memory_inactive_file_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2659811810062953,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 4,
+      "change_point": null
+    },
+    {
+      "metric": "memory_buffers_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2499090041140535,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 5,
+      "change_point": null
+    },
+    {
+      "metric": "buffer_usage_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.249909004114053,
+      "t_onset": "2025-09-20T07:04:13",
+      "onset_rank": 6,
+      "change_point": null
+    },
+    {
+      "metric": "swap_cached_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2268167120582103,
+      "t_onset": "2025-09-20T07:04:43",
+      "onset_rank": 14,
+      "change_point": null
+    },
+    {
+      "metric": "memory_cached_bytes",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.210129986052399,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 12,
+      "change_point": null
+    },
+    {
+      "metric": "cache_usage_percent",
+      "subsystem": "memory",
+      "direction": "-",
+      "score": 1.2101299860523977,
+      "t_onset": "2025-09-20T07:04:28",
+      "onset_rank": 13,
+      "change_point": null
+    }
+  ],
+  "causal_order": [
+    "load_1min",
+    "memory_sunreclaim_bytes",
+    "cpu_user_percent",
+    "memory_inactive_file_bytes",
+    "memory_buffers_bytes",
+    "buffer_usage_percent",
+    "page_swap_in_rate",
+    "disk_read_rate_bytes_per_sec",
+    "filesystem_avail_bytes",
+    "filesystem_free_bytes",
+    "memory_inactive_anon_bytes",
+    "memory_cached_bytes",
+    "cache_usage_percent",
+    "swap_cached_bytes",
+    "disk_read_iops"
+  ],
+  "subsystem_scores": {
+    "load": 2.2178771911389124,
+    "memory": 1.3843869336415033,
+    "cpu": 1.8359712878987713,
+    "disk": 1.4458076991890692
+  },
+  "leading_subsystem": "cpu",
+  "nodes": [
+    {
+      "node": "node-0",
+      "severity": "low"
+    }
+  ],
+  "jobs": [
+    {
+      "job_id": "276",
+      "overlap_ratio": 0.0452,
+      "node_set": [
+        "wizhua-virtual-machine"
+      ]
+    }
+  ],
+  "triage_confidence": 0.22178771911389122
+}

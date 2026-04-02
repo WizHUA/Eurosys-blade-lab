@@ -1,0 +1,926 @@
+{
+  "run_id": "exp_015_Full",
+  "diagnosis_trace_steps": 12,
+  "audit_trace_steps": 1,
+  "diagnosis_trace": [
+    {
+      "step_id": 1,
+      "thought": "当前有三个活跃假设：disk_burn、mem_load和disk_fill。首先需要验证disk_burn假设，因为它的置信度最高。disk_burn假设的关键验证点是磁盘I/O使用率是否持续高负载。因此，我需要查询disk_io_usage_percent指标在异常时间窗口内的聚合统计量。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "avg"
+        },
+        "call_id": "c1"
+      },
+      "observation": "disk_io_usage_percent: mean=77.8642424242422",
+      "evidence_generated": "e1",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:13:46.045535",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前有三个活跃假设：disk_burn、mem_load和disk_fill。首先需要验证disk_burn假设，因为它的置信度最高。disk_burn假设的关键验证点是磁盘I/O使用率是否持续高负载。因此，我需要查询disk_io_usage_percent指标在异常时间窗口内的聚合统计量。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"avg\"\n    },\n    \"reasoning\": \"为了验证disk_burn假设，需要检查磁盘I/O使用率是否持续高负载。通过查询disk_io_usage_percent指标的平均值，可以判断磁盘I/O负载是否异常。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 2,
+      "thought": "当前假设 h1 (disk_burn) 的 confidence 为 0.70，且已通过 disk_io_usage_percent 的高负载验证。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，这可以通过检查 processes_blocked 指标来确认。如果 processes_blocked 在异常时间窗口内显著增加，将进一步支持 disk_burn 假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c2"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667",
+      "evidence_generated": "e2",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:13:56.039231",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的 confidence 为 0.70，且已通过 disk_io_usage_percent 的高负载验证。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，这可以通过检查 processes_blocked 指标来确认。如果 processes_blocked 在异常时间窗口内显著增加，将进一步支持 disk_burn 假设。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"通过查询 processes_blocked 指标，可以验证磁盘 I/O 压力是否导致进程阻塞，从而进一步支持 disk_burn 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 3,
+      "thought": "当前假设 h1 (disk_burn) 的 confidence 为 0.70，已通过 disk_io_usage_percent 的高负载验证。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，以及检查磁盘读写操作频率是否异常。为了验证进程阻塞，可以查询 processes_blocked 指标，但已有数据显示 processes_blocked 的均值为 1.1666666666666667，这并不显著。因此，下一步应检查磁盘读写操作频率是否异常，以进一步确认 disk_burn 假设。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_read_iops",
+            "disk_write_iops"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c3"
+      },
+      "observation": "disk_read_iops: mean=4787.01212121212; disk_write_iops: mean=6561.4636363636355",
+      "evidence_generated": "e3",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:06.313773",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的 confidence 为 0.70，已通过 disk_io_usage_percent 的高负载验证。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，以及检查磁盘读写操作频率是否异常。为了验证进程阻塞，可以查询 processes_blocked 指标，但已有数据显示 processes_blocked 的均值为 1.1666666666666667，这并不显著。因此，下一步应检查磁盘读写操作频率是否异常，以进一步确认 disk_burn 假设。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_read_iops\", \"disk_write_iops\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"通过查询 disk_read_iops 和 disk_write_iops 的均值，可以判断磁盘读写操作频率是否异常，从而进一步验证 disk_burn 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 4,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.70，已经验证了磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常，但尚未验证磁盘 I/O 压力是否导致进程阻塞。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c4"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667",
+      "evidence_generated": "e4",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:13.663182",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.70，已经验证了磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常，但尚未验证磁盘 I/O 压力是否导致进程阻塞。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证磁盘 I/O 压力是否导致进程阻塞，需要查询 processes_blocked 指标在异常时间窗口内的均值。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 5,
+      "thought": "当前假设 h1 (disk_burn) 已经验证了磁盘 I/O 使用率和读写操作频率异常，但还需要验证磁盘 I/O 压力是否导致进程阻塞。同时，假设 h2 (mem_load) 和 h3 (disk_fill) 尚未验证。为了进一步确认 h1，我需要检查磁盘 I/O 压力是否导致进程阻塞。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c5"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667",
+      "evidence_generated": "e5",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:22.243083",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 已经验证了磁盘 I/O 使用率和读写操作频率异常，但还需要验证磁盘 I/O 压力是否导致进程阻塞。同时，假设 h2 (mem_load) 和 h3 (disk_fill) 尚未验证。为了进一步确认 h1，我需要检查磁盘 I/O 压力是否导致进程阻塞。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"为了验证磁盘 I/O 压力是否导致进程阻塞，我需要查询 processes_blocked 指标的平均值。如果该值显著高于正常水平，将进一步支持 h1 (disk_burn) 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 6,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.70，已有证据支持磁盘 I/O 使用率持续高负载和读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_weighted_time_seconds_total"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c6"
+      },
+      "observation": "disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+      "evidence_generated": "e6",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:31.072548",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.70，已有证据支持磁盘 I/O 使用率持续高负载和读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_weighted_time_seconds_total\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"调用 MetricQueryTool 查询 disk_io_weighted_time_seconds_total 指标，以验证磁盘 I/O 压力是否导致进程阻塞。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 7,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.70，已通过 disk_io_usage_percent 和 disk_read_iops/disk_write_iops 的验证，但尚未验证磁盘 I/O 压力是否导致进程阻塞。为了进一步确认 h1，需要检查 processes_blocked 是否与磁盘 I/O 压力相关。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_weighted_time_seconds_total",
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c7"
+      },
+      "observation": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+      "evidence_generated": "e7",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:40.017750",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.70，已通过 disk_io_usage_percent 和 disk_read_iops/disk_write_iops 的验证，但尚未验证磁盘 I/O 压力是否导致进程阻塞。为了进一步确认 h1，需要检查 processes_blocked 是否与磁盘 I/O 压力相关。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"通过查询 disk_io_weighted_time_seconds_total 和 processes_blocked 的均值，可以验证磁盘 I/O 压力是否导致进程阻塞，从而进一步确认 h1 的置信度。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 8,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.70，已经验证了磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常，但磁盘 I/O 压力是否导致进程阻塞还未验证。为了进一步验证 h1，需要检查进程阻塞是否与磁盘 I/O 压力相关。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "disk_io_weighted_time_seconds_total",
+            "processes_blocked"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c8"
+      },
+      "observation": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+      "evidence_generated": "e8",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:46.820084",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.70，已经验证了磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常，但磁盘 I/O 压力是否导致进程阻塞还未验证。为了进一步验证 h1，需要检查进程阻塞是否与磁盘 I/O 压力相关。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"通过查询 disk_io_weighted_time_seconds_total 和 processes_blocked 的均值，可以验证磁盘 I/O 压力是否导致进程阻塞，从而进一步支持或否定 h1 假设。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 9,
+      "thought": "当前主要假设是 disk_burn (h1)，其置信度已经较高（0.7），并且已经验证了磁盘 I/O 使用率和读写操作频率异常。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，这是 h1 的最后一个待验证项。同时，h2 (mem_load) 和 h3 (disk_fill) 的验证项尚未开始，需要进一步收集证据。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked",
+            "disk_io_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c9"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+      "evidence_generated": "e9",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:14:57.241092",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前主要假设是 disk_burn (h1)，其置信度已经较高（0.7），并且已经验证了磁盘 I/O 使用率和读写操作频率异常。接下来需要验证磁盘 I/O 压力是否导致进程阻塞，这是 h1 的最后一个待验证项。同时，h2 (mem_load) 和 h3 (disk_fill) 的验证项尚未开始，需要进一步收集证据。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.75, \"reason\": \"进一步验证磁盘 I/O 压力与进程阻塞的关系\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"需要同时查询 processes_blocked 和 disk_io_usage_percent 以验证磁盘 I/O 压力是否导致进程阻塞。这将帮助确认 h1 的最后一个验证项。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 10,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.75，已有证据支持磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查进程阻塞是否与磁盘 I/O 压力相关。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked",
+            "disk_io_usage_percent"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c10"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+      "evidence_generated": "e10",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:15:07.496098",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.75，已有证据支持磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查进程阻塞是否与磁盘 I/O 压力相关。\",\n  \"hypothesis_updates\": [],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"调用 MetricQueryTool 查询 processes_blocked 和 disk_io_usage_percent 的平均值，以验证磁盘 I/O 压力是否导致进程阻塞。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 11,
+      "thought": "当前假设 h1 (disk_burn) 的置信度为 0.75，已有证据支持磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。",
+      "action_type": "tool_call",
+      "tool_call": {
+        "tool": "MetricQueryTool",
+        "args": {
+          "metrics": [
+            "processes_blocked",
+            "disk_io_weighted_time_seconds_total"
+          ],
+          "time_window": {
+            "start": "2025-09-20T07:30:13",
+            "end": "2025-09-20T07:31:28"
+          },
+          "aggregation": "mean"
+        },
+        "call_id": "c11"
+      },
+      "observation": "processes_blocked: mean=1.1666666666666667; disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+      "evidence_generated": "e11",
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:19:36.577196",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前假设 h1 (disk_burn) 的置信度为 0.75，已有证据支持磁盘 I/O 使用率持续高负载和磁盘读写操作频率异常。然而，验证磁盘 I/O 压力是否导致进程阻塞的证据尚未收集。为了进一步验证 h1，需要检查磁盘 I/O 压力是否导致进程阻塞。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.75, \"reason\": \"等待进一步证据验证磁盘 I/O 压力是否导致进程阻塞\"}\n  ],\n  \"action\": {\n    \"type\": \"tool_call\",\n    \"tool\": \"MetricQueryTool\",\n    \"args\": {\n      \"metrics\": [\"processes_blocked\", \"disk_io_weighted_time_seconds_total\"],\n      \"time_window\": {\n        \"start\": \"2025-09-20T07:30:13\",\n        \"end\": \"2025-09-20T07:31:28\"\n      },\n      \"aggregation\": \"mean\"\n    },\n    \"reasoning\": \"调用 MetricQueryTool 查询 processes_blocked 和 disk_io_weighted_time_seconds_total 的均值，以验证磁盘 I/O 压力是否导致进程阻塞。\"\n  }\n}\n```"
+    },
+    {
+      "step_id": 12,
+      "thought": "当前证据已经支持 disk_burn (h1) 假设，磁盘 I/O 使用率和读写操作频率均显示异常高负载，且磁盘 I/O 加权时间显著增加。虽然进程阻塞指标（processes_blocked）没有显著上升，但这可能是由于系统调度策略或其他因素导致的。对于 mem_load (h2) 和 disk_fill (h3) 假设，尚未收集到直接证据。考虑到步骤限制和已有证据的充分性，应优先确认 disk_burn 假设。",
+      "action_type": "conclude",
+      "tool_call": null,
+      "observation": null,
+      "evidence_generated": null,
+      "hypotheses_updated": [],
+      "timestamp": "2026-04-02T20:19:49.553194",
+      "duration_ms": null,
+      "llm_raw_response": "```json\n{\n  \"thought\": \"当前证据已经支持 disk_burn (h1) 假设，磁盘 I/O 使用率和读写操作频率均显示异常高负载，且磁盘 I/O 加权时间显著增加。虽然进程阻塞指标（processes_blocked）没有显著上升，但这可能是由于系统调度策略或其他因素导致的。对于 mem_load (h2) 和 disk_fill (h3) 假设，尚未收集到直接证据。考虑到步骤限制和已有证据的充分性，应优先确认 disk_burn 假设。\",\n  \"hypothesis_updates\": [\n    {\"hypothesis_id\": \"h1\", \"new_confidence\": 0.85, \"reason\": \"磁盘 I/O 使用率和读写操作频率异常高负载，且磁盘 I/O 加权时间显著增加\"},\n    {\"hypothesis_id\": \"h2\", \"new_confidence\": 0.30, \"reason\": \"缺乏直接内存指标异常证据\"},\n    {\"hypothesis_id\": \"h3\", \"new_confidence\": 0.30, \"reason\": \"缺乏直接磁盘空间不足证据\"}\n  ],\n  \"action\": {\n    \"type\": \"conclude\",\n    \"reasoning\": \"已有直接证据充分支持 disk_burn 假设，无需进一步验证。其他假设缺乏直接证据支持，可以排除。\"\n  }\n}\n```"
+    }
+  ],
+  "audit_trace": [
+    {
+      "step_id": 1,
+      "thought": "审查推理过程如下：\n1. **证据类型审查**: 证据池中有 8 条证据类型为 'supporting'，3 条为 'neutral'。\n2. **子系统直接证据**: 对于 disk_burn，有 disk_io_usage_percent、disk_read_iops、disk_write_iops、disk_io_weighted_time_seconds_total 等直接观测指标支持。对于 disk_fill，缺乏直接观测指标如 filesystem_avail_bytes 的支持。\n3. **故障标签合理性**: disk_burn 的故障标签与实际观测到的异常指标一致，disk_fill 的故障标签缺乏直接证据支持。\n4. **复合故障判断**: disk_burn 和 disk_fill 可能是因果链关系，而非独立故障。",
+      "action_type": "decision",
+      "tool_call": null,
+      "observation": null,
+      "audit_evidence_generated": null,
+      "timestamp": "2026-04-02T20:19:58.921780",
+      "llm_raw_response": "```json\n{\n  \"thought\": \"审查推理过程如下：\\n1. **证据类型审查**: 证据池中有 8 条证据类型为 'supporting'，3 条为 'neutral'。\\n2. **子系统直接证据**: 对于 disk_burn，有 disk_io_usage_percent、disk_read_iops、disk_write_iops、disk_io_weighted_time_seconds_total 等直接观测指标支持。对于 disk_fill，缺乏直接观测指标如 filesystem_avail_bytes 的支持。\\n3. **故障标签合理性**: disk_burn 的故障标签与实际观测到的异常指标一致，disk_fill 的故障标签缺乏直接证据支持。\\n4. **复合故障判断**: disk_burn 和 disk_fill 可能是因果链关系，而非独立故障。\",\n  \"action_type\": \"decision\",\n  \"decision\": {\n    \"decision\": \"continue\",\n    \"reason\": \"disk_burn 的证据充分，但 disk_fill 缺乏直接观测证据支持，需要补充证据后再审。\",\n    \"hint\": \"请补充 disk_fill 的直接观测指标，如 filesystem_avail_bytes。\",\n    \"diagnosis_type\": \"composite_fault\"\n  }\n}\n```"
+    }
+  ],
+  "round_count": 1,
+  "rehyp_count": 0,
+  "token_usage": {
+    "diagnosis_hypothesize": {
+      "prompt": 1676,
+      "completion": 468,
+      "total": 2144
+    },
+    "diagnosis_think": {
+      "prompt": 33565,
+      "completion": 3005,
+      "total": 36570
+    },
+    "audit_think": {
+      "prompt": 1688,
+      "completion": 271,
+      "total": 1959
+    },
+    "finalize": {
+      "prompt": 723,
+      "completion": 114,
+      "total": 837
+    },
+    "reflect": {
+      "prompt": 0,
+      "completion": 0,
+      "total": 0
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "h1",
+      "root_cause": "磁盘 I/O 过载导致系统性能下降",
+      "fault_type": "disk_burn",
+      "subsystem": "disk",
+      "prior_confidence": 0.7000000000000001,
+      "current_confidence": 0.85,
+      "required_verifications": [
+        {
+          "description": "检查磁盘 I/O 使用率是否持续高负载",
+          "status": "verified",
+          "evidence_id": "e1",
+          "required_metrics": [
+            "disk_io_usage_percent"
+          ]
+        },
+        {
+          "description": "验证磁盘 I/O 压力是否导致进程阻塞",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "io_pressure_stalled_rate",
+            "io_pressure_waiting_rate"
+          ]
+        },
+        {
+          "description": "检查磁盘读写操作频率是否异常",
+          "status": "verified",
+          "evidence_id": "e3",
+          "required_metrics": [
+            "disk_write_iops",
+            "disk_total_iops"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h2",
+      "root_cause": "内存压力过大导致频繁换页和磁盘 I/O 增加",
+      "fault_type": "mem_load",
+      "subsystem": "memory",
+      "prior_confidence": 0.55,
+      "current_confidence": 0.3,
+      "required_verifications": [
+        {
+          "description": "检查交换缓存使用量是否异常增加",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "swap_cached_bytes"
+          ]
+        },
+        {
+          "description": "验证主缺页率是否显著上升",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "page_major_faults_rate"
+          ]
+        },
+        {
+          "description": "检查内存使用情况是否接近上限",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "memory_used_percent"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    },
+    {
+      "id": "h3",
+      "root_cause": "磁盘空间不足导致 I/O 操作受阻",
+      "fault_type": "disk_fill",
+      "subsystem": "disk",
+      "prior_confidence": 0.5,
+      "current_confidence": 0.3,
+      "required_verifications": [
+        {
+          "description": "检查磁盘可用空间是否接近耗尽",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "filesystem_avail_bytes"
+          ]
+        },
+        {
+          "description": "验证磁盘 I/O 阻塞是否与空间不足相关",
+          "status": "pending",
+          "evidence_id": null,
+          "required_metrics": [
+            "io_pressure_stalled_rate",
+            "io_pressure_waiting_rate"
+          ]
+        }
+      ],
+      "status": "active",
+      "fpl_pattern_id": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-)",
+      "result_digest": "disk_io_usage_percent: mean=77.8642424242422",
+      "raw_stats": {
+        "disk_io_usage_percent": 77.8642424242422
+      },
+      "created_at_step": 1
+    },
+    {
+      "id": "e2",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+      "result_digest": "processes_blocked: mean=1.1666666666666667",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667
+      },
+      "created_at_step": 2
+    },
+    {
+      "id": "e3",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_iops\", \"disk_write_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \")",
+      "result_digest": "disk_read_iops: mean=4787.01212121212; disk_write_iops: mean=6561.4636363636355",
+      "raw_stats": {
+        "disk_read_iops": 4787.01212121212,
+        "disk_write_iops": 6561.4636363636355
+      },
+      "created_at_step": 3
+    },
+    {
+      "id": "e4",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+      "result_digest": "processes_blocked: mean=1.1666666666666667",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667
+      },
+      "created_at_step": 4
+    },
+    {
+      "id": "e5",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "neutral",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+      "result_digest": "processes_blocked: mean=1.1666666666666667",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667
+      },
+      "created_at_step": 5
+    },
+    {
+      "id": "e6",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\",)",
+      "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+      "raw_stats": {
+        "disk_io_weighted_time_seconds_total": 108793.17599999999
+      },
+      "created_at_step": 6
+    },
+    {
+      "id": "e7",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"], \"time_window\": {\"start\": \")",
+      "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+      "raw_stats": {
+        "disk_io_weighted_time_seconds_total": 108793.17599999999,
+        "processes_blocked": 1.1666666666666667
+      },
+      "created_at_step": 7
+    },
+    {
+      "id": "e8",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"], \"time_window\": {\"start\": \")",
+      "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+      "raw_stats": {
+        "disk_io_weighted_time_seconds_total": 108793.17599999999,
+        "processes_blocked": 1.1666666666666667
+      },
+      "created_at_step": 8
+    },
+    {
+      "id": "e9",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+      "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667,
+        "disk_io_usage_percent": 77.8642424242422
+      },
+      "created_at_step": 9
+    },
+    {
+      "id": "e10",
+      "hypothesis_ids": [
+        "h1"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+      "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667,
+        "disk_io_usage_percent": 77.8642424242422
+      },
+      "created_at_step": 10
+    },
+    {
+      "id": "e11",
+      "hypothesis_ids": [
+        "h1",
+        "h3"
+      ],
+      "type": "supporting",
+      "source_tool": "MetricQueryTool",
+      "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_weighted_time_seconds_total\"], \"time_window\": {\"start\": \")",
+      "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+      "raw_stats": {
+        "processes_blocked": 1.1666666666666667,
+        "disk_io_weighted_time_seconds_total": 108793.17599999999
+      },
+      "created_at_step": 11
+    }
+  ],
+  "proposal": {
+    "hypotheses": [
+      {
+        "id": "h1",
+        "root_cause": "磁盘 I/O 过载导致系统性能下降",
+        "fault_type": "disk_burn",
+        "subsystem": "disk",
+        "prior_confidence": 0.7000000000000001,
+        "current_confidence": 0.85,
+        "required_verifications": [
+          {
+            "description": "检查磁盘 I/O 使用率是否持续高负载",
+            "status": "verified",
+            "evidence_id": "e1",
+            "required_metrics": [
+              "disk_io_usage_percent"
+            ]
+          },
+          {
+            "description": "验证磁盘 I/O 压力是否导致进程阻塞",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "io_pressure_stalled_rate",
+              "io_pressure_waiting_rate"
+            ]
+          },
+          {
+            "description": "检查磁盘读写操作频率是否异常",
+            "status": "verified",
+            "evidence_id": "e3",
+            "required_metrics": [
+              "disk_write_iops",
+              "disk_total_iops"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h2",
+        "root_cause": "内存压力过大导致频繁换页和磁盘 I/O 增加",
+        "fault_type": "mem_load",
+        "subsystem": "memory",
+        "prior_confidence": 0.55,
+        "current_confidence": 0.3,
+        "required_verifications": [
+          {
+            "description": "检查交换缓存使用量是否异常增加",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "swap_cached_bytes"
+            ]
+          },
+          {
+            "description": "验证主缺页率是否显著上升",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "page_major_faults_rate"
+            ]
+          },
+          {
+            "description": "检查内存使用情况是否接近上限",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "memory_used_percent"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      },
+      {
+        "id": "h3",
+        "root_cause": "磁盘空间不足导致 I/O 操作受阻",
+        "fault_type": "disk_fill",
+        "subsystem": "disk",
+        "prior_confidence": 0.5,
+        "current_confidence": 0.3,
+        "required_verifications": [
+          {
+            "description": "检查磁盘可用空间是否接近耗尽",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "filesystem_avail_bytes"
+            ]
+          },
+          {
+            "description": "验证磁盘 I/O 阻塞是否与空间不足相关",
+            "status": "pending",
+            "evidence_id": null,
+            "required_metrics": [
+              "io_pressure_stalled_rate",
+              "io_pressure_waiting_rate"
+            ]
+          }
+        ],
+        "status": "active",
+        "fpl_pattern_id": null
+      }
+    ],
+    "evidence": [
+      {
+        "id": "e1",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-)",
+        "result_digest": "disk_io_usage_percent: mean=77.8642424242422",
+        "raw_stats": {
+          "disk_io_usage_percent": 77.8642424242422
+        },
+        "created_at_step": 1
+      },
+      {
+        "id": "e2",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+        "result_digest": "processes_blocked: mean=1.1666666666666667",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667
+        },
+        "created_at_step": 2
+      },
+      {
+        "id": "e3",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_read_iops\", \"disk_write_iops\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \")",
+        "result_digest": "disk_read_iops: mean=4787.01212121212; disk_write_iops: mean=6561.4636363636355",
+        "raw_stats": {
+          "disk_read_iops": 4787.01212121212,
+          "disk_write_iops": 6561.4636363636355
+        },
+        "created_at_step": 3
+      },
+      {
+        "id": "e4",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+        "result_digest": "processes_blocked: mean=1.1666666666666667",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667
+        },
+        "created_at_step": 4
+      },
+      {
+        "id": "e5",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "neutral",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\", \"end\": \"2025-09-2)",
+        "result_digest": "processes_blocked: mean=1.1666666666666667",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667
+        },
+        "created_at_step": 5
+      },
+      {
+        "id": "e6",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\"], \"time_window\": {\"start\": \"2025-09-20T07:30:13\",)",
+        "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+        "raw_stats": {
+          "disk_io_weighted_time_seconds_total": 108793.17599999999
+        },
+        "created_at_step": 6
+      },
+      {
+        "id": "e7",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"], \"time_window\": {\"start\": \")",
+        "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+        "raw_stats": {
+          "disk_io_weighted_time_seconds_total": 108793.17599999999,
+          "processes_blocked": 1.1666666666666667
+        },
+        "created_at_step": 7
+      },
+      {
+        "id": "e8",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"disk_io_weighted_time_seconds_total\", \"processes_blocked\"], \"time_window\": {\"start\": \")",
+        "result_digest": "disk_io_weighted_time_seconds_total: mean=108793.17599999999; processes_blocked: mean=1.1666666666666667",
+        "raw_stats": {
+          "disk_io_weighted_time_seconds_total": 108793.17599999999,
+          "processes_blocked": 1.1666666666666667
+        },
+        "created_at_step": 8
+      },
+      {
+        "id": "e9",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+        "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667,
+          "disk_io_usage_percent": 77.8642424242422
+        },
+        "created_at_step": 9
+      },
+      {
+        "id": "e10",
+        "hypothesis_ids": [
+          "h1"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_usage_percent\"], \"time_window\": {\"start\": \"2025-09-20T07:)",
+        "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_usage_percent: mean=77.8642424242422",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667,
+          "disk_io_usage_percent": 77.8642424242422
+        },
+        "created_at_step": 10
+      },
+      {
+        "id": "e11",
+        "hypothesis_ids": [
+          "h1",
+          "h3"
+        ],
+        "type": "supporting",
+        "source_tool": "MetricQueryTool",
+        "query_summary": "MetricQueryTool({\"metrics\": [\"processes_blocked\", \"disk_io_weighted_time_seconds_total\"], \"time_window\": {\"start\": \")",
+        "result_digest": "processes_blocked: mean=1.1666666666666667; disk_io_weighted_time_seconds_total: mean=108793.17599999999",
+        "raw_stats": {
+          "processes_blocked": 1.1666666666666667,
+          "disk_io_weighted_time_seconds_total": 108793.17599999999
+        },
+        "created_at_step": 11
+      }
+    ],
+    "proposed_diagnosis_type": "composite_fault",
+    "proposed_root_causes": [
+      {
+        "cause": "磁盘 I/O 过载导致系统性能下降",
+        "fault_type": "disk_burn",
+        "confidence": 0.85,
+        "evidence_ids": [
+          "e1",
+          "e2",
+          "e3",
+          "e4",
+          "e5",
+          "e6",
+          "e7",
+          "e8",
+          "e9",
+          "e10",
+          "e11"
+        ]
+      },
+      {
+        "cause": "磁盘空间不足导致 I/O 操作受阻",
+        "fault_type": "disk_fill",
+        "confidence": 0.3,
+        "evidence_ids": [
+          "e2",
+          "e4",
+          "e5",
+          "e6",
+          "e7",
+          "e8",
+          "e11"
+        ]
+      }
+    ]
+  }
+}

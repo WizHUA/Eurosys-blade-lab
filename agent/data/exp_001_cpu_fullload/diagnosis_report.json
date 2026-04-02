@@ -1,0 +1,65 @@
+{
+  "run_id": "exp_001_Full",
+  "anomaly_summary": "系统出现复合型性能问题，主要表现为内存压力过大导致频繁页面交换，以及CPU满载运行导致资源争用，共同影响了整体性能。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存压力过大，导致系统频繁进行页面交换，进而影响磁盘 I/O 性能",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e3",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 满载运行，导致系统资源被大量占用，进而影响其他子系统的性能",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘 I/O 过载，导致系统响应变慢，进而影响其他子系统的性能",
+      "fault_type": "disk_burn",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e4",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "磁盘I/O过载(disk_burn)的置信度较低(0.10)，需要更多证据确认其实际影响程度",
+    "虽然观察到磁盘读写速率较高，但磁盘I/O使用率指标(0.43%)显示实际负载较低，这一矛盾现象需要进一步调查"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "cpu",
+    "triage_confidence": 0.42458853046086426,
+    "main_tools_used": [
+      "MetricQueryTool x6",
+      "KBRetrievalTool x1"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 7,
+    "main_iterations": 8,
+    "audit_iterations": 1,
+    "total_tokens_in": 25369,
+    "total_tokens_out": 3276,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T19:38:30.124748"
+}

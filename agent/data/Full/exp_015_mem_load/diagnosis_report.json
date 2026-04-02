@@ -1,0 +1,66 @@
+{
+  "run_id": "exp_015_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u578b\u78c1\u76d8\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u78c1\u76d8I/O\u8fc7\u8f7d\uff08\u7f6e\u4fe1\u5ea60.85\uff09\u548c\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\uff08\u7f6e\u4fe1\u5ea60.30\uff09\u5bfc\u81f4\u7684\u6027\u80fd\u4e0b\u964d\u548cI/O\u64cd\u4f5c\u53d7\u963b\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u78c1\u76d8 I/O \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_burn",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "e10",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u5bfc\u81f4 I/O \u64cd\u4f5c\u53d7\u963b",
+      "fault_type": "disk_fill",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e2",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u7684\u6839\u56e0\u7f6e\u4fe1\u5ea6\u8f83\u4f4e\uff080.30\uff09\uff0c\u9700\u8981\u8fdb\u4e00\u6b65\u786e\u8ba4\u5176\u5b9e\u9645\u5f71\u54cd\u7a0b\u5ea6",
+    "\u5c3d\u7ba1\u5b58\u5728\u591a\u4e2a\u8fdb\u7a0b\u963b\u585e\u8bc1\u636e\uff0c\u4f46\u5176\u5e73\u5747\u503c\uff081.166\uff09\u662f\u5426\u6784\u6210\u663e\u8457\u5f71\u54cd\u5c1a\u4e0d\u660e\u786e"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.1867278299839566,
+    "main_tools_used": [
+      "MetricQueryTool x11"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 11,
+    "main_iterations": 12,
+    "audit_iterations": 1,
+    "total_tokens_in": 37652,
+    "total_tokens_out": 3858,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:20:04.603111"
+}

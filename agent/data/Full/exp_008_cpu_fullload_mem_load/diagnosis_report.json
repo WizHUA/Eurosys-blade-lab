@@ -1,0 +1,75 @@
+{
+  "run_id": "exp_008_Full",
+  "anomaly_summary": "\u7cfb\u7edf\u51fa\u73b0\u590d\u5408\u578b\u6545\u969c\uff0c\u4e3b\u8981\u8868\u73b0\u4e3a\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u3001\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\u548cCPU\u8fc7\u8f7d\uff0c\u5bfc\u81f4\u6574\u4f53\u6027\u80fd\u4e0b\u964d\u548c\u54cd\u5e94\u53d8\u6162\u3002",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "\u78c1\u76d8\u7a7a\u95f4\u4e0d\u8db3\u5bfc\u81f4\u7cfb\u7edf\u6027\u80fd\u4e0b\u964d",
+      "fault_type": "disk_fill",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e2"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u5185\u5b58\u8d44\u6e90\u7d27\u5f20\u5bfc\u81f4\u9891\u7e41\u9875\u9762\u4ea4\u6362",
+      "fault_type": "mem_load",
+      "confidence": 0.8,
+      "evidence_ids": [
+        "e4",
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u54cd\u5e94\u53d8\u6162",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.6,
+      "evidence_ids": [
+        "e3"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "\u78c1\u76d8 I/O \u8fc7\u8f7d\u5bfc\u81f4\u7cfb\u7edf\u54cd\u5e94\u53d8\u6162",
+      "fault_type": "disk_burn",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e1",
+        "e5"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "\u78c1\u76d8I/O\u8fc7\u8f7d(disc_burn)\u7684\u7f6e\u4fe1\u5ea6\u8f83\u4f4e(0.30)\uff0c\u9700\u8981\u8fdb\u4e00\u6b65\u786e\u8ba4\u5176\u5f71\u54cd\u7a0b\u5ea6",
+    "\u5185\u5b58\u4f7f\u7528\u7387(59.28%)\u867d\u672a\u8fbe\u4e34\u754c\u503c\u4f46\u5df2\u51fa\u73b0\u9891\u7e41\u9875\u9762\u4ea4\u6362\uff0c\u9700\u5173\u6ce8\u5177\u4f53\u5e94\u7528\u7684\u5185\u5b58\u9700\u6c42"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.14619010286727835,
+    "main_tools_used": [
+      "MetricQueryTool x6"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 6,
+    "main_iterations": 7,
+    "audit_iterations": 1,
+    "total_tokens_in": 22484,
+    "total_tokens_out": 2751,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T19:55:27.127700"
+}

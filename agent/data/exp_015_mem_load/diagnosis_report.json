@@ -1,0 +1,66 @@
+{
+  "run_id": "exp_015_Full",
+  "anomaly_summary": "系统出现复合型磁盘故障，主要表现为磁盘I/O过载（置信度0.85）和磁盘空间不足（置信度0.30）导致的性能下降和I/O操作受阻。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "磁盘 I/O 过载导致系统性能下降",
+      "fault_type": "disk_burn",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "e10",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间不足导致 I/O 操作受阻",
+      "fault_type": "disk_fill",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e2",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e11"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "磁盘空间不足的根因置信度较低（0.30），需要进一步确认其实际影响程度",
+    "尽管存在多个进程阻塞证据，但其平均值（1.166）是否构成显著影响尚不明确"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.1867278299839566,
+    "main_tools_used": [
+      "MetricQueryTool x11"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 11,
+    "main_iterations": 12,
+    "audit_iterations": 1,
+    "total_tokens_in": 37652,
+    "total_tokens_out": 3858,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:20:04.603111"
+}

@@ -1,0 +1,159 @@
+======================================================================
+SECTION 3: PER FAULT TYPE (Single-Fault)
+======================================================================
+  cpu_fullload         1  H1=1/1 (100%)  H3=1/1 (100%)
+    [Y] exp_001: ['cpu_fullload', 'disk_burn']
+  disk_burn            2  H1=0/2 (0%)  H3=0/2 (0%)
+    [N] exp_006: ['cpu_fullload', 'mem_load', 'network_loss', 'disk_burn']
+    [N] exp_027: ['mem_load', 'cpu_fullload', 'disk_fill', 'network_loss']
+  disk_fill            1  H1=0/1 (0%)  H3=0/1 (0%)
+    [N] exp_007: ['mem_load']
+  mem_load             6  H1=3/6 (50%)  H3=4/6 (67%)
+    [N] exp_002: ['disk_burn']
+    [N] exp_003: ['disk_fill', 'disk_burn']
+    [Y] exp_004: ['mem_load', 'cpu_fullload', 'disk_fill', 'network_loss']
+    [Y] exp_014: ['mem_load', 'cpu_fullload', 'disk_fill']
+    [N] exp_015: ['disk_burn', 'mem_load', 'disk_burn']
+    [Y] exp_019: ['mem_load', 'cpu_fullload', 'disk_fill', 'disk_burn']
+  network_loss         2  H1=0/2 (0%)  H3=1/2 (50%)
+    [N] exp_005: ['mem_load', 'network_loss', 'disk_burn']
+    [N] exp_026: ['disk_fill']
+  TOTAL: 12 H1=4/12 (33%) H3=6/12 (50%)
+
+======================================================================
+SECTION 4: COMPOSITE COVERAGE
+======================================================================
+  Hit@1: 12/17 (71%)
+  Hit@3: 15/17 (88%)
+  FullCov: 5/17 (29%)
+    exp_008: GT=cpu_fullload+mem_load pred=['mem_load', 'cpu_fullload', 'disk_fill'] -> FULL
+    exp_009: GT=cpu_fullload+mem_load pred=['mem_load', 'cpu_fullload'] -> FULL
+    exp_010: GT=cpu_fullload+mem_load pred=['mem_load'] -> PARTIAL miss:cpu_fullload
+    exp_011: GT=cpu_fullload+network_loss pred=['cpu_fullload', 'disk_fill', 'mem_load'] -> PARTIAL miss:network_loss
+    exp_012: GT=cpu_fullload+disk_burn pred=['mem_load', 'network_loss'] -> MISS miss:cpu_fullload,disk_burn
+    exp_013: GT=cpu_fullload+disk_fill pred=['mem_load'] -> MISS miss:cpu_fullload,disk_fill
+    exp_016: GT=mem_load+network_loss pred=['mem_load', 'cpu_fullload', 'network_loss'] -> FULL
+    exp_017: GT=disk_burn+mem_load pred=['mem_load', 'disk_fill'] -> PARTIAL miss:disk_burn
+    exp_018: GT=disk_fill+mem_load pred=['mem_load', 'disk_burn', 'cpu_fullload'] -> PARTIAL miss:disk_fill
+    exp_020: GT=mem_load+network_loss pred=['disk_fill', 'network_loss'] -> PARTIAL miss:mem_load
+    exp_021: GT=disk_burn+mem_load pred=['mem_load', 'cpu_fullload', 'disk_fill'] -> PARTIAL miss:disk_burn
+    exp_022: GT=disk_fill+mem_load pred=['mem_load', 'cpu_fullload', 'disk_burn'] -> PARTIAL miss:disk_fill
+    exp_023: GT=mem_load+network_loss pred=['mem_load', 'disk_fill'] -> PARTIAL miss:network_loss
+    exp_024: GT=disk_burn+mem_load pred=['mem_load', 'cpu_fullload', 'disk_burn'] -> FULL
+    exp_025: GT=disk_fill+mem_load pred=['mem_load', 'cpu_fullload', 'disk_fill'] -> FULL
+    exp_028: GT=disk_fill+network_loss pred=['mem_load', 'disk_fill'] -> PARTIAL miss:network_loss
+    exp_029: GT=disk_burn+disk_fill pred=['mem_load', 'disk_fill', 'cpu_fullload'] -> PARTIAL miss:disk_burn
+
+======================================================================
+SECTION 5: MISDIAGNOSIS PATTERNS
+======================================================================
+  2x mem_load -> disk_burn [exp_002, exp_015]
+  1x mem_load -> disk_fill [exp_003]
+  1x network_loss -> mem_load [exp_005]
+  1x disk_burn -> cpu_fullload [exp_006]
+  1x disk_fill -> mem_load [exp_007]
+  1x cpu_fullload+disk_burn -> mem_load [exp_012]
+  1x cpu_fullload+disk_fill -> mem_load [exp_013]
+  1x mem_load+network_loss -> disk_fill [exp_020]
+  1x network_loss -> disk_fill [exp_026]
+  1x disk_burn -> mem_load [exp_027]
+  1x disk_fill+network_loss -> mem_load [exp_028]
+  1x disk_burn+disk_fill -> mem_load [exp_029]
+FP Frequency:
+  disk_fill: 12
+  cpu_fullload: 12
+  disk_burn: 9
+  mem_load: 9
+  network_loss: 6
+
+======================================================================
+SECTION 6: TRIAGE ACCURACY
+======================================================================
+  Overall: 11/29 (37.9%)
+    cpu          3/7 (43%)
+    disk         5/13 (38%)
+    memory       8/18 (44%)
+    network      4/7 (57%)
+  Errors:
+    exp_002: GT_sub={'memory'} -> lead=cpu (conf=0.00)
+    exp_003: GT_sub={'memory'} -> lead=disk (conf=0.00)
+    exp_004: GT_sub={'memory'} -> lead=network (conf=0.00)
+    exp_006: GT_sub={'disk'} -> lead=network (conf=0.00)
+    exp_007: GT_sub={'disk'} -> lead=memory (conf=0.00)
+    exp_008: GT_sub={'cpu', 'memory'} -> lead=disk (conf=0.00)
+    exp_010: GT_sub={'cpu', 'memory'} -> lead=network (conf=0.00)
+    exp_011: GT_sub={'cpu', 'network'} -> lead=disk (conf=0.00)
+    exp_012: GT_sub={'cpu', 'disk'} -> lead=network (conf=0.00)
+    exp_014: GT_sub={'memory'} -> lead=network (conf=0.00)
+    exp_015: GT_sub={'memory'} -> lead=disk (conf=0.00)
+    exp_019: GT_sub={'memory'} -> lead=disk (conf=0.00)
+    exp_022: GT_sub={'disk', 'memory'} -> lead=network (conf=0.00)
+    exp_025: GT_sub={'disk', 'memory'} -> lead=cpu (conf=0.00)
+    exp_026: GT_sub={'network'} -> lead=memory (conf=0.00)
+    exp_027: GT_sub={'disk'} -> lead=memory (conf=0.00)
+    exp_028: GT_sub={'network', 'disk'} -> lead=cpu (conf=0.00)
+    exp_029: GT_sub={'disk'} -> lead=cpu (conf=0.00)
+
+======================================================================
+SECTION 7: HYPOTHESIS QUALITY
+======================================================================
+  ALL GT in hyps:  21/29 (72%)
+  SOME GT in hyps: 6/29 (21%)
+  NO GT in hyps:   2/29 (7%)
+  Avg hyps: 3.7, min=3, max=4
+  FP Hyps:
+    cpu_fullload: 18
+    disk_fill: 14
+    disk_burn: 13
+    network_loss: 13
+    mem_load: 11
+    network_delay: 1
+  exp_001: GT=cpu_fullload hyps=['cpu_fullload(0.90)', 'mem_load(0.65)', 'disk_burn(0.50)'] -> ALL
+  exp_002: GT=mem_load hyps=['disk_fill(0.70)', 'mem_load(0.60)', 'cpu_fullload(0.55)', 'disk_burn(0.40)'] -> ALL
+  exp_003: GT=mem_load hyps=['disk_fill(0.90)', 'mem_load(0.70)', 'cpu_fullload(0.60)', 'disk_burn(0.55)'] -> ALL
+  exp_004: GT=mem_load hyps=['disk_fill(0.70)', 'mem_load(0.65)', 'network_loss(0.55)', 'cpu_fullload(0.45)'] -> ALL
+  exp_005: GT=network_loss hyps=['network_loss(0.70)', 'cpu_fullload(0.55)', 'disk_burn(0.45)', 'mem_load(0.35)'] -> ALL
+  exp_006: GT=disk_burn hyps=['cpu_fullload(0.70)', 'mem_load(0.60)', 'network_loss(0.55)', 'disk_burn(0.40)'] -> ALL
+  exp_007: GT=disk_fill hyps=['mem_load(0.75)', 'disk_burn(0.50)', 'network_loss(0.40)'] -> MISS
+  exp_008: GT=cpu_fullload+mem_load hyps=['disk_fill(0.75)', 'cpu_fullload(0.60)', 'mem_load(0.50)', 'network_loss(0.40)'] -> ALL
+  exp_009: GT=cpu_fullload+mem_load hyps=['disk_fill(0.70)', 'mem_load(0.60)', 'cpu_fullload(0.55)', 'network_loss(0.40)'] -> ALL
+  exp_010: GT=cpu_fullload+mem_load hyps=['cpu_fullload(0.70)', 'mem_load(0.60)', 'network_loss(0.55)', 'disk_burn(0.40)'] -> ALL
+  exp_011: GT=cpu_fullload+network_loss hyps=['disk_fill(0.75)', 'mem_load(0.60)', 'cpu_fullload(0.50)', 'network_loss(0.40)'] -> ALL
+  exp_012: GT=cpu_fullload+disk_burn hyps=['mem_load(0.70)', 'network_loss(0.65)', 'disk_burn(0.50)'] -> PART
+  exp_013: GT=cpu_fullload+disk_fill hyps=['disk_burn(0.70)', 'mem_load(0.55)', 'disk_fill(0.45)'] -> PART
+  exp_014: GT=mem_load hyps=['mem_load(0.70)', 'disk_fill(0.60)', 'cpu_fullload(0.50)', 'network_delay(0.45)'] -> ALL
+  exp_015: GT=mem_load hyps=['disk_burn(0.75)', 'mem_load(0.60)', 'disk_burn(0.50)'] -> ALL
+  exp_016: GT=mem_load+network_loss hyps=['network_loss(0.75)', 'cpu_fullload(0.60)', 'mem_load(0.50)'] -> ALL
+  exp_017: GT=disk_burn+mem_load hyps=['disk_fill(0.75)', 'mem_load(0.60)', 'network_loss(0.50)'] -> PART
+  exp_018: GT=disk_fill+mem_load hyps=['mem_load(0.65)', 'network_loss(0.50)', 'disk_burn(0.40)', 'cpu_fullload(0.30)'] -> PART
+  exp_019: GT=mem_load hyps=['disk_fill(0.75)', 'mem_load(0.60)', 'cpu_fullload(0.50)', 'disk_burn(0.45)'] -> ALL
+  exp_020: GT=mem_load+network_loss hyps=['network_loss(0.65)', 'disk_fill(0.55)', 'cpu_fullload(0.45)', 'mem_load(0.40)'] -> ALL
+  exp_021: GT=disk_burn+mem_load hyps=['mem_load(0.75)', 'cpu_fullload(0.60)', 'disk_fill(0.50)', 'disk_burn(0.40)'] -> ALL
+  exp_022: GT=disk_fill+mem_load hyps=['network_loss(0.65)', 'disk_burn(0.55)', 'cpu_fullload(0.50)', 'mem_load(0.45)'] -> PART
+  exp_023: GT=mem_load+network_loss hyps=['disk_fill(0.70)', 'mem_load(0.60)', 'network_loss(0.55)', 'disk_burn(0.40)'] -> ALL
+  exp_024: GT=disk_burn+mem_load hyps=['mem_load(0.70)', 'cpu_fullload(0.60)', 'disk_burn(0.55)', 'network_loss(0.50)'] -> ALL
+  exp_025: GT=disk_fill+mem_load hyps=['cpu_fullload(0.70)', 'disk_fill(0.60)', 'mem_load(0.55)'] -> ALL
+  exp_026: GT=network_loss hyps=['mem_load(0.65)', 'disk_fill(0.50)', 'cpu_fullload(0.40)', 'network_loss(0.30)'] -> ALL
+  exp_027: GT=disk_burn hyps=['mem_load(0.70)', 'disk_fill(0.60)', 'cpu_fullload(0.55)', 'network_loss(0.45)'] -> MISS
+  exp_028: GT=disk_fill+network_loss hyps=['disk_fill(0.80)', 'mem_load(0.70)', 'network_loss(0.60)', 'cpu_fullload(0.55)'] -> ALL
+  exp_029: GT=disk_burn+disk_fill hyps=['disk_fill(0.70)', 'cpu_fullload(0.65)', 'mem_load(0.50)', 'network_loss(0.40)'] -> PART
+
+======================================================================
+SECTION 8: EVIDENCE QUALITY
+======================================================================
+  Total: 183, With data: 183 (100%), No data: 0 (0%)
+  Avg/exp: 6.3, min=1, max=14
+  Type distribution:
+    neutral: 96
+    supporting: 87
+  Avg supporting: 3.0
+  Avg neutral: 3.3
+  Avg contra: 0.0
+
+======================================================================
+SECTION 9: ROUNDS & BUDGET
+======================================================================
+  Rounds: avg=1.0, min=1, max=1
+  Steps: avg=9.3, min=4, max=15
+
+DONE

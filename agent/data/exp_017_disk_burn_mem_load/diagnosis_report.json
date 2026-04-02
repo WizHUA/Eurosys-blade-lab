@@ -1,0 +1,50 @@
+{
+  "run_id": "exp_017_Full",
+  "anomaly_summary": "系统磁盘空间使用率高达80.39%，导致磁盘I/O性能显著下降，影响了整体系统性能。",
+  "diagnosis_type": "single_fault",
+  "root_causes": [
+    {
+      "cause": "磁盘空间不足导致磁盘 I/O 性能下降",
+      "fault_type": "disk_fill",
+      "confidence": 0.85,
+      "evidence_ids": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "e10",
+        "e11",
+        "e12",
+        "e13",
+        "e14",
+        "e15"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.12161509778559842,
+    "main_tools_used": [
+      "MetricQueryTool x15"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 15,
+    "main_iterations": 16,
+    "audit_iterations": 1,
+    "total_tokens_in": 50166,
+    "total_tokens_out": 4809,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:28:23.767774"
+}

@@ -1,0 +1,78 @@
+{
+  "run_id": "exp_019_Full",
+  "anomaly_summary": "系统出现复合故障，主要表现为内存压力过大导致频繁页面交换和页面错误，同时CPU负载过高和磁盘I/O过载进一步加剧了系统性能问题。",
+  "diagnosis_type": "composite_fault",
+  "root_causes": [
+    {
+      "cause": "内存压力过大，导致频繁的页面交换和页面错误",
+      "fault_type": "mem_load",
+      "confidence": 0.95,
+      "evidence_ids": [
+        "e2",
+        "e3",
+        "e5",
+        "e8",
+        "e9"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "CPU 负载过高，可能导致系统响应缓慢",
+      "fault_type": "cpu_fullload",
+      "confidence": 0.5,
+      "evidence_ids": [
+        "e6"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘 I/O 过载，可能导致系统 I/O 阻塞",
+      "fault_type": "disk_burn",
+      "confidence": 0.3,
+      "evidence_ids": [
+        "e1",
+        "e4",
+        "e7"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    },
+    {
+      "cause": "磁盘空间持续减少，可能导致系统无法写入新数据",
+      "fault_type": "disk_fill",
+      "confidence": 0.1,
+      "evidence_ids": [
+        "e1",
+        "e4"
+      ],
+      "counter_evidence_ids": [],
+      "fpl_pattern_id": null,
+      "affected_nodes": []
+    }
+  ],
+  "derived_symptoms": [],
+  "solutions": [],
+  "uncertainties": [
+    "磁盘空间持续减少的影响尚不明确，需进一步监控磁盘使用情况。"
+  ],
+  "trace_summary": {
+    "triage_leading_subsystem": "disk",
+    "triage_confidence": 0.14452365825997895,
+    "main_tools_used": [
+      "MetricQueryTool x9"
+    ],
+    "audit_tools_used": [],
+    "total_tool_calls": 9,
+    "main_iterations": 10,
+    "audit_iterations": 1,
+    "total_tokens_in": 31823,
+    "total_tokens_out": 3948,
+    "diagnosis_duration_sec": null
+  },
+  "generated_at": "2026-04-02T20:32:36.244707"
+}

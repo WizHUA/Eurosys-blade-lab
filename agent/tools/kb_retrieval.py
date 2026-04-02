@@ -42,19 +42,32 @@ class KBRetrievalTool(BaseTool):
             subsystem = args.get("subsystem", "")
             anomaly_metrics = set(args.get("anomaly_metrics", []))
 
+            # "filesystem" is a sub-domain of "disk"; treat as partial match when querying "disk"
+            _SUBSYSTEM_ALIASES: dict[str, set[str]] = {
+                "disk": {"disk", "filesystem"},
+            }
+
             hits: list[dict[str, Any]] = []
             for rule in self.fpl_entries:
                 sig = rule.get("symptom_signature", {})
                 rule_sub = sig.get("leading_subsystem", "")
                 required = set(sig.get("required_metrics", []))
+                optional = set(sig.get("optional_metrics", []))
 
-                sub_score = 1.0 if subsystem and subsystem == rule_sub else 0.0
-                overlap = len(required & anomaly_metrics)
-                overlap_score = overlap / max(len(required), 1)
+                # Sub-system score: 1.0 for exact match, 0.5 for alias match
+                if subsystem and subsystem == rule_sub:
+                    sub_score = 1.0
+                elif subsystem and rule_sub in _SUBSYSTEM_ALIASES.get(subsystem, set()):
+                    sub_score = 0.5
+                else:
+                    sub_score = 0.0
+
+                req_overlap = len(required & anomaly_metrics) / max(len(required), 1)
+                opt_overlap = len(optional & anomaly_metrics) / max(len(optional), 1)
                 conf = float(rule.get("confidence", 0.0))
 
-                # Weighted match score
-                match_score = 0.4 * sub_score + 0.4 * overlap_score + 0.2 * conf
+                # Weighted match score: required overlap + optional overlap (lower weight)
+                match_score = 0.4 * sub_score + 0.3 * req_overlap + 0.1 * opt_overlap + 0.2 * conf
                 hits.append(
                     {
                         "pattern_id": rule.get("pattern_id", "unknown"),

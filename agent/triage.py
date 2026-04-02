@@ -80,6 +80,13 @@ SUBSYSTEM_GROUP: dict[str, str] = {
     "entropy": "system", "process": "system", "processes": "system",
 }
 
+CORE_SUBSYSTEM_METRICS: dict[str, list[str]] = {
+    "cpu": ["cpu_usage_percent", "load_1min", "cpu_user_percent", "context_switches_rate"],
+    "memory": ["memory_usage_percent", "anon_memory_percent", "memory_available_bytes", "page_faults_rate"],
+    "network": ["network_transmit_drop_rate", "network_receive_drop_rate", "network_transmit_rate_bytes_per_sec", "network_receive_packets_rate"],
+    "disk": ["filesystem_avail_bytes", "filesystem_free_bytes", "disk_io_usage_percent", "disk_read_iops", "disk_write_iops"],
+}
+
 
 def _resolve_subsystem(metric_name: str, metric_kb: list[dict]) -> str:
     """Resolve metric name to subsystem. KB takes priority, then prefix map."""
@@ -256,6 +263,146 @@ def _detect_onset(
     return t_onset, change_point
 
 
+def _build_top_metrics(
+    candidates: list[dict],
+    df: pd.DataFrame,
+    metric_kb: list[dict],
+    z_threshold: float,
+) -> list[TopMetric]:
+    """Build TopMetric models from scored candidate metrics."""
+    metrics_with_onset: list[tuple[dict, datetime, datetime | None]] = []
+    for cand in candidates:
+        t_onset, change_point = _detect_onset(
+            df[cand["metric"]], cand["z_scores"], z_threshold
+        )
+        metrics_with_onset.append((cand, t_onset, change_point))
+
+    metrics_with_onset.sort(key=lambda x: x[1])
+
+    top_metrics: list[TopMetric] = []
+    for rank, (cand, t_onset, change_point) in enumerate(metrics_with_onset, start=1):
+        subsystem = _resolve_subsystem(cand["metric"], metric_kb)
+        top_metrics.append(
+            TopMetric(
+                metric=cand["metric"],
+                subsystem=subsystem,
+                direction=cand["direction"],
+                score=cand["score"],
+                t_onset=t_onset,
+                onset_rank=rank,
+                change_point=change_point,
+            )
+        )
+
+    top_metrics.sort(key=lambda m: m.score, reverse=True)
+    return top_metrics
+
+
+def _ensure_metric_coverage(
+    df: pd.DataFrame,
+    metric_kb: list[dict],
+    top_metrics: list[TopMetric],
+    leading_subsystem: str,
+    subsystem_scores: dict[str, float],
+    config: TriageConfig,
+) -> list[TopMetric]:
+    """Ensure leading and near-leading subsystems retain direct anomaly signals.
+
+    Pure Top-K ranking can hide direct CPU/Memory metrics behind many secondary
+    drops. That hurts downstream hypothesis generation and recall. This helper
+    supplements a small number of additional metrics from the leading subsystem.
+    """
+    if not top_metrics:
+        return top_metrics
+
+    grouped_scores: dict[str, float] = {}
+    grouped_counts: dict[str, int] = {}
+    for subsystem, score in subsystem_scores.items():
+        group = SUBSYSTEM_GROUP.get(subsystem, subsystem)
+        if group not in COMPETING_SUBSYSTEMS:
+            continue
+        grouped_scores[group] = grouped_scores.get(group, 0.0) + score
+        grouped_counts[group] = grouped_counts.get(group, 0) + 1
+    for group in grouped_scores:
+        grouped_scores[group] /= grouped_counts[group]
+
+    target_groups = [leading_subsystem]
+
+    def _group_of(metric: TopMetric) -> str:
+        return SUBSYSTEM_GROUP.get(metric.subsystem, metric.subsystem)
+
+    def _count_in_group(metrics: list[TopMetric], group: str) -> int:
+        return sum(1 for metric in metrics if _group_of(metric) == group)
+
+    if all(
+        _count_in_group(top_metrics, group) >= (2 if group == leading_subsystem else 1)
+        for group in target_groups
+    ):
+        return top_metrics
+
+    all_candidates = _zscore_anomaly(
+        df,
+        n_baseline=config.baseline_window_points,
+        z_threshold=config.z_score_threshold,
+        persistence_ratio=config.persistence_ratio,
+    )
+    kb_metric_names = {entry.get("name") for entry in metric_kb if entry.get("name")}
+    core_metric_priority = {
+        metric: idx
+        for idx, metric in enumerate(CORE_SUBSYSTEM_METRICS.get(leading_subsystem, []))
+    }
+    ordered_candidates = sorted(
+        all_candidates,
+        key=lambda cand: (
+            core_metric_priority.get(cand["metric"], 10_000),
+            cand["metric"] not in kb_metric_names,
+            -cand["score"],
+        ),
+    )
+    selected_metrics = {metric.metric for metric in top_metrics}
+    extras: list[dict] = []
+
+    for cand in ordered_candidates:
+        if cand["metric"] in selected_metrics:
+            continue
+        subsystem = _resolve_subsystem(cand["metric"], metric_kb)
+        group = SUBSYSTEM_GROUP.get(subsystem, subsystem)
+        if group not in target_groups:
+            continue
+        desired_count = 2 if group == leading_subsystem else 1
+        if _count_in_group(top_metrics, group) + sum(
+            1
+            for extra in extras
+            if SUBSYSTEM_GROUP.get(_resolve_subsystem(extra["metric"], metric_kb), _resolve_subsystem(extra["metric"], metric_kb)) == group
+        ) >= desired_count:
+            continue
+        extras.append(cand)
+        if len(extras) >= 4:
+            break
+
+    if not extras:
+        return top_metrics
+
+    extra_metrics = _build_top_metrics(
+        extras,
+        df,
+        metric_kb,
+        config.z_score_threshold,
+    )
+    combined = top_metrics + extra_metrics
+    sorted_by_onset = sorted(combined, key=lambda metric: metric.t_onset)
+    onset_ranks = {
+        metric.metric: rank
+        for rank, metric in enumerate(sorted_by_onset, start=1)
+    }
+    rebuilt = [
+        metric.model_copy(update={"onset_rank": onset_ranks[metric.metric]})
+        for metric in combined
+    ]
+    rebuilt.sort(key=lambda metric: metric.score, reverse=True)
+    return rebuilt
+
+
 # ===========================================================================
 # Step 1: 异常指标筛选
 # ===========================================================================
@@ -275,36 +422,12 @@ def _step1_anomaly_scoring(
 
     # Take top-K
     top_candidates = candidates[: config.top_k]
-
-    # Detect onset and build TopMetric objects
-    metrics_with_onset: list[tuple[dict, datetime, datetime | None]] = []
-    for cand in top_candidates:
-        t_onset, change_point = _detect_onset(
-            df[cand["metric"]], cand["z_scores"], config.z_score_threshold
-        )
-        metrics_with_onset.append((cand, t_onset, change_point))
-
-    # Sort by t_onset for onset_rank assignment
-    metrics_with_onset.sort(key=lambda x: x[1])
-
-    top_metrics: list[TopMetric] = []
-    for rank, (cand, t_onset, change_point) in enumerate(metrics_with_onset, start=1):
-        subsystem = _resolve_subsystem(cand["metric"], metric_kb)
-        top_metrics.append(
-            TopMetric(
-                metric=cand["metric"],
-                subsystem=subsystem,
-                direction=cand["direction"],
-                score=cand["score"],
-                t_onset=t_onset,
-                onset_rank=rank,
-                change_point=change_point,
-            )
-        )
-
-    # Return sorted by score descending (original order)
-    top_metrics.sort(key=lambda m: m.score, reverse=True)
-    return top_metrics
+    return _build_top_metrics(
+        top_candidates,
+        df,
+        metric_kb,
+        config.z_score_threshold,
+    )
 
 
 # ===========================================================================
@@ -435,7 +558,7 @@ def _step3_build_context(
     # triage_confidence
     if top_metrics:
         top_score = top_metrics[0].score
-        signal_ratio = len(top_metrics) / config.top_k
+        signal_ratio = min(1.0, len(top_metrics) / config.top_k)
         triage_confidence = min(1.0, top_score / 10.0) * signal_ratio
         triage_confidence = min(1.0, max(0.0, triage_confidence))
     else:
@@ -545,6 +668,19 @@ def run_triage(
     causal_order, subsystem_scores, leading_subsystem = _step2_temporal_ordering(
         top_metrics, ablation
     )
+
+    # Supplement direct signals for the leading subsystem so that downstream
+    # diagnosis sees at least one direct root-cause metric. This augmentation is
+    # for context only and must not change the deterministic leading decision.
+    top_metrics = _ensure_metric_coverage(
+        df,
+        metric_kb,
+        top_metrics,
+        leading_subsystem,
+        subsystem_scores,
+        config,
+    )
+    causal_order = [metric.metric for metric in sorted(top_metrics, key=lambda metric: metric.t_onset)]
     logger.info("[Triage] Leading subsystem: %s", leading_subsystem)
 
     # Step 3: Build context
